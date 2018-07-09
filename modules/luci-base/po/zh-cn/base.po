@@ -1408,6 +1408,9 @@ msgstr "主机到期超时"
 msgid "Host-<abbr title=\"Internet Protocol Address\">IP</abbr> or Network"
 msgstr "主机 <abbr title=\"Internet Protocol Address\">IP</abbr> 或网络"
 
+msgid "Host-Uniq tag content"
+msgstr "Host-Uniq 标签内容"
+
 msgid "Hostname"
 msgstr "主机名"
 
@@ -2611,6 +2614,9 @@ msgstr "Radius 认证密钥"
 
 msgid "Radius-Authentication-Server"
 msgstr "Radius 认证服务器"
+
+msgid "Raw hex-encoded bytes. Leave empty unless your ISP require this"
+msgstr "原始 16 进制编码的字节。除非您的运营商要求，否则请留空"
 
 msgid ""
 "Read <code>/etc/ethers</code> to configure the <abbr title=\"Dynamic Host "
@@ -3876,7 +3882,7 @@ msgid "overlay"
 msgstr "覆盖"
 
 msgid "random"
-msgstr ""
+msgstr "随机"
 
 msgid "relay mode"
 msgstr "中继模式"
@@ -4111,9 +4117,6 @@ msgstr "已标记"
 
 msgid "untagged"
 msgstr "未标记"
-
-msgid "Logo"
-msgstr "图标"
 
 msgid "Compatible Mode"
 msgstr "兼容模式"
