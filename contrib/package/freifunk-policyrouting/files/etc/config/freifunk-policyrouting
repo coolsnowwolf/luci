@@ -1,0 +1,7 @@
+
+config 'settings' 'pr'
+	option 'enable' '0'
+	option 'strict' '1'
+        option 'fallback' '1'
+	option 'zones' ''
+
