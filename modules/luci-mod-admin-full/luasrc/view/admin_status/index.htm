@@ -753,6 +753,7 @@
 	</table>
 </fieldset>
 
+<% if has_ipv6 then %>
 <fieldset class="cbi-section" style="display:none">
 	<legend><%:DHCPv6 Leases%></legend>
 
@@ -768,6 +769,7 @@
 		</tr>
 	</table>
 </fieldset>
+<% end %>
 <% end %>
 
 <% if has_dsl then %>
