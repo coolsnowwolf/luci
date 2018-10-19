@@ -642,7 +642,7 @@
 
 			if (e = document.getElementById('memtotal'))
 				e.innerHTML = progressbar(
-					Math.floor(((info.memory.free + info.memory.buffered + info.memory.shared) / 1048576) + (info.memcached / 1024)) + " <%:MB%>",
+					Math.floor(((info.memory.free + info.memory.buffered) / 1048576) + (info.memcached / 1024)) + " <%:MB%>",
 					Math.floor(info.memory.total / 1048576) + " <%:MB%>"
 				);
 
