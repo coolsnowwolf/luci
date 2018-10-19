@@ -678,7 +678,8 @@
 
 	<table width="100%" cellspacing="10">
 		<tr><td width="33%"><%:Hostname%></td><td><%=luci.sys.hostname() or "?"%></td></tr>
-		<tr><td width="33%"><%:Model%></td><td><%=pcdata(boardinfo.model or boardinfo.system or "?")%></td></tr>
+		<tr><td width="33%"><%:Model%></td><td><%=pcdata(boardinfo.model or "?")%></td></tr>
+		<tr><td width="33%"><%:Architecture%></td><td><%=pcdata(boardinfo.system or "?")%></td></tr>
 		<tr><td width="33%"><%:Firmware Version%></td><td>
 			<%=pcdata(ver.distname)%> <%=pcdata(ver.distversion)%> /
 			<%=pcdata(ver.luciname)%> (<%=pcdata(ver.luciversion)%>)
