@@ -545,7 +545,7 @@ msgid "Broadcom BCM%04x 802.11 Wireless Controller"
 msgstr "Broadcom BCM%04x 802.11 无线控制器"
 
 msgid "Buffered"
-msgstr "已缓冲"
+msgstr "已缓存"
 
 msgid ""
 "Build/distribution specific feed definitions. This file will NOT be "
@@ -3841,9 +3841,6 @@ msgstr "无状态的"
 msgid "stateless + stateful"
 msgstr "无状态的 + 有状态的"
 
-msgid "tagged"
-msgstr "已标记"
-
 msgid "time units (TUs / 1.024 ms) [1000-65535]"
 msgstr "时间单位（TUs / 1.024ms）[1000-65535]"
 
@@ -3858,9 +3855,6 @@ msgstr "未指定"
 
 msgid "unspecified -or- create:"
 msgstr "不指定或新建："
-
-msgid "untagged"
-msgstr "未标记"
 
 msgid "yes"
 msgstr "是"
