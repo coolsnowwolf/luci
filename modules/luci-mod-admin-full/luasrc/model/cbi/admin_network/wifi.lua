@@ -492,7 +492,7 @@ if hwtype == "mac80211" then
 	ifname = s:taboption("advanced", Value, "ifname", translate("Interface name"), translate("Override default interface name"))
 	ifname.optional = true
 
-  disassoc_low_ack = s:taboption("general", Flag, "disassoc_low_ack", translate("Disassociate On Low Acknowledgement"),"Allow AP mode to disconnect STAs based on low ACK condition")
+  disassoc_low_ack = s:taboption("general", Flag, "disassoc_low_ack", translate("Disassociate On Low Acknowledgement"),translate("Allow AP mode to disconnect STAs based on low ACK condition"))
   disassoc_low_ack.default = disassoc_low_ack.enabled
 end
 
