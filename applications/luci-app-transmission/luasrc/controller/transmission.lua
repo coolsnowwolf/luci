@@ -7,8 +7,10 @@ function index()
 	if not nixio.fs.access("/etc/config/transmission") then
 		return
 	end
+	
+	entry({"admin", "nas"}, firstchild(), "NAS", 44).dependent = false
 
-	local page = entry({"admin", "services", "transmission"}, cbi("transmission"), _("Transmission"))
+	local page = entry({"admin", "nas", "transmission"}, cbi("transmission"), _("Transmission"))
 	page.dependent = true
 
 end
