@@ -724,7 +724,6 @@ form.inline + form.inline,
     word-wrap: break-word;
     padding-top: 0.6rem;
     width: 23rem;
-    float: left;
     text-align: right;
     padding-right: 2rem;
     display: table-cell;
