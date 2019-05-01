@@ -219,3 +219,6 @@ msgstr "单位 B/s, 您可以在数字后跟上 K 或 M。"
 
 #~ msgid "General settings"
 #~ msgstr "基本设置"
+
+msgid "Open AriaNg"
+msgstr "打开 AriaNg"

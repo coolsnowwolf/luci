@@ -1,5 +1,5 @@
 <script type="text/javascript">//<![CDATA[
-XHR.poll(5, '<%=luci.dispatcher.build_url("admin/services/aria2/status")%>', null,
+XHR.poll(5, '<%=luci.dispatcher.build_url("admin/nas/aria2/status")%>', null,
 	function(x, data) {
 		var tb = document.getElementById('aria2_status');
 		if (data && tb) {
@@ -10,6 +10,9 @@ XHR.poll(5, '<%=luci.dispatcher.build_url("admin/services/aria2/status")%>', nul
 				}
 				if (data.webui) {
 					links += '<input class="cbi-button mar-10" type="button" value="<%:Open WebUI-Aria2%>" onclick="openWebUI(\'webui-aria2\');" />';
+				}
+				if (data.ariang) {
+					links += '<input class="cbi-button mar-10" type="button" value="<%:Open AriaNg%>" onclick="openWebUI(\'ariang\');" />';
 				}
 				tb.innerHTML = links;
 			} else {
