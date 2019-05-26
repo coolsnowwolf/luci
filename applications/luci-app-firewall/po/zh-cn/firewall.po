@@ -121,6 +121,9 @@ msgstr "启用 NAT 环回"
 msgid "Enable SYN-flood protection"
 msgstr "启用 SYN-flood 防御"
 
+msgid "Enable FullCone NAT"
+msgstr "启用FullCone-NAT"
+
 msgid "Enable logging on this zone"
 msgstr "启用此区域的日志记录"
 
