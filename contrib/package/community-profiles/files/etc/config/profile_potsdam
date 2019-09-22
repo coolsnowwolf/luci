@@ -1,7 +1,7 @@
 config 'community' 'profile'
 	option 'name' 'Freifunk Potsdam'
 	option 'homepage' 'http://potsdam.freifunk.net'
-	option 'ssid' 'freifunk-potsdam.de'
+	option 'ssid' 'Freifunk-Potsdam-XXX-YYY'
 	option 'mesh_network' '10.22.0.0/16'
 	option 'splash_network' '192.168.22.0/24'
 	option 'splash_prefix' '24'
@@ -11,7 +11,7 @@ config 'community' 'profile'
 
 config 'defaults' 'interface'
 	option 'netmask' '255.255.0.0'
-	option 'dns' '85.214.20.141 194.150.168.168'
+	option 'dns' '85.214.20.141 213.73.91.35 194.150.168.168'
 	option 'delegate' '0'
 
 config 'defaults' 'wifi_device'

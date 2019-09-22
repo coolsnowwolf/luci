@@ -5,8 +5,8 @@
 module("luci.controller.admin.uci", package.seeall)
 
 function index()
-	local redir = luci.http.formvalue("redir", true)
-		or table.concat(luci.dispatcher.context.request, "/")
+	local redir = luci.http.formvalue("redir", true) or
+	  luci.dispatcher.build_url(unpack(luci.dispatcher.context.request))
 
 	entry({"admin", "uci"}, nil, _("Configuration"))
 	entry({"admin", "uci", "changes"}, call("action_changes"), _("Changes"), 40).query = {redir=redir}

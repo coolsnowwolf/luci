@@ -12,9 +12,6 @@ msgstr ""
 "10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.0.6\n"
 
-msgid "%.1f dB"
-msgstr ""
-
 msgid "%s is untagged in multiple VLANs!"
 msgstr ""
 
@@ -145,9 +142,6 @@ msgstr ""
 "<abbr title=\"Media Access Control — управління доступом до носія\">MAC</"
 "abbr>-адреса"
 
-msgid "<abbr title=\"The DHCP Unique Identifier\">DUID</abbr>"
-msgstr ""
-
 msgid ""
 "<abbr title=\"maximal\">Max.</abbr> <abbr title=\"Dynamic Host Configuration "
 "Protocol\">DHCP</abbr> leases"
@@ -236,6 +230,9 @@ msgstr "Концентратор доступу"
 msgid "Access Point"
 msgstr "Точка доступу"
 
+msgid "Action"
+msgstr "Дія"
+
 msgid "Actions"
 msgstr "Дії"
 
@@ -308,9 +305,6 @@ msgstr ""
 
 msgid "Allow all except listed"
 msgstr "Дозволити всі, крім зазначених"
-
-msgid "Allow legacy 802.11b rates"
-msgstr ""
 
 msgid "Allow listed only"
 msgstr "Дозволити тільки зазначені"
@@ -583,6 +577,9 @@ msgid ""
 "preserved in any sysupgrade."
 msgstr ""
 
+msgid "Buttons"
+msgstr "Кнопки"
+
 msgid "CA certificate; if empty it will be saved after the first connection."
 msgstr ""
 
@@ -613,7 +610,7 @@ msgstr "Канал"
 msgid "Check"
 msgstr "Перевірити"
 
-msgid "Check filesystems before mount"
+msgid "Check fileystems before mount"
 msgstr ""
 
 msgid "Check this option to delete the existing networks from this radio."
@@ -679,13 +676,6 @@ msgstr "Команда"
 
 msgid "Common Configuration"
 msgstr "Загальна конфігурація"
-
-msgid ""
-"Complicates key reinstallation attacks on the client side by disabling "
-"retransmission of EAPOL-Key frames that are used to install keys. This "
-"workaround might cause interoperability issues and reduced robustness of key "
-"negotiation especially in environments with heavy traffic load."
-msgstr ""
 
 msgid "Configuration"
 msgstr "Конфігурація"
@@ -753,11 +743,6 @@ msgid ""
 msgstr ""
 
 msgid "Custom feeds"
-msgstr ""
-
-msgid ""
-"Custom files (certificates, scripts) may remain on the system. To prevent "
-"this, perform a factory-reset first."
 msgstr ""
 
 msgid ""
@@ -982,9 +967,6 @@ msgstr "Завантажити та інсталювати пакети"
 msgid "Download backup"
 msgstr "Завантажити резервну копію"
 
-msgid "Downstream SNR offset"
-msgstr ""
-
 msgid "Dropbear Instance"
 msgstr "Реалізація Dropbear"
 
@@ -1039,11 +1021,6 @@ msgstr "Аварійний"
 msgid "Enable"
 msgstr "Увімкнути"
 
-msgid ""
-"Enable <abbr title=\"Internet Group Management Protocol\">IGMP</abbr> "
-"snooping"
-msgstr ""
-
 msgid "Enable <abbr title=\"Spanning Tree Protocol\">STP</abbr>"
 msgstr "Увімкнути <abbr title=\"Spanning Tree Protocol\">STP</abbr>"
 
@@ -1074,9 +1051,6 @@ msgstr "Увімкнути підтримку VLAN"
 msgid "Enable WPS pushbutton, requires WPA(2)-PSK"
 msgstr ""
 
-msgid "Enable key reinstallation (KRACK) countermeasures"
-msgstr ""
-
 msgid "Enable learning and aging"
 msgstr "Увімкнути learning та aging"
 
@@ -1100,9 +1074,6 @@ msgstr "Увімкнено/Вимкнено"
 
 msgid "Enabled"
 msgstr "Увімкнено"
-
-msgid "Enables IGMP snooping on this bridge"
-msgstr ""
 
 msgid ""
 "Enables fast roaming among access points that belong to the same Mobility "
@@ -1173,15 +1144,6 @@ msgid "External system log server protocol"
 msgstr ""
 
 msgid "Extra SSH command options"
-msgstr ""
-
-msgid "FT over DS"
-msgstr ""
-
-msgid "FT over the Air"
-msgstr ""
-
-msgid "FT protocol"
 msgstr ""
 
 msgid "File"
@@ -1285,9 +1247,6 @@ msgstr ""
 msgid "Forward broadcast traffic"
 msgstr "Спрямовувати широкомовний трафік"
 
-msgid "Forward mesh peer traffic"
-msgstr ""
-
 msgid "Forwarding mode"
 msgstr "Режим спрямовування"
 
@@ -1332,9 +1291,6 @@ msgstr ""
 msgid "Generate Config"
 msgstr ""
 
-msgid "Generate PMK locally"
-msgstr ""
-
 msgid "Generate archive"
 msgstr "Cтворити архів"
 
@@ -1370,6 +1326,9 @@ msgstr ""
 
 msgid "HT mode (802.11n)"
 msgstr ""
+
+msgid "Handler"
+msgstr "Обробник"
 
 msgid "Hang Up"
 msgstr "Призупинити"
@@ -1543,7 +1502,7 @@ msgstr "IPv6 через IPv4 (6to4)"
 msgid "Identity"
 msgstr "Ідентичність"
 
-msgid "If checked, 1DES is enabled"
+msgid "If checked, 1DES is enaled"
 msgstr ""
 
 msgid "If checked, encryption is disabled"
@@ -1976,6 +1935,9 @@ msgstr "Максимально допустимий розмір UDP-пакет�
 msgid "Maximum amount of seconds to wait for the modem to become ready"
 msgstr "Максимальний час очікування готовності модему (секунд)"
 
+msgid "Maximum hold time"
+msgstr "Максимальний час утримування"
+
 msgid ""
 "Maximum length of the name is 15 characters including the automatic protocol/"
 "bridge prefix (br-, 6in4-, pppoe- etc.)"
@@ -1993,11 +1955,11 @@ msgstr "Пам'ять"
 msgid "Memory usage (%)"
 msgstr "Використання пам'яті, %"
 
-msgid "Mesh Id"
-msgstr ""
-
 msgid "Metric"
 msgstr "Метрика"
+
+msgid "Minimum hold time"
+msgstr "Мінімальний час утримування"
 
 msgid "Mirror monitor port"
 msgstr ""
@@ -2203,9 +2165,6 @@ msgstr "Попередження"
 
 msgid "Nslookup"
 msgstr "DNS-запит"
-
-msgid "Number of cached DNS entries (max is 10000, 0 is no caching)"
-msgstr ""
 
 msgid "OK"
 msgstr "OK"
@@ -2450,6 +2409,9 @@ msgstr "Шлях до сертифікату клієнта"
 
 msgid "Path to Private Key"
 msgstr "Шлях до закритого ключа"
+
+msgid "Path to executable which handles the button event"
+msgstr "Шлях до програми, яка обробляє натискання кнопки"
 
 msgid "Path to inner CA-Certificate"
 msgstr ""
@@ -2989,9 +2951,6 @@ msgstr "Розмір"
 msgid "Size (.ipk)"
 msgstr ""
 
-msgid "Size of DNS query cache"
-msgstr ""
-
 msgid "Skip"
 msgstr "Пропустити"
 
@@ -3036,6 +2995,9 @@ msgstr "Джерело"
 
 msgid "Source routing"
 msgstr ""
+
+msgid "Specifies the button state to handle"
+msgstr "Визначає стан кнопки для обробки"
 
 msgid "Specifies the directory the device is attached to"
 msgstr "Визначає каталог, до якого приєднаний пристрій"
@@ -3142,9 +3104,6 @@ msgstr "Комутатор %q (%s)"
 
 msgid ""
 "Switch %q has an unknown topology - the VLAN settings might not be accurate."
-msgstr ""
-
-msgid "Switch Port Mask"
 msgstr ""
 
 msgid "Switch VLAN"
@@ -3410,10 +3369,10 @@ msgstr ""
 
 msgid ""
 "This is the local endpoint address assigned by the tunnel broker, it usually "
-"ends with <code>...:2/64</code>"
+"ends with <code>:2</code>"
 msgstr ""
 "Це локальна адреса кінцевої точки, присвоєна тунельним брокером, зазвичай "
-"закінчується на <code>...:2/64</code>"
+"закінчується на <code>:2</code>"
 
 msgid ""
 "This is the only <abbr title=\"Dynamic Host Configuration Protocol\">DHCP</"
@@ -3446,6 +3405,9 @@ msgid ""
 msgstr ""
 "У цьому списку наведені працюючі на даний момент системні процеси та їх "
 "статус."
+
+msgid "This page allows the configuration of custom button actions"
+msgstr "Ця сторінка дозволяє настроїти нетипові дії кнопки"
 
 msgid "This page gives an overview over currently active network connections."
 msgstr "Ця сторінка надає огляд поточних активних мережних підключень."
@@ -3633,9 +3595,9 @@ msgstr "Використовувати таблицю маршрутизації
 
 msgid ""
 "Use the <em>Add</em> Button to add a new lease entry. The <em>MAC-Address</"
-"em> identifies the host, the <em>IPv4-Address</em> specifies the fixed "
-"address to use, and the <em>Hostname</em> is assigned as a symbolic name to "
-"the requesting host. The optional <em>Lease time</em> can be used to set non-"
+"em> indentifies the host, the <em>IPv4-Address</em> specifies to the fixed "
+"address to use and the <em>Hostname</em> is assigned as symbolic name to the "
+"requesting host. The optional <em>Lease time</em> can be used to set non-"
 "standard host-specific lease time, e.g. 12h, 3d or infinite."
 msgstr ""
 "Використовуйте кнопку <em>Додати</em>, щоб додати новий запис оренди. "
@@ -3753,11 +3715,6 @@ msgid "Warning"
 msgstr "Застереження"
 
 msgid "Warning: There are unsaved changes that will get lost on reboot!"
-msgstr ""
-
-msgid ""
-"When using a PSK, the PMK can be generated locally without inter AP "
-"communications"
 msgstr ""
 
 msgid "Whether to create an IPv6 default route over the tunnel"
@@ -3941,9 +3898,6 @@ msgstr "відкрита"
 msgid "overlay"
 msgstr ""
 
-msgid "random"
-msgstr ""
-
 msgid "relay mode"
 msgstr ""
 
@@ -3988,30 +3942,6 @@ msgstr "так"
 
 msgid "« Back"
 msgstr "« Назад"
-
-#~ msgid "Action"
-#~ msgstr "Дія"
-
-#~ msgid "Buttons"
-#~ msgstr "Кнопки"
-
-#~ msgid "Handler"
-#~ msgstr "Обробник"
-
-#~ msgid "Maximum hold time"
-#~ msgstr "Максимальний час утримування"
-
-#~ msgid "Minimum hold time"
-#~ msgstr "Мінімальний час утримування"
-
-#~ msgid "Path to executable which handles the button event"
-#~ msgstr "Шлях до програми, яка обробляє натискання кнопки"
-
-#~ msgid "Specifies the button state to handle"
-#~ msgstr "Визначає стан кнопки для обробки"
-
-#~ msgid "This page allows the configuration of custom button actions"
-#~ msgstr "Ця сторінка дозволяє настроїти нетипові дії кнопки"
 
 #~ msgid "Leasetime"
 #~ msgstr "Час оренди"

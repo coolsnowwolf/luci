@@ -3,11 +3,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Last-Translator: Hsing-Wang Liao <kuoruan@gmail.com>\n"
 
-msgid "%.1f dB"
-msgstr ""
-
 msgid "%s is untagged in multiple VLANs!"
-msgstr "%s 在多个 VLAN 中均未标记！"
+msgstr "%s 在多个 VLAN 中均未关联！"
 
 msgid "(%d minute window, %d second interval)"
 msgstr "（最近 %d 分钟信息，每 %d 秒刷新）"
@@ -125,9 +122,6 @@ msgstr "<abbr title=\"Light Emitting Diode\">LED</abbr> 名称"
 msgid "<abbr title=\"Media Access Control\">MAC</abbr>-Address"
 msgstr "<abbr title=\"Media Access Control\">MAC</abbr> 地址"
 
-msgid "<abbr title=\"The DHCP Unique Identifier\">DUID</abbr>"
-msgstr ""
-
 msgid ""
 "<abbr title=\"maximal\">Max.</abbr> <abbr title=\"Dynamic Host Configuration "
 "Protocol\">DHCP</abbr> leases"
@@ -209,6 +203,9 @@ msgstr "接入集中器"
 msgid "Access Point"
 msgstr "接入点 AP"
 
+msgid "Action"
+msgstr "动作"
+
 msgid "Actions"
 msgstr "动作"
 
@@ -255,7 +252,7 @@ msgid "Address to access local relay bridge"
 msgstr "接入本地中继桥的地址"
 
 msgid "Administration"
-msgstr "管理权"
+msgstr "管理"
 
 msgid "Advanced Settings"
 msgstr "高级设置"
@@ -278,13 +275,10 @@ msgid "Allow <abbr title=\"Secure Shell\">SSH</abbr> password authentication"
 msgstr "允许 <abbr title=\"Secure Shell\">SSH</abbr> 密码验证"
 
 msgid "Allow all except listed"
-msgstr "仅允许列表外"
-
-msgid "Allow legacy 802.11b rates"
-msgstr "允许传统的 802.11b 速率"
+msgstr "黑名单"
 
 msgid "Allow listed only"
-msgstr "仅允许列表内"
+msgstr "白名单"
 
 msgid "Allow localhost"
 msgstr "允许本机"
@@ -408,7 +402,7 @@ msgid ""
 msgstr "将此十六进制子 ID 前缀分配给此接口"
 
 msgid "Associated Stations"
-msgstr "已连接站点"
+msgstr "已连接客户端"
 
 msgid "Auth Group"
 msgstr "认证组"
@@ -545,12 +539,15 @@ msgid "Broadcom BCM%04x 802.11 Wireless Controller"
 msgstr "Broadcom BCM%04x 802.11 无线控制器"
 
 msgid "Buffered"
-msgstr "已缓存"
+msgstr "已缓冲"
 
 msgid ""
 "Build/distribution specific feed definitions. This file will NOT be "
 "preserved in any sysupgrade."
 msgstr "由固件指定的软件源。此处的设置在任何系统升级中都不会被保留。"
+
+msgid "Buttons"
+msgstr "按键"
 
 msgid "CA certificate; if empty it will be saved after the first connection."
 msgstr "CA 证书，如果留空，则证书将在第一次连接后被保存。"
@@ -582,7 +579,7 @@ msgstr "信道"
 msgid "Check"
 msgstr "检查"
 
-msgid "Check filesystems before mount"
+msgid "Check fileystems before mount"
 msgstr "在挂载前检查文件系统"
 
 msgid "Check this option to delete the existing networks from this radio."
@@ -641,16 +638,6 @@ msgstr "命令"
 
 msgid "Common Configuration"
 msgstr "一般配置"
-
-msgid ""
-"Complicates key reinstallation attacks on the client side by disabling "
-"retransmission of EAPOL-Key frames that are used to install keys. This "
-"workaround might cause interoperability issues and reduced robustness of key "
-"negotiation especially in environments with heavy traffic load."
-msgstr ""
-"通过禁用用于安装密钥的 EAPOL-Key 帧的重新传输，来增加客户端密钥重安装攻击的复"
-"杂度。此解决方法可能会导致互操作性问题，并降低密钥协商的可靠性，特别是在流量"
-"负载较重的环境中。"
 
 msgid "Configuration"
 msgstr "配置"
@@ -719,12 +706,6 @@ msgstr "自定义软件源地址，例如：私有的软件源。此文件在系
 
 msgid "Custom feeds"
 msgstr "自定义软件源"
-
-msgid ""
-"Custom files (certificates, scripts) may remain on the system. To prevent "
-"this, perform a factory-reset first."
-msgstr ""
-"自定义文件（证书、脚本）会保留在系统上。若无需保留，请先执行恢复出厂设置。"
 
 msgid ""
 "Customizes the behaviour of the device <abbr title=\"Light Emitting Diode"
@@ -875,6 +856,9 @@ msgstr "停用 DNS 设定"
 msgid "Disable Encryption"
 msgstr "禁用加密"
 
+msgid "No Encryption"
+msgstr "禁用加密"
+
 msgid "Disabled"
 msgstr "禁用"
 
@@ -921,6 +905,24 @@ msgstr "不转发本地网络的反向查询"
 msgid "Domain required"
 msgstr "忽略空域名解析"
 
+msgid "redirect all dns requests"
+msgstr "挟持所有的DNS解析"
+
+msgid "Redirect all <abbr title=\"Domain Name System\">DNS</abbr>-requests to dnsmasq"
+msgstr "挟持所有的客户端的<abbr title=\"Domain Name System\">DNS</abbr>解析到dnsmasq"
+
+msgid "Custom domain"
+msgstr "自定义DNS解析"
+
+msgid "Define a custom domain name and the corresponding PTR record"
+msgstr "挟持特定的域名到指定的IP地址"
+
+msgid "Comments"
+msgstr "注释"
+
+msgid "Domain name"
+msgstr "域名"
+
 msgid "Domain whitelist"
 msgstr "域名白名单"
 
@@ -938,9 +940,6 @@ msgstr "下载并安装软件包"
 
 msgid "Download backup"
 msgstr "下载备份"
-
-msgid "Downstream SNR offset"
-msgstr "下游 SNR 偏移"
 
 msgid "Dropbear Instance"
 msgstr "Dropbear 实例"
@@ -993,11 +992,6 @@ msgstr "紧急"
 msgid "Enable"
 msgstr "启用"
 
-msgid ""
-"Enable <abbr title=\"Internet Group Management Protocol\">IGMP</abbr> "
-"snooping"
-msgstr ""
-
 msgid "Enable <abbr title=\"Spanning Tree Protocol\">STP</abbr>"
 msgstr "开启 <abbr title=\"Spanning Tree Protocol\">STP</abbr>"
 
@@ -1028,9 +1022,6 @@ msgstr "启用 VLAN"
 msgid "Enable WPS pushbutton, requires WPA(2)-PSK"
 msgstr "启用 WPS 一键加密按钮，需要 WPA(2)-PSK"
 
-msgid "Enable key reinstallation (KRACK) countermeasures"
-msgstr "启用密钥重新安装（KRACK）对策"
-
 msgid "Enable learning and aging"
 msgstr "启用智能交换学习"
 
@@ -1054,9 +1045,6 @@ msgstr "启用/禁用"
 
 msgid "Enabled"
 msgstr "启用"
-
-msgid "Enables IGMP snooping on this bridge"
-msgstr ""
 
 msgid ""
 "Enables fast roaming among access points that belong to the same Mobility "
@@ -1127,15 +1115,6 @@ msgstr "外部系统日志服务器协议"
 msgid "Extra SSH command options"
 msgstr "额外的 SSH 命令选项"
 
-msgid "FT over DS"
-msgstr ""
-
-msgid "FT over the Air"
-msgstr ""
-
-msgid "FT protocol"
-msgstr "FT 协议"
-
 msgid "File"
 msgstr "文件"
 
@@ -1190,19 +1169,19 @@ msgid "Fixed source port for outbound DNS queries"
 msgstr "指定的 DNS 查询源端口"
 
 msgid "Flash Firmware"
-msgstr "刷新固件"
+msgstr "更新固件"
 
 msgid "Flash image..."
-msgstr "刷写固件..."
+msgstr "更新固件..."
 
 msgid "Flash new firmware image"
 msgstr "刷写新的固件"
 
 msgid "Flash operations"
-msgstr "刷新操作"
+msgstr "固件操作"
 
 msgid "Flashing..."
-msgstr "刷写中..."
+msgstr "更新中..."
 
 msgid "Force"
 msgstr "强制"
@@ -1236,9 +1215,6 @@ msgstr "前向纠错秒数（FECS）"
 
 msgid "Forward broadcast traffic"
 msgstr "转发广播数据包"
-
-msgid "Forward mesh peer traffic"
-msgstr "转发 mesh 节点数据包"
 
 msgid "Forwarding mode"
 msgstr "转发模式"
@@ -1286,9 +1262,6 @@ msgstr "OPKG 基础配置"
 msgid "Generate Config"
 msgstr "生成配置"
 
-msgid "Generate PMK locally"
-msgstr "本地生成 PMK"
-
 msgid "Generate archive"
 msgstr "生成备份"
 
@@ -1324,6 +1297,9 @@ msgstr "HE.net 用户名"
 
 msgid "HT mode (802.11n)"
 msgstr "HT 模式（802.11n）"
+
+msgid "Handler"
+msgstr "处理程序"
 
 msgid "Hang Up"
 msgstr "挂起"
@@ -1491,7 +1467,7 @@ msgstr "IPv6-over-IPv4 (6to4)"
 msgid "Identity"
 msgstr "鉴权"
 
-msgid "If checked, 1DES is enabled"
+msgid "If checked, 1DES is enaled"
 msgstr "选中以启用 1DES"
 
 msgid "If checked, encryption is disabled"
@@ -1633,7 +1609,7 @@ msgstr "隔离客户端"
 msgid ""
 "It appears that you are trying to flash an image that does not fit into the "
 "flash memory, please verify the image file!"
-msgstr "您尝试刷写的固件与本路由器不兼容，请重新验证固件文件。"
+msgstr "你尝试刷写的固件与本路由器不兼容，请重新验证固件文件。"
 
 msgid "JavaScript required!"
 msgstr "需要 JavaScript！"
@@ -1913,6 +1889,9 @@ msgstr "允许的最大 EDNS.0 UDP 数据包大小"
 msgid "Maximum amount of seconds to wait for the modem to become ready"
 msgstr "调制解调器就绪的最大等待时间（秒）"
 
+msgid "Maximum hold time"
+msgstr "最大持续时间"
+
 msgid ""
 "Maximum length of the name is 15 characters including the automatic protocol/"
 "bridge prefix (br-, 6in4-, pppoe- etc.)"
@@ -1932,11 +1911,11 @@ msgstr "内存"
 msgid "Memory usage (%)"
 msgstr "内存使用率（%）"
 
-msgid "Mesh Id"
-msgstr "Mesh ID"
-
 msgid "Metric"
 msgstr "跃点数"
+
+msgid "Minimum hold time"
+msgstr "最低持续时间"
 
 msgid "Mirror monitor port"
 msgstr "数据包镜像监听端口"
@@ -1954,7 +1933,7 @@ msgid "Mode"
 msgstr "模式"
 
 msgid "Model"
-msgstr "主机型号"
+msgstr "设备型号"
 
 msgid "Modem device"
 msgstr "调制解调器节点"
@@ -2124,7 +2103,7 @@ msgid "Not Found"
 msgstr "未找到"
 
 msgid "Not associated"
-msgstr "未关联"
+msgstr "未链接"
 
 msgid "Not connected"
 msgstr "未连接"
@@ -2140,9 +2119,6 @@ msgstr "注意"
 
 msgid "Nslookup"
 msgstr "Nslookup"
-
-msgid "Number of cached DNS entries (max is 10000, 0 is no caching)"
-msgstr "缓存的 DNS 条目数量（最大 10000，0 表示不缓存）"
 
 msgid "OK"
 msgstr "确认"
@@ -2167,7 +2143,7 @@ msgid ""
 "<samp>INTERFACE.VLANNR</samp> (<abbr title=\"for example\">e.g.</abbr>: "
 "<samp>eth0.1</samp>)."
 msgstr ""
-"在此页面，您可以配置网络接口。您可以勾选“桥接接口”，并输入由空格分隔的多个网"
+"在此页面，你可以配置网络接口。你可以勾选“桥接接口”，并输入由空格分隔的多个网"
 "络接口的名称来桥接多个接口。接口名称中可以使用 <abbr title=\"Virtual Local "
 "Area Network\">VLAN</abbr> 记号 <samp>INTERFACE.VLANNR</samp>（例如："
 "<samp>eth0.1</samp>）。"
@@ -2209,7 +2185,7 @@ msgid "Optional, specify to override default server (tic.sixxs.net)"
 msgstr "可选，设置这个选项会覆盖默认服务器（tic.sixxs.net）"
 
 msgid "Optional, use when the SIXXS account has more than one tunnel"
-msgstr "可选，如果您的 SIXXS 账号拥有一个以上的隧道请设置此项"
+msgstr "可选，如果你的 SIXXS 账号拥有一个以上的隧道请设置此项"
 
 msgid ""
 "Optional. 32-bit mark for outgoing encrypted packets. Enter value in hex, "
@@ -2316,7 +2292,7 @@ msgid "PIN"
 msgstr "PIN"
 
 msgid "PMK R1 Push"
-msgstr "R1 推送 PMK"
+msgstr "PMK R1 Push"
 
 msgid "PPP"
 msgstr "PPP"
@@ -2386,6 +2362,9 @@ msgstr "客户端证书路径"
 
 msgid "Path to Private Key"
 msgstr "私钥路径"
+
+msgid "Path to executable which handles the button event"
+msgstr "处理按键动作的可执行文件路径"
 
 msgid "Path to inner CA-Certificate"
 msgstr "内部 CA 证书的路径"
@@ -2522,10 +2501,10 @@ msgid "Quality"
 msgstr "质量"
 
 msgid "R0 Key Lifetime"
-msgstr "R0 密钥生存期"
+msgstr "R0 Key Lifetime"
 
 msgid "R1 Key Holder"
-msgstr "R1 密钥持有者"
+msgstr "R1 Key Holder"
 
 msgid "RFC3947 NAT-T mode"
 msgstr "RFC3947 NAT-T 模式"
@@ -2587,14 +2566,14 @@ msgid ""
 "Really shut down network?\\nYou might lose access to this device if you are "
 "connected via this interface."
 msgstr ""
-"确定要关闭此网络？\\n如果您正在使用此接口连接路由器，关闭此网络可能导致连接断"
+"确定要关闭此网络？\\n如果你正在使用此接口连接路由器，关闭此网络可能导致连接断"
 "开！"
 
 msgid ""
 "Really shutdown interface \"%s\" ?\\nYou might lose access to this device if "
 "you are connected via this interface."
 msgstr ""
-"确定要关闭接口 \"%s\"？\\n如果您正在使用此接口连接路由器，关闭此网络可能导致"
+"确定要关闭接口 \"%s\"？\\n如果你正在使用此接口连接路由器，关闭此网络可能导致"
 "连接断开！"
 
 msgid "Really switch protocol?"
@@ -2725,6 +2704,9 @@ msgstr "复位"
 msgid "Reset Counters"
 msgstr "复位计数器"
 
+msgid "Free Memory"
+msgstr "释放内存"
+
 msgid "Reset to defaults"
 msgstr "恢复到出厂设置"
 
@@ -2834,6 +2816,123 @@ msgstr "扫描"
 msgid "Scheduled Tasks"
 msgstr "计划任务"
 
+msgid "Task Name"
+msgstr "任务名称"
+
+msgid "Task Name desc"
+msgstr "填写任务名称"
+ 
+msgid "Task Name desc"
+msgstr "填写任务名称"
+ 
+msgid "Custom"
+msgstr "自定义"
+
+msgid "Custom cron"
+msgstr "自定义cron参数"
+
+msgid "custom cron desc"
+msgstr "cron原生参数"
+
+msgid "Everyday"
+msgstr "每天"
+
+msgid "Task Everyday desc"
+msgstr "设置每天都执行一次,周执行计划失效"
+
+msgid "Day(s) of Week"
+msgstr "一周执行时间"
+
+msgid "Start time"
+msgstr "执行时间"
+
+msgid "Start time desc"
+msgstr "具体执行时间"
+
+msgid "Scheduled Tasks Configuration"
+msgstr "配置计划任务"
+
+msgid "Restart system"
+msgstr "重启系统"
+
+msgid "custom minutes"
+msgstr "每X分钟执行"
+
+msgid "command for schedule"
+msgstr "填入计划执行的命令"
+
+msgid "Global Settings"
+msgstr "全局设置"
+
+msgid "Enable"
+msgstr "启用"
+
+msgid "Sunday"
+msgstr "星期日"
+
+msgid "Monday"
+msgstr "星期一"
+
+msgid "Tuesday"
+msgstr "星期二"
+
+msgid "Wednesday"
+msgstr "星期三"
+
+msgid "Thursday"
+msgstr "星期四"
+
+msgid "Friday"
+msgstr "星期五"
+
+msgid "Saturday"
+msgstr "星期六"
+
+msgid "Schedule"
+msgstr "计划表"
+
+msgid "Schedule events"
+msgstr "计划事件"
+
+msgid "Start Time"
+msgstr "启动时间"
+
+msgid "every_5_minute"
+msgstr "每5分钟"
+
+msgid "every_15_minute"
+msgstr "每15分钟"
+
+msgid "every_30_minute"
+msgstr "每30分钟"
+
+msgid "every_1_hour"
+msgstr "每个小时"
+
+msgid "every_12_hour"
+msgstr "每12小时"
+
+msgid "every_24_hour"
+msgstr "每一天"
+
+msgid "every-custom-minute"
+msgstr "自定义每X分钟"
+
+msgid "bandwidth reset"
+msgstr "重置带宽控制"
+
+msgid "Wifi Up"
+msgstr "重启无线"
+
+msgid "Wifi Down"
+msgstr "关闭无线"
+
+msgid "Wan Up"
+msgstr "重启外网(WAN)"
+
+msgid "Wan Down"
+msgstr "关闭外网(WAN)"
+
 msgid "Section added"
 msgstr "添加的节点"
 
@@ -2917,9 +3016,6 @@ msgstr "大小"
 msgid "Size (.ipk)"
 msgstr "大小（.ipk）"
 
-msgid "Size of DNS query cache"
-msgstr "DNS 查询缓存的大小"
-
 msgid "Skip"
 msgstr "跳过"
 
@@ -2963,6 +3059,9 @@ msgstr "源地址"
 
 msgid "Source routing"
 msgstr "源路由"
+
+msgid "Specifies the button state to handle"
+msgstr "指定要处理的按键状态"
 
 msgid "Specifies the directory the device is attached to"
 msgstr "指定设备的挂载目录"
@@ -3064,9 +3163,6 @@ msgstr "交换机 %q（%s）"
 msgid ""
 "Switch %q has an unknown topology - the VLAN settings might not be accurate."
 msgstr "交换机 %q 具有未知的拓扑结构，VLAN 设置可能不正确。"
-
-msgid "Switch Port Mask"
-msgstr "交换机端口掩码"
 
 msgid "Switch VLAN"
 msgstr "交换机 VLAN"
@@ -3303,8 +3399,8 @@ msgstr "启动脚本插入到 'exit 0' 之前即可随系统启动运行。"
 
 msgid ""
 "This is the local endpoint address assigned by the tunnel broker, it usually "
-"ends with <code>...:2/64</code>"
-msgstr "隧道代理分配的本地终端地址，通常以 <code>...:2/64</code> 结尾"
+"ends with <code>:2</code>"
+msgstr "隧道代理分配的本地终端地址，通常以 <code>:2</code> 结尾"
 
 msgid ""
 "This is the only <abbr title=\"Dynamic Host Configuration Protocol\">DHCP</"
@@ -3318,7 +3414,7 @@ msgstr "登录账户时填写的用户名"
 
 msgid ""
 "This is the prefix routed to you by the tunnel broker for use by clients"
-msgstr "这是隧道代理分配给您的路由前缀，供客户端使用"
+msgstr "这是隧道代理分配给你的路由前缀，供客户端使用"
 
 msgid "This is the system crontab in which scheduled tasks can be defined."
 msgstr "自定义系统 crontab 中的计划任务。"
@@ -3331,6 +3427,9 @@ msgid ""
 "This list gives an overview over currently running system processes and "
 "their status."
 msgstr "系统中正在运行的进程概况和它们的状态信息。"
+
+msgid "This page allows the configuration of custom button actions"
+msgstr "自定义按键动作。"
 
 msgid "This page gives an overview over currently active network connections."
 msgstr "活跃的网络连接概况。"
@@ -3515,9 +3614,9 @@ msgstr "使用路由表"
 
 msgid ""
 "Use the <em>Add</em> Button to add a new lease entry. The <em>MAC-Address</"
-"em> identifies the host, the <em>IPv4-Address</em> specifies the fixed "
-"address to use, and the <em>Hostname</em> is assigned as a symbolic name to "
-"the requesting host. The optional <em>Lease time</em> can be used to set non-"
+"em> indentifies the host, the <em>IPv4-Address</em> specifies to the fixed "
+"address to use and the <em>Hostname</em> is assigned as symbolic name to the "
+"requesting host. The optional <em>Lease time</em> can be used to set non-"
 "standard host-specific lease time, e.g. 12h, 3d or infinite."
 msgstr ""
 "使用“添加”按钮来增加新的租约条目。“IPv4 地址”和“主机名”字段的值将被固定分配"
@@ -3597,6 +3696,9 @@ msgstr "版本"
 msgid "WDS"
 msgstr "WDS"
 
+msgid "Static WDS"
+msgstr "静态WDS"
+
 msgid "WEP Open System"
 msgstr "WEP 开放式系统"
 
@@ -3637,11 +3739,6 @@ msgstr "警告"
 
 msgid "Warning: There are unsaved changes that will get lost on reboot!"
 msgstr "警告：一些未保存的配置将在重启后丢失！"
-
-msgid ""
-"When using a PSK, the PMK can be generated locally without inter AP "
-"communications"
-msgstr "当使用 PSK 时，PMK 可以在没有 AP 间通信的情况下在本地生成"
 
 msgid "Whether to create an IPv6 default route over the tunnel"
 msgstr "是否添加一条通向隧道的 IPv6 默认路由"
@@ -3711,7 +3808,7 @@ msgid ""
 "upgrade it to at least version 7 or use another browser like Firefox, Opera "
 "or Safari."
 msgstr ""
-"您的 IE 浏览器太老了，无法正常显示这个页面！请更新到 IE7 及以上或使用其他浏览"
+"你的 IE 浏览器太老了，无法正常显示这个页面！请更新到 IE7 及以上或使用其他浏览"
 "器，例如：Chrome、Firefox、Opera、Safari。"
 
 msgid "any"
@@ -3820,9 +3917,6 @@ msgstr "开放式"
 msgid "overlay"
 msgstr "覆盖"
 
-msgid "random"
-msgstr ""
-
 msgid "relay mode"
 msgstr "中继模式"
 
@@ -3841,6 +3935,9 @@ msgstr "无状态的"
 msgid "stateless + stateful"
 msgstr "无状态的 + 有状态的"
 
+msgid "tagged"
+msgstr "已标记"
+
 msgid "time units (TUs / 1.024 ms) [1000-65535]"
 msgstr "时间单位（TUs / 1.024ms）[1000-65535]"
 
@@ -3856,35 +3953,14 @@ msgstr "未指定"
 msgid "unspecified -or- create:"
 msgstr "不指定或新建："
 
+msgid "untagged"
+msgstr "未标记"
+
 msgid "yes"
 msgstr "是"
 
 msgid "« Back"
 msgstr "« 后退"
-
-#~ msgid "Action"
-#~ msgstr "动作"
-
-#~ msgid "Buttons"
-#~ msgstr "按键"
-
-#~ msgid "Handler"
-#~ msgstr "处理程序"
-
-#~ msgid "Maximum hold time"
-#~ msgstr "最大持续时间"
-
-#~ msgid "Minimum hold time"
-#~ msgstr "最低持续时间"
-
-#~ msgid "Path to executable which handles the button event"
-#~ msgstr "处理按键动作的可执行文件路径"
-
-#~ msgid "Specifies the button state to handle"
-#~ msgstr "指定要处理的按键状态"
-
-#~ msgid "This page allows the configuration of custom button actions"
-#~ msgstr "自定义按键动作。"
 
 #~ msgid "Leasetime"
 #~ msgstr "租用时间"
@@ -3934,14 +4010,32 @@ msgstr "« 后退"
 #~ msgid "Minimum Rate"
 #~ msgstr "最低速率"
 
-#~ msgid "Multicast Rate"
-#~ msgstr "多播速率"
+msgid "Force HT40/VHT80"
+msgstr "强制使用HT40优先"
 
-#~ msgid "Outdoor Channels"
-#~ msgstr "户外频道"
+msgid "SmartWiFi"
+msgstr "智能抗干扰"
 
-#~ msgid "Regulatory Domain"
-#~ msgstr "无线网络国家区域"
+msgid "Depends on factory set"
+msgstr "依赖于出厂设置,为出厂设置的百分比"
+
+msgid "Disable MU-MIMO for Broadcom Device"
+msgstr "为Broadcom的垃圾禁用MU-MIMO"
+
+msgid "HT-Greenfield"
+msgstr "HT-Greenfield模式(不兼容11n以下设备)"
+
+msgid "Green AP"
+msgstr "节能AP模式"
+
+msgid "Tx Burst"
+msgstr "突发传输(Tx优先)"
+
+msgid "Band Steering"
+msgstr "智能合频"
+
+msgid "Lowest RSSI for connected clients"
+msgstr "已连接客户端RSSI下限"
 
 #~ msgid "Separate WDS"
 #~ msgstr "隔离 WDS"
@@ -3958,23 +4052,595 @@ msgstr "« 后退"
 #~ msgid "Required. Public key of peer."
 #~ msgstr "必须，Peer 的公钥。"
 
-#~ msgid "An additional network will be created if you leave this checked."
-#~ msgstr "如果选中此复选框，则会创建一个附加网络。"
+msgid "RSSI Limit for clients"
+msgstr "客户端RSSI限制"
 
-#~ msgid "An additional network will be created if you leave this unchecked."
-#~ msgstr "取消选中将会另外创建一个新网络，而不会覆盖当前网络设置"
+msgid "Set the lowest RSSI for connected clients.Clients with RSSI lower than this value will be kicked out.<br />Acceptable values: -100~0.Value '0' means disable."
+msgstr "设置已连接客户端RSSI下限。RSSI低于此值的客户端将被断开连接。<br />设置值：-100~0。值为0时禁用此功能。"
 
-#~ msgid "Join Network: Settings"
-#~ msgstr "加入网络：设置"
+msgid "Set RSSI limit for clients.Clients with RSSI lower than this value won't be able to connect.<br />Acceptable values: -100~0.Value '0' means disable."
+msgstr "设置客户端RSSI限制。RSSI低于此值的未连接客户端将不允许连接至此AP。<br />设置值：-100~0。值为0时禁用此功能。"
 
-#~ msgid "CPU"
-#~ msgstr "CPU"
+msgid "Use all servers"
+msgstr "同时使用所有服务器"
 
-#~ msgid "Port %d"
-#~ msgstr "端口 %d"
+msgid "Setting this flag forces dnsmasq to send all queries to all available servers. The reply from the server which answers first will be returned to the original requester."
+msgstr "启用该选项后，dnsmasq将会同时向所有可用服务器发送DNS请求，回复最快的DNS服务器所返回的结果将会被转发给客户端。"
+
+msgid "IP list for DNS Filter"
+msgstr "DNS过滤器IP列表"
+
+msgid "IP list for dnsmasq to select a server.By using this, dnsmasq will only forward the reply from servers in this list if the replied ip is in the list.Or it will forward the reply from other servers.<br />Leave empty to disable this feature."
+msgstr "启用此功能后，当回复的结果在该列表内时，使用来自在列表内的DNS服务器返回的结果，否则使用列表外DNS服务器所返回的结果。<br />留空则禁用此功能。"
 
 #~ msgid "Port %d is untagged in multiple VLANs!"
-#~ msgstr "端口 %d 在多个 VLAN 中均未标记！"
+#~ msgstr "端口 %d 在多个 VLAN 中均未关联！"
 
 #~ msgid "VLAN Interface"
 #~ msgstr "VLAN 接口"
+
+msgid "Depends on factory set"
+msgstr "依赖于出厂设置值"
+
+msgid "Choose mtdblock"
+msgstr "选择MTD分区"
+
+msgid "Download mtdblock"
+msgstr "下载MTD分区"
+
+msgid "Save mtdblock"
+msgstr "备份MTD"
+
+msgid "Save mtdblock contents"
+msgstr "备份MTD内容"
+
+msgid "Click \"Save mtdblock\" to download specified mtdblock file. (NOTE: THIS FEATURE IS FOR PROFESSIONALS! )"
+msgstr "点击\"备份MTD\"可以下载指定分区数据.(注意！仅提供给专业人士使用！)"
+
+msgid "System Stop"
+msgstr "关机"
+
+msgid "Graceful system stop. De-power then re-power to restart."
+msgstr "停止所有系统任务，并关闭或重启电源"
+
+msgid "SYSTEM STOP"
+msgstr "关闭系统"
+
+msgid "Modem"
+msgstr "移动网络"
+
+msgid "Connection Info"
+msgstr "连接设置"
+
+msgid "Modem Connection Information"
+msgstr "移动网络参数设置"
+
+msgid "Please fill out the entries below"
+msgstr "请在下面输入相关的参数，如果不清楚，可以留空让系统自动配置"
+
+msgid "Modem Information #"
+msgstr "模块参数 #"
+
+msgid "User Name"
+msgstr "用户名"
+
+msgid "Password"
+msgstr "密码"
+
+msgid "Connection Delay in Seconds"
+msgstr "链接延迟时间(秒)"
+
+msgid "Force Modem to PPP Protocol"
+msgstr "强制使用PPP拨号模式"
+
+msgid "Authentication Protocol"
+msgstr "认证协议"
+
+msgid "Both"
+msgstr "所有"
+
+msgid "Lock Connection to a Provider"
+msgstr "锁定运营商"
+
+msgid "Provider Country Code"
+msgstr "运营商国家码"
+
+msgid "Provider Network Code"
+msgstr "运营商网络码"
+
+msgid "Custom DNS Server1"
+msgstr "自定义DNS服务器1"
+
+msgid "Custom DNS Server2"
+msgstr "自定义DNS服务器2"
+
+msgid "Enable Connection Logging"
+msgstr "自定义DNS服务器2"
+
+msgid "Enable Custom AT Startup Command at Connection"
+msgstr "启用自定义AT命令(链接时)"
+
+msgid "Custom AT Startup Command"
+msgstr "启用自定义AT命令(启动时)"
+
+msgid "Modem Connection Monitoring"
+msgstr "模块链接监控"
+
+msgid "Use Pinging to keep the Modem Connection Working"
+msgstr "使用ping作为看门狗保证链接能正常工作"
+
+msgid "Modem Ping Details #"
+msgstr "模块ping参数详情 #"
+
+msgid "MONITOR WITH OPTIONAL RECONNECT :"
+msgstr "监控及触发模式"
+
+msgid "Tracking reliability"
+msgstr "链接可靠性"
+
+msgid "Acceptable values: 1-100. This many Tracking IP addresses must respond for the link to be deemed up"
+msgstr "允许的值:1-100,"
+
+msgid "Ping count"
+msgstr "Ping次数"
+
+msgid "Ping interval"
+msgstr "Ping间隔"
+
+msgid "Amount of time between tracking tests"
+msgstr "每次跟踪测试的间隔时间"
+
+msgid "5 seconds"
+msgstr "5秒"
+
+msgid "10 seconds"
+msgstr "10秒"
+
+msgid "20 seconds"
+msgstr "20秒"
+
+msgid "30 seconds"
+msgstr "30秒"
+
+msgid "1 minute"
+msgstr "1分钟"
+
+msgid "3 minute"
+msgstr "3分钟"
+
+msgid "5 minutes"
+msgstr "5分钟"
+
+msgid "10 minutes"
+msgstr "10分钟"
+
+msgid "15 minutes"
+msgstr "15分钟"
+
+msgid "30 minutes"
+msgstr "30分钟"
+
+msgid "1 hour"
+msgstr "1小时"
+
+msgid "Ping timeout"
+msgstr "Ping超时"
+
+msgid "Ping packet size in bytes"
+msgstr "Ping包大小"
+
+msgid "Acceptable values: 4-56. Number of data bytes to send in ping packets. This may have to be adjusted for certain ISPs"
+msgstr "允许值：4-56.每次ping包发送数据的大小，请根据运营商情况调整"
+
+msgid "Interface down"
+msgstr "接口断开"
+
+msgid "Interface will be deemed down after this many failed ping tests"
+msgstr "已经链接接口在多少次ping失败之后可以认为接口已经断开链接"
+
+msgid "Interface up"
+msgstr "接口链接"
+
+msgid "Downed interface will be deemed up after this many successful ping tests"
+msgstr "已经断开接口在多少次测试之后可以认为已经链接"
+
+msgid "Tracking IP"
+msgstr "跟踪IP"
+
+msgid "This IP address will be pinged to dermine if the link is up or down."
+msgstr "这个IP地址用来ping测试目标接口链接或者断开"
+ 
+msgid "Enabled with Router Reboot"
+msgstr "启用并触发路由器重启"
+
+msgid "Enabled with Modem Reconnect"
+msgstr "启用并触发模块重连"
+
+msgid "Enabled with Power Toggle or Modem Reconnect"
+msgstr "启用并触发模块重置并重连"
+
+msgid "Network Status"
+msgstr "网络状态"
+
+
+msgid "Signal/Cell Information"
+msgstr "信号/基站状态"
+
+msgid "Cell Information"
+msgstr "基站信息"
+
+msgid "General Information"
+msgstr "标准信息"
+
+msgid "Modem Name"
+msgstr "模块型号"
+
+msgid "Modem ID"
+msgstr "模块ID"
+
+msgid "Decrease"
+msgstr "向下切换端口"
+
+msgid "Increase"
+msgstr "向上切换端口"
+
+msgid "SIM Information"
+msgstr "网络状态"
+
+msgid "Current Connection"
+msgstr "当前链接信息"
+
+msgid "Signal Information"
+msgstr "信号信息"
+
+msgid "Modem IMEI"
+msgstr "模块IMEI"
+
+msgid "SIM Phone Number"
+msgstr "SMI卡电话号码"
+
+msgid "SIM Name"
+msgstr "SIM卡名称"
+
+msgid "Signal Strength"
+msgstr "信号强度"
+
+msgid "UMTS Channel"
+msgstr "UMTS信道"
+
+msgid "LTE Band"
+msgstr "LTE频段"
+
+msgid "Maximum Qos"
+msgstr "最大QoS"
+
+msgid "Connection Monitoring Status"
+msgstr "网络链接状态"
+
+msgid "Next Modem"
+msgstr "下一个模块"
+
+msgid "Prev Modem"
+msgstr "上一个模块"
+
+msgid "Provider"
+msgstr "运营商"
+
+msgid "Comm Port"
+msgstr "通信端口"
+
+msgid "Hide Information"
+msgstr "隐藏信息"
+
+msgid "Apply Change"
+msgstr "应用修改"
+
+msgid "Refresh Rate"
+msgstr "刷新速率"
+
+msgid "Current Refresh Rate"
+msgstr "当前刷新速率"
+
+msgid "Change Refresh Rate"
+msgstr "修改刷新速率"
+
+msgid "Apply Rate Change"
+msgstr "应用速率修改"
+
+msgid "SMS Messaging"
+msgstr "短信息"
+
+msgid "Send and Receive Text Messages Through Your Modem"
+msgstr "使用移动网络模块收发短信息"
+
+msgid "Modem Information"
+msgstr "模块信息"
+
+msgid "Waiting to Read Messages"
+msgstr "正在等待读取短信息"
+
+msgid "Message Read Problem"
+msgstr "短信息读取错误"
+
+msgid "Unread SMS count on modem"
+msgstr "无法从模块读取短信数量"
+
+msgid "SMS Not Supported or No Modem"
+msgstr "不支持短信息或无模块"
+
+msgid "Enable SMS transfer from modem to SIM"
+msgstr "允许模块与SIM卡互传短信息"
+
+msgid "Received Messages"
+msgstr "收件箱"
+
+msgid "Total SIM Message Slots"
+msgstr "收件箱最大容量"
+
+msgid "Used SIM Message Slots"
+msgstr "收件箱已使用容量"
+
+msgid "Messages Present"
+msgstr "短信息已就绪"
+
+msgid "Read"
+msgstr "序号"
+
+msgid "Sender"
+msgstr "发件人"
+
+msgid "Date"
+msgstr "日期"
+
+msgid "Time"
+msgstr "时间"
+
+msgid "Message"
+msgstr "短信内容"
+
+msgid "Message :"
+msgstr "短信息内容 :"
+
+msgid "Send Messages"
+msgstr "发送短消息"
+
+msgid "Send To :"
+msgstr "发送给 :"
+
+msgid "Sending Status :"
+msgstr "发送状态:"
+
+msgid "Delete Message"
+msgstr "删除信息"
+
+msgid "Reply to Message"
+msgstr "回复信息"
+
+msgid "New Message"
+msgstr "新建短信"
+
+msgid "Send"
+msgstr "发送信息"
+
+msgid "Sending Message. Please Wait"
+msgstr "发送短消息中，请稍等..."
+
+msgid "Delete the selected message?"
+msgstr "删除所选的短消息？"
+
+msgid "Message will be deleted. It may take some time before the list is updated."
+msgstr "短消息将被删除，稍后将会更新信息。"
+
+msgid "SMS will be queued for processing.\\nA status update will follow."
+msgstr "信息已经在队列处理中，稍后会更新状态."
+
+msgid "Message is blank!!"
+msgstr "信息内容不能为空！！！"
+
+msgid "You must enter a phone number!!"
+msgstr "您必须输入一个电话号码！！"
+
+msgid "Waiting to Read Messages"
+msgstr "等待读取短信息"
+
+msgid "Message Read Problem"
+msgstr "短消息读取错误"
+
+msgid "Debug Information"
+msgstr "调试信息"
+
+msgid "Custom Modem Ports"
+msgstr "端口设置"
+
+msgid "Custom Modem Port Database"
+msgstr "自定义端口数据"
+
+msgid "Data Port"
+msgstr "数据端口"
+
+msgid "Communication Port"
+msgstr "通信端口"
+
+msgid "Custom Modem Support"
+msgstr "自定义通信端口"
+
+msgid "Change the Data and Communication Ports used by a Specific Modem"
+msgstr "修改指定模块的数据与通信端口"
+
+msgid "Switched Vendor ID"
+msgstr "厂商ID(PID)"
+
+msgid "Switched Product ID"
+msgstr "产品ID(VID)"
+
+msgid "PPP Modem Data Port"
+msgstr "PPP数据端口"
+
+msgid "AT Communication Port"
+msgstr "AT通讯端口"
+
+msgid "No Entries"
+msgstr "无数据"
+
+msgid "Delete Modem Port Database"
+msgstr "删除端口数据"
+
+msgid "Miscellaneous"
+msgstr "其他设置"
+
+msgid "Miscellaneous Modem Features"
+msgstr "混合设置"
+
+msgid "A Collection of Modem Features"
+msgstr "模块混合特性设置"
+
+msgid "No Modem Present"
+msgstr "没有存在模块"
+
+msgid "Modem Present/Not Connected"
+msgstr "模块存在/未链接"
+
+msgid "Modem Connected"
+msgstr "模块已连接"
+
+msgid "Current Modem"
+msgstr "当前模块"
+
+msgid "Connection/Disconnection"
+msgstr "连接/断开连接"
+
+msgid "Connect Current Modem"
+msgstr "链接当前模块"
+
+msgid "Disconnect Current Modem"
+msgstr "断开当前模块"
+
+msgid "Connecting..."
+msgstr "连接中..."
+
+msgid "Changing..."
+msgstr "修改中..."
+
+msgid "Disconnecting..."
+msgstr "断开链接中..."
+
+msgid "Re-bind USB 1 Driver"
+msgstr "重新绑定USB1驱动"
+
+msgid "Re-bind USB 2 Driver"
+msgstr "重新绑定USB2驱动"
+
+msgid "Connection//Disconnection"
+msgstr "链接/断开"
+
+msgid "AT-Command Terminal"
+msgstr "AT命令终端"
+
+msgid "AT-Command"
+msgstr "AT命令"
+
+msgid "Waiting for a Response"
+msgstr "等待响应..."
+
+msgid "You must enter an AT-Command!!"
+msgstr "您必须输入AT命令！！"
+
+msgid "Send Command"
+msgstr "发送命令"
+
+msgid "Cellular Mode"
+msgstr "网络制式"
+
+msgid "Current Cellular Mode"
+msgstr "当前网络制式"
+
+msgid "Change Cellular Mode"
+msgstr "修改网络制式"
+
+msgid "2G Preferred"
+msgstr "2G优先"
+
+msgid "2G Only"
+msgstr "仅2G"
+
+msgid "3G Preferred"
+msgstr "3G优先"
+
+msgid "3G Only"
+msgstr "仅3G"
+
+msgid "4G Preferred"
+msgstr "4G优先"
+
+msgid "4G Only"
+msgstr "仅4G"
+
+msgid "Changing Mode ..."
+msgstr "正在修改模式..."
+
+msgid "Applying Change"
+msgstr "正在应用设置"
+
+msgid "Toggling..."
+msgstr "切换中..."
+
+msgid "Apply Mode Change"
+msgstr "应用模式设置"
+
+msgid "Connection Monitoring"
+msgstr "链接监控"
+
+msgid "Connection Log"
+msgstr "链接日志"
+
+msgid "Clear Log"
+msgstr "清除日志"
+
+msgid "Modem Debug Information"
+msgstr "模块调试信息"
+
+msgid "AT-Command Execution"
+msgstr "AT命令执行日志"
+
+msgid "Device Information"
+msgstr "设备信息"
+
+msgid "Connection Log"
+msgstr "链接日志"
+
+msgid "United States"
+msgstr "美国"
+
+msgid "China"
+msgstr "中国"
+
+msgid "Europe"
+msgstr "欧洲"
+
+msgid "World"
+msgstr "全球"
+
+msgid "Australia"
+msgstr "澳大利亚"
+
+msgid "Russia"
+msgstr "俄罗斯"
+
+msgid "VHT40(256QAM) Support"
+msgstr "VHT40(256QAM)支持"
+
+msgid "TDMA Support"
+msgstr "TDMA支持"
+
+msgid "Enable U-APSD"
+msgstr "启用U-APSD省电模式"
+
+msgid "Multicast Rate"
+msgstr "组播速率"
+
+msgid "pppd options"
+msgstr "特殊拨号选项"
+
+msgid "PPP options,Leave empty to autodetect"
+msgstr "特殊拨号选项，留空不启用"
+

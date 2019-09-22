@@ -3,7 +3,6 @@
 -- Licensed to the public under the Apache License 2.0.
 
 local ipc = require "luci.ip"
-local sys = require "luci.sys"
 
 m = Map("dhcp", translate("Hostnames"))
 
@@ -20,11 +19,9 @@ ip = s:option(Value, "ip", translate("IP address"))
 ip.datatype = "ipaddr"
 ip.rmempty  = true
 
-sys.net.host_hints(function(mac, v4, v6, name)
-	v6 = v6 and ipc.IPv6(v6)
-
-	if v4 or (v6 and not v6:is6linklocal()) then
-		ip:value(tostring(v4 or v6), "%s (%s)" %{ tostring(v4 or v6), name or mac })
+ipc.neighbors({ }, function(n)
+	if n.mac and n.dest and not n.dest:is6linklocal() then
+		ip:value(n.dest:string(), "%s (%s)" %{ n.dest:string(), n.mac })
 	end
 end)
 

@@ -82,7 +82,7 @@ function index()
 		end
 
 
-		page = entry({"admin", "network", "iface_add"}, form("admin_network/iface_add"), nil)
+		page = entry({"admin", "network", "iface_add"}, cbi("admin_network/iface_add"), nil)
 		page.leaf = true
 
 		page = entry({"admin", "network", "iface_delete"}, post("iface_delete"), nil)
@@ -230,6 +230,12 @@ function iface_status(ifaces)
 		local net = netm:get_network(iface)
 		local device = net and net:get_interface()
 		if device then
+			-- FIXME:Workaround:Use the MAC address of L2 device if we can't get the mac of L3 device.
+			local devmac = device:mac()
+			if (devmac == "00:00:00:00:00:00" and net:proto() == "pppoe") then
+				devmac = (netm.interface(net:_ubus("device"),net)):mac() or "00:00:00:00:00:00"
+			end
+
 			local data = {
 				id         = iface,
 				proto      = net:proto(),
@@ -242,7 +248,7 @@ function iface_status(ifaces)
 				name       = device:shortname(),
 				type       = device:type(),
 				ifname     = device:name(),
-				macaddr    = device:mac(),
+				macaddr    = devmac,
 				is_up      = device:is_up(),
 				rx_bytes   = device:rx_bytes(),
 				tx_bytes   = device:tx_bytes(),
@@ -257,6 +263,7 @@ function iface_status(ifaces)
 					name       = device:shortname(),
 					type       = device:type(),
 					ifname     = device:name(),
+					macaddr    = device:mac(),
 					macaddr    = device:mac(),
 					is_up      = device:is_up(),
 					rx_bytes   = device:rx_bytes(),
@@ -289,8 +296,7 @@ function iface_reconnect(iface)
 	local netmd = require "luci.model.network".init()
 	local net = netmd:get_network(iface)
 	if net then
-		luci.sys.call("env -i /sbin/ifup %s >/dev/null 2>/dev/null"
-			% luci.util.shellquote(iface))
+		luci.sys.call("env -i /sbin/ifup %q >/dev/null 2>/dev/null" % iface)
 		luci.http.status(200, "Reconnected")
 		return
 	end
@@ -302,8 +308,7 @@ function iface_shutdown(iface)
 	local netmd = require "luci.model.network".init()
 	local net = netmd:get_network(iface)
 	if net then
-		luci.sys.call("env -i /sbin/ifdown %s >/dev/null 2>/dev/null"
-			% luci.util.shellquote(iface))
+		luci.sys.call("env -i /sbin/ifdown %q >/dev/null 2>/dev/null" % iface)
 		luci.http.status(200, "Shutdown")
 		return
 	end
@@ -315,8 +320,7 @@ function iface_delete(iface)
 	local netmd = require "luci.model.network".init()
 	local net = netmd:del_network(iface)
 	if net then
-		luci.sys.call("env -i /sbin/ifdown %s >/dev/null 2>/dev/null"
-			% luci.util.shellquote(iface))
+		luci.sys.call("env -i /sbin/ifdown %q >/dev/null 2>/dev/null" % iface)
 		luci.http.redirect(luci.dispatcher.build_url("admin/network/network"))
 		netmd:commit("network")
 		netmd:commit("wireless")
@@ -392,7 +396,7 @@ function diag_command(cmd, addr)
 	if addr and addr:match("^[a-zA-Z0-9%-%.:_]+$") then
 		luci.http.prepare_content("text/plain")
 
-		local util = io.popen(cmd % luci.util.shellquote(addr))
+		local util = io.popen(cmd % addr)
 		if util then
 			while true do
 				local ln = util:read("*l")
@@ -411,21 +415,21 @@ function diag_command(cmd, addr)
 end
 
 function diag_ping(addr)
-	diag_command("ping -c 5 -W 1 %s 2>&1", addr)
+	diag_command("ping -c 5 -W 1 %q 2>&1", addr)
 end
 
 function diag_traceroute(addr)
-	diag_command("traceroute -q 1 -w 1 -n %s 2>&1", addr)
+	diag_command("traceroute -q 1 -w 1 -n %q 2>&1", addr)
 end
 
 function diag_nslookup(addr)
-	diag_command("nslookup %s 2>&1", addr)
+	diag_command("nslookup %q 2>&1", addr)
 end
 
 function diag_ping6(addr)
-	diag_command("ping6 -c 5 %s 2>&1", addr)
+	diag_command("ping6 -c 5 %q 2>&1", addr)
 end
 
 function diag_traceroute6(addr)
-	diag_command("traceroute6 -q 1 -w 2 -n %s 2>&1", addr)
+	diag_command("traceroute6 -q 1 -w 2 -n %q 2>&1", addr)
 end

@@ -19,22 +19,22 @@ function index()
 	end
 
 	entry({"admin", "system", "startup"}, form("admin_system/startup"), _("Startup"), 45)
-	entry({"admin", "system", "crontab"}, form("admin_system/crontab"), _("Scheduled Tasks"), 46)
-
+	--entry({"admin", "system", "crontab"}, form("admin_system/crontab"), _("Scheduled Tasks"), 46)
+	entry({"admin", "system", "crontab"},arcombine(cbi("admin_system/crontab"), cbi("admin_system/crontab-details")),_("Scheduled Tasks"), 46).leaf = true
 	if fs.access("/sbin/block") and fs.access("/etc/config/fstab") then
 		entry({"admin", "system", "fstab"}, cbi("admin_system/fstab"), _("Mount Points"), 50)
 		entry({"admin", "system", "fstab", "mount"}, cbi("admin_system/fstab/mount"), nil).leaf = true
 		entry({"admin", "system", "fstab", "swap"},  cbi("admin_system/fstab/swap"),  nil).leaf = true
 	end
 
-	local nodes, number = fs.glob("/sys/class/leds/*")
-	if number > 0 then
+	if fs.access("/sys/class/leds") then
 		entry({"admin", "system", "leds"}, cbi("admin_system/leds"), _("<abbr title=\"Light Emitting Diode\">LED</abbr> Configuration"), 60)
 	end
 
 	entry({"admin", "system", "flashops"}, call("action_flashops"), _("Backup / Flash Firmware"), 70)
 	entry({"admin", "system", "flashops", "reset"}, post("action_reset"))
 	entry({"admin", "system", "flashops", "backup"}, post("action_backup"))
+	entry({"admin", "system", "flashops", "backupmtdblock"}, post("action_backupmtdblock"))
 	entry({"admin", "system", "flashops", "backupfiles"}, form("admin_system/backupfiles"))
 
 	-- call() instead of post() due to upload handling!
@@ -311,6 +311,23 @@ function action_backup()
 		})
 
 	luci.http.prepare_content("application/x-targz")
+	luci.ltn12.pump.all(reader, luci.http.write)
+end
+
+function action_backupmtdblock()
+	local http = require "luci.http"
+	local mv = http.formvalue("mtdblockname")
+	local m, s, n = mv:match('^([^%s]+)/([^%s]+)/([^%s]+)')
+
+	local reader = ltn12_popen("cat /dev/mtd%s" % n)
+
+	luci.http.header(
+		'Content-Disposition', 'attachment; filename="backup-%s-%s-%s.bin"' %{
+			luci.sys.hostname(), m,
+			os.date("%Y-%m-%d")
+		})
+
+	luci.http.prepare_content("application/octet-stream")
 	luci.ltn12.pump.all(reader, luci.http.write)
 end
 

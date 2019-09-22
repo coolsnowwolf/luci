@@ -16,9 +16,9 @@
 <% end %>
 
 <div class="cbi-page-actions">
-	<% local node, url = luci.dispatcher.lookup(luci.http.formvalue("redir")); if url then %>
+	<% local r = luci.http.formvalue("redir"); if r and #r > 0 then %>
 	<div style="float:left">
-		<form class="inline" method="get" action="<%=luci.util.pcdata(url)%>">
+		<form class="inline" method="get" action="<%=luci.util.pcdata(r)%>">
 			<input class="cbi-button cbi-button-link" style="float:left; margin:0" type="submit" value="<%:Back%>" />
 		</form>
 	</div>

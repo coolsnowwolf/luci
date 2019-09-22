@@ -498,13 +498,11 @@ function forwarding.dest(self)
 end
 
 function forwarding.src_zone(self)
-	local z = zone(self:src())
-	return z.sid and z
+	return zone(self:src())
 end
 
 function forwarding.dest_zone(self)
-	local z = zone(self:dest())
-	return z.sid and z
+	return zone(self:dest())
 end
 
 

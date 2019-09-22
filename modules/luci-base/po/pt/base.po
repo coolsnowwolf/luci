@@ -13,9 +13,6 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.0.6\n"
 
-msgid "%.1f dB"
-msgstr ""
-
 msgid "%s is untagged in multiple VLANs!"
 msgstr ""
 
@@ -140,9 +137,6 @@ msgstr "Nome da <abbr title=\"Diodo Emissor de Luz\">LED</abbr>"
 msgid "<abbr title=\"Media Access Control\">MAC</abbr>-Address"
 msgstr "Endereço <abbr title=\"Controle de Acesso ao Meio\">MAC</abbr>"
 
-msgid "<abbr title=\"The DHCP Unique Identifier\">DUID</abbr>"
-msgstr ""
-
 msgid ""
 "<abbr title=\"maximal\">Max.</abbr> <abbr title=\"Dynamic Host Configuration "
 "Protocol\">DHCP</abbr> leases"
@@ -225,6 +219,9 @@ msgstr "Concentrador de Acesso"
 msgid "Access Point"
 msgstr "Access Point (AP)"
 
+msgid "Action"
+msgstr "Acção"
+
 msgid "Actions"
 msgstr "Acções"
 
@@ -300,9 +297,6 @@ msgstr ""
 
 msgid "Allow all except listed"
 msgstr "Permitir todos, excepto os listados"
-
-msgid "Allow legacy 802.11b rates"
-msgstr ""
 
 msgid "Allow listed only"
 msgstr "Permitir somente os listados"
@@ -574,6 +568,9 @@ msgid ""
 "preserved in any sysupgrade."
 msgstr ""
 
+msgid "Buttons"
+msgstr "Botões"
+
 msgid "CA certificate; if empty it will be saved after the first connection."
 msgstr ""
 
@@ -604,7 +601,7 @@ msgstr "Canal"
 msgid "Check"
 msgstr "Verificar"
 
-msgid "Check filesystems before mount"
+msgid "Check fileystems before mount"
 msgstr ""
 
 msgid "Check this option to delete the existing networks from this radio."
@@ -670,13 +667,6 @@ msgstr "Comando"
 
 msgid "Common Configuration"
 msgstr "Configuração comum"
-
-msgid ""
-"Complicates key reinstallation attacks on the client side by disabling "
-"retransmission of EAPOL-Key frames that are used to install keys. This "
-"workaround might cause interoperability issues and reduced robustness of key "
-"negotiation especially in environments with heavy traffic load."
-msgstr ""
 
 msgid "Configuration"
 msgstr "Configuração"
@@ -744,11 +734,6 @@ msgid ""
 msgstr ""
 
 msgid "Custom feeds"
-msgstr ""
-
-msgid ""
-"Custom files (certificates, scripts) may remain on the system. To prevent "
-"this, perform a factory-reset first."
 msgstr ""
 
 msgid ""
@@ -972,9 +957,6 @@ msgstr "Descarregar e instalar pacote"
 msgid "Download backup"
 msgstr "Descarregar backup"
 
-msgid "Downstream SNR offset"
-msgstr ""
-
 msgid "Dropbear Instance"
 msgstr "Instância do Dropbear"
 
@@ -1029,11 +1011,6 @@ msgstr "Emergência"
 msgid "Enable"
 msgstr "Ativar"
 
-msgid ""
-"Enable <abbr title=\"Internet Group Management Protocol\">IGMP</abbr> "
-"snooping"
-msgstr ""
-
 msgid "Enable <abbr title=\"Spanning Tree Protocol\">STP</abbr>"
 msgstr "Ativar <abbr title=\"Spanning Tree Protocol\">STP</abbr>"
 
@@ -1064,9 +1041,6 @@ msgstr "Ativar a funcionalidade VLAN"
 msgid "Enable WPS pushbutton, requires WPA(2)-PSK"
 msgstr ""
 
-msgid "Enable key reinstallation (KRACK) countermeasures"
-msgstr ""
-
 msgid "Enable learning and aging"
 msgstr "Ativar aprendizagem e envelhecimento"
 
@@ -1090,9 +1064,6 @@ msgstr "Ativar/Desativar"
 
 msgid "Enabled"
 msgstr "Ativado"
-
-msgid "Enables IGMP snooping on this bridge"
-msgstr ""
 
 msgid ""
 "Enables fast roaming among access points that belong to the same Mobility "
@@ -1164,15 +1135,6 @@ msgid "External system log server protocol"
 msgstr ""
 
 msgid "Extra SSH command options"
-msgstr ""
-
-msgid "FT over DS"
-msgstr ""
-
-msgid "FT over the Air"
-msgstr ""
-
-msgid "FT protocol"
 msgstr ""
 
 msgid "File"
@@ -1276,9 +1238,6 @@ msgstr ""
 msgid "Forward broadcast traffic"
 msgstr "Encaminhar trafego de broadcast"
 
-msgid "Forward mesh peer traffic"
-msgstr ""
-
 msgid "Forwarding mode"
 msgstr "Modo de encaminhamento"
 
@@ -1323,9 +1282,6 @@ msgstr ""
 msgid "Generate Config"
 msgstr ""
 
-msgid "Generate PMK locally"
-msgstr ""
-
 msgid "Generate archive"
 msgstr "Gerar arquivo"
 
@@ -1362,6 +1318,9 @@ msgstr ""
 
 msgid "HT mode (802.11n)"
 msgstr ""
+
+msgid "Handler"
+msgstr "Handler"
 
 msgid "Hang Up"
 msgstr "Suspender"
@@ -1536,7 +1495,7 @@ msgstr "IPv6-sobre-IPv4 (6to4)"
 msgid "Identity"
 msgstr "Identidade"
 
-msgid "If checked, 1DES is enabled"
+msgid "If checked, 1DES is enaled"
 msgstr ""
 
 msgid "If checked, encryption is disabled"
@@ -1962,6 +1921,9 @@ msgstr ""
 msgid "Maximum amount of seconds to wait for the modem to become ready"
 msgstr "Número máximo de segundos a esperar pelo modem para ficar pronto"
 
+msgid "Maximum hold time"
+msgstr "Tempo máximo de espera"
+
 msgid ""
 "Maximum length of the name is 15 characters including the automatic protocol/"
 "bridge prefix (br-, 6in4-, pppoe- etc.)"
@@ -1979,11 +1941,11 @@ msgstr "Memória"
 msgid "Memory usage (%)"
 msgstr "Uso de memória (%)"
 
-msgid "Mesh Id"
-msgstr ""
-
 msgid "Metric"
 msgstr "Métrica"
+
+msgid "Minimum hold time"
+msgstr "Tempo de retenção mínimo"
 
 msgid "Mirror monitor port"
 msgstr ""
@@ -2189,9 +2151,6 @@ msgstr "Reparo"
 
 msgid "Nslookup"
 msgstr "Nslookup"
-
-msgid "Number of cached DNS entries (max is 10000, 0 is no caching)"
-msgstr ""
 
 msgid "OK"
 msgstr "OK"
@@ -2431,6 +2390,9 @@ msgstr "Caminho para o Certificado de Cliente"
 
 msgid "Path to Private Key"
 msgstr "Caminho da Chave Privada"
+
+msgid "Path to executable which handles the button event"
+msgstr "Caminho do executável que lida com o botão de eventos"
 
 msgid "Path to inner CA-Certificate"
 msgstr ""
@@ -2964,9 +2926,6 @@ msgstr "Tamanho"
 msgid "Size (.ipk)"
 msgstr ""
 
-msgid "Size of DNS query cache"
-msgstr ""
-
 msgid "Skip"
 msgstr "Saltar"
 
@@ -3007,6 +2966,9 @@ msgid "Source"
 msgstr "Origem"
 
 msgid "Source routing"
+msgstr ""
+
+msgid "Specifies the button state to handle"
 msgstr ""
 
 msgid "Specifies the directory the device is attached to"
@@ -3106,9 +3068,6 @@ msgstr ""
 
 msgid ""
 "Switch %q has an unknown topology - the VLAN settings might not be accurate."
-msgstr ""
-
-msgid "Switch Port Mask"
 msgstr ""
 
 msgid "Switch VLAN"
@@ -3366,7 +3325,7 @@ msgstr ""
 
 msgid ""
 "This is the local endpoint address assigned by the tunnel broker, it usually "
-"ends with <code>...:2/64</code>"
+"ends with <code>:2</code>"
 msgstr ""
 
 msgid ""
@@ -3395,6 +3354,10 @@ msgid ""
 "their status."
 msgstr ""
 "Esta lista fornece uma visão geral sobre os processos em execução no sistema."
+
+msgid "This page allows the configuration of custom button actions"
+msgstr ""
+"Esta página permite a configuração de botões para acções personalizadas."
 
 msgid "This page gives an overview over currently active network connections."
 msgstr "Esta página fornece informações sobre as ligações de rede ativas."
@@ -3579,9 +3542,9 @@ msgstr "Usar tabela de roteamento"
 
 msgid ""
 "Use the <em>Add</em> Button to add a new lease entry. The <em>MAC-Address</"
-"em> identifies the host, the <em>IPv4-Address</em> specifies the fixed "
-"address to use, and the <em>Hostname</em> is assigned as a symbolic name to "
-"the requesting host. The optional <em>Lease time</em> can be used to set non-"
+"em> indentifies the host, the <em>IPv4-Address</em> specifies to the fixed "
+"address to use and the <em>Hostname</em> is assigned as symbolic name to the "
+"requesting host. The optional <em>Lease time</em> can be used to set non-"
 "standard host-specific lease time, e.g. 12h, 3d or infinite."
 msgstr ""
 
@@ -3695,11 +3658,6 @@ msgid "Warning"
 msgstr "Aviso"
 
 msgid "Warning: There are unsaved changes that will get lost on reboot!"
-msgstr ""
-
-msgid ""
-"When using a PSK, the PMK can be generated locally without inter AP "
-"communications"
 msgstr ""
 
 msgid "Whether to create an IPv6 default route over the tunnel"
@@ -3883,9 +3841,6 @@ msgstr "abrir"
 msgid "overlay"
 msgstr ""
 
-msgid "random"
-msgstr ""
-
 msgid "relay mode"
 msgstr ""
 
@@ -3930,28 +3885,6 @@ msgstr "sim"
 
 msgid "« Back"
 msgstr "« Voltar"
-
-#~ msgid "Action"
-#~ msgstr "Acção"
-
-#~ msgid "Buttons"
-#~ msgstr "Botões"
-
-#~ msgid "Handler"
-#~ msgstr "Handler"
-
-#~ msgid "Maximum hold time"
-#~ msgstr "Tempo máximo de espera"
-
-#~ msgid "Minimum hold time"
-#~ msgstr "Tempo de retenção mínimo"
-
-#~ msgid "Path to executable which handles the button event"
-#~ msgstr "Caminho do executável que lida com o botão de eventos"
-
-#~ msgid "This page allows the configuration of custom button actions"
-#~ msgstr ""
-#~ "Esta página permite a configuração de botões para acções personalizadas."
 
 #~ msgid "Leasetime"
 #~ msgstr "Tempo de concessão"

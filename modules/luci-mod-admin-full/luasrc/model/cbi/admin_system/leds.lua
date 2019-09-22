@@ -46,7 +46,8 @@ local triggers = fs.readfile(sysfs_path .. leds[1] .. "/trigger")
 for t in triggers:gmatch("[%w-]+") do
 	trigger:value(t, translate(t:gsub("-", "")))
 end
-
+trigger:value("rssi", translate("rssi"))
+trigger:value("pb_internet", translate("pb_internet"))
 
 delayon = s:option(Value, "delayon", translate ("On-State Delay"))
 delayon:depends("trigger", "timer")
@@ -94,6 +95,17 @@ usbdev = s:option(ListValue, "_usb_dev", translate("USB Device"))
 usbdev:depends("trigger", "usbdev")
 usbdev.rmempty = true
 usbdev:value("")
+
+port_mask = s:option(Value, "port_mask", translate("Port Mask"))
+port_mask:depends("trigger", "switch0")
+port_mask.rmempty = true
+port_mask:value("0x01")
+port_mask:value("0x02")
+port_mask:value("0x04")
+port_mask:value("0x08")
+port_mask:value("0x10")
+
+s:option(DynamicList, "port", translate ("USB Port")):depends("trigger", "usbport")
 
 function usbdev.cfgvalue(self, section)
 	return m.uci:get("system", section, "dev")
@@ -151,8 +163,5 @@ for p in nixio.fs.glob("/sys/bus/usb/devices/*/usb[0-9]*-port[0-9]*") do
 		              "Hub %u, Port %u" %{ tonumber(bus), tonumber(port) })
 	end
 end
-
-port_mask = s:option(Value, "port_mask", translate ("Switch Port Mask"))
-port_mask:depends("trigger", "switch0")
 
 return m

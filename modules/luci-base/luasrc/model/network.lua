@@ -6,12 +6,14 @@ local type, next, pairs, ipairs, loadfile, table, select
 
 local tonumber, tostring, math = tonumber, tostring, math
 
-local pcall, require, setmetatable = pcall, require, setmetatable
+local require = require
 
 local nxo = require "nixio"
 local nfs = require "nixio.fs"
 local ipc = require "luci.ip"
+local sys = require "luci.sys"
 local utl = require "luci.util"
+local dsp = require "luci.dispatcher"
 local uci = require "luci.model.uci"
 local lng = require "luci.i18n"
 local jsc = require "luci.jsonc"
@@ -21,7 +23,7 @@ module "luci.model.network"
 
 IFACE_PATTERNS_VIRTUAL  = { }
 IFACE_PATTERNS_IGNORE   = { "^wmaster%d", "^wifi%d", "^hwsim%d", "^imq%d", "^ifb%d", "^mon%.wlan%d", "^sit%d", "^gre%d", "^gretap%d", "^ip6gre%d", "^ip6tnl%d", "^tunl%d", "^lo$" }
-IFACE_PATTERNS_WIRELESS = { "^wlan%d", "^wl%d", "^ath%d", "^%w+%.network%d" }
+IFACE_PATTERNS_WIRELESS = { "^wlan%d", "^wl%d", "^ath%d", "^rausb%d", "^rai%d", "^ra%d", "^wdsi%d", "^wds%d", "^apclii%d", "^apcli%d", "^apcliusb%d", "^%w+%.network%d" }
 
 
 protocol = utl.class()
@@ -106,58 +108,6 @@ function _set(c, s, o, v)
 	end
 end
 
-local function _wifi_state()
-	if not next(_ubuswificache) then
-		_ubuswificache = utl.ubus("network.wireless", "status", {}) or {}
-	end
-	return _ubuswificache
-end
-
-local function _wifi_state_by_sid(sid)
-	local t1, n1 = _uci:get("wireless", sid)
-	if t1 == "wifi-iface" and n1 ~= nil then
-		local radioname, radiostate
-		for radioname, radiostate in pairs(_wifi_state()) do
-			if type(radiostate) == "table" and
-			   type(radiostate.interfaces) == "table"
-			then
-				local netidx, netstate
-				for netidx, netstate in ipairs(radiostate.interfaces) do
-					if type(netstate) == "table" and
-					   type(netstate.section) == "string"
-					then
-						local t2, n2 = _uci:get("wireless", netstate.section)
-						if t1 == t2 and n1 == n2 then
-							return radioname, radiostate, netstate
-						end
-					end
-				end
-			end
-		end
-	end
-end
-
-local function _wifi_state_by_ifname(ifname)
-	if type(ifname) == "string" then
-		local radioname, radiostate
-		for radioname, radiostate in pairs(_wifi_state()) do
-			if type(radiostate) == "table" and
-			   type(radiostate.interfaces) == "table"
-			then
-				local netidx, netstate
-				for netidx, netstate in ipairs(radiostate.interfaces) do
-					if type(netstate) == "table" and
-					   type(netstate.ifname) == "string" and
-					   netstate.ifname == ifname
-					then
-						return radioname, radiostate, netstate
-					end
-				end
-			end
-		end
-	end
-end
-
 function _wifi_iface(x)
 	local _, p
 	for _, p in ipairs(IFACE_PATTERNS_WIRELESS) do
@@ -168,111 +118,59 @@ function _wifi_iface(x)
 	return false
 end
 
-local function _wifi_iwinfo_by_ifname(ifname, force_phy_only)
-	local stat, iwinfo = pcall(require, "iwinfo")
-	local iwtype = stat and type(ifname) == "string" and iwinfo.type(ifname)
-	local is_nonphy_op = {
-		bitrate     = true,
-		quality     = true,
-		quality_max = true,
-		mode        = true,
-		ssid        = true,
-		bssid       = true,
-		assoclist   = true,
-		encryption  = true
-	}
+function _wifi_state(key, val, field)
+	local radio, radiostate, ifc, ifcstate
 
-	if iwtype then
-		-- if we got a type but no real netdev, we're referring to a phy
-		local phy_only = force_phy_only or (ipc.link(ifname).type ~= 1)
+	if not next(_ubuswificache) then
+		_ubuswificache = utl.ubus("network.wireless", "status", {}) or {}
 
-		return setmetatable({}, {
-			__index = function(t, k)
-				if k == "ifname" then
-					return ifname
-				elseif phy_only and is_nonphy_op[k] then
-					return nil
-				elseif iwinfo[iwtype][k] then
-					return iwinfo[iwtype][k](ifname)
+		-- workaround extended section format
+		for radio, radiostate in pairs(_ubuswificache) do
+			for ifc, ifcstate in pairs(radiostate.interfaces) do
+				if ifcstate.section and ifcstate.section:sub(1, 1) == '@' then
+					local s = _uci:get_all('wireless.%s' % ifcstate.section)
+					if s then
+						ifcstate.section = s['.name']
+					end
 				end
 			end
-		})
+		end
 	end
-end
 
-local function _wifi_sid_by_netid(netid)
-	if type(netid) == "string" then
-		local radioname, netidx = netid:match("^(%w+)%.network(%d+)$")
-		if radioname and netidx then
-			local i, n = 0, nil
-
-			netidx = tonumber(netidx)
-			_uci:foreach("wireless", "wifi-iface",
-				function(s)
-					if s.device == radioname then
-						i = i + 1
-						if i == netidx then
-							n = s[".name"]
-							return false
-						end
-					end
-				end)
-
-			return n
+	for radio, radiostate in pairs(_ubuswificache) do
+		for ifc, ifcstate in pairs(radiostate.interfaces) do
+			if ifcstate[key] == val then
+				return ifcstate[field]
+			end
 		end
 	end
 end
 
-function _wifi_sid_by_ifname(ifn)
-	local sid = _wifi_sid_by_netid(ifn)
-	if sid then
+function _wifi_lookup(ifn)
+	-- got a radio#.network# pseudo iface, locate the corresponding section
+	local radio, ifnidx = ifn:match("^(%w+)%.network(%d+)$")
+	if radio and ifnidx then
+		local sid = nil
+		local num = 0
+
+		ifnidx = tonumber(ifnidx)
+		_uci:foreach("wireless", "wifi-iface",
+			function(s)
+				if s.device == radio then
+					num = num + 1
+					if num == ifnidx then
+						sid = s['.name']
+						return false
+					end
+				end
+			end)
+
 		return sid
+
+	-- looks like wifi, try to locate the section via ubus state
+	elseif _wifi_iface(ifn) then
+		return _wifi_state("ifname", ifn, "section")
 	end
-
-	local _, _, netstate = _wifi_state_by_ifname(ifn)
-	if netstate and type(netstate.section) == "string" then
-		return netstate.section
-	end
-end
-
-local function _wifi_netid_by_sid(sid)
-	local t, n = _uci:get("wireless", sid)
-	if t == "wifi-iface" and n ~= nil then
-		local radioname = _uci:get("wireless", n, "device")
-		if type(radioname) == "string" then
-			local i, netid = 0, nil
-
-			_uci:foreach("wireless", "wifi-iface",
-				function(s)
-					if s.device == radioname then
-						i = i + 1
-						if s[".name"] == n then
-							netid = "%s.network%d" %{ radioname, i }
-							return false
-						end
-					end
-				end)
-
-			return netid, radioname
-		end
-	end
-end
-
-local function _wifi_netid_by_netname(name)
-	local netid = nil
-
-	_uci:foreach("wireless", "wifi-iface",
-		function(s)
-			local net
-			for net in utl.imatch(s.network) do
-				if net == name then
-					netid = _wifi_netid_by_sid(s[".name"])
-					return false
-				end
-			end
-		end)
-
-	return netid
 end
 
 function _iface_virtual(x)
@@ -330,7 +228,7 @@ function init(cursor)
 			if i.family == "packet" then
 				_interfaces[name].flags   = i.flags
 				_interfaces[name].stats   = i.data
-				_interfaces[name].macaddr = ipc.checkmac(i.addr)
+				_interfaces[name].macaddr = i.addr
 			elseif i.family == "inet" then
 				_interfaces[name].ipaddrs[#_interfaces[name].ipaddrs+1] = ipc.IPv4(i.addr, i.netmask)
 			elseif i.family == "inet6" then
@@ -543,9 +441,6 @@ end
 function del_network(self, n)
 	local r = _uci:delete("network", n)
 	if r then
-		_uci:delete_all("luci", "ifstate",
-			function(s) return (s.interface == n) end)
-
 		_uci:delete_all("network", "alias",
 			function(s) return (s.interface == n) end)
 
@@ -629,8 +524,20 @@ function get_interface(self, i)
 	if _interfaces[i] or _wifi_iface(i) then
 		return interface(i)
 	else
-		local netid = _wifi_netid_by_sid(i)
-		return netid and interface(netid)
+		local ifc
+		local num = { }
+		_uci:foreach("wireless", "wifi-iface",
+			function(s)
+				if s.device then
+					num[s.device] = num[s.device] and num[s.device] + 1 or 1
+					if s['.name'] == i then
+						ifc = interface(
+							"%s.network%d" %{s.device, num[s.device] })
+						return false
+					end
+				end
+			end)
+		return ifc
 	end
 end
 
@@ -737,7 +644,7 @@ function get_wifidevs(self)
 end
 
 function get_wifinet(self, net)
-	local wnet = _wifi_sid_by_ifname(net)
+	local wnet = _wifi_lookup(net)
 	if wnet then
 		return wifinet(wnet)
 	end
@@ -753,7 +660,7 @@ function add_wifinet(self, net, options)
 end
 
 function del_wifinet(self, net)
-	local wnet = _wifi_sid_by_ifname(net)
+	local wnet = _wifi_lookup(net)
 	if wnet then
 		_uci:delete("wireless", wnet)
 		return true
@@ -877,7 +784,22 @@ function protocol.ifname(self)
 		ifname = self:_ubus("device")
 	end
 	if not ifname then
-		ifname = _wifi_netid_by_netname(self.sid)
+		local num = { }
+		_uci:foreach("wireless", "wifi-iface",
+			function(s)
+				if s.device then
+					num[s.device] = num[s.device]
+						and num[s.device] + 1 or 1
+
+					local net
+					for net in utl.imatch(s.network) do
+						if net == self.sid then
+							ifname = "%s.network%d" %{ s.device, num[s.device] }
+							return false
+						end
+					end
+				end
+			end)
 	end
 	return ifname
 end
@@ -1001,15 +923,7 @@ function protocol.ip6addrs(self)
 
 	if type(addrs) == "table" then
 		for n, addr in ipairs(addrs) do
-			if type(addr["local-address"]) == "table" and
-			   type(addr["local-address"].mask) == "number" and
-			   type(addr["local-address"].address) == "string"
-			then
-				rv[#rv+1] = "%s/%d" %{
-					addr["local-address"].address,
-					addr["local-address"].mask
-				}
-			end
+			rv[#rv+1] = "%s1/%d" %{ addr.address, addr.mask }
 		end
 	end
 
@@ -1067,17 +981,24 @@ function protocol.is_empty(self)
 	if self:is_floating() then
 		return false
 	else
-		local empty = true
+		local rv = true
 
 		if (self:_get("ifname") or ""):match("%S+") then
-			empty = false
+			rv = false
 		end
 
-		if empty and _wifi_netid_by_netname(self.sid) then
-			empty = false
-		end
+		_uci:foreach("wireless", "wifi-iface",
+			function(s)
+				local n
+				for n in utl.imatch(s.network) do
+					if n == self.sid then
+						rv = false
+						return false
+					end
+				end
+			end)
 
-		return empty
+		return rv
 	end
 end
 
@@ -1085,7 +1006,7 @@ function protocol.add_interface(self, ifname)
 	ifname = _M:ifnameof(ifname)
 	if ifname and not self:is_floating() then
 		-- if its a wifi interface, change its network option
-		local wif = _wifi_sid_by_ifname(ifname)
+		local wif = _wifi_lookup(ifname)
 		if wif then
 			_append("wireless", wif, "network", self.sid)
 
@@ -1100,7 +1021,7 @@ function protocol.del_interface(self, ifname)
 	ifname = _M:ifnameof(ifname)
 	if ifname and not self:is_floating() then
 		-- if its a wireless interface, clear its network option
-		local wif = _wifi_sid_by_ifname(ifname)
+		local wif = _wifi_lookup(ifname)
 		if wif then _filter("wireless", wif, "network", self.sid) end
 
 		-- remove the interface
@@ -1122,7 +1043,21 @@ function protocol.get_interface(self)
 			ifn = ifn:match("^[^:/]+")
 			return ifn and interface(ifn, self)
 		end
-		ifn = _wifi_netid_by_netname(self.sid)
+		ifn = nil
+		_uci:foreach("wireless", "wifi-iface",
+			function(s)
+				if s.device then
+					num[s.device] = num[s.device] and num[s.device] + 1 or 1
+
+					local net
+					for net in utl.imatch(s.network) do
+						if net == self.sid then
+							ifn = "%s.network%d" %{ s.device, num[s.device] }
+							return false
+						end
+					end
+				end
+			end)
 		return ifn and interface(ifn, self)
 	end
 end
@@ -1142,17 +1077,18 @@ function protocol.get_interfaces(self)
 			ifaces[#ifaces+1] = nfs[ifn]
 		end
 
+		local num = { }
 		local wfs = { }
 		_uci:foreach("wireless", "wifi-iface",
 			function(s)
 				if s.device then
+					num[s.device] = num[s.device] and num[s.device] + 1 or 1
+
 					local net
 					for net in utl.imatch(s.network) do
 						if net == self.sid then
-							ifn = _wifi_netid_by_sid(s[".name"])
-							if ifn then
-								wfs[ifn] = interface(ifn, self)
-							end
+							ifn = "%s.network%d" %{ s.device, num[s.device] }
+							wfs[ifn] = interface(ifn, self)
 						end
 					end
 				end
@@ -1183,7 +1119,7 @@ function protocol.contains_interface(self, ifname)
 			end
 		end
 
-		local wif = _wifi_sid_by_ifname(ifname)
+		local wif = _wifi_lookup(ifname)
 		if wif then
 			local n
 			for n in utl.imatch(_uci:get("wireless", wif, "network")) do
@@ -1198,18 +1134,17 @@ function protocol.contains_interface(self, ifname)
 end
 
 function protocol.adminlink(self)
-	local stat, dsp = pcall(require, "luci.dispatcher")
-	return stat and dsp.build_url("admin", "network", "network", self.sid)
+	return dsp.build_url("admin", "network", "network", self.sid)
 end
 
 
 interface = utl.class()
 
 function interface.__init__(self, ifname, network)
-	local wif = _wifi_sid_by_ifname(ifname)
+	local wif = _wifi_lookup(ifname)
 	if wif then
 		self.wif    = wifinet(wif)
-		self.ifname = self.wif:ifname()
+		self.ifname = _wifi_state("section", wif, "ifname")
 	end
 
 	self.ifname  = self.ifname or ifname
@@ -1233,7 +1168,8 @@ function interface.name(self)
 end
 
 function interface.mac(self)
-	return ipc.checkmac(self:_ubus("macaddr"))
+	local mac = self:_ubus("macaddr")
+	return mac and mac:upper()
 end
 
 function interface.ipaddrs(self)
@@ -1396,14 +1332,9 @@ end
 
 wifidev = utl.class()
 
-function wifidev.__init__(self, name)
-	local t, n = _uci:get("wireless", name)
-	if t == "wifi-device" and n ~= nil then
-		self.sid    = n
-		self.iwinfo = _wifi_iwinfo_by_ifname(self.sid, true)
-	end
-	self.sid    = self.sid    or name
-	self.iwinfo = self.iwinfo or { ifname = self.sid }
+function wifidev.__init__(self, dev)
+	self.sid    = dev
+	self.iwinfo = dev and sys.wifi.getiwinfo(dev) or { }
 end
 
 function wifidev.get(self, opt)
@@ -1428,9 +1359,11 @@ function wifidev.hwmodes(self)
 end
 
 function wifidev.get_i18n(self)
-	local t = self.iwinfo.hardware_name or "Generic"
+	local t = "Generic"
 	if self.iwinfo.type == "wl" then
 		t = "Broadcom"
+	elseif self.iwinfo.type == "ra" then
+		t = "Ralink/MediaTek"
 	end
 
 	local m = ""
@@ -1456,7 +1389,7 @@ function wifidev.get_wifinet(self, net)
 	if _uci:get("wireless", net) == "wifi-iface" then
 		return wifinet(net)
 	else
-		local wnet = _wifi_sid_by_ifname(net)
+		local wnet = _wifi_lookup(net)
 		if wnet then
 			return wifinet(wnet)
 		end
@@ -1490,7 +1423,7 @@ function wifidev.del_wifinet(self, net)
 	if utl.instanceof(net, wifinet) then
 		net = net.sid
 	elseif _uci:get("wireless", net) ~= "wifi-iface" then
-		net = _wifi_sid_by_ifname(net)
+		net = _wifi_lookup(net)
 	end
 
 	if net and _uci:get("wireless", net, "device") == self.sid then
@@ -1504,50 +1437,49 @@ end
 
 wifinet = utl.class()
 
-function wifinet.__init__(self, name, data)
-	local sid, netid, radioname, radiostate, netstate
+function wifinet.__init__(self, net, data)
+	self.sid = net
 
-	-- lookup state by radio#.network# notation
-	sid = _wifi_sid_by_netid(name)
+	local n = 0
+	local num = { }
+	local netid, sid
+	_uci:foreach("wireless", "wifi-iface",
+		function(s)
+			n = n + 1
+			if s.device then
+				num[s.device] = num[s.device] and num[s.device] + 1 or 1
+				if s['.name'] == self.sid then
+					sid = "@wifi-iface[%d]" % n
+					netid = "%s.network%d" %{ s.device, num[s.device] }
+					return false
+				end
+			end
+		end)
+
 	if sid then
-		netid = name
-		radioname, radiostate, netstate = _wifi_state_by_sid(sid)
-	else
-		-- lookup state by ifname (e.g. wlan0)
-		radioname, radiostate, netstate = _wifi_state_by_ifname(name)
-		if radioname and radiostate and netstate then
-			sid = netstate.section
-			netid = _wifi_netid_by_sid(sid)
-		else
-			-- lookup state by uci section id (e.g. cfg053579)
-			radioname, radiostate, netstate = _wifi_state_by_sid(name)
-			if radioname and radiostate and netstate then
-				sid = name
-				netid = _wifi_netid_by_sid(sid)
-			else
-				-- no state available, try to resolve from uci
-				netid, radioname = _wifi_netid_by_sid(name)
-				if netid and radioname then
-					sid = name
+		local _, k, r, i
+		for k, r in pairs(_ubuswificache) do
+			if type(r) == "table" and
+			   type(r.interfaces) == "table"
+			then
+				for _, i in ipairs(r.interfaces) do
+					if type(i) == "table" and i.section == sid then
+						self._ubusdata = {
+							radio = k,
+							dev = r,
+							net = i
+						}
+					end
 				end
 			end
 		end
 	end
 
-	local iwinfo =
-		(netstate and _wifi_iwinfo_by_ifname(netstate.ifname)) or
-		(radioname and _wifi_iwinfo_by_ifname(radioname)) or
-		{ ifname = (netid or sid or name) }
+	local dev = _wifi_state("section", self.sid, "ifname") or netid
 
-	self.sid       = sid or name
-	self.wdev      = iwinfo.ifname
-	self.iwinfo    = iwinfo
-	self.netid     = netid
-	self._ubusdata = {
-		radio = radioname,
-		dev   = radiostate,
-		net   = netstate
-	}
+	self.netid  = netid
+	self.wdev   = dev
+	self.iwinfo = dev and sys.wifi.getiwinfo(dev) or { }
 end
 
 function wifinet.ubus(self, ...)
@@ -1600,7 +1532,7 @@ end
 
 function wifinet.ifname(self)
 	local ifname = self:ubus("net", "ifname") or self.iwinfo.ifname
-	if not ifname or ifname:match("^wifi%d") or ifname:match("^radio%d") then
+	if not ifname or ifname:match("^wifi%d") or ifname:match("^radio%d") or ifname:match("^ra") or ifname:match("^rai")  then
 		ifname = self.wdev
 	end
 	return ifname
@@ -1734,8 +1666,7 @@ function wifinet.get_i18n(self)
 end
 
 function wifinet.adminlink(self)
-	local stat, dsp = pcall(require, "luci.dispatcher")
-	return dsp and dsp.build_url("admin", "network", "wireless", self.netid)
+	return dsp.build_url("admin", "network", "wireless", self.netid)
 end
 
 function wifinet.get_network(self)

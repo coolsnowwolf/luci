@@ -20,14 +20,12 @@ module "luci.model.ipkg"
 
 -- Internal action function
 local function _action(cmd, ...)
-	local cmdline = { ipkg, cmd }
-
-	local k, v
+	local pkg = ""
 	for k, v in pairs({...}) do
-		cmdline[#cmdline+1] = util.shellquote(v)
+		pkg = pkg .. " '" .. v:gsub("'", "") .. "'"
 	end
 
-	local c = "%s >/tmp/opkg.stdout 2>/tmp/opkg.stderr" % table.concat(cmdline, " ")
+	local c = "%s %s %s >/tmp/opkg.stdout 2>/tmp/opkg.stderr" %{ ipkg, cmd, pkg }
 	local r = os.execute(c)
 	local e = fs.readfile("/tmp/opkg.stderr")
 	local o = fs.readfile("/tmp/opkg.stdout")
@@ -76,17 +74,17 @@ local function _parselist(rawdata)
 end
 
 -- Internal lookup function
-local function _lookup(cmd, pkg)
-	local cmdline = { ipkg, cmd }
+local function _lookup(act, pkg)
+	local cmd = ipkg .. " " .. act
 	if pkg then
-		cmdline[#cmdline+1] = util.shellquote(pkg)
+		cmd = cmd .. " '" .. pkg:gsub("'", "") .. "'"
 	end
 
 	-- OPKG sometimes kills the whole machine because it sucks
 	-- Therefore we have to use a sucky approach too and use
 	-- tmpfiles instead of directly reading the output
 	local tmpfile = os.tmpname()
-	os.execute("%s >%s 2>/dev/null" %{ table.concat(cmdline, " "), tmpfile })
+	os.execute(cmd .. (" >%s 2>/dev/null" % tmpfile))
 
 	local data = _parselist(io.lines(tmpfile))
 	os.remove(tmpfile)
@@ -125,12 +123,9 @@ end
 
 -- List helper
 local function _list(action, pat, cb)
-	local cmdline = { ipkg, action }
-	if pat then
-		cmdline[#cmdline+1] = util.shellquote(pat)
-	end
+	local fd = io.popen(ipkg .. " " .. action ..
+		(pat and (" '%s'" % pat:gsub("'", "")) or ""))
 
-	local fd = io.popen(table.concat(cmdline, " "))
 	if fd then
 		local name, version, sz, desc
 		while true do

@@ -1,0 +1,8 @@
+#!/bin/sh
+uci -q batch <<-EOF >/dev/null
+	add_list uhttpd.main.index_page='cgi-bin/luci'
+	commit uhttpd
+	set luci.main.lang=zh_cn
+	commit luci
+EOF
+exit 0

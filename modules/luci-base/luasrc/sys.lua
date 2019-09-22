@@ -7,7 +7,6 @@ local table  = require "table"
 local nixio  = require "nixio"
 local fs     = require "nixio.fs"
 local uci    = require "luci.model.uci"
-local ntm    = require "luci.model.network"
 
 local luci  = {}
 luci.util   = require "luci.util"
@@ -70,6 +69,24 @@ function mounts()
 	return data
 end
 
+function mtds()
+	local data = {}
+
+	if fs.access("/proc/mtd") then
+		for l in io.lines("/proc/mtd") do
+			local d, s, e, n = l:match('^([^%s]+)%s+([^%s]+)%s+([^%s]+)%s+"([^%s]+)"')
+			if s and n then
+				local d = {}
+				d.size = tonumber(s, 16)
+				d.name = n
+				table.insert(data, d)
+			end
+		end
+	end
+
+	return data
+end
+
 -- containing the whole environment is returned otherwise this function returns
 -- the corresponding string value for the given name or nil if no such variable
 -- exists.
@@ -87,10 +104,10 @@ end
 function httpget(url, stream, target)
 	if not target then
 		local source = stream and io.popen or luci.util.exec
-		return source("wget -qO- %s" % luci.util.shellquote(url))
+		return source("wget -qO- '"..url:gsub("'", "").."'")
 	else
-		return os.execute("wget -qO %s %s" %
-			{luci.util.shellquote(target), luci.util.shellquote(url)})
+		return os.execute("wget -qO '%s' '%s'" %
+			{target:gsub("'", ""), url:gsub("'", "")})
 	end
 end
 
@@ -138,22 +155,17 @@ local function _nethints(what, callback)
 
 	luci.ip.neighbors(nil, function(neigh)
 		if neigh.mac and neigh.family == 4 then
-			_add(what, neigh.mac:string(), neigh.dest:string(), nil, nil)
+			_add(what, neigh.mac:upper(), neigh.dest:string(), nil, nil)
 		elseif neigh.mac and neigh.family == 6 then
-			_add(what, neigh.mac:string(), nil, neigh.dest:string(), nil)
+			_add(what, neigh.mac:upper(), nil, neigh.dest:string(), nil)
 		end
 	end)
 
 	if fs.access("/etc/ethers") then
 		for e in io.lines("/etc/ethers") do
-			mac, name = e:match("^([a-fA-F0-9:-]+)%s+(%S+)")
-			mac = luci.ip.checkmac(mac)
-			if mac and name then
-				if luci.ip.checkip4(name) then
-					_add(what, mac, name, nil, nil)
-				else
-					_add(what, mac, nil, nil, name)
-				end
+			mac, ip = e:match("^([a-f0-9]%S+) (%S+)")
+			if mac and ip then
+				_add(what, mac:upper(), ip, nil, nil)
 			end
 		end
 	end
@@ -163,9 +175,8 @@ local function _nethints(what, callback)
 			if s.leasefile and fs.access(s.leasefile) then
 				for e in io.lines(s.leasefile) do
 					mac, ip, name = e:match("^%d+ (%S+) (%S+) (%S+)")
-					mac = luci.ip.checkmac(mac)
 					if mac and ip then
-						_add(what, mac, ip, nil, name ~= "*" and name)
+						_add(what, mac:upper(), ip, nil, name ~= "*" and name)
 					end
 				end
 			end
@@ -175,10 +186,7 @@ local function _nethints(what, callback)
 	cur:foreach("dhcp", "host",
 		function(s)
 			for mac in luci.util.imatch(s.mac) do
-				mac = luci.ip.checkmac(mac)
-				if mac then
-					_add(what, mac, s.ip, nil, s.name)
-				end
+				_add(what, mac:upper(), s.ip, nil, s.name)
 			end
 		end)
 
@@ -443,30 +451,55 @@ function user.checkpasswd(username, pass)
 end
 
 function user.setpasswd(username, password)
-	return os.execute("(echo %s; sleep 1; echo %s) | passwd %s >/dev/null 2>&1" %{
-		luci.util.shellquote(password),
-		luci.util.shellquote(password),
-		luci.util.shellquote(username)
-	})
+	if password then
+		password = password:gsub("'", [['"'"']])
+	end
+
+	if username then
+		username = username:gsub("'", [['"'"']])
+	end
+
+	return os.execute(
+		"(echo '" .. password .. "'; sleep 1; echo '" .. password .. "') | " ..
+		"passwd '" .. username .. "' >/dev/null 2>&1"
+	)
 end
 
 
 wifi = {}
 
 function wifi.getiwinfo(ifname)
-	ntm.init()
+	local stat, iwinfo = pcall(require, "iwinfo")
 
-	local wnet = ntm:get_wifinet(ifname)
-	if wnet and wnet.iwinfo then
-		return wnet.iwinfo
+	if ifname then
+		local d, n = ifname:match("^(%w+)%.network(%d+)")
+		local wstate = luci.util.ubus("network.wireless", "status") or { }
+
+		d = d or ifname
+		n = n and tonumber(n) or 1
+
+		if type(wstate[d]) == "table" and
+		   type(wstate[d].interfaces) == "table" and
+		   type(wstate[d].interfaces[n]) == "table" and
+		   type(wstate[d].interfaces[n].ifname) == "string"
+		then
+			ifname = wstate[d].interfaces[n].ifname
+		else
+			ifname = d
+		end
+
+		local t = stat and iwinfo.type(ifname)
+		local x = t and iwinfo[t] or { }
+		return setmetatable({}, {
+			__index = function(t, k)
+				if k == "ifname" then
+					return ifname
+				elseif x[k] then
+					return x[k](ifname)
+				end
+			end
+		})
 	end
-
-	local wdev = ntm:get_wifidev(ifname)
-	if wdev and wdev.iwinfo then
-		return wdev.iwinfo
-	end
-
-	return { ifname = ifname }
 end
 
 

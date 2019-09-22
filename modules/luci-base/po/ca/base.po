@@ -13,9 +13,6 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.0.6\n"
 
-msgid "%.1f dB"
-msgstr ""
-
 msgid "%s is untagged in multiple VLANs!"
 msgstr ""
 
@@ -127,16 +124,13 @@ msgid "<abbr title=\"Internet Protocol Version 6\">IPv6</abbr>-Suffix (hex)"
 msgstr ""
 
 msgid "<abbr title=\"Light Emitting Diode\">LED</abbr> Configuration"
-msgstr "Configuració dels <abbr title=\"Light Emitting Diode\">LED</abbr>s"
+msgstr "Configuració <abbr title=\"Light Emitting Diode\">LED</abbr>"
 
 msgid "<abbr title=\"Light Emitting Diode\">LED</abbr> Name"
 msgstr "Nom <abbr title=\"Light Emitting Diode\">LED</abbr>"
 
 msgid "<abbr title=\"Media Access Control\">MAC</abbr>-Address"
 msgstr "Adreça <abbr title=\"Media Access Control\">MAC</abbr>"
-
-msgid "<abbr title=\"The DHCP Unique Identifier\">DUID</abbr>"
-msgstr ""
 
 msgid ""
 "<abbr title=\"maximal\">Max.</abbr> <abbr title=\"Dynamic Host Configuration "
@@ -162,8 +156,6 @@ msgid ""
 "<br/>Note: you need to manually restart the cron service if the crontab file "
 "was empty before editing."
 msgstr ""
-"Avís: cal reiniciar manualment el servei cron si el fitxer crontab estava "
-"buit abans d'editar-lo."
 
 msgid "A43C + J43 + A43"
 msgstr ""
@@ -221,6 +213,9 @@ msgstr "Concentrador d'accés"
 
 msgid "Access Point"
 msgstr "Punt d'accés"
+
+msgid "Action"
+msgstr "Acció"
 
 msgid "Actions"
 msgstr "Accions"
@@ -290,14 +285,10 @@ msgstr ""
 
 msgid "Allow <abbr title=\"Secure Shell\">SSH</abbr> password authentication"
 msgstr ""
-"Permetre l'autenticació <abbr title=\"Secure Shell\">SSH</abbr> amb "
-"contrasenya"
+"Permet autenticació <abbr title=\"Secure Shell\">SSH</abbr> per contrasenya"
 
 msgid "Allow all except listed"
 msgstr "Permet-les totes menys les llistades"
-
-msgid "Allow legacy 802.11b rates"
-msgstr ""
 
 msgid "Allow listed only"
 msgstr "Permet només les llistades"
@@ -307,14 +298,13 @@ msgstr "Permetre el localhost"
 
 msgid "Allow remote hosts to connect to local SSH forwarded ports"
 msgstr ""
-"Permetre a màquines remotes de connectar-se als ports reenviats de l'SSH "
-"local"
+"Permetre a màquines remotes de connectar als ports reenviats de l'SSH local"
 
 msgid "Allow root logins with password"
-msgstr "Accés d'administrador amb contrasenya"
+msgstr "Permetre l'accés del l'administrador amb paraula clau"
 
 msgid "Allow the <em>root</em> user to login with password"
-msgstr "Permetre l'accés de l'usurari <em>root</em> amb contrasenya"
+msgstr "Permetre l'accés de l'usurari <em>root</em> amb paraula clau"
 
 msgid ""
 "Allow upstream responses in the 127.0.0.0/8 range, e.g. for RBL services"
@@ -503,10 +493,10 @@ msgid "Back to scan results"
 msgstr "Enrere als resultats de l'escaneig"
 
 msgid "Backup / Flash Firmware"
-msgstr "Còpia de seguretat i microprogramari"
+msgstr "Còpia de seguretat / Recàrrega de programari"
 
 msgid "Backup / Restore"
-msgstr "Còpia de seguretat i restauració de la configuració"
+msgstr "Còpia de seguretat / Restauració"
 
 msgid "Backup file list"
 msgstr "Llista de còpies de seguretat"
@@ -569,8 +559,9 @@ msgid ""
 "Build/distribution specific feed definitions. This file will NOT be "
 "preserved in any sysupgrade."
 msgstr ""
-"Repositoris específics de la distribució/compilació. Aquest fitxer NO es "
-"preservarà durant les actualitzacions del microprogramari del sistema."
+
+msgid "Buttons"
+msgstr "Botons"
 
 msgid "CA certificate; if empty it will be saved after the first connection."
 msgstr ""
@@ -602,7 +593,7 @@ msgstr "Canal"
 msgid "Check"
 msgstr "Comprovació"
 
-msgid "Check filesystems before mount"
+msgid "Check fileystems before mount"
 msgstr ""
 
 msgid "Check this option to delete the existing networks from this radio."
@@ -640,10 +631,6 @@ msgid ""
 "configuration files. To reset the firmware to its initial state, click "
 "\"Perform reset\" (only possible with squashfs images)."
 msgstr ""
-"Fes clic a \"Genera l'arxiu\" per obtenir un fitxer .tar.gz amb els fitxers "
-"de configuració actuals. Per restablir el microprogramari al seu estat "
-"inicial, fes clic a \"Restableix la configuració\" (només funciona amb "
-"imatges squashfs)."
 
 msgid "Client"
 msgstr "Client"
@@ -667,13 +654,6 @@ msgstr "Ordre"
 
 msgid "Common Configuration"
 msgstr "Configuració comuna"
-
-msgid ""
-"Complicates key reinstallation attacks on the client side by disabling "
-"retransmission of EAPOL-Key frames that are used to install keys. This "
-"workaround might cause interoperability issues and reduced robustness of key "
-"negotiation especially in environments with heavy traffic load."
-msgstr ""
 
 msgid "Configuration"
 msgstr "Configuració"
@@ -744,16 +724,11 @@ msgid "Custom feeds"
 msgstr ""
 
 msgid ""
-"Custom files (certificates, scripts) may remain on the system. To prevent "
-"this, perform a factory-reset first."
-msgstr ""
-
-msgid ""
 "Customizes the behaviour of the device <abbr title=\"Light Emitting Diode"
 "\">LED</abbr>s if possible."
 msgstr ""
 "Personalitza el comportament dels <abbr title=\"Light Emitting Diode\">LED</"
-"abbr>s del dispositiu, si és possible."
+"abbr>s del dispositiu si és possible."
 
 msgid "DHCP Leases"
 msgstr "Arrendaments DHCP"
@@ -916,7 +891,7 @@ msgid "Distance to farthest network member in meters."
 msgstr "Distància al membre de la xarxa més allunyat en metres."
 
 msgid "Distribution feeds"
-msgstr "Repositoris de la distribució"
+msgstr ""
 
 msgid "Diversity"
 msgstr "Diversitat"
@@ -961,10 +936,7 @@ msgid "Download and install package"
 msgstr "Descarrega i instal·la el paquet"
 
 msgid "Download backup"
-msgstr "Descarrega còpia de seguretat"
-
-msgid "Downstream SNR offset"
-msgstr ""
+msgstr "Descarrega còpia de seguritat"
 
 msgid "Dropbear Instance"
 msgstr "Instància de Dropbear"
@@ -973,8 +945,8 @@ msgid ""
 "Dropbear offers <abbr title=\"Secure Shell\">SSH</abbr> network shell access "
 "and an integrated <abbr title=\"Secure Copy\">SCP</abbr> server"
 msgstr ""
-"El Dropbear ofereix accés a una consola <abbr title=\"Secure Shell\">SSH</"
-"abbr> per xarxa i un servidor <abbr title=\"Secure Copy\">SCP</abbr> integrat"
+"El Dropbear ofereix accés per la xarxa a consola <abbr title=\"Secure Shell"
+"\">SSH</abbr>i un servidor <abbr title=\"Secure Copy\">SCP</abbr> integrat"
 
 msgid "Dual-Stack Lite (RFC6333)"
 msgstr ""
@@ -1017,11 +989,6 @@ msgstr "Emergència"
 msgid "Enable"
 msgstr "Habilita"
 
-msgid ""
-"Enable <abbr title=\"Internet Group Management Protocol\">IGMP</abbr> "
-"snooping"
-msgstr ""
-
 msgid "Enable <abbr title=\"Spanning Tree Protocol\">STP</abbr>"
 msgstr "Habilita l'<abbr title=\"Spanning Tree Protocol\">STP</abbr>"
 
@@ -1052,9 +1019,6 @@ msgstr "Habilita la funcionalitat VLAN"
 msgid "Enable WPS pushbutton, requires WPA(2)-PSK"
 msgstr ""
 
-msgid "Enable key reinstallation (KRACK) countermeasures"
-msgstr ""
-
 msgid "Enable learning and aging"
 msgstr "Habilita l'aprenentatge i l'envelliment"
 
@@ -1078,9 +1042,6 @@ msgstr "Activa/Desactiva"
 
 msgid "Enabled"
 msgstr "Habilitat"
-
-msgid "Enables IGMP snooping on this bridge"
-msgstr ""
 
 msgid ""
 "Enables fast roaming among access points that belong to the same Mobility "
@@ -1140,24 +1101,15 @@ msgid "External R1 Key Holder List"
 msgstr ""
 
 msgid "External system log server"
-msgstr "Servidor de registre del sistema extern"
+msgstr ""
 
 msgid "External system log server port"
-msgstr "Port del servidor de registre del sistema extern"
+msgstr ""
 
 msgid "External system log server protocol"
-msgstr "Protocol del servidor de registre del sistema extern"
+msgstr ""
 
 msgid "Extra SSH command options"
-msgstr ""
-
-msgid "FT over DS"
-msgstr ""
-
-msgid "FT over the Air"
-msgstr ""
-
-msgid "FT protocol"
 msgstr ""
 
 msgid "File"
@@ -1214,19 +1166,19 @@ msgid "Fixed source port for outbound DNS queries"
 msgstr ""
 
 msgid "Flash Firmware"
-msgstr "Escriptura del microprogramari a la memòria flaix"
+msgstr "Reescriu el microprogramari"
 
 msgid "Flash image..."
-msgstr "Puja una imatge..."
+msgstr "Escriu una imatge..."
 
 msgid "Flash new firmware image"
-msgstr "Escriu una imatge nova a la memòria flaix"
+msgstr "Escriu una imatge nova"
 
 msgid "Flash operations"
-msgstr "Operacions a la memòria flaix"
+msgstr "Operacions d'escriptura"
 
 msgid "Flashing..."
-msgstr "Escrivint a la memòria flaix..."
+msgstr "Escrivent..."
 
 msgid "Force"
 msgstr "Força"
@@ -1253,16 +1205,13 @@ msgid "Form token mismatch"
 msgstr ""
 
 msgid "Forward DHCP traffic"
-msgstr "Reenvia el trànsit DHCP"
+msgstr "Reenvia el tràfic DHCP"
 
 msgid "Forward Error Correction Seconds (FECS)"
 msgstr ""
 
 msgid "Forward broadcast traffic"
-msgstr "Reenvia el trànsit difós"
-
-msgid "Forward mesh peer traffic"
-msgstr ""
+msgstr "Reenvia el tràfic difós"
 
 msgid "Forwarding mode"
 msgstr "Mode de reenviament"
@@ -1274,7 +1223,7 @@ msgid "Frame Bursting"
 msgstr ""
 
 msgid "Free"
-msgstr "Lliure"
+msgstr "Lliures"
 
 msgid "Free space"
 msgstr "Espai lliure"
@@ -1303,19 +1252,16 @@ msgid "General Setup"
 msgstr ""
 
 msgid "General options for opkg"
-msgstr "Opcions generals d'opkg"
+msgstr ""
 
 msgid "Generate Config"
 msgstr ""
 
-msgid "Generate PMK locally"
+msgid "Generate archive"
 msgstr ""
 
-msgid "Generate archive"
-msgstr "Genera l'arxiu"
-
 msgid "Generic 802.11%s Wireless Controller"
-msgstr "Controlador sense fils 802.11%s genèric"
+msgstr "Controlador sense fil 802.11%s genèric"
 
 msgid "Given password confirmation did not match, password not changed!"
 msgstr ""
@@ -1349,6 +1295,9 @@ msgstr ""
 msgid "HT mode (802.11n)"
 msgstr ""
 
+msgid "Handler"
+msgstr ""
+
 msgid "Hang Up"
 msgstr "Penja"
 
@@ -1369,8 +1318,6 @@ msgid ""
 "Here you can paste public SSH-Keys (one per line) for SSH public-key "
 "authentication."
 msgstr ""
-"Aquí pots afegir-hi les claus SSH públiques (una per línia) per entrar per "
-"SSH amb autenticació per clau."
 
 msgid "Hermes 802.11b Wireless Controller"
 msgstr "Controlador sense fil Hermes 802.11b"
@@ -1380,7 +1327,7 @@ msgstr ""
 "No mostris l'<abbr title=\"Extended Service Set Identifier\">ESSID</abbr>"
 
 msgid "Host"
-msgstr "Nom de màquina"
+msgstr ""
 
 msgid "Host entries"
 msgstr "Entrades de noms de màquina"
@@ -1449,7 +1396,7 @@ msgid "IPv4 prefix length"
 msgstr "Longitud de prefix IPv4"
 
 msgid "IPv4-Address"
-msgstr "Adreça IPv4"
+msgstr "Adreça IPv6"
 
 msgid "IPv4-in-IPv4 (RFC2003)"
 msgstr ""
@@ -1461,7 +1408,7 @@ msgid "IPv6 Firewall"
 msgstr "Tallafocs IPv6"
 
 msgid "IPv6 Neighbours"
-msgstr "Veïns IPv6"
+msgstr ""
 
 msgid "IPv6 Settings"
 msgstr ""
@@ -1470,7 +1417,7 @@ msgid "IPv6 ULA-Prefix"
 msgstr ""
 
 msgid "IPv6 WAN Status"
-msgstr "Estat WAN IPv6"
+msgstr "Estado WAN IPv6"
 
 msgid "IPv6 address"
 msgstr "Adreça IPv6"
@@ -1520,7 +1467,7 @@ msgstr "IPv6-sobre-IPv4 (6to4)"
 msgid "Identity"
 msgstr "Identitat"
 
-msgid "If checked, 1DES is enabled"
+msgid "If checked, 1DES is enaled"
 msgstr ""
 
 msgid "If checked, encryption is disabled"
@@ -1565,10 +1512,10 @@ msgid "Ignore resolve file"
 msgstr "Ignora el fitxer de resolució"
 
 msgid "Image"
-msgstr "Fitxer d'imatge"
+msgstr "Imatge"
 
 msgid "In"
-msgstr "Entr."
+msgstr "En"
 
 msgid ""
 "In order to prevent unauthorized access to the system, your request has been "
@@ -1680,7 +1627,7 @@ msgid "Joining Network: %q"
 msgstr ""
 
 msgid "Keep settings"
-msgstr "Mantenir la configuració"
+msgstr ""
 
 msgid "Kernel Log"
 msgstr "Registre del nucli"
@@ -1737,7 +1684,7 @@ msgid "Leasefile"
 msgstr "Fitxer d'arrendament"
 
 msgid "Leasetime remaining"
-msgstr "Temps d'arrendament restant"
+msgstr "Duració d'arrendament restant"
 
 msgid "Leave empty to autodetect"
 msgstr "Deixeu-ho en blanc per autodetectar"
@@ -1770,7 +1717,7 @@ msgid "Line Uptime"
 msgstr ""
 
 msgid "Link On"
-msgstr "Enllaç actiu"
+msgstr "Enllaç activa"
 
 msgid ""
 "List of <abbr title=\"Domain Name System\">DNS</abbr> servers to forward "
@@ -1810,17 +1757,15 @@ msgstr ""
 
 msgid "Listen only on the given interface or, if unspecified, on all"
 msgstr ""
-"Habilita el servei en totes les interfícies o, si no se n'especifica cap, en "
-"totes"
 
 msgid "Listening port for inbound DNS queries"
 msgstr ""
 
 msgid "Load"
-msgstr "Càrrega"
+msgstr "Carrega"
 
 msgid "Load Average"
-msgstr "Càrrega mitjana"
+msgstr "Carrega mitjana"
 
 msgid "Loading"
 msgstr "Carregant"
@@ -1939,6 +1884,9 @@ msgstr ""
 msgid "Maximum amount of seconds to wait for the modem to become ready"
 msgstr ""
 
+msgid "Maximum hold time"
+msgstr ""
+
 msgid ""
 "Maximum length of the name is 15 characters including the automatic protocol/"
 "bridge prefix (br-, 6in4-, pppoe- etc.)"
@@ -1956,11 +1904,11 @@ msgstr "Memòria"
 msgid "Memory usage (%)"
 msgstr "Ús de Memòria (%)"
 
-msgid "Mesh Id"
-msgstr ""
-
 msgid "Metric"
-msgstr "Mètrica"
+msgstr "Mètric"
+
+msgid "Minimum hold time"
+msgstr ""
 
 msgid "Mirror monitor port"
 msgstr ""
@@ -2096,13 +2044,13 @@ msgid "No NAT-T"
 msgstr ""
 
 msgid "No chains in this table"
-msgstr "No hi ha cadenes en aquesta taula"
+msgstr "No hi ha cadenes a aquesta taula"
 
 msgid "No files found"
 msgstr "Cap fitxer trobat"
 
 msgid "No information available"
-msgstr "No hi ha informació disponible"
+msgstr "Cap informació disponible"
 
 msgid "No negative cache"
 msgstr "Sense memòria cau negativa"
@@ -2117,7 +2065,7 @@ msgid "No package lists available"
 msgstr "No hi ha llistes de paquets disponibles"
 
 msgid "No password set!"
-msgstr "No hi ha cap contrasenya establerta!"
+msgstr "Cap contrasenya establerta!"
 
 msgid "No rules in this chain"
 msgstr "No hi ha regles en aquesta cadena"
@@ -2166,9 +2114,6 @@ msgstr "Avís"
 
 msgid "Nslookup"
 msgstr "Nslookup"
-
-msgid "Number of cached DNS entries (max is 10000, 0 is no caching)"
-msgstr ""
 
 msgid "OK"
 msgstr "D'acord"
@@ -2285,7 +2230,7 @@ msgid "Other:"
 msgstr "Altres:"
 
 msgid "Out"
-msgstr "Sort."
+msgstr ""
 
 msgid "Outbound:"
 msgstr "Sortint:"
@@ -2409,6 +2354,9 @@ msgstr ""
 msgid "Path to Private Key"
 msgstr "Ruta a la clau privada"
 
+msgid "Path to executable which handles the button event"
+msgstr ""
+
 msgid "Path to inner CA-Certificate"
 msgstr ""
 
@@ -2499,7 +2447,7 @@ msgid "Private Key"
 msgstr ""
 
 msgid "Proceed"
-msgstr "Procedeix"
+msgstr "continua"
 
 msgid "Processes"
 msgstr "Processos"
@@ -2523,7 +2471,7 @@ msgid "Protocol support is not installed"
 msgstr ""
 
 msgid "Provide NTP server"
-msgstr "Habilita el servidor NTP"
+msgstr ""
 
 msgid "Provide new network"
 msgstr ""
@@ -2616,19 +2564,19 @@ msgid "Really switch protocol?"
 msgstr ""
 
 msgid "Realtime Connections"
-msgstr "Connexions en temps real"
+msgstr ""
 
 msgid "Realtime Graphs"
-msgstr "Gràfiques en temps real"
+msgstr ""
 
 msgid "Realtime Load"
-msgstr "Càrrega en temps real"
+msgstr ""
 
 msgid "Realtime Traffic"
-msgstr "Trànsit en temps real"
+msgstr ""
 
 msgid "Realtime Wireless"
-msgstr "Dispositiu sense fils en temps real"
+msgstr ""
 
 msgid "Reassociation Deadline"
 msgstr ""
@@ -2646,7 +2594,7 @@ msgid "Reboots the operating system of your device"
 msgstr "Arranca de nou el sistema operatiu del teu dispositiu"
 
 msgid "Receive"
-msgstr "Recepció"
+msgstr "Rep"
 
 msgid "Receiver Antenna"
 msgstr "Antena receptora"
@@ -2676,10 +2624,10 @@ msgid "Relay bridge"
 msgstr "Pont de relé"
 
 msgid "Remote IPv4 address"
-msgstr "Adreça IPv4 remota"
+msgstr "Adreça IPv6 remota"
 
 msgid "Remote IPv4 address or FQDN"
-msgstr "Adreça IPv4 remota o FQDN"
+msgstr ""
 
 msgid "Remove"
 msgstr "Treu"
@@ -2731,7 +2679,7 @@ msgid ""
 msgstr ""
 
 msgid "Reset"
-msgstr "Restableix"
+msgstr "Reinicia"
 
 msgid "Reset Counters"
 msgstr "Reinicia els comptadors"
@@ -2749,7 +2697,7 @@ msgid "Restart"
 msgstr "Reinicia"
 
 msgid "Restart Firewall"
-msgstr "Reinicia el tallafocs"
+msgstr "Reinicia Tallafocs"
 
 msgid "Restore backup"
 msgstr "Restaura còpia de seguretat"
@@ -2836,10 +2784,10 @@ msgid "Save"
 msgstr "Desa"
 
 msgid "Save & Apply"
-msgstr "Desa i aplica"
+msgstr "Desa y aplica"
 
 msgid "Save &#38; Apply"
-msgstr "Desa i aplica"
+msgstr "Desa y aplica"
 
 msgid "Scan"
 msgstr "Escaneja"
@@ -2894,7 +2842,7 @@ msgstr ""
 
 #, fuzzy
 msgid "Set up Time Synchronization"
-msgstr "Configura la sincronització de l'hora"
+msgstr "Sincronització de hora"
 
 msgid "Setup DHCP Server"
 msgstr ""
@@ -2927,9 +2875,6 @@ msgid "Size"
 msgstr "Mida"
 
 msgid "Size (.ipk)"
-msgstr "Mida (.ipk)"
-
-msgid "Size of DNS query cache"
 msgstr ""
 
 msgid "Skip"
@@ -2974,6 +2919,9 @@ msgstr "Origen"
 msgid "Source routing"
 msgstr ""
 
+msgid "Specifies the button state to handle"
+msgstr ""
+
 msgid "Specifies the directory the device is attached to"
 msgstr "Especifica el directori a que el dispositiu està adjuntat"
 
@@ -3013,7 +2961,7 @@ msgid "Start priority"
 msgstr "Prioritat d'inici"
 
 msgid "Startup"
-msgstr "Arrencada"
+msgstr "Arranca"
 
 msgid "Static IPv4 Routes"
 msgstr "Rutes IPv4 estàtiques"
@@ -3073,9 +3021,6 @@ msgid ""
 "Switch %q has an unknown topology - the VLAN settings might not be accurate."
 msgstr ""
 
-msgid "Switch Port Mask"
-msgstr ""
-
 msgid "Switch VLAN"
 msgstr ""
 
@@ -3083,7 +3028,7 @@ msgid "Switch protocol"
 msgstr "Protocol de commutador"
 
 msgid "Sync with browser"
-msgstr "Sincronitza amb el navegador"
+msgstr "Sincronitza amb navegador"
 
 msgid "Synchronizing..."
 msgstr "Sincronitzant..."
@@ -3092,13 +3037,13 @@ msgid "System"
 msgstr "Sistema"
 
 msgid "System Log"
-msgstr "Registre del sistema"
+msgstr "Registre de sistema"
 
 msgid "System Properties"
-msgstr "Propietats del sistema"
+msgstr "Propietats de sistema"
 
 msgid "System log buffer size"
-msgstr "Mida de la memòria intermèdia per al registre del sistema"
+msgstr "Mida de la memòria intermèdia del registre de sistema"
 
 msgid "TCP:"
 msgstr "TCP:"
@@ -3186,10 +3131,6 @@ msgid ""
 "compare them with the original file to ensure data integrity.<br /> Click "
 "\"Proceed\" below to start the flash procedure."
 msgstr ""
-"S'ha pujat la imatge per a la memòria flaix. A sota hi ha llistades la suma "
-"de verificació i la mida del fitxer per assegurar la integritat de les dades."
-"<br />Fes clic a \"Procedeix\" a continuació per començar el procés "
-"d'escriptura a la memòria flaix."
 
 msgid "The following changes have been committed"
 msgstr "S'han comès els següents canvis"
@@ -3198,7 +3139,7 @@ msgid "The following changes have been reverted"
 msgstr "S&#39;han desfet els següents canvis"
 
 msgid "The following rules are currently active on this system."
-msgstr "Les següents regles estan actualment actives en aquest sistema."
+msgstr "Els següents regles estan actualment actives en aquest sistema."
 
 msgid "The given network name is not unique"
 msgstr "El nom de xarxa donat no és únic"
@@ -3252,11 +3193,10 @@ msgid ""
 "address of your computer to reach the device again, depending on your "
 "settings."
 msgstr ""
-"S'està escrivint la imatge del microprogramari a la memòria flaix.<br />NO "
-"APAGUIS EL DISPOSITIU!<br />Espera uns minuts abans d'intentar connectar-te "
-"de nou. Pot ser necessari que renovis l'adreça DHCP del teu ordinador per "
-"connectar-te de nou a l'encaminador, depenent de la configuració que hi "
-"tinguis."
+"El sistema s'està escrivent ara.<br />NO APAGUEU EL DISPOSITIU!<br />Espereu "
+"uns minuts abans d'intentar connectar-vos de nou. Pot ser necessari que "
+"renoveu l'adreça del vostre ordinador per a connectar al dispositiu de nou, "
+"depenent dels vostres ajusts."
 
 msgid ""
 "The tunnel end-point is behind NAT, defaults to disabled and only applies to "
@@ -3291,8 +3231,6 @@ msgid ""
 "There is no password set on this router. Please configure a root password to "
 "protect the web interface and enable SSH."
 msgstr ""
-"No s'ha establert cap contrasenya en aquest encaminador. Si us plau, "
-"configura una contrasenya per protegir la interfície web i l'accés SSH."
 
 msgid "This IPv4 address of the relay"
 msgstr ""
@@ -3318,13 +3256,10 @@ msgid ""
 "This is the content of /etc/rc.local. Insert your own commands here (in "
 "front of 'exit 0') to execute them at the end of the boot process."
 msgstr ""
-"Aquest és el contingut de /etc/rc.local. Afegeix-hi les teves comandes "
-"(abans de la línia 'exit 0') per executar-les en finalitzar el procés "
-"d'arrencada."
 
 msgid ""
 "This is the local endpoint address assigned by the tunnel broker, it usually "
-"ends with <code>...:2/64</code>"
+"ends with <code>:2</code>"
 msgstr ""
 
 msgid ""
@@ -3357,16 +3292,19 @@ msgstr ""
 "Aquesta llista mostra una vista general sobre els processos corrent al "
 "sistema actualment i el seu estat."
 
+msgid "This page allows the configuration of custom button actions"
+msgstr ""
+
 msgid "This page gives an overview over currently active network connections."
 msgstr ""
 "Aquesta pàgina ofereix una vista general de les connexions de xarxa actives "
 "actualment."
 
 msgid "This section contains no values yet"
-msgstr "Aquesta secció encara no conté cap valor"
+msgstr "Aquesta secció no conté cap valor encara"
 
 msgid "Time Synchronization"
-msgstr "Sincronització de l'hora"
+msgstr "Sincronització de hora"
 
 msgid "Time Synchronization is not configured yet."
 msgstr "La sincronització de hora encara no s'ha configurat."
@@ -3378,8 +3316,6 @@ msgid ""
 "To restore configuration files, you can upload a previously generated backup "
 "archive here."
 msgstr ""
-"Per restaurar els fitxers de configuració, pots pujar una còpia de seguretat "
-"generada anteriorment aquí."
 
 msgid "Tone"
 msgstr ""
@@ -3391,7 +3327,7 @@ msgid "Traceroute"
 msgstr "Rastre de ruta"
 
 msgid "Traffic"
-msgstr "Trànsit"
+msgstr "Tràfic"
 
 msgid "Transfer"
 msgstr "Transferència"
@@ -3400,7 +3336,7 @@ msgid "Transmission Rate"
 msgstr "Taxa de transmissió"
 
 msgid "Transmit"
-msgstr "Transmissió"
+msgstr "Transmet"
 
 msgid "Transmit Power"
 msgstr "Potència de transmissió"
@@ -3409,10 +3345,10 @@ msgid "Transmitter Antenna"
 msgstr "Antena transmissora"
 
 msgid "Trigger"
-msgstr "Activador"
+msgstr ""
 
 msgid "Trigger Mode"
-msgstr "Mode d'activació"
+msgstr ""
 
 msgid "Tunnel ID"
 msgstr "ID del túnel"
@@ -3488,9 +3424,6 @@ msgid ""
 "Check \"Keep settings\" to retain the current configuration (requires a "
 "compatible firmware image)."
 msgstr ""
-"Puja aquí una imatge compatible amb sysupgrade per reemplaçar el "
-"microprogramari actual. Activa \"Mantenir la configuració\" per retenir la "
-"configuració actual (requereix una imatge de microprogramari compatible)."
 
 msgid "Upload archive..."
 msgstr "Puja un arxiu..."
@@ -3499,7 +3432,7 @@ msgid "Uploaded File"
 msgstr "Fitxer pujat"
 
 msgid "Uptime"
-msgstr "Temps en marxa"
+msgstr "Temps d'alta"
 
 msgid "Use <code>/etc/ethers</code>"
 msgstr "Fes servir <code>/etc/ethers</code>"
@@ -3545,9 +3478,9 @@ msgstr ""
 
 msgid ""
 "Use the <em>Add</em> Button to add a new lease entry. The <em>MAC-Address</"
-"em> identifies the host, the <em>IPv4-Address</em> specifies the fixed "
-"address to use, and the <em>Hostname</em> is assigned as a symbolic name to "
-"the requesting host. The optional <em>Lease time</em> can be used to set non-"
+"em> indentifies the host, the <em>IPv4-Address</em> specifies to the fixed "
+"address to use and the <em>Hostname</em> is assigned as symbolic name to the "
+"requesting host. The optional <em>Lease time</em> can be used to set non-"
 "standard host-specific lease time, e.g. 12h, 3d or infinite."
 msgstr ""
 
@@ -3655,17 +3588,12 @@ msgid "Waiting for command to complete..."
 msgstr "Esperant que s'acabi l'ordre..."
 
 msgid "Waiting for device..."
-msgstr "Esperant el dispositiu..."
+msgstr ""
 
 msgid "Warning"
 msgstr "Advertència"
 
 msgid "Warning: There are unsaved changes that will get lost on reboot!"
-msgstr ""
-
-msgid ""
-"When using a PSK, the PMK can be generated locally without inter AP "
-"communications"
 msgstr ""
 
 msgid "Whether to create an IPv6 default route over the tunnel"
@@ -3696,10 +3624,10 @@ msgid "Wireless Security"
 msgstr "Seguretat sense fils"
 
 msgid "Wireless is disabled or not associated"
-msgstr "El dispositiu sense fils està inhabilitat o sense associar"
+msgstr "El sense fil està inhabilitat o sense associar"
 
 msgid "Wireless is restarting..."
-msgstr "El dispositiu sense fils està reiniciant..."
+msgstr "Sense fils està reiniciant..."
 
 msgid "Wireless network is disabled"
 msgstr "La xarxa sense fil està inhabilitada"
@@ -3714,10 +3642,10 @@ msgid "Wireless shut down"
 msgstr "Sense fils aturat"
 
 msgid "Write received DNS requests to syslog"
-msgstr "Escriure les peticions DNS rebudes al registre del sistema"
+msgstr "Escriure les peticions DNS rebudes al syslog"
 
 msgid "Write system log to file"
-msgstr "Escriure el registre del sistema al fitxer"
+msgstr ""
 
 msgid ""
 "You can enable or disable installed init scripts here. Changes will applied "
@@ -3847,9 +3775,6 @@ msgstr "obert"
 msgid "overlay"
 msgstr ""
 
-msgid "random"
-msgstr ""
-
 msgid "relay mode"
 msgstr ""
 
@@ -3894,12 +3819,6 @@ msgstr "sí"
 
 msgid "« Back"
 msgstr "« Enrere"
-
-#~ msgid "Action"
-#~ msgstr "Acció"
-
-#~ msgid "Buttons"
-#~ msgstr "Botons"
 
 #~ msgid "Leasetime"
 #~ msgstr "Duració d'arrendament"

@@ -10,11 +10,12 @@ function index()
 
 	entry({"admin", "status", "iptables"}, template("admin_status/iptables"), _("Firewall"), 2).leaf = true
 	entry({"admin", "status", "iptables_action"}, post("action_iptables")).leaf = true
-
+	entry({"admin", "status", "free_memory_action"}, post("action_free_memory")).leaf = true
+	
 	entry({"admin", "status", "routes"}, template("admin_status/routes"), _("Routes"), 3)
 	entry({"admin", "status", "syslog"}, call("action_syslog"), _("System Log"), 4)
 	entry({"admin", "status", "dmesg"}, call("action_dmesg"), _("Kernel Log"), 5)
-	entry({"admin", "status", "processes"}, form("admin_status/processes"), _("Processes"), 6)
+	entry({"admin", "status", "processes"}, cbi("admin_status/processes"), _("Processes"), 6)
 
 	entry({"admin", "status", "realtime"}, alias("admin", "status", "realtime", "load"), _("Realtime Graphs"), 7)
 
@@ -59,12 +60,19 @@ function action_iptables()
 	luci.http.redirect(luci.dispatcher.build_url("admin/status/iptables"))
 end
 
+function action_free_memory()
+	if luci.http.formvalue("free") then
+		luci.util.exec("/bin/sync")
+		luci.util.exec("/bin/echo 3 > /proc/sys/vm/drop_caches")
+	end
+
+	luci.http.redirect(luci.dispatcher.build_url("admin/status"))
+end
+
 function action_bandwidth(iface)
 	luci.http.prepare_content("application/json")
 
-	local bwc = io.popen("luci-bwc -i %s 2>/dev/null"
-		% luci.util.shellquote(iface))
-
+	local bwc = io.popen("luci-bwc -i %q 2>/dev/null" % iface)
 	if bwc then
 		luci.http.write("[")
 
@@ -82,9 +90,7 @@ end
 function action_wireless(iface)
 	luci.http.prepare_content("application/json")
 
-	local bwc = io.popen("luci-bwc -r %s 2>/dev/null"
-		% luci.util.shellquote(iface))
-
+	local bwc = io.popen("luci-bwc -r %q 2>/dev/null" % iface)
 	if bwc then
 		luci.http.write("[")
 

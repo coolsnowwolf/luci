@@ -9,7 +9,7 @@
 	local dev
 	local devices = { }
 	for _, dev in luci.util.vspairs(luci.sys.net.devices()) do
-		if dev:match("^wlan%d") or dev:match("^ath%d") or dev:match("^wl%d") then
+		if dev:match("^wlan%d") or dev:match("^ath%d") or dev:match("^wl%d") or dev:match("^host%d") or dev:match("^rausb%d") or dev:match("^rai%d") or dev:match("^ra%d") or dev:match("^apclii%d") or dev:match("^apcli%d") then
 			devices[#devices+1] = dev
 		end
 	end

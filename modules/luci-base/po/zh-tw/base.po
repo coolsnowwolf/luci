@@ -11,9 +11,6 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.0.6\n"
 
-msgid "%.1f dB"
-msgstr ""
-
 msgid "%s is untagged in multiple VLANs!"
 msgstr ""
 
@@ -130,9 +127,6 @@ msgstr "<abbr title=\"Light Emitting Diode\">LED</abbr> 名稱"
 msgid "<abbr title=\"Media Access Control\">MAC</abbr>-Address"
 msgstr "<abbr title=\"Media Access Control\">MAC</abbr>-位置"
 
-msgid "<abbr title=\"The DHCP Unique Identifier\">DUID</abbr>"
-msgstr ""
-
 msgid ""
 "<abbr title=\"maximal\">Max.</abbr> <abbr title=\"Dynamic Host Configuration "
 "Protocol\">DHCP</abbr> leases"
@@ -214,6 +208,9 @@ msgstr "接入集線器"
 msgid "Access Point"
 msgstr "存取點 (AP)"
 
+msgid "Action"
+msgstr "動作"
+
 msgid "Actions"
 msgstr "動作"
 
@@ -284,9 +281,6 @@ msgstr "允許 <abbr title=\"Secure Shell\">SSH</abbr> 密碼驗證"
 
 msgid "Allow all except listed"
 msgstr "僅允許列表外"
-
-msgid "Allow legacy 802.11b rates"
-msgstr ""
 
 msgid "Allow listed only"
 msgstr "僅允許列表內"
@@ -555,6 +549,9 @@ msgid ""
 "preserved in any sysupgrade."
 msgstr ""
 
+msgid "Buttons"
+msgstr "按鈕"
+
 msgid "CA certificate; if empty it will be saved after the first connection."
 msgstr ""
 
@@ -585,7 +582,7 @@ msgstr "頻道"
 msgid "Check"
 msgstr "檢查"
 
-msgid "Check filesystems before mount"
+msgid "Check fileystems before mount"
 msgstr ""
 
 msgid "Check this option to delete the existing networks from this radio."
@@ -600,14 +597,14 @@ msgid ""
 "fill out the <em>create</em> field to define a new zone and attach the "
 "interface to it."
 msgstr ""
-"選擇您要指定給這介面的防火牆區. 撿選<em>unspecified</em>以便從指定區域除這個"
+"選擇你要指定給這介面的防火牆區. 撿選<em>unspecified</em>以便從指定區域除這個"
 "介面或者填寫<em>create</em>欄以便定義附加這個介面到一個新的區域上."
 
 msgid ""
 "Choose the network(s) you want to attach to this wireless interface or fill "
 "out the <em>create</em> field to define a new network."
 msgstr ""
-"選擇您要附加到無線網路介面的多個網路或者填寫<em>create</em> 以便定義一個新的"
+"選擇你要附加到無線網路介面的多個網路或者填寫<em>create</em> 以便定義一個新的"
 "網路."
 
 msgid "Cipher"
@@ -646,13 +643,6 @@ msgstr "指令"
 
 msgid "Common Configuration"
 msgstr "一般設定"
-
-msgid ""
-"Complicates key reinstallation attacks on the client side by disabling "
-"retransmission of EAPOL-Key frames that are used to install keys. This "
-"workaround might cause interoperability issues and reduced robustness of key "
-"negotiation especially in environments with heavy traffic load."
-msgstr ""
 
 msgid "Configuration"
 msgstr "設定"
@@ -720,11 +710,6 @@ msgid ""
 msgstr ""
 
 msgid "Custom feeds"
-msgstr ""
-
-msgid ""
-"Custom files (certificates, scripts) may remain on the system. To prevent "
-"this, perform a factory-reset first."
 msgstr ""
 
 msgid ""
@@ -942,9 +927,6 @@ msgstr "下載並安裝軟體包"
 msgid "Download backup"
 msgstr "下載備份檔"
 
-msgid "Downstream SNR offset"
-msgstr ""
-
 msgid "Dropbear Instance"
 msgstr "Dropbear SSH例子"
 
@@ -995,11 +977,6 @@ msgstr "緊急"
 msgid "Enable"
 msgstr "啟用"
 
-msgid ""
-"Enable <abbr title=\"Internet Group Management Protocol\">IGMP</abbr> "
-"snooping"
-msgstr ""
-
 msgid "Enable <abbr title=\"Spanning Tree Protocol\">STP</abbr>"
 msgstr "啟用 <abbr title=\"Spanning Tree Protocol\">STP</abbr>"
 
@@ -1030,9 +1007,6 @@ msgstr "啟用VLAN功能"
 msgid "Enable WPS pushbutton, requires WPA(2)-PSK"
 msgstr ""
 
-msgid "Enable key reinstallation (KRACK) countermeasures"
-msgstr ""
-
 msgid "Enable learning and aging"
 msgstr "啟用智慧學習功能"
 
@@ -1056,9 +1030,6 @@ msgstr "啟用/關閉"
 
 msgid "Enabled"
 msgstr "啟用"
-
-msgid "Enables IGMP snooping on this bridge"
-msgstr ""
 
 msgid ""
 "Enables fast roaming among access points that belong to the same Mobility "
@@ -1128,15 +1099,6 @@ msgid "External system log server protocol"
 msgstr ""
 
 msgid "Extra SSH command options"
-msgstr ""
-
-msgid "FT over DS"
-msgstr ""
-
-msgid "FT over the Air"
-msgstr ""
-
-msgid "FT protocol"
 msgstr ""
 
 msgid "File"
@@ -1240,9 +1202,6 @@ msgstr ""
 msgid "Forward broadcast traffic"
 msgstr "轉發廣播流量"
 
-msgid "Forward mesh peer traffic"
-msgstr ""
-
 msgid "Forwarding mode"
 msgstr "轉發模式"
 
@@ -1287,9 +1246,6 @@ msgstr ""
 msgid "Generate Config"
 msgstr ""
 
-msgid "Generate PMK locally"
-msgstr ""
-
 msgid "Generate archive"
 msgstr "製作壓縮檔"
 
@@ -1325,6 +1281,9 @@ msgstr ""
 
 msgid "HT mode (802.11n)"
 msgstr ""
+
+msgid "Handler"
+msgstr "多執行緒"
 
 msgid "Hang Up"
 msgstr "斷線"
@@ -1492,7 +1451,7 @@ msgstr "IPv6凌駕IPv4外(6轉4)"
 msgid "Identity"
 msgstr "特性"
 
-msgid "If checked, 1DES is enabled"
+msgid "If checked, 1DES is enaled"
 msgstr ""
 
 msgid "If checked, encryption is disabled"
@@ -1520,7 +1479,7 @@ msgid ""
 "slow process as the swap-device cannot be accessed with the high datarates "
 "of the <abbr title=\"Random Access Memory\">RAM</abbr>."
 msgstr ""
-"如果您的物理內存不足時,未使用的數據可以是暫時交換到導致更高的交換設備量的可用"
+"如果你的物理內存不足時,未使用的數據可以是暫時交換到導致更高的交換設備量的可用"
 "<abbr title=\"Random Access Memory\">RAM</abbr>內.請注意，交換數據是一個非常"
 "緩慢的過程,作為交換裝置不能用高數據速率訪問該<abbr title=\"Random Access "
 "Memory\">RAM</縮寫>"
@@ -1633,7 +1592,7 @@ msgstr ""
 msgid ""
 "It appears that you are trying to flash an image that does not fit into the "
 "flash memory, please verify the image file!"
-msgstr "它顯示您正嘗試更新不適用於這個flash記憶體的映像檔,請檢查確認這個映像檔"
+msgstr "它顯示你正嘗試更新不適用於這個flash記憶體的映像檔,請檢查確認這個映像檔"
 
 msgid "JavaScript required!"
 msgstr "需要Java腳本"
@@ -1906,6 +1865,9 @@ msgstr "允許EDNS.0 協定的UDP封包最大數量"
 msgid "Maximum amount of seconds to wait for the modem to become ready"
 msgstr "等待數據機待命的最大秒數"
 
+msgid "Maximum hold time"
+msgstr "可持有最長時間"
+
 msgid ""
 "Maximum length of the name is 15 characters including the automatic protocol/"
 "bridge prefix (br-, 6in4-, pppoe- etc.)"
@@ -1923,11 +1885,11 @@ msgstr "記憶體"
 msgid "Memory usage (%)"
 msgstr "記憶體使用 (%)"
 
-msgid "Mesh Id"
-msgstr ""
-
 msgid "Metric"
 msgstr "公測單位"
+
+msgid "Minimum hold time"
+msgstr "可持有的最低時間"
 
 msgid "Mirror monitor port"
 msgstr ""
@@ -2132,9 +2094,6 @@ msgstr "通知"
 msgid "Nslookup"
 msgstr "DNS偵錯Nslookup"
 
-msgid "Number of cached DNS entries (max is 10000, 0 is no caching)"
-msgstr ""
-
 msgid "OK"
 msgstr "行"
 
@@ -2158,8 +2117,8 @@ msgid ""
 "<samp>INTERFACE.VLANNR</samp> (<abbr title=\"for example\">e.g.</abbr>: "
 "<samp>eth0.1</samp>)."
 msgstr ""
-"在這個頁面您可以設定網路介面. 只要點下這個\"介面群橋接\"而且打入數個以空格分"
-"開網路介面的名稱就可以橋接數個介面群. 您也可以使用<abbr title=\"Virtual "
+"在這個頁面你可以設定網路介面. 只要點下這個\"介面群橋接\"而且打入數個以空格分"
+"開網路介面的名稱就可以橋接數個介面群. 你也可以使用<abbr title=\"Virtual "
 "Local Area Network\">VLAN</abbr> 符號<samp>INTERFACE.VLANNR</samp> (<abbr "
 "title=\"for example\">例.如</abbr>: <samp>eth0.1</samp>)."
 
@@ -2372,6 +2331,9 @@ msgstr "用戶端-證書的路徑"
 msgid "Path to Private Key"
 msgstr "私人金鑰的路徑"
 
+msgid "Path to executable which handles the button event"
+msgstr "處理按鍵效果可執行檔路徑"
+
 msgid "Path to inner CA-Certificate"
 msgstr ""
 
@@ -2415,7 +2377,7 @@ msgid "Pkts."
 msgstr "封包數."
 
 msgid "Please enter your username and password."
-msgstr "請輸入您的用戶名稱和密碼"
+msgstr "請輸入你的用戶名稱和密碼"
 
 msgid "Policy"
 msgstr "策略"
@@ -2557,14 +2519,14 @@ msgid ""
 "lose access to this device if you are connected via this interface."
 msgstr ""
 "真的要刪除這介面?無法復元刪除!\n"
-"假如您要透過這個介面連線您可能會無法存取這個設備."
+"假如你要透過這個介面連線你可能會無法存取這個設備."
 
 msgid ""
 "Really delete this wireless network? The deletion cannot be undone!\\nYou "
 "might lose access to this device if you are connected via this network."
 msgstr ""
 "真的要刪除這個無線網路?無法復元的刪除!\n"
-"假如您是透過這個網路連線您可能會無法存取這個設備."
+"假如你是透過這個網路連線你可能會無法存取這個設備."
 
 msgid "Really reset all changes?"
 msgstr "確定要重置回復原廠?"
@@ -2575,14 +2537,14 @@ msgid ""
 "connected via this interface."
 msgstr ""
 "真的要刪除這個網路 ?\n"
-"假如您是透過這個介面連線您可能會無法存取這個設備."
+"假如你是透過這個介面連線你可能會無法存取這個設備."
 
 msgid ""
 "Really shutdown interface \"%s\" ?\\nYou might lose access to this device if "
 "you are connected via this interface."
 msgstr ""
 "真的要關閉這個介面 \"%s\" ?!\n"
-"假如您要透過這個介面連線您可能會無法存取這個設備."
+"假如你要透過這個介面連線你可能會無法存取這個設備."
 
 msgid "Really switch protocol?"
 msgstr "確定要更換協定?"
@@ -2615,7 +2577,7 @@ msgid "Rebooting..."
 msgstr "重開中..."
 
 msgid "Reboots the operating system of your device"
-msgstr "重啟您設備的作業系統"
+msgstr "重啟你設備的作業系統"
 
 msgid "Receive"
 msgstr "接收"
@@ -2899,9 +2861,6 @@ msgstr "大小"
 msgid "Size (.ipk)"
 msgstr ""
 
-msgid "Size of DNS query cache"
-msgstr ""
-
 msgid "Skip"
 msgstr "跳過"
 
@@ -2924,7 +2883,7 @@ msgid "Some fields are invalid, cannot save values!"
 msgstr "有些欄位失效, 無法儲存數值!"
 
 msgid "Sorry, the object you requested was not found."
-msgstr "抱歉, 您請求的這物件尚無發現."
+msgstr "抱歉, 你請求的這物件尚無發現."
 
 msgid "Sorry, the server encountered an unexpected error."
 msgstr "抱歉, 伺服器遭遇非預期的錯誤."
@@ -2945,6 +2904,9 @@ msgstr "來源"
 
 msgid "Source routing"
 msgstr ""
+
+msgid "Specifies the button state to handle"
+msgstr "指定這個按鈕狀態以便操作"
 
 msgid "Specifies the directory the device is attached to"
 msgstr "指定這個設備被附掛到那個目錄"
@@ -3047,9 +3009,6 @@ msgid ""
 "Switch %q has an unknown topology - the VLAN settings might not be accurate."
 msgstr ""
 
-msgid "Switch Port Mask"
-msgstr ""
-
 msgid "Switch VLAN"
 msgstr ""
 
@@ -3118,7 +3077,7 @@ msgid ""
 "The <em>libiwinfo-lua</em> package is not installed. You must install this "
 "component for working wireless configuration!"
 msgstr ""
-"這 <em>libiwinfo-lua</em> 軟體包尚未安裝. 您必須安裝這個元件以便無線網路設定"
+"這 <em>libiwinfo-lua</em> 軟體包尚未安裝. 你必須安裝這個元件以便無線網路設定"
 "有作用."
 
 msgid ""
@@ -3183,7 +3142,7 @@ msgstr "輸入的網路名稱非獨一"
 msgid ""
 "The hardware is not multi-SSID capable and the existing configuration will "
 "be replaced if you proceed."
-msgstr "如果您繼續的話.這硬體並非多SSID工能並且已存的設定將會被覆蓋."
+msgstr "如果你繼續的話.這硬體並非多SSID工能並且已存的設定將會被覆蓋."
 
 msgid ""
 "The length of the IPv4 prefix in bits, the remainder is used in the IPv6 "
@@ -3227,8 +3186,8 @@ msgid ""
 "address of your computer to reach the device again, depending on your "
 "settings."
 msgstr ""
-"系統現正刷機中.<br /> 請勿關閉設備!<br />  等待數分鐘直到您重新在連線. 可能需"
-"要更新您電腦的位址以便再連設備, 端看您的設定. "
+"系統現正刷機中.<br /> 請勿關閉設備!<br />  等待數分鐘直到你重新在連線. 可能需"
+"要更新你電腦的位址以便再連設備, 端看你的設定. "
 
 msgid ""
 "The tunnel end-point is behind NAT, defaults to disabled and only applies to "
@@ -3239,7 +3198,7 @@ msgid ""
 "The uploaded image file does not contain a supported format. Make sure that "
 "you choose the generic image format for your platform."
 msgstr ""
-"以上傳的映像檔不包含支援格式. 請確認您選擇的是針對您的平台採用的通用映像檔."
+"以上傳的映像檔不包含支援格式. 請確認你選擇的是針對你的平台採用的通用映像檔."
 
 msgid "There are no active leases."
 msgstr "租賃尚未啟動."
@@ -3294,8 +3253,8 @@ msgstr ""
 
 msgid ""
 "This is the local endpoint address assigned by the tunnel broker, it usually "
-"ends with <code>...:2/64</code>"
-msgstr "這是由通道代理人指定的本地終端位址, 通常用 <code>...:2/64</code>結尾."
+"ends with <code>:2</code>"
+msgstr "這是由通道代理人指定的本地終端位址, 通常用 <code>:2</code>結尾."
 
 msgid ""
 "This is the only <abbr title=\"Dynamic Host Configuration Protocol\">DHCP</"
@@ -3322,6 +3281,9 @@ msgid ""
 "This list gives an overview over currently running system processes and "
 "their status."
 msgstr "這清單提供目前正在執行的系統的執行緒和狀態的預覽."
+
+msgid "This page allows the configuration of custom button actions"
+msgstr "這一頁允許客製化按鍵動作的設定"
 
 msgid "This page gives an overview over currently active network connections."
 msgstr "這一頁提供目前正在活動中網路連線的預覽."
@@ -3506,9 +3468,9 @@ msgstr "使用路由表"
 
 msgid ""
 "Use the <em>Add</em> Button to add a new lease entry. The <em>MAC-Address</"
-"em> identifies the host, the <em>IPv4-Address</em> specifies the fixed "
-"address to use, and the <em>Hostname</em> is assigned as a symbolic name to "
-"the requesting host. The optional <em>Lease time</em> can be used to set non-"
+"em> indentifies the host, the <em>IPv4-Address</em> specifies to the fixed "
+"address to use and the <em>Hostname</em> is assigned as symbolic name to the "
+"requesting host. The optional <em>Lease time</em> can be used to set non-"
 "standard host-specific lease time, e.g. 12h, 3d or infinite."
 msgstr ""
 "使用 <em>Add</em> 鍵以便新增一個租賃的項目. 這個 <em>MAC-Address</em> 標誌這"
@@ -3627,11 +3589,6 @@ msgstr "警告"
 msgid "Warning: There are unsaved changes that will get lost on reboot!"
 msgstr ""
 
-msgid ""
-"When using a PSK, the PMK can be generated locally without inter AP "
-"communications"
-msgstr ""
-
 msgid "Whether to create an IPv6 default route over the tunnel"
 msgstr ""
 
@@ -3688,12 +3645,12 @@ msgid ""
 "after a device reboot.<br /><strong>Warning: If you disable essential init "
 "scripts like \"network\", your device might become inaccessible!</strong>"
 msgstr ""
-"您可以開啟或關閉初始化指令在這. 修改將會在設備重開後被啟用. <br /><strong>警"
-"告: 假如您關閉必要的初始化腳本像\"網路\", 您的設備將可能無法存取!</strong>"
+"你可以開啟或關閉初始化指令在這. 修改將會在設備重開後被啟用. <br /><strong>警"
+"告: 假如你關閉必要的初始化腳本像\"網路\", 你的設備將可能無法存取!</strong>"
 
 msgid ""
 "You must enable JavaScript in your browser or LuCI will not work properly."
-msgstr "在瀏覽器您必須啟用JavaScript否則LuCI無法正常運作."
+msgstr "在瀏覽器你必須啟用JavaScript否則LuCI無法正常運作."
 
 msgid ""
 "Your Internet Explorer is too old to display this page correctly. Please "
@@ -3807,9 +3764,6 @@ msgstr "打開"
 msgid "overlay"
 msgstr ""
 
-msgid "random"
-msgstr ""
-
 msgid "relay mode"
 msgstr ""
 
@@ -3854,30 +3808,6 @@ msgstr "是的"
 
 msgid "« Back"
 msgstr "« 倒退"
-
-#~ msgid "Action"
-#~ msgstr "動作"
-
-#~ msgid "Buttons"
-#~ msgstr "按鈕"
-
-#~ msgid "Handler"
-#~ msgstr "多執行緒"
-
-#~ msgid "Maximum hold time"
-#~ msgstr "可持有最長時間"
-
-#~ msgid "Minimum hold time"
-#~ msgstr "可持有的最低時間"
-
-#~ msgid "Path to executable which handles the button event"
-#~ msgstr "處理按鍵效果可執行檔路徑"
-
-#~ msgid "Specifies the button state to handle"
-#~ msgstr "指定這個按鈕狀態以便操作"
-
-#~ msgid "This page allows the configuration of custom button actions"
-#~ msgstr "這一頁允許客製化按鍵動作的設定"
 
 #~ msgid "Leasetime"
 #~ msgstr "租賃時間"

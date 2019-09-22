@@ -1,5 +1,5 @@
 /*
-Copyright 2015-2018 Jo-Philipp Wich <jo@mein.io>
+Copyright 2015 Jo-Philipp Wich <jow@openwrt.org>
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -42,16 +42,6 @@ limitations under the License.
 #define RTA_INT(x)	(*(int *)RTA_DATA(x))
 #define RTA_U32(x)	(*(uint32_t *)RTA_DATA(x))
 
-#define AF_BITS(f) \
-	((f) == AF_INET ? 32 : \
-		((f) == AF_INET6 ? 128 : \
-			((f) == AF_PACKET ? 48 : 0)))
-
-#define AF_BYTES(f) \
-	((f) == AF_INET ? 4 : \
-		((f) == AF_INET6 ? 16 : \
-			((f) == AF_PACKET ? 6 : 0)))
-
 static int hz = 0;
 static struct nl_sock *sock = NULL;
 
@@ -59,11 +49,11 @@ typedef struct {
 	union {
 		struct in_addr v4;
 		struct in6_addr v6;
-		struct ether_addr mac;
-		uint8_t u8[16];
 	} addr;
-	uint16_t family;
-	int16_t bits;
+	int len;
+	int bits;
+	int family;
+	bool exact;
 } cidr_t;
 
 struct dump_filter {
@@ -80,8 +70,6 @@ struct dump_filter {
 	cidr_t src;
 	cidr_t dst;
 	struct ether_addr mac;
-	bool from_exact;
-	bool dst_exact;
 };
 
 struct dump_state {
@@ -107,68 +95,29 @@ static cidr_t *L_checkcidr (lua_State *L, int index, cidr_t *p)
 	return NULL;
 }
 
-static bool parse_mac(const char *mac, struct ether_addr *ea)
-{
-	unsigned long int n;
-	char *e, sep = 0;
-	int i;
-
-	for (i = 0; i < 6; i++)
-	{
-		if (i > 0)
-		{
-			if (sep == 0 && (mac[0] == ':' || mac[0] == '-'))
-				sep = mac[0];
-
-			if (sep == 0 || mac[0] != sep)
-				return false;
-
-			mac++;
-		}
-
-		n = strtoul(mac, &e, 16);
-
-		if (n > 0xFF)
-			return false;
-
-		mac += (e - mac);
-		ea->ether_addr_octet[i] = n;
-	}
-
-	if (mac[0] != 0)
-		return false;
-
-	return true;
-}
-
-static bool parse_mask(int family, const char *mask, int16_t *bits)
+static bool parse_mask(int family, const char *mask, int *bits)
 {
 	char *e;
-	union {
-		struct in_addr v4;
-		struct in6_addr v6;
-		struct ether_addr mac;
-		uint8_t u8[16];
-	} m;
+	struct in_addr m;
+	struct in6_addr m6;
 
-	if (family == AF_INET && inet_pton(AF_INET, mask, &m.v4))
+	if (family == AF_INET && inet_pton(AF_INET, mask, &m))
 	{
-		for (*bits = 0, m.v4.s_addr = ntohl(m.v4.s_addr);
-			 *bits < AF_BITS(AF_INET) && (m.v4.s_addr << *bits) & 0x80000000;
+		for (*bits = 0, m.s_addr = ntohl(m.s_addr);
+			 *bits < 32 && (m.s_addr << *bits) & 0x80000000;
 			 ++*bits);
 	}
-	else if ((family == AF_INET6 && inet_pton(AF_INET6, mask, &m.v6)) ||
-	         (family == AF_PACKET && parse_mac(mask, &m.mac)))
+	else if (family == AF_INET6 && inet_pton(AF_INET6, mask, &m6))
 	{
 		for (*bits = 0;
-			 *bits < AF_BITS(family) && (m.u8[*bits / 8] << (*bits % 8)) & 128;
+			 *bits < 128 && (m6.s6_addr[*bits / 8] << (*bits % 8)) & 128;
 			 ++*bits);
 	}
 	else
 	{
 		*bits = strtoul(mask, &e, 10);
 
-		if (e == mask || *e != 0 || *bits > AF_BITS(family))
+		if (e == mask || *e != 0 || *bits > ((family == AF_INET) ? 32 : 128))
 			return false;
 	}
 
@@ -178,6 +127,7 @@ static bool parse_mask(int family, const char *mask, int16_t *bits)
 static bool parse_cidr(const char *dest, cidr_t *pp)
 {
 	char *p, buf[INET6_ADDRSTRLEN * 2 + 2];
+	uint8_t bitlen = 0;
 
 	strncpy(buf, dest, sizeof(buf) - 1);
 
@@ -187,11 +137,17 @@ static bool parse_cidr(const char *dest, cidr_t *pp)
 		*p++ = 0;
 
 	if (inet_pton(AF_INET, buf, &pp->addr.v4))
+	{
+		bitlen = 32;
 		pp->family = AF_INET;
+		pp->len = sizeof(struct in_addr);
+	}
 	else if (inet_pton(AF_INET6, buf, &pp->addr.v6))
+	{
+		bitlen = 128;
 		pp->family = AF_INET6;
-	else if (parse_mac(buf, &pp->addr.mac))
-		pp->family = AF_PACKET;
+		pp->len = sizeof(struct in6_addr);
+	}
 	else
 		return false;
 
@@ -202,43 +158,10 @@ static bool parse_cidr(const char *dest, cidr_t *pp)
 	}
 	else
 	{
-		pp->bits = AF_BITS(pp->family);
+		pp->bits = bitlen;
 	}
 
 	return true;
-}
-
-static int format_cidr(lua_State *L, cidr_t *p)
-{
-	char buf[INET6_ADDRSTRLEN];
-
-	if (p->family == AF_PACKET)
-	{
-		snprintf(buf, sizeof(buf), "%02X:%02X:%02X:%02X:%02X:%02X",
-		         p->addr.mac.ether_addr_octet[0],
-		         p->addr.mac.ether_addr_octet[1],
-		         p->addr.mac.ether_addr_octet[2],
-		         p->addr.mac.ether_addr_octet[3],
-		         p->addr.mac.ether_addr_octet[4],
-		         p->addr.mac.ether_addr_octet[5]);
-
-		if (p->bits < AF_BITS(AF_PACKET))
-			lua_pushfstring(L, "%s/%d", buf, p->bits);
-		else
-			lua_pushstring(L, buf);
-	}
-	else
-	{
-		if (p->bits < AF_BITS(p->family))
-			lua_pushfstring(L, "%s/%d",
-			                inet_ntop(p->family, &p->addr.v6, buf, sizeof(buf)),
-			                p->bits);
-		else
-			lua_pushstring(L,
-			               inet_ntop(p->family, &p->addr.v6, buf, sizeof(buf)));
-	}
-
-	return 1;
 }
 
 static int L_getint(lua_State *L, int index, const char *name)
@@ -297,20 +220,16 @@ static void L_setaddr(struct lua_State *L, const char *name,
 	if (family == AF_INET)
 	{
 		p->family = AF_INET;
-		p->bits = (bits < 0) ? AF_BITS(AF_INET) : bits;
+		p->bits = (bits < 0) ? 32 : bits;
+		p->len = sizeof(p->addr.v4);
 		p->addr.v4 = *(struct in_addr *)addr;
-	}
-	else if (family == AF_INET6)
-	{
-		p->family = AF_INET6;
-		p->bits = (bits < 0) ? AF_BITS(AF_INET6) : bits;
-		p->addr.v6 = *(struct in6_addr *)addr;
 	}
 	else
 	{
-		p->family = AF_PACKET;
-		p->bits = (bits < 0) ? AF_BITS(AF_PACKET) : bits;
-		p->addr.mac = *(struct ether_addr *)addr;
+		p->family = AF_INET6;
+		p->bits = (bits < 0) ? 128 : bits;
+		p->len = sizeof(p->addr.v6);
+		p->addr.v6 = *(struct in6_addr *)addr;
 	}
 
 	luaL_getmetatable(L, LUCI_IP_CIDR);
@@ -335,7 +254,6 @@ static void L_setdev(struct lua_State *L, const char *name,
 
 static int L_checkbits(lua_State *L, int index, cidr_t *p)
 {
-	int16_t s16;
 	int bits;
 
 	if (lua_gettop(L) < index || lua_isnil(L, index))
@@ -346,15 +264,13 @@ static int L_checkbits(lua_State *L, int index, cidr_t *p)
 	{
 		bits = lua_tointeger(L, index);
 
-		if (bits < 0 || bits > AF_BITS(p->family))
+		if (bits < 0 || bits > ((p->family == AF_INET) ? 32 : 128))
 			return luaL_error(L, "Invalid prefix size");
 	}
 	else if (lua_type(L, index) == LUA_TSTRING)
 	{
-		if (!parse_mask(p->family, lua_tostring(L, index), &s16))
+		if (!parse_mask(p->family, lua_tostring(L, index), &bits))
 			return luaL_error(L, "Invalid netmask format");
-
-		bits = s16;
 	}
 	else
 	{
@@ -377,26 +293,20 @@ static int _cidr_new(lua_State *L, int index, int family, bool mask)
 		if (family == AF_INET6)
 		{
 			cidr.family = AF_INET6;
+			cidr.bits = 128;
+			cidr.len = sizeof(cidr.addr.v6);
 			cidr.addr.v6.s6_addr[12] = n;
 			cidr.addr.v6.s6_addr[13] = (n >> 8);
 			cidr.addr.v6.s6_addr[14] = (n >> 16);
 			cidr.addr.v6.s6_addr[15] = (n >> 24);
 		}
-		else if (family == AF_INET)
-		{
-			cidr.family = AF_INET;
-			cidr.addr.v4.s_addr = n;
-		}
 		else
 		{
-			cidr.family = AF_PACKET;
-			cidr.addr.mac.ether_addr_octet[2] = n;
-			cidr.addr.mac.ether_addr_octet[3] = (n >> 8);
-			cidr.addr.mac.ether_addr_octet[4] = (n >> 16);
-			cidr.addr.mac.ether_addr_octet[5] = (n >> 24);
+			cidr.family = AF_INET;
+			cidr.bits = 32;
+			cidr.len = sizeof(cidr.addr.v4);
+			cidr.addr.v4.s_addr = n;
 		}
-
-		cidr.bits = AF_BITS(cidr.family);
 	}
 	else
 	{
@@ -434,62 +344,6 @@ static int cidr_ipv4(lua_State *L)
 static int cidr_ipv6(lua_State *L)
 {
 	return _cidr_new(L, 1, AF_INET6, true);
-}
-
-static int cidr_mac(lua_State *L)
-{
-	return _cidr_new(L, 1, AF_PACKET, true);
-}
-
-static int cidr_check(lua_State *L, int family)
-{
-	cidr_t cidr = { }, *cidrp;
-	const char *addr;
-
-	if (lua_type(L, 1) == LUA_TSTRING)
-	{
-		addr = lua_tostring(L, 1);
-
-		if (addr && parse_cidr(addr, &cidr) && cidr.family == family)
-			return format_cidr(L, &cidr);
-	}
-	else
-	{
-		cidrp = lua_touserdata(L, 1);
-
-		if (cidrp == NULL)
-			return 0;
-
-		if (!lua_getmetatable(L, 1))
-			return 0;
-
-		lua_getfield(L, LUA_REGISTRYINDEX, LUCI_IP_CIDR);
-
-		if (!lua_rawequal(L, -1, -2))
-			cidrp = NULL;
-
-		lua_pop(L, 2);
-
-		if (cidrp != NULL && cidrp->family == family)
-			return format_cidr(L, cidrp);
-	}
-
-	return 0;
-}
-
-static int cidr_checkip4(lua_State *L)
-{
-	return cidr_check(L, AF_INET);
-}
-
-static int cidr_checkip6(lua_State *L)
-{
-	return cidr_check(L, AF_INET6);
-}
-
-static int cidr_checkmac(lua_State *L)
-{
-	return cidr_check(L, AF_PACKET);
 }
 
 static int cidr_is4(lua_State *L)
@@ -570,34 +424,6 @@ static int cidr_is6linklocal(lua_State *L)
 	return 1;
 }
 
-static int cidr_ismac(lua_State *L)
-{
-	cidr_t *p = L_checkcidr(L, 1, NULL);
-
-	lua_pushboolean(L, p->family == AF_PACKET);
-	return 1;
-}
-
-static int cidr_ismacmcast(lua_State *L)
-{
-	cidr_t *p = L_checkcidr(L, 1, NULL);
-
-	lua_pushboolean(L, (p->family == AF_PACKET &&
-	                    (p->addr.mac.ether_addr_octet[0] & 0x1)));
-
-	return 1;
-}
-
-static int cidr_ismaclocal(lua_State *L)
-{
-	cidr_t *p = L_checkcidr(L, 1, NULL);
-
-	lua_pushboolean(L, (p->family == AF_PACKET &&
-	                    (p->addr.mac.ether_addr_octet[0] & 0x2)));
-
-	return 1;
-}
-
 static int _cidr_cmp(lua_State *L)
 {
 	cidr_t *a = L_checkcidr(L, 1, NULL);
@@ -606,7 +432,7 @@ static int _cidr_cmp(lua_State *L)
 	if (a->family != b->family)
 		return (a->family - b->family);
 
-	return memcmp(&a->addr.v6, &b->addr.v6, AF_BYTES(a->family));
+	return memcmp(&a->addr.v6, &b->addr.v6, a->len);
 }
 
 static int cidr_lower(lua_State *L)
@@ -649,24 +475,24 @@ static void _apply_mask(cidr_t *p, int bits, bool inv)
 
 	if (bits <= 0)
 	{
-		memset(&p->addr.u8, inv * 0xFF, AF_BYTES(p->family));
+		memset(&p->addr.v6, inv * 0xFF, p->len);
 	}
-	else if (p->family == AF_INET && bits <= AF_BITS(AF_INET))
+	else if (p->family == AF_INET && bits <= 32)
 	{
 		if (inv)
-			p->addr.v4.s_addr |= ntohl((1 << (AF_BITS(AF_INET) - bits)) - 1);
+			p->addr.v4.s_addr |= ntohl((1 << (32 - bits)) - 1);
 		else
-			p->addr.v4.s_addr &= ntohl(~((1 << (AF_BITS(AF_INET) - bits)) - 1));
+			p->addr.v4.s_addr &= ntohl(~((1 << (32 - bits)) - 1));
 	}
-	else if (bits <= AF_BITS(p->family))
+	else if (p->family == AF_INET6 && bits <= 128)
 	{
-		for (i = 0; i < AF_BYTES(p->family); i++)
+		for (i = 0; i < sizeof(p->addr.v6.s6_addr); i++)
 		{
 			b = (bits > 8) ? 8 : bits;
 			if (inv)
-				p->addr.u8[i] |= ~((uint8_t)(0xFF << (8 - b)));
+				p->addr.v6.s6_addr[i] |= ~((uint8_t)(0xFF << (8 - b)));
 			else
-				p->addr.u8[i] &= (uint8_t)(0xFF << (8 - b));
+				p->addr.v6.s6_addr[i] &= (uint8_t)(0xFF << (8 - b));
 			bits -= b;
 		}
 	}
@@ -681,7 +507,7 @@ static int cidr_network(lua_State *L)
 		return 0;
 
 	*p2 = *p1;
-	p2->bits = AF_BITS(p1->family);
+	p2->bits = (p1->family == AF_INET) ? 32 : 128;
 	_apply_mask(p2, bits, false);
 
 	luaL_getmetatable(L, LUCI_IP_CIDR);
@@ -698,7 +524,7 @@ static int cidr_host(lua_State *L)
 		return 0;
 
 	*p2 = *p1;
-	p2->bits = AF_BITS(p1->family);
+	p2->bits = (p1->family == AF_INET) ? 32 : 128;
 
 	luaL_getmetatable(L, LUCI_IP_CIDR);
 	lua_setmetatable(L, -2);
@@ -713,7 +539,7 @@ static int cidr_mask(lua_State *L)
 	if (!(p2 = lua_newuserdata(L, sizeof(*p2))))
 		return 0;
 
-	p2->bits = AF_BITS(p1->family);
+	p2->bits = (p1->family == AF_INET) ? 32 : 128;
 	p2->family = p1->family;
 
 	memset(&p2->addr.v6.s6_addr, 0xFF, sizeof(p2->addr.v6.s6_addr));
@@ -730,14 +556,14 @@ static int cidr_broadcast(lua_State *L)
 	cidr_t *p2;
 	int bits = L_checkbits(L, 2, p1);
 
-	if (p1->family != AF_INET)
+	if (p1->family == AF_INET6)
 		return 0;
 
 	if (!(p2 = lua_newuserdata(L, sizeof(*p2))))
 		return 0;
 
 	*p2 = *p1;
-	p2->bits = AF_BITS(AF_INET);
+	p2->bits = (p1->family == AF_INET) ? 32 : 128;
 	_apply_mask(p2, bits, true);
 
 	luaL_getmetatable(L, LUCI_IP_CIDR);
@@ -757,74 +583,8 @@ static int cidr_mapped4(lua_State *L)
 		return 0;
 
 	p2->family = AF_INET;
-	p2->bits = (p1->bits > AF_BITS(AF_INET)) ? AF_BITS(AF_INET) : p1->bits;
+	p2->bits = (p1->bits > 32) ? 32 : p1->bits;
 	memcpy(&p2->addr.v4, p1->addr.v6.s6_addr + 12, sizeof(p2->addr.v4));
-
-	luaL_getmetatable(L, LUCI_IP_CIDR);
-	lua_setmetatable(L, -2);
-	return 1;
-}
-
-static int cidr_tolinklocal(lua_State *L)
-{
-	cidr_t *p1 = L_checkcidr(L, 1, NULL);
-	cidr_t *p2;
-	int i;
-
-	if (p1->family != AF_PACKET)
-		return 0;
-
-	if (!(p2 = lua_newuserdata(L, sizeof(*p2))))
-		return 0;
-
-	p2->family = AF_INET6;
-	p2->bits = AF_BITS(AF_INET6);
-	p2->addr.u8[0] = 0xFE;
-	p2->addr.u8[1] = 0x80;
-	p2->addr.u8[8] = p1->addr.u8[0] ^ 0x02;
-	p2->addr.u8[9] = p1->addr.u8[1];
-	p2->addr.u8[10] = p1->addr.u8[2];
-	p2->addr.u8[11] = 0xFF;
-	p2->addr.u8[12] = 0xFE;
-	p2->addr.u8[13] = p1->addr.u8[3];
-	p2->addr.u8[14] = p1->addr.u8[4];
-	p2->addr.u8[15] = p1->addr.u8[5];
-
-	luaL_getmetatable(L, LUCI_IP_CIDR);
-	lua_setmetatable(L, -2);
-	return 1;
-}
-
-static int cidr_tomac(lua_State *L)
-{
-	cidr_t *p1 = L_checkcidr(L, 1, NULL);
-	cidr_t *p2;
-	int i;
-
-	if (p1->family != AF_INET6 ||
-	    p1->addr.u8[0] != 0xFE ||
-	    p1->addr.u8[1] != 0x80 ||
-	    p1->addr.u8[2] != 0x00 ||
-	    p1->addr.u8[3] != 0x00 ||
-	    p1->addr.u8[4] != 0x00 ||
-	    p1->addr.u8[5] != 0x00 ||
-	    p1->addr.u8[6] != 0x00 ||
-	    p1->addr.u8[7] != 0x00 ||
-	    p1->addr.u8[11] != 0xFF ||
-	    p1->addr.u8[12] != 0xFE)
-	    return 0;
-
-	if (!(p2 = lua_newuserdata(L, sizeof(*p2))))
-		return 0;
-
-	p2->family = AF_PACKET;
-	p2->bits = AF_BITS(AF_PACKET);
-	p2->addr.u8[0] = p1->addr.u8[8] ^ 0x02;
-	p2->addr.u8[1] = p1->addr.u8[9];
-	p2->addr.u8[2] = p1->addr.u8[10];
-	p2->addr.u8[3] = p1->addr.u8[13];
-	p2->addr.u8[4] = p1->addr.u8[14];
-	p2->addr.u8[5] = p1->addr.u8[15];
 
 	luaL_getmetatable(L, LUCI_IP_CIDR);
 	lua_setmetatable(L, -2);
@@ -843,15 +603,15 @@ static int cidr_contains(lua_State *L)
 		_apply_mask(&a, p1->bits, false);
 		_apply_mask(&b, p1->bits, false);
 
-		rv = !memcmp(&a.addr.v6, &b.addr.v6, AF_BYTES(a.family));
+		rv = !memcmp(&a.addr.v6, &b.addr.v6, a.len);
 	}
 
 	lua_pushboolean(L, rv);
 	return 1;
 }
 
-#define BYTE(a, i) \
-	(a)->addr.u8[AF_BYTES((a)->family) - (i) - 1]
+#define S6_BYTE(a, i) \
+	(a)->addr.v6.s6_addr[sizeof((a)->addr.v6.s6_addr) - (i) - 1]
 
 static int _cidr_add_sub(lua_State *L, bool add)
 {
@@ -865,7 +625,30 @@ static int _cidr_add_sub(lua_State *L, bool add)
 
 	if (p1->family == p2->family)
 	{
-		if (p1->family == AF_INET)
+		if (p1->family == AF_INET6)
+		{
+			for (i = 0, carry = 0; i < sizeof(r.addr.v6.s6_addr); i++)
+			{
+				if (add)
+				{
+					S6_BYTE(&r, i) = S6_BYTE(p1, i) + S6_BYTE(p2, i) + carry;
+					carry = (S6_BYTE(p1, i) + S6_BYTE(p2, i) + carry) / 256;
+				}
+				else
+				{
+					S6_BYTE(&r, i) = (S6_BYTE(p1, i) - S6_BYTE(p2, i) - carry);
+					carry = (S6_BYTE(p1, i) < (S6_BYTE(p2, i) + carry));
+				}
+			}
+
+			/* would over/underflow */
+			if (carry)
+			{
+				memset(&r.addr.v6, add * 0xFF, sizeof(r.addr.v6));
+				ok = false;
+			}
+		}
+		else
 		{
 			a = ntohl(p1->addr.v4.s_addr);
 			b = ntohl(p2->addr.v4.s_addr);
@@ -879,29 +662,6 @@ static int _cidr_add_sub(lua_State *L, bool add)
 			else
 			{
 				r.addr.v4.s_addr = add ? htonl(a + b) : htonl(a - b);
-			}
-		}
-		else
-		{
-			for (i = 0, carry = 0; i < AF_BYTES(p1->family); i++)
-			{
-				if (add)
-				{
-					BYTE(&r, i) = BYTE(p1, i) + BYTE(p2, i) + carry;
-					carry = (BYTE(p1, i) + BYTE(p2, i) + carry) / 256;
-				}
-				else
-				{
-					BYTE(&r, i) = (BYTE(p1, i) - BYTE(p2, i) - carry);
-					carry = (BYTE(p1, i) < (BYTE(p2, i) + carry));
-				}
-			}
-
-			/* would over/underflow */
-			if (carry)
-			{
-				memset(&r.addr.u8, add * 0xFF, AF_BYTES(r.family));
-				ok = false;
 			}
 		}
 	}
@@ -945,21 +705,21 @@ static int cidr_minhost(lua_State *L)
 
 	_apply_mask(&r, r.bits, false);
 
-	if (r.family == AF_INET && r.bits < AF_BITS(AF_INET))
+	if (r.family == AF_INET6 && r.bits < 128)
 	{
-		r.bits = AF_BITS(AF_INET);
-		r.addr.v4.s_addr = htonl(ntohl(r.addr.v4.s_addr) + 1);
-	}
-	else if (r.bits < AF_BITS(r.family))
-	{
-		r.bits = AF_BITS(r.family);
+		r.bits = 128;
 
-		for (i = 0, carry = 1; i < AF_BYTES(r.family); i++)
+		for (i = 0, carry = 1; i < sizeof(r.addr.v6.s6_addr); i++)
 		{
-			rest = (BYTE(&r, i) + carry) > 255;
-			BYTE(&r, i) += carry;
+			rest = (S6_BYTE(&r, i) + carry) > 255;
+			S6_BYTE(&r, i) += carry;
 			carry = rest;
 		}
+	}
+	else if (r.family == AF_INET && r.bits < 32)
+	{
+		r.bits = 32;
+		r.addr.v4.s_addr = htonl(ntohl(r.addr.v4.s_addr) + 1);
 	}
 
 	if (!(p = lua_newuserdata(L, sizeof(*p))))
@@ -979,14 +739,14 @@ static int cidr_maxhost(lua_State *L)
 
 	_apply_mask(&r, r.bits, true);
 
-	if (r.family == AF_INET && r.bits < AF_BITS(AF_INET))
+	if (r.family == AF_INET && r.bits < 32)
 	{
-		r.bits = AF_BITS(AF_INET);
+		r.bits = 32;
 		r.addr.v4.s_addr = htonl(ntohl(r.addr.v4.s_addr) - 1);
 	}
-	else
+	else if (r.family == AF_INET6)
 	{
-		r.bits = AF_BITS(r.family);
+		r.bits = 128;
 	}
 
 	if (!(p = lua_newuserdata(L, sizeof(*p))))
@@ -1006,17 +766,31 @@ static int cidr_gc (lua_State *L)
 
 static int cidr_tostring (lua_State *L)
 {
+	char buf[INET6_ADDRSTRLEN];
 	cidr_t *p = L_checkcidr(L, 1, NULL);
-	return format_cidr(L, p);
+
+	if ((p->family == AF_INET && p->bits < 32) ||
+	    (p->family == AF_INET6 && p->bits < 128))
+	{
+		lua_pushfstring(L, "%s/%d",
+		                inet_ntop(p->family, &p->addr.v6, buf, sizeof(buf)),
+						p->bits);
+	}
+	else
+	{
+		lua_pushstring(L, inet_ntop(p->family, &p->addr.v6, buf, sizeof(buf)));
+	}
+
+	return 1;
 }
 
 /*
  * route functions
  */
 
-static bool diff_prefix(int family, void *addr, int bits, bool exact, cidr_t *p)
+static bool diff_prefix(int family, void *addr, int bits, cidr_t *p)
 {
-	uint8_t i, b, r, *a;
+	uint8_t i, b, r;
 	uint32_t m;
 
 	if (!p->family)
@@ -1025,27 +799,28 @@ static bool diff_prefix(int family, void *addr, int bits, bool exact, cidr_t *p)
 	if (!addr || p->family != family || p->bits > bits)
 		return true;
 
-	if (family == AF_INET)
+	if (family == AF_INET6)
 	{
-		m = p->bits ? htonl(~((1 << (AF_BITS(AF_INET) - p->bits)) - 1)) : 0;
-
-		if ((((struct in_addr *)addr)->s_addr & m) != (p->addr.v4.s_addr & m))
-			return true;
-	}
-	else
-	{
-		for (i = 0, a = addr, r = p->bits; i < AF_BYTES(p->family); i++)
+		for (i = 0, r = p->bits; i < sizeof(struct in6_addr); i++)
 		{
 			b = r ? (0xFF << (8 - ((r > 8) ? 8 : r))) : 0;
 
-			if ((a[i] & b) != (p->addr.u8[i] & b))
+			if ((((struct in6_addr *)addr)->s6_addr[i] & b) !=
+			    (p->addr.v6.s6_addr[i] & b))
 				return true;
 
 			r -= ((r > 8) ? 8 : r);
 		}
 	}
+	else
+	{
+		m = p->bits ? htonl(~((1 << (32 - p->bits)) - 1)) : 0;
 
-	return (exact && p->bits != bits);
+		if ((((struct in_addr *)addr)->s_addr & m) != (p->addr.v4.s_addr & m))
+			return true;
+	}
+
+	return (p->exact && p->bits != bits);
 }
 
 static int cb_dump_route(struct nl_msg *msg, void *arg)
@@ -1073,7 +848,7 @@ static int cb_dump_route(struct nl_msg *msg, void *arg)
 	dst   = tb[RTA_DST]     ? RTA_DATA(tb[RTA_DST])     : &def;
 	gw    = tb[RTA_GATEWAY] ? RTA_DATA(tb[RTA_GATEWAY]) : NULL;
 
-	bitlen = AF_BITS(rt->rtm_family);
+	bitlen = (rt->rtm_family == AF_INET6) ? 128 : 32;
 
 	if ((f->type   && rt->rtm_type     != f->type)   ||
 	    (f->family && rt->rtm_family   != f->family) ||
@@ -1082,14 +857,10 @@ static int cb_dump_route(struct nl_msg *msg, void *arg)
 		(f->iif    && iif              != f->iif)    ||
 		(f->oif    && oif              != f->oif)    ||
 		(f->table  && table            != f->table)  ||
-	    diff_prefix(rt->rtm_family, from, rt->rtm_src_len,
-	                f->from_exact, &f->from)         ||
-	    diff_prefix(rt->rtm_family, dst,  rt->rtm_dst_len,
-	                f->dst_exact, &f->dst)           ||
-	    diff_prefix(rt->rtm_family, gw,   bitlen,
-	                false, &f->gw)                   ||
-	    diff_prefix(rt->rtm_family, src,  bitlen,
-	                false, &f->src))
+	    diff_prefix(rt->rtm_family, from, rt->rtm_src_len, &f->from) ||
+	    diff_prefix(rt->rtm_family, dst,  rt->rtm_dst_len, &f->dst)  ||
+	    diff_prefix(rt->rtm_family, gw,   bitlen, &f->gw)            ||
+	    diff_prefix(rt->rtm_family, src,  bitlen, &f->src))
 		goto out;
 
 	if (s->callback)
@@ -1217,8 +988,7 @@ static int _route_dump(lua_State *L, struct dump_filter *filter)
 	nlmsg_append(msg, &rtm, sizeof(rtm), 0);
 
 	if (filter->get)
-		nla_put(msg, RTA_DST, AF_BYTES(filter->dst.family),
-		        &filter->dst.addr.v6);
+		nla_put(msg, RTA_DST, filter->dst.len, &filter->dst.addr.v6);
 
 	nl_cb_set(cb, NL_CB_VALID, NL_CB_CUSTOM, cb_dump_route, &s);
 	nl_cb_set(cb, NL_CB_FINISH, NL_CB_CUSTOM, cb_done, &s);
@@ -1293,10 +1063,10 @@ static int route_dump(lua_State *L)
 			filter.dst = p;
 
 		if ((s = L_getstr(L, 1, "from_exact")) != NULL && parse_cidr(s, &p))
-			filter.from = p, filter.from_exact = true;
+			filter.from = p, filter.from.exact = true;
 
 		if ((s = L_getstr(L, 1, "dest_exact")) != NULL && parse_cidr(s, &p))
-			filter.dst = p, filter.dst_exact = true;
+			filter.dst = p, filter.dst.exact = true;
 	}
 
 	return _route_dump(L, &filter);
@@ -1337,12 +1107,12 @@ static int cb_dump_neigh(struct nl_msg *msg, void *arg)
 	mac = tb[NDA_LLADDR] ? RTA_DATA(tb[NDA_LLADDR]) : NULL;
 	dst = tb[NDA_DST]    ? RTA_DATA(tb[NDA_DST])    : NULL;
 
-	bitlen = AF_BITS(nd->ndm_family);
+	bitlen = (nd->ndm_family == AF_INET) ? 32 : 128;
 
 	if ((f->family && nd->ndm_family  != f->family) ||
 	    (f->iif    && nd->ndm_ifindex != f->iif) ||
 		(f->type   && !(f->type & nd->ndm_state)) ||
-	    diff_prefix(nd->ndm_family, dst, bitlen, false, &f->dst) ||
+	    diff_prefix(nd->ndm_family, dst, bitlen, &f->dst) ||
 	    diff_macaddr(mac, &f->mac))
 		goto out;
 
@@ -1370,7 +1140,15 @@ static int cb_dump_neigh(struct nl_msg *msg, void *arg)
 		L_setaddr(s->L, "dest", nd->ndm_family, dst, -1);
 
 	if (mac)
-		L_setaddr(s->L, "mac", AF_PACKET, mac, -1);
+	{
+		snprintf(buf, sizeof(buf), "%02x:%02x:%02x:%02x:%02x:%02x",
+		         mac->ether_addr_octet[0], mac->ether_addr_octet[1],
+		         mac->ether_addr_octet[2], mac->ether_addr_octet[3],
+		         mac->ether_addr_octet[4], mac->ether_addr_octet[5]);
+
+		lua_pushstring(s->L, buf);
+		lua_setfield(s->L, -2, "mac");
+	}
 
 	s->index++;
 
@@ -1463,7 +1241,7 @@ out:
 
 static int cb_dump_link(struct nl_msg *msg, void *arg)
 {
-	char buf[48];
+	char *p, *addr, buf[48];
 	struct dump_state *s = arg;
 	struct nlmsghdr *hdr = nlmsg_hdr(msg);
 	struct ifinfomsg *ifm = NLMSG_DATA(hdr);
@@ -1488,8 +1266,19 @@ static int cb_dump_link(struct nl_msg *msg, void *arg)
 	if (tb[IFLA_MASTER])
 		L_setdev(s->L, "master", tb[IFLA_MASTER]);
 
-	if (tb[IFLA_ADDRESS] && nla_len(tb[IFLA_ADDRESS]) == AF_BYTES(AF_PACKET))
-		L_setaddr(s->L, "mac", AF_PACKET, nla_get_string(tb[IFLA_ADDRESS]), -1);
+	if (tb[IFLA_ADDRESS])
+	{
+		len  = nla_len(tb[IFLA_ADDRESS]);
+		addr = nla_get_string(tb[IFLA_ADDRESS]);
+
+		if ((len * 3) <= sizeof(buf))
+		{
+			for (p = buf, i = 0; i < len; i++)
+				p += sprintf(p, "%s%02x", (i ? ":" : ""), (uint8_t)*addr++);
+
+			L_setstr(s->L, "mac", buf);
+		}
+	}
 
 	s->pending = 0;
 	return NL_SKIP;
@@ -1544,18 +1333,13 @@ static const luaL_reg ip_methods[] = {
 	{ "new",			cidr_new          },
 	{ "IPv4",			cidr_ipv4         },
 	{ "IPv6",			cidr_ipv6         },
-	{ "MAC",			cidr_mac          },
-
-	{ "checkip4",			cidr_checkip4     },
-	{ "checkip6",			cidr_checkip6     },
-	{ "checkmac",			cidr_checkmac     },
 
 	{ "route",			route_get         },
 	{ "routes",			route_dump        },
 
 	{ "neighbors",		neighbor_dump     },
 
-	{ "link",			link_get          },
+	{ "link",           link_get          },
 
 	{ }
 };
@@ -1567,9 +1351,6 @@ static const luaL_reg ip_cidr_methods[] = {
 	{ "is6",			cidr_is6          },
 	{ "is6linklocal",	cidr_is6linklocal },
 	{ "is6mapped4",		cidr_is6mapped4   },
-	{ "ismac",			cidr_ismac        },
-	{ "ismaclocal",		cidr_ismaclocal   },
-	{ "ismacmcast",		cidr_ismacmcast   },
 	{ "lower",			cidr_lower        },
 	{ "higher",			cidr_higher       },
 	{ "equal",			cidr_equal        },
@@ -1579,9 +1360,7 @@ static const luaL_reg ip_cidr_methods[] = {
 	{ "mask",			cidr_mask         },
 	{ "broadcast",		cidr_broadcast    },
 	{ "mapped4",		cidr_mapped4      },
-	{ "tomac",			cidr_tomac        },
-	{ "tolinklocal",	cidr_tolinklocal  },
-	{ "contains",		cidr_contains     },
+	{ "contains",       cidr_contains     },
 	{ "add",			cidr_add          },
 	{ "sub",			cidr_sub          },
 	{ "minhost",		cidr_minhost      },
