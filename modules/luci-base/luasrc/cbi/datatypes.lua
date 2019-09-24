@@ -132,43 +132,50 @@ function ip6prefix(val)
 	return ( val and val >= 0 and val <= 128 )
 end
 
+function cidr4(val)
+	local ip, mask = val:match("^([^/]+)/([^/]+)$")
+
+	return ip4addr(ip) and ip4prefix(mask)
+end
+
+function cidr6(val)
+	local ip, mask = val:match("^([^/]+)/([^/]+)$")
+
+	return ip6addr(ip) and ip6prefix(mask)
+end
+
+function ipnet4(val)
+	local ip, mask = val:match("^([^/]+)/([^/]+)$")
+
+	return ip4addr(ip) and ip4addr(mask)
+end
+
+function ipnet6(val)
+	local ip, mask = val:match("^([^/]+)/([^/]+)$")
+
+	return ip6addr(ip) and ip6addr(mask)
+end
+
 function ipmask(val)
 	return ipmask4(val) or ipmask6(val)
 end
 
 function ipmask4(val)
-	local ip, mask = val:match("^([^/]+)/([^/]+)$")
-	local bits = tonumber(mask)
-
-	if bits and (bits < 0 or bits > 32) then
-		return false
-	end
-
-	if not bits and mask and not ip4addr(mask) then
-		return false
-	end
-
-	return ip4addr(ip or val)
+	return cidr4(val) or ipnet4(val) or ip4addr(val)
 end
 
 function ipmask6(val)
-	local ip, mask = val:match("^([^/]+)/([^/]+)$")
-	local bits = tonumber(mask)
-
-	if bits and (bits < 0 or bits > 128) then
-		return false
-	end
-
-	if not bits and mask and not ip6addr(mask) then
-		return false
-	end
-
-	return ip6addr(ip or val)
+	return cidr6(val) or ipnet6(val) or ip6addr(val)
 end
 
 function ip6hostid(val)
-	if val and val:match("^[a-fA-F0-9:]+$") and (#val > 2) then
-		return (ip6addr("2001:db8:0:0" .. val) or ip6addr("2001:db8:0:0:" .. val))
+	if val == "eui64" or val == "random" then
+		return true
+	else
+		local addr = ip.IPv6(val)
+		if addr and addr:prefix() == 128 and addr:lower("::1:0:0:0:0") then
+			return true
+		end
 	end
 
 	return false
@@ -189,32 +196,16 @@ function portrange(val)
 end
 
 function macaddr(val)
-	if val and val:match(
-		"^[a-fA-F0-9]+:[a-fA-F0-9]+:[a-fA-F0-9]+:" ..
-		 "[a-fA-F0-9]+:[a-fA-F0-9]+:[a-fA-F0-9]+$"
-	) then
-		local parts = util.split( val, ":" )
-
-		for i = 1,6 do
-			parts[i] = tonumber( parts[i], 16 )
-			if parts[i] < 0 or parts[i] > 255 then
-				return false
-			end
-		end
-
-		return true
-	end
-
-	return false
+	return ip.checkmac(val) and true or false
 end
 
-function hostname(val)
+function hostname(val, strict)
 	if val and (#val < 254) and (
 	   val:match("^[a-zA-Z_]+$") or
 	   (val:match("^[a-zA-Z0-9_][a-zA-Z0-9_%-%.]*[a-zA-Z0-9]$") and
 	    val:match("[^0-9%.]"))
 	) then
-		return true
+		return (not strict or not val:match("^_"))
 	end
 	return false
 end
