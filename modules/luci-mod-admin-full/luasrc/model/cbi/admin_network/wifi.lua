@@ -235,9 +235,9 @@ if hwtype == "mac80211" then
 	legacyrates.rmempty = false
 	legacyrates.default = "1"
 	
-	legacyrates = s:taboption("advanced", Flag, "mu_beamformer", translate("MU-MIMO"))
-	legacyrates.rmempty = false
-	legacyrates.default = "0"
+	mubeamformer = s:taboption("advanced", Flag, "mu_beamformer", translate("MU-MIMO"))
+	mubeamformer.rmempty = false
+	mubeamformer.default = "0"
 
 	s:taboption("advanced", Value, "distance", translate("Distance Optimization"),
 		translate("Distance to farthest network member in meters."))
