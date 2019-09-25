@@ -3997,3 +3997,22 @@ msgstr "备份MTD内容"
 msgid "Click \"Save mtdblock\" to download specified mtdblock file. (NOTE: THIS FEATURE IS FOR PROFESSIONALS! )"
 msgstr "点击\"备份MTD\"可以下载指定分区数据.(注意！仅提供给专业人士使用！)"
 
+msgid "Use all servers"
+msgstr "使用 all-servers 并发查询"
+
+msgid "Setting this flag forces dnsmasq to send all queries to all available servers. The reply from the server which answers first will be returned to the original requester."
+msgstr "对所有 DNS 服务器发起查询，选择回应最快的一条作为查询结果返回"
+
+msgid "Custom domain"
+msgstr "自定义挟持域名"
+
+msgid "Define a custom domain name and the corresponding PTR record"
+msgstr "自定义域名对应的IP地址（需要客户端DNS指向本路由）"
+
+msgid "Domain name"
+msgstr "域名（不带 HTTP(S)://）"
+
+msgid "Comments"
+msgstr "备注"
+
+
