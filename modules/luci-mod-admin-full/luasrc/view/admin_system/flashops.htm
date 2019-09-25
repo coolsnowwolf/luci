@@ -41,7 +41,7 @@
 			<% end %>
 		</div>
 	<% local mtds = require("luci.sys").mtds(); if #mtds > 0 then -%>
-	<h3><%:Save mtdblock contents%></h3>
+	<legend><%:Save mtdblock contents%></legend>
 	<div class="cbi-section-descr"><%:Click "Save mtdblock" to download specified mtdblock file. (NOTE: THIS FEATURE IS FOR PROFESSIONALS! )%></div>
 	<div class="cbi-section-node">
 		<form class="inline" method="post" action="<%=url('admin/system/flashops/backupmtdblock')%>">
@@ -66,7 +66,7 @@
 			<div class="cbi-value cbi-value-last<% if reset_avail then %> cbi-value-error<% end %>">
 				<label class="cbi-value-title" for="image"><%:Download mtdblock%></label>
 				<div class="cbi-value-field">
-					<input type="submit" class="cbi-button cbi-button-apply" value="<%:Save mtdblock%>" />
+					<input class="cbi-button cbi-button-apply" type="submit" value="<%:Save mtdblock%>" />
 				</div>
 			</div>
 		</form>
