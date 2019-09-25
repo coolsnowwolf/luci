@@ -157,14 +157,6 @@ define SrcDiet
 	done
 endef
 
-#Marked by lintel: debug.lua bad bytecode after luac
-define SrcCompile
-	$(FIND) $(1) -type f -name '*.lua' | while read src; do \
-		if luac -s -o "$$$$src.o" "$$$$src"; \
-		then mv "$$$$src.o" "$$$$src"; fi; \
-	done
-endef
-
 define SubstituteVersion
 	$(FIND) $(1) -type f -name '*.htm' | while read src; do \
 		$(SED) 's/<%# *\([^ ]*\)PKG_VERSION *%>/\1$(PKG_VERSION)/g' \
