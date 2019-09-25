@@ -221,6 +221,12 @@ cq.optional = true
 cq.datatype = "uinteger"
 cq.placeholder = 150
 
+cs = s:taboption("advanced", Value, "cachesize",
+	translate("Size of DNS query cache"),
+	translate("Number of cached DNS entries (max is 10000, 0 is no caching)"))
+cs.optional = true
+cs.datatype = "range(0,10000)"
+cs.placeholder = 150
 
 s:taboption("tftp", Flag, "enable_tftp",
 	translate("Enable TFTP server")).optional = true
@@ -304,7 +310,7 @@ ip = s:option(Value, "ip", translate("<abbr title=\"Internet Protocol Version 4\
 ip.datatype = "or(ip4addr,'ignore')"
 
 time = s:option(Value, "leasetime", translate("Lease time"))
-time.rmempty  = true
+time.rmempty = true
 
 hostid = s:option(Value, "hostid", translate("<abbr title=\"Internet Protocol Version 6\">IPv6</abbr>-Suffix (hex)"))
 
