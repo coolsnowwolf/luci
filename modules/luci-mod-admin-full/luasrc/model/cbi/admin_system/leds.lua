@@ -47,7 +47,6 @@ for t in triggers:gmatch("[%w-]+") do
 	trigger:value(t, translate(t:gsub("-", "")))
 end
 trigger:value("rssi", translate("rssi"))
-trigger:value("pb_internet", translate("pb_internet"))
 
 delayon = s:option(Value, "delayon", translate ("On-State Delay"))
 delayon:depends("trigger", "timer")
