@@ -1,9 +1,7 @@
 -- Copyright 2010 Jo-Philipp Wich <jow@openwrt.org>
 -- Licensed to the public under the Apache License 2.0.
 
-local utl = require "luci.util"
 local sys = require "luci.sys"
-local ipc = require "luci.ip"
 local fs  = require "nixio.fs"
 
 m = SimpleForm("wol", translate("Wake on LAN"),
@@ -34,7 +32,7 @@ if has_ewk then
 	if has_wol then
 		iface:depends("binary", "/usr/bin/etherwake")
 	end
-
+	iface.default = "br-lan"
 	iface:value("", translate("Broadcast on all interfaces"))
 
 	for _, e in ipairs(sys.net.devices()) do
@@ -53,6 +51,7 @@ end)
 if has_ewk then
 	broadcast = s:option(Flag, "broadcast",
 		translate("Send to broadcast address"))
+	broadcast.default = "1"
 	if has_wol then
 		broadcast:depends("binary", "/usr/bin/etherwake")
 	end
@@ -60,8 +59,7 @@ end
 
 function host.write(self, s, val)
 	local host = luci.http.formvalue("cbid.wol.1.mac")
-	local mac = ipc.checkmac(host)
-	if mac then
+	if host and #host > 0 and host:match("^[a-fA-F0-9:]+$") then
 		local cmd
 		local util = luci.http.formvalue("cbid.wol.1.binary") or (
 			has_ewk and "/usr/bin/etherwake" or "/usr/bin/wol"
@@ -70,16 +68,16 @@ function host.write(self, s, val)
 		if util == "/usr/bin/etherwake" then
 			local iface = luci.http.formvalue("cbid.wol.1.iface")
 			local broadcast = luci.http.formvalue("cbid.wol.1.broadcast")
-			cmd = "%s -D%s %s %q 2>&1" %{
-				util, (iface ~= "" and " -i %s" % utl.shellquote(iface) or ""),
-				(broadcast == "1" and " -b" or ""), mac
+			cmd = "%s -D%s %s %q" %{
+				util, (iface ~= "" and " -i %q" % iface or ""),
+				(broadcast == "1" and " -b" or ""), host
 			}
 		else
-			cmd = "%s -v %q" %{ util, mac }
+			cmd = "%s -v %q" %{ util, host }
 		end
 
 		local msg = "<p><strong>%s</strong><br /><br /><code>%s<br /><br />" %{
-			translate("Starting WoL utility:"), utl.pcdata(cmd)
+			translate("Starting WoL utility:"), cmd
 		}
 
 		local p = io.popen(cmd .. " 2>&1")
