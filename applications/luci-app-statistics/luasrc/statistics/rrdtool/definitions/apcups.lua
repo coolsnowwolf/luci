@@ -3,6 +3,10 @@
 
 module("luci.statistics.rrdtool.definitions.apcups",package.seeall)
 
+function item()
+	return luci.i18n.translate("APC UPS")
+end
+
 function rrdargs( graph, plugin, plugin_instance )
 
 	local lu = require("luci.util")
@@ -19,8 +23,7 @@ function rrdargs( graph, plugin, plugin_instance )
 		ups_inst[t] = graph.tree:data_instances( plugin, plugin_instance, t )
 	end
 
-
-    -- Check if hash table or array is empty or nil-filled
+	-- Check if hash table or array is empty or nil-filled
 
 	local function empty( t )
 		for _, v in pairs(t) do
@@ -57,8 +60,8 @@ function rrdargs( graph, plugin, plugin_instance )
 	end
 
 
-    -- Graph definitions for APC UPS measurements MUST use only 'instances':
-    -- e.g. instances = { voltage = {  "input", "output" } }
+	-- Graph definitions for APC UPS measurements MUST use only 'instances':
+	-- e.g. instances = { voltage = {  "input", "output" } }
 
 	local voltagesdc = {
 		title = "%H: Voltages on APC UPS - Battery",

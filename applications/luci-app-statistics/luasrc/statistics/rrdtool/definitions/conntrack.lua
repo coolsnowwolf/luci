@@ -3,7 +3,12 @@
 
 module("luci.statistics.rrdtool.definitions.conntrack",package.seeall)
 
+function item()
+	return luci.i18n.translate("Conntrack")
+end
+
 function rrdargs( graph, plugin, plugin_instance, dtype )
+
 	return {
 		title = "%H: Conntrack entries",
 		vlabel = "Count",
