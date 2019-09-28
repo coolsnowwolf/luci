@@ -3,10 +3,6 @@
 
 module("luci.statistics.rrdtool.definitions.netlink", package.seeall)
 
-function item()
-	return luci.i18n.translate("Netlink")
-end
-
 function rrdargs( graph, plugin, plugin_instance )
 
 	--
@@ -18,7 +14,7 @@ function rrdargs( graph, plugin, plugin_instance )
 
 		-- diagram data description
 		data = {
-			-- defined sources for data types, if omitted assume a single DS named "value" (optional)
+			-- defined sources for data types, if ommitted assume a single DS named "value" (optional)
 			sources = {
 				if_octets = { "tx", "rx" }
 			},
@@ -40,6 +36,7 @@ function rrdargs( graph, plugin, plugin_instance )
 			}
 		}
 	}
+
 
 	--
 	-- packet diagram
@@ -122,6 +119,7 @@ function rrdargs( graph, plugin, plugin_instance )
 		}
 	}
 
+
 	--
 	-- multicast diagram
 	--
@@ -146,6 +144,7 @@ function rrdargs( graph, plugin, plugin_instance )
 		}
 	}
 
+
 	--
 	-- collision diagram
 	--
@@ -169,6 +168,7 @@ function rrdargs( graph, plugin, plugin_instance )
 			}
 		}
 	}
+
 
 	--
 	-- error diagram
@@ -205,6 +205,7 @@ function rrdargs( graph, plugin, plugin_instance )
 			}
 		}
 	}
+
 
 	return { traffic, packets, multicast, collisions, errors }
 end

@@ -3,12 +3,7 @@
 
 module("luci.statistics.rrdtool.definitions.sensors", package.seeall)
 
-function item()
-	return luci.i18n.translate("Sensors")
-end
-
 function rrdargs( graph, plugin, plugin_instance )
-
 	return {
 		{
 			per_instance = true,

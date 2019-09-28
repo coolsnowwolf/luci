@@ -1,7 +1,7 @@
 -- Copyright 2008 Freifunk Leipzig / Jo-Philipp Wich <jow@openwrt.org>
 -- Licensed to the public under the Apache License 2.0.
 
-local sys = require("luci.sys")
+require("luci.sys")
 
 
 m = Map("luci_statistics",
@@ -17,7 +17,7 @@ s = m:section( NamedSection, "collectd", "luci_statistics" )
 
 -- general.hostname (Hostname)
 hostname = s:option( Value, "Hostname", translate("Hostname") )
-hostname.default  = sys.hostname()
+hostname.default  = luci.sys.hostname()
 hostname.optional = true
 
 -- general.basedir (BaseDir)

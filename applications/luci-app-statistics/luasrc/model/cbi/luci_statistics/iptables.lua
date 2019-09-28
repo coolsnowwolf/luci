@@ -1,12 +1,13 @@
 -- Copyright 2008 Freifunk Leipzig / Jo-Philipp Wich <jow@openwrt.org>
 -- Licensed to the public under the Apache License 2.0.
 
-local ip = require("luci.sys.iptparser").IptParser()
+require("luci.sys.iptparser")
 
-local chains  = { }
-local targets = { }
+ip = luci.sys.iptparser.IptParser()
+chains  = { }
+targets = { }
 
-for i, rule in ipairs( ip:find() ) do
+for i, rule in ipairs( ip:find() ) do 
 	if rule.chain and rule.target then
 		chains[rule.chain] = true
 		targets[rule.target] = true
@@ -18,7 +19,7 @@ m = Map("luci_statistics",
 	translate("Iptables Plugin Configuration"),
 	translate(
 		"The iptables plugin will monitor selected firewall rules and " ..
-		"collect information about processed bytes and packets per rule."
+		"collect informations about processed bytes and packets per rule."
 	))
 
 -- collectd_iptables config section

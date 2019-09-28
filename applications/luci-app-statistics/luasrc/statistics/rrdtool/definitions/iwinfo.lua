@@ -3,10 +3,6 @@
 
 module("luci.statistics.rrdtool.definitions.iwinfo", package.seeall)
 
-function item()
-	return luci.i18n.translate("Wireless")
-end
-
 function rrdargs( graph, plugin, plugin_instance )
 
 	--

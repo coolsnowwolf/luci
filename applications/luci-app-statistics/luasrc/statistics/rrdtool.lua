@@ -3,46 +3,46 @@
 
 module("luci.statistics.rrdtool", package.seeall)
 
-local tree   = require("luci.statistics.datatree")
-local colors = require("luci.statistics.rrdtool.colors")
-local i18n   = require("luci.statistics.i18n")
-local uci    = require("luci.model.uci").cursor()
-local util   = require("luci.util")
-local sys    = require("luci.sys")
-local fs     = require("nixio.fs")
+require("luci.statistics.datatree")
+require("luci.statistics.rrdtool.colors")
+require("luci.statistics.i18n")
+require("luci.model.uci")
+require("luci.util")
+require("luci.sys")
+
+local fs = require "nixio.fs"
 
 
-Graph = util.class()
+Graph = luci.util.class()
 
 function Graph.__init__( self, timespan, opts )
 
 	opts = opts or { }
 
+	local uci = luci.model.uci.cursor()
 	local sections = uci:get_all( "luci_statistics" )
 
 	-- options
 	opts.timespan  = timespan       or sections.rrdtool.default_timespan or 900
 	opts.rrasingle = opts.rrasingle or ( sections.collectd_rrdtool.RRASingle == "1" )
 	opts.rramax    = opts.rramax    or ( sections.collectd_rrdtool.RRAMax == "1" )
-	opts.host      = opts.host      or sections.collectd.Hostname        or sys.hostname()
+	opts.host      = opts.host      or sections.collectd.Hostname        or luci.sys.hostname()
 	opts.width     = opts.width     or sections.rrdtool.image_width      or 400
-	opts.height    = opts.height    or sections.rrdtool.image_height     or 100
 	opts.rrdpath   = opts.rrdpath   or sections.collectd_rrdtool.DataDir or "/tmp/rrd"
 	opts.imgpath   = opts.imgpath   or sections.rrdtool.image_path       or "/tmp/rrdimg"
 	opts.rrdpath   = opts.rrdpath:gsub("/$","")
 	opts.imgpath   = opts.imgpath:gsub("/$","")
 
 	-- helper classes
-	self.colors = colors.Instance()
-	self.tree   = tree.Instance(opts.host)
-	self.i18n   = i18n.Instance( self )
+	self.colors = luci.statistics.rrdtool.colors.Instance()
+	self.tree   = luci.statistics.datatree.Instance(opts.host)
+	self.i18n   = luci.statistics.i18n.Instance( self )
 
 	-- rrdtool default args
 	self.args = {
 		"-a", "PNG",
 		"-s", "NOW-" .. opts.timespan,
-		"-w", opts.width,
-		"-h", opts.height
+		"-w", opts.width
 	}
 
 	-- store options
@@ -62,7 +62,7 @@ function Graph._mkpath( self, plugin, plugin_instance, dtype, dtype_instance )
 end
 
 function Graph.mkrrdpath( self, ... )
-	return string.format( "%s/%s.rrd", self.opts.rrdpath, self:_mkpath( ... ):gsub("\\", "\\\\"):gsub(":", "\\:") )
+	return string.format( "%s/%s.rrd", self.opts.rrdpath, self:_mkpath( ... ) )
 end
 
 function Graph.mkpngpath( self, ... )
@@ -102,7 +102,7 @@ function Graph._rrdtool( self, def, rrd )
 			opt = opt:gsub( "{file}", rrd )
 		end
 
-		cmdline[#cmdline+1] = util.shellquote(opt)
+		cmdline[#cmdline+1] = luci.util.shellquote(opt)
 	end
 
 	-- execute rrdtool
@@ -136,7 +136,7 @@ function Graph._generic( self, opts, plugin, plugin_instance, dtype, index )
 	function __def(source)
 
 		local inst = source.sname
-		local rrd  = source.rrd:gsub(":", "\\:")
+		local rrd  = source.rrd
 		local ds   = source.ds
 
 		if not ds or ds:len() == 0 then ds = "value" end
@@ -407,9 +407,7 @@ function Graph._generic( self, opts, plugin, plugin_instance, dtype, index )
 					transform_rpn = dopts.transform_rpn or "0,+",
 					noarea   = dopts.noarea  or false,
 					title    = dopts.title   or nil,
-					weight   = dopts.weight or
-						   (dopts.negweight and -tonumber(dinst)) or
-						   (dopts.posweight and tonumber(dinst)) or nil,
+					weight   = dopts.weight  or nil,
 					ds       = dsource,
 					type     = dtype,
 					instance = dinst,
@@ -488,13 +486,6 @@ function Graph._generic( self, opts, plugin, plugin_instance, dtype, index )
 			local y = b.weight or b.index or 0
 			return x < y
 		end)
-
-		-- define colors in order
-		if opts.ordercolor then
-		    for i, source in ipairs(_sources) do
-			source.color = self.colors:defined(i)
-		    end
-		end
 
 		-- create DEF statements for each instance
 		for i, source in ipairs(_sources) do

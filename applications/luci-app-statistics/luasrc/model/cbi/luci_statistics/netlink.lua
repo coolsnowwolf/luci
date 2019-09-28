@@ -1,15 +1,15 @@
 -- Copyright 2008 Freifunk Leipzig / Jo-Philipp Wich <jow@openwrt.org>
 -- Licensed to the public under the Apache License 2.0.
 
-local sys = require("luci.sys")
+require("luci.sys")
 
-local devices = sys.net.devices()
+local devices = luci.sys.net.devices()
 
 
 m = Map("luci_statistics",
 	translate("Netlink Plugin Configuration"),
 	translate(
-		"The netlink plugin collects extended information like " ..
+		"The netlink plugin collects extended informations like " ..
 		"qdisc-, class- and filter-statistics for selected interfaces."
 	))
 

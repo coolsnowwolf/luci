@@ -3,10 +3,6 @@
 
 module("luci.statistics.rrdtool.definitions.dns", package.seeall)
 
-function item()
-	return luci.i18n.translate("DNS")
-end
-
 function rrdargs( graph, plugin, plugin_instance )
 
 	local traffic = {

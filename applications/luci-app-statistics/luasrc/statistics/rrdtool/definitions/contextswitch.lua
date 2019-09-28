@@ -2,10 +2,6 @@
 
 module("luci.statistics.rrdtool.definitions.contextswitch",package.seeall)
 
-function item()
-	return luci.i18n.translate("Context Switches")
-end
-
 function rrdargs( graph, plugin, plugin_instance, dtype )
 
 	return {

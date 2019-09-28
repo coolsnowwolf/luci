@@ -1,13 +1,13 @@
 -- Copyright 2008 Freifunk Leipzig / Jo-Philipp Wich <jow@openwrt.org>
 -- Licensed to the public under the Apache License 2.0.
 
-local sys = require("luci.sys")
+require("luci.sys")
 
 
 m = Map("luci_statistics",
 	translate("DNS Plugin Configuration"),
 	translate(
-		"The dns plugin collects detailed statistics about dns " ..
+		"The dns plugin collects detailled statistics about dns " ..
 		"related traffic on selected interfaces."
 	))
 
@@ -24,7 +24,7 @@ interfaces.widget = "select"
 interfaces.size   = 5
 interfaces:depends( "enable", 1 )
 interfaces:value("any")
-for k, v in pairs(sys.net.devices()) do
+for k, v in pairs(luci.sys.net.devices()) do
         interfaces:value(v)
 end
          

@@ -2,10 +2,6 @@
 
 module("luci.statistics.rrdtool.definitions.thermal",package.seeall)
 
-function item()
-	return luci.i18n.translate("Thermal")
-end
-
 function rrdargs( graph, plugin, plugin_instance, dtype )
 
 	return {
