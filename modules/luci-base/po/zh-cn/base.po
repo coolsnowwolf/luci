@@ -3489,6 +3489,9 @@ msgstr "隧道接口的 MTU"
 msgid "Use TTL on tunnel interface"
 msgstr "隧道接口的 TTL"
 
+msgid "Use as Docker data (/opt)"
+msgstr "作为 Docker 数据分区使用 (/opt)"
+
 msgid "Use as external overlay (/overlay)"
 msgstr "作为外部 overlay 使用（/overlay）"
 

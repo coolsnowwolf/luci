@@ -102,6 +102,7 @@ end
 o = mount:taboption("general", Value, "target", translate("Mount point"),
 	translate("Specifies the directory the device is attached to"))
 
+o:value("/opt", translate("Use as Docker data (/opt)"))
 o:value("/", translate("Use as root filesystem (/)"))
 o:value("/overlay", translate("Use as external overlay (/overlay)"))
 
