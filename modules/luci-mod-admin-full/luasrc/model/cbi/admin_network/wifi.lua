@@ -196,9 +196,14 @@ else
 		m:set(section, "channel", value[2])
 		m:set(section, "htmode", value[3])
 	end
+	
   noscan = s:taboption("general", Flag, "noscan", translate("Force 40MHz mode"),
   translate("Always use 40MHz channels even if the secondary channel overlaps. Using this option does not comply with IEEE 802.11n-2009!"))
   noscan.default = noscan.disabled
+  
+  vendor_vht = s:taboption("general", Flag, "vendor_vht", translate("Enable 256-QAM"),translate("802.11n 2.4Ghz Only"))
+  vendor_vht.default = vendor_vht.disabled
+  
 end
 
 ------------------- MAC80211 Device ------------------

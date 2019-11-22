@@ -4047,3 +4047,9 @@ msgstr "时区"
 
 msgid "Local time zone as specified in 8.3 of IEEE Std 1003.1-2004"
 msgstr "本地时区采用 IEEE Std 1003.1-2004 的 8.3 格式（例如 UTC8）"
+
+msgid "Enable 256-QAM"
+msgstr "启用 256-QAM"
+
+msgid "802.11n 2.4Ghz Only"
+msgstr "只适合 802.11n 2.4Ghz"
