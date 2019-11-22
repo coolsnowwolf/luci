@@ -783,6 +783,70 @@ end
 
 
 if hwtype == "mac80211" or hwtype == "prism2" then
+  
+	-- Probe 802.11k support
+	ieee80211k = s:taboption("encryption", Flag, "ieee80211k", translate("802.11k"), translate("Enables The 802.11k standard provides information to discover the best available access point"))
+	ieee80211k:depends({mode="ap", encryption="wpa"})
+	ieee80211k:depends({mode="ap", encryption="wpa2"})
+	ieee80211k:depends({mode="ap-wds", encryption="wpa"})
+	ieee80211k:depends({mode="ap-wds", encryption="wpa2"})
+	ieee80211k:depends({mode="ap", encryption="psk"})
+	ieee80211k:depends({mode="ap", encryption="psk2"})
+	ieee80211k:depends({mode="ap", encryption="psk-mixed"})
+	ieee80211k:depends({mode="ap-wds", encryption="psk"})
+	ieee80211k:depends({mode="ap-wds", encryption="psk2"})
+	ieee80211k:depends({mode="ap-wds", encryption="psk-mixed"})
+	ieee80211k.rmempty = true
+	
+	rrmneighborreport = s:taboption("encryption", Flag, "rrm_neighbor_report", translate("Enable neighbor report via radio measurements"))
+	rrmneighborreport.default = rrmneighborreport.enabled
+	rrmneighborreport:depends({ieee80211k="1"})
+	rrmneighborreport.rmempty = true
+
+	rrmbeaconreport = s:taboption("encryption", Flag, "rrm_beacon_report", translate("Enable beacon report via radio measurements"))
+	rrmbeaconreport.default = rrmbeaconreport.enabled
+	rrmbeaconreport:depends({ieee80211k="1"})
+	rrmbeaconreport.rmempty = true
+	-- End of 802.11k options
+
+	-- Probe 802.11v support
+	ieee80211v = s:taboption("encryption", Flag, "ieee80211v", translate("802.11v"), translate("Enables 802.11v allows client devices to exchange information about the network topology,tating overall improvement of the wireless network."))
+	ieee80211v:depends({mode="ap", encryption="wpa"})
+	ieee80211v:depends({mode="ap", encryption="wpa2"})
+	ieee80211v:depends({mode="ap-wds", encryption="wpa"})
+	ieee80211v:depends({mode="ap-wds", encryption="wpa2"})
+	ieee80211v:depends({mode="ap", encryption="psk"})
+	ieee80211v:depends({mode="ap", encryption="psk2"})
+	ieee80211v:depends({mode="ap", encryption="psk-mixed"})
+	ieee80211v:depends({mode="ap-wds", encryption="psk"})
+	ieee80211v:depends({mode="ap-wds", encryption="psk2"})
+	ieee80211v:depends({mode="ap-wds", encryption="psk-mixed"})
+	ieee80211v.rmempty = true
+	
+
+	wnmsleepmode = s:taboption("encryption", Flag, "wnm_sleep_mode", translate("extended sleep mode for stations"))
+	wnmsleepmode.default = wnmsleepmode.disabled
+	wnmsleepmode:depends({ieee80211v="1"})
+	wnmsleepmode.rmempty = true
+
+	bsstransition = s:taboption("encryption", Flag, "bss_transition", translate("BSS Transition Management"))
+	bsstransition.default = bsstransition.disabled
+	bsstransition:depends({ieee80211v="1"})
+	bsstransition.rmempty = true
+
+	timeadvertisement = s:taboption("encryption", ListValue, "time_advertisement", translate("Time advertisement"))
+	timeadvertisement:depends({ieee80211v="1"})
+	timeadvertisement:value("0", translatef("disabled"))
+	timeadvertisement:value("2", translatef("UTC time at which the TSF timer is 0"))
+	timeadvertisement.rmempty = true
+
+	time_zone = s:taboption("encryption", Value, "time_zone",
+	translate("time zone"), translate("Local time zone as specified in 8.3 of IEEE Std 1003.1-2004"))
+	time_zone:depends({time_advertisement="2"})
+	time_zone.placeholder = "UTC8"
+	time_zone.rmempty = true
+	-- End of 802.11v options
+
 
 	-- Probe 802.11r support (and EAP support as a proxy for Openwrt)
 	local has_80211r = (os.execute("hostapd -v11r 2>/dev/null || hostapd -veap 2>/dev/null") == 0)
