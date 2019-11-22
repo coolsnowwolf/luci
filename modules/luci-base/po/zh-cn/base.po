@@ -4031,10 +4031,13 @@ msgid "Enables 802.11v allows client devices to exchange information about the n
 msgstr "启用 802.11v 将允许客户端设备交换有关网络拓扑的信息，从而全面改善无线网络漫游"
 
 msgid "extended sleep mode for stations"
-msgstr 扩展无线休眠节能模式"
+msgstr "扩展无线休眠节能模式"
 
 msgid "BSS Transition Management"
 msgstr "BSS 传输管理"
+
+msgid "UTC time at which the TSF timer is 0"
+msgstr "TSF计时器为0的UTC时间"
 
 msgid "Time advertisement"
 msgstr "广播同步时间"
