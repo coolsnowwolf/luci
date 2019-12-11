@@ -1,9 +1,19 @@
 msgid ""
-msgstr "Content-Type: text/plain; charset=UTF-8\n"
+msgstr ""
+"PO-Revision-Date: 2019-11-05 01:57+0000\n"
+"Last-Translator: Yurii Petrashko <yuripet@gmail.com>\n"
+"Language-Team: Ukrainian <https://hosted.weblate.org/projects/openwrt/"
+"luciapplicationswifischedule/uk/>\n"
+"Language: uk\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<="
+"4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
+"X-Generator: Weblate 3.10-dev\n"
 
 #: applications/luci-app-wifischedule/luasrc/model/cbi/wifischedule/wifi_schedule.lua:81
 msgid "Activate wifi"
-msgstr "Aktivera wifi"
+msgstr ""
 
 #: applications/luci-app-wifischedule/luasrc/model/cbi/wifischedule/wifi_schedule.lua:65
 msgid "Could not find required /usr/bin/wifi_schedule.sh or /sbin/wifi"
@@ -15,39 +25,39 @@ msgstr ""
 
 #: applications/luci-app-wifischedule/luasrc/controller/wifischedule/wifi_schedule.lua:41
 msgid "Cron Jobs"
-msgstr "Cron-jobb"
+msgstr ""
 
 #: applications/luci-app-wifischedule/luasrc/model/cbi/wifischedule/wifi_schedule.lua:154
 msgid "Day(s) of Week"
-msgstr "Dag(ar) i veckan"
+msgstr ""
 
 #: applications/luci-app-wifischedule/luasrc/model/cbi/wifischedule/wifi_schedule.lua:39
 msgid "Defines a schedule when to turn on and off wifi."
-msgstr "Anger ett schema när wifi ska startas och stängas ner."
+msgstr ""
 
 #: applications/luci-app-wifischedule/luasrc/model/cbi/wifischedule/wifi_schedule.lua:133
 msgid "Determine Modules Automatically"
-msgstr "Avgör moduler automatiskt"
+msgstr ""
 
 #: applications/luci-app-wifischedule/luasrc/model/cbi/wifischedule/wifi_schedule.lua:88
 msgid "Disable wifi gracefully"
-msgstr "Inaktivera wifi elegant"
+msgstr ""
 
 #: applications/luci-app-wifischedule/luasrc/model/cbi/wifischedule/wifi_schedule.lua:95
 msgid "Disabled wifi forced"
-msgstr "Inaktivering av wifi påtvingat"
+msgstr ""
 
 #: applications/luci-app-wifischedule/luasrc/model/cbi/wifischedule/wifi_schedule.lua:148
 msgid "Enable"
-msgstr "Aktivera"
+msgstr "Увімкнути"
 
 #: applications/luci-app-wifischedule/luasrc/model/cbi/wifischedule/wifi_schedule.lua:55
 msgid "Enable Wifi Schedule"
-msgstr "Aktivera Wifi-schema"
+msgstr ""
 
 #: applications/luci-app-wifischedule/luasrc/model/cbi/wifischedule/wifi_schedule.lua:74
 msgid "Enable logging"
-msgstr "Aktivera loggning"
+msgstr ""
 
 #: applications/luci-app-wifischedule/luasrc/model/cbi/wifischedule/wifi_schedule.lua:235
 msgid "Force disabling wifi even if stations associated"
@@ -55,81 +65,81 @@ msgstr ""
 
 #: applications/luci-app-wifischedule/luasrc/model/cbi/wifischedule/wifi_schedule.lua:161
 msgid "Friday"
-msgstr "Fredag"
+msgstr "П'ятниця"
 
 #: applications/luci-app-wifischedule/luasrc/model/cbi/wifischedule/wifi_schedule.lua:48
 msgid "Global Settings"
-msgstr "Globala inställningar"
+msgstr "Загальні параметри"
 
 #: applications/luci-app-wifischedule/luasrc/model/cbi/wifischedule/wifi_schedule.lua:157
 msgid "Monday"
-msgstr "Måndag"
+msgstr "Понеділок"
 
 #: applications/luci-app-wifischedule/luasrc/model/cbi/wifischedule/wifi_schedule.lua:162
 msgid "Saturday"
-msgstr "Lördag"
+msgstr "Субота"
 
 #: applications/luci-app-wifischedule/luasrc/controller/wifischedule/wifi_schedule.lua:27
 msgid "Schedule"
-msgstr "Schema"
+msgstr ""
 
 #: applications/luci-app-wifischedule/luasrc/model/cbi/wifischedule/wifi_schedule.lua:142
 msgid "Schedule events"
-msgstr "Schemalägg händelser"
+msgstr ""
 
 #: applications/luci-app-wifischedule/luasrc/model/cbi/wifischedule/wifi_schedule.lua:196
 msgid "Start Time"
-msgstr "Starttid"
+msgstr ""
 
 #: applications/luci-app-wifischedule/luasrc/model/cbi/wifischedule/wifi_schedule.lua:167
 msgid "Start WiFi"
-msgstr "Starta WiFi"
+msgstr ""
 
 #: applications/luci-app-wifischedule/luasrc/model/cbi/wifischedule/wifi_schedule.lua:230
 msgid "Stop Time"
-msgstr "Stopptid"
+msgstr ""
 
 #: applications/luci-app-wifischedule/luasrc/model/cbi/wifischedule/wifi_schedule.lua:201
 msgid "Stop WiFi"
-msgstr "Stoppa WiFi"
+msgstr ""
 
 #: applications/luci-app-wifischedule/luasrc/model/cbi/wifischedule/wifi_schedule.lua:163
 msgid "Sunday"
-msgstr "Söndag"
+msgstr "Неділя"
 
 #: applications/luci-app-wifischedule/luasrc/model/cbi/wifischedule/wifi_schedule.lua:33
 msgid "The value %s is invalid"
-msgstr "Värdet %s är ogiltigt"
+msgstr ""
 
 #: applications/luci-app-wifischedule/luasrc/model/cbi/wifischedule/wifi_schedule.lua:160
 msgid "Thursday"
-msgstr "Torsdag"
+msgstr "Четвер"
 
 #: applications/luci-app-wifischedule/luasrc/model/cbi/wifischedule/wifi_schedule.lua:158
 msgid "Tuesday"
-msgstr "Tisdag"
+msgstr "Вівторок"
 
 #: applications/luci-app-wifischedule/luasrc/model/cbi/wifischedule/wifi_schedule.lua:102
 msgid "Unload Modules (experimental; saves more power)"
-msgstr "Befria moduler (experimentiell; sparar mer ström)"
+msgstr ""
 
 #: applications/luci-app-wifischedule/luasrc/controller/wifischedule/wifi_schedule.lua:29
 msgid "View Cron Jobs"
-msgstr "Se Cron-jobb"
+msgstr ""
 
 #: applications/luci-app-wifischedule/luasrc/controller/wifischedule/wifi_schedule.lua:28
 msgid "View Logfile"
-msgstr "Se loggfilen"
+msgstr ""
 
 #: applications/luci-app-wifischedule/luasrc/model/cbi/wifischedule/wifi_schedule.lua:159
 msgid "Wednesday"
-msgstr "Onsdag"
+msgstr "Середа"
 
 #: applications/luci-app-wifischedule/luasrc/controller/wifischedule/wifi_schedule.lua:26
 #: applications/luci-app-wifischedule/luasrc/model/cbi/wifischedule/wifi_schedule.lua:39
 msgid "Wifi Schedule"
-msgstr "Wifi-schema"
+msgstr ""
 
 #: applications/luci-app-wifischedule/luasrc/controller/wifischedule/wifi_schedule.lua:35
 msgid "Wifi Schedule Logfile"
-msgstr "Loggfil för Wifi-schema"
+msgstr ""
