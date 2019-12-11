@@ -13,7 +13,7 @@ PKG_LICENSE:=MIT
 PKG_MAINTAINER:=Xingwang Liao <kuoruan@gmail.com>
 
 LUCI_TITLE:=LuCI support for Frpc
-LUCI_DEPENDS:=
+LUCI_DEPENDS:=+wget +frpc
 LUCI_PKGARCH:=all
 
 define Package/$(PKG_NAME)/conffiles
