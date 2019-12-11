@@ -1,9 +1,7 @@
 -- Copyright 2008 Steven Barth <steven@midlink.org>
 -- Licensed to the public under the Apache License 2.0.
 
-require("luci.ip")
-require("luci.model.uci")
-
+local fs = require("nixio.fs")
 
 local knownParams = {
 	--
@@ -144,9 +142,9 @@ local knownParams = {
 			"client_connect",
 			"/usr/bin/ovpn-clientconnect",
 			translate("Run script cmd on client connection") },
-		{ Flag,
+		{ Value,
 			"client_disconnect",
-			0,
+			"/usr/bin/ovpn-clientdisconnect",
 			translate("Run script cmd on client disconnection") },
 		{ Value,
 			"learn_address",
@@ -160,6 +158,10 @@ local knownParams = {
 			"script_security",
 			{ 0, 1, 2, 3 },
 			translate("Policy level over usage of external programs and scripts") },
+		{ ListValue,
+			"compress",
+			{ "lzo", "lz4" },
+			translate("Enable a compression algorithm") },
 	} },
 
 	{ "Networking", {
@@ -204,10 +206,6 @@ local knownParams = {
 			"dev_node",
 			"/dev/net/tun",
 			translate("Use tun/tap device node") },
-		{ Flag,
-			"tun_ipv6",
-			0,
-			translate("Make tun device IPv6 capable") },
 		{ Value,
 			"ifconfig",
 			"10.200.200.3 10.200.200.1",
@@ -240,6 +238,10 @@ local knownParams = {
 			"route_nopull",
 			0,
 			translate("Don't pull routes automatically") },
+		{ Flag,
+			"allow_recursive_routing",
+			0,
+			translate("Don't drop incoming tun packets with same destination as host") },
 		{ ListValue,
 			"mtu_disc",
 			{ "yes", "maybe", "no" },
@@ -398,12 +400,6 @@ local knownParams = {
 			"/etc/openvpn/ipp.txt 600",
 			translate("Persist/unpersist ifconfig-pool"),
 			{ client="0" }, { client="" } },
-	-- deprecated and replaced by --topology p2p
-	--	{ Flag,
-	--		"ifconfig_pool_linear",
-	--		0,
-	--		translate("Use individual addresses rather than /30 subnets"),
-	--		{ client="0" }, { client="" } },
 		{ Value,
 			"ifconfig_push",
 			"10.200.200.1 255.255.255.255",
@@ -470,11 +466,6 @@ local knownParams = {
 			translate("Allowed maximum of new connections"),
 			{ client="0" }, { client="" } },
 		{ Flag,
-			"client_cert_not_required",
-			0,
-			translate("Don't require client certificate"),
-			{ client="0" }, { client="" } },
-		{ Flag,
 			"username_as_common_name",
 			0,
 			translate("Use username as common name"),
@@ -488,7 +479,7 @@ local knownParams = {
 			0,
 			translate("Accept options pushed from server"),
 			{ client="1" } },
-		{ Value,
+		{ FileUpload,
 			"auth_user_pass",
 			"/etc/openvpn/userpass.txt",
 			translate("Authenticate using username/password"),
@@ -506,8 +497,7 @@ local knownParams = {
 		{ DynamicList,
 			"remote",
 			"1.2.3.4",
-			translate("Remote host name or ip address"),
-			{ client="1" } },
+			translate("Remote host name or ip address") },
 		{ Flag,
 			"remote_random",
 			0,
@@ -564,6 +554,10 @@ local knownParams = {
 			{ "", "local", "def1", "local def1" },
 			translate("Automatically redirect default route"),
 			{ client="1" } },
+		{ Value,
+			"verify_client_cert",
+			{  "none", "optional", "require" },
+			translate("Specify whether the client is required to supply a valid certificate") },
 	} },
 
 	{ "Cryptography", {
@@ -579,7 +573,51 @@ local knownParams = {
 	-- parse
 		{ Value,
 			"cipher",
-			"BF-CBC",
+			{
+				"AES-128-CBC",
+				"AES-128-CFB",
+				"AES-128-CFB1",
+				"AES-128-CFB8",
+				"AES-128-GCM",
+				"AES-128-OFB",
+				"AES-192-CBC",
+				"AES-192-CFB",
+				"AES-192-CFB1",
+				"AES-192-CFB8",
+				"AES-192-GCM",
+				"AES-192-OFB",
+				"AES-256-CBC",
+				"AES-256-CFB",
+				"AES-256-CFB1",
+				"AES-256-CFB8",
+				"AES-256-GCM",
+				"AES-256-OFB",
+				"BF-CBC",
+				"BF-CFB",
+				"BF-OFB",
+				"CAST5-CBC",
+				"CAST5-CFB",
+				"CAST5-OFB",
+				"DES-CBC",
+				"DES-CFB",
+				"DES-CFB1",
+				"DES-CFB8",
+				"DES-EDE-CBC",
+				"DES-EDE-CFB",
+				"DES-EDE-OFB",
+				"DES-EDE3-CBC",
+				"DES-EDE3-CFB",
+				"DES-EDE3-CFB1",
+				"DES-EDE3-CFB8",
+				"DES-EDE3-OFB",
+				"DES-OFB",
+				"DESX-CBC",
+				"RC2-40-CBC",
+				"RC2-64-CBC",
+				"RC2-CBC",
+				"RC2-CFB",
+				"RC2-OFB"
+			},
 			translate("Encryption cipher for packets") },
 	-- parse
 		{ Value,
@@ -591,10 +629,6 @@ local knownParams = {
 			"engine",
 			"dynamic",
 			translate("Enable OpenSSL hardware crypto engines") },
-		{ Flag,
-			"no_replay",
-			0,
-			translate("Disable replay protection") },
 		{ Value,
 			"replay_window",
 			"64 15",
@@ -607,10 +641,6 @@ local knownParams = {
 			"replay_persist",
 			"/var/run/openvpn-replay-state",
 			translate("Persist replay-protection state") },
-		{ Flag,
-			"no_iv",
-			0,
-			translate("Disable cipher initialisation vector") },
 		{ Flag,
 			"tls_server",
 			0,
@@ -645,10 +675,38 @@ local knownParams = {
 			"key_method",
 			{ 1, 2 },
 			translate("Enable TLS and assume client role") },
-		{ Value,
+		{ DynamicList,
 			"tls_cipher",
-			"DHE-RSA-AES256-SHA:DHE-DSS-AES256-SHA:AES256-SHA:EDH-RSA-DES-CBC3-SHA:EDH-DSS-DES-CBC3-SHA:DES-CBC3-SHA:DHE-RSA-AES128-SHA:DHE-DSS-AES128-SHA:AES128-SHA:RC4-SHA:RC4-MD5:EDH-RSA-DES-CBC-SHA:EDH-DSS-DES-CBC-SHA:DES-CBC-SHA:EXP-EDH-RSA-DES-CBC-SHA:EXP-EDH-DSS-DES-CBC-SHA:EXP-DES-CBC-SHA:EXP-RC2-CBC-MD5:EXP-RC4-MD5",
+			{
+				"DHE-RSA-AES256-SHA",
+				"DHE-DSS-AES256-SHA",
+				"AES256-SHA",
+				"EDH-RSA-DES-CBC3-SHA",
+				"EDH-DSS-DES-CBC3-SHA",
+				"DES-CBC3-SHA",
+				"DHE-RSA-AES128-SHA",
+				"DHE-DSS-AES128-SHA",
+				"AES128-SHA",
+				"RC4-SHA",
+				"RC4-MD5",
+				"EDH-RSA-DES-CBC-SHA",
+				"EDH-DSS-DES-CBC-SHA",
+				"DES-CBC-SHA",
+				"EXP-EDH-RSA-DES-CBC-SHA",
+				"EXP-EDH-DSS-DES-CBC-SHA",
+				"EXP-DES-CBC-SHA",
+				"EXP-RC2-CBC-MD5",
+				"EXP-RC4-MD5"
+			},
 			translate("TLS cipher") },
+		{ DynamicList,
+			"tls_ciphersuites",
+			{
+				"TLS_AES_256_GCM_SHA384",
+				"TLS_AES_128_GCM_SHA256",
+				"TLS_CHACHA20_POLY1305_SHA256"
+			},
+			translate("TLS 1.3 or newer cipher") },
 		{ Value,
 			"tls_timeout",
 			2,
@@ -721,10 +779,18 @@ local knownParams = {
 			"tls_version_max",
 			"1.2",
 			translate("The highest supported TLS version") },
-		{ Value,
+		{ ListValue,
 			"key_direction",
-			"1",
+			{ 0, 1 },
 			translate("The key direction for 'tls-auth' and 'secret' options") },
+		{ Flag,
+			"ncp_disable",
+			0,
+			translate("This completely disables cipher negotiation") },
+		{ Value,
+			"ncp_ciphers",
+			"AES-256-GCM:AES-128-GCM",
+			translate("Restrict the allowed ciphers to be negotiated") },
 	} }
 }
 
@@ -733,8 +799,10 @@ local cts = { }
 local params = { }
 
 local m = Map("openvpn")
-local p = m:section( SimpleSection )
+m.redirect = luci.dispatcher.build_url("admin", "vpn", "openvpn")
+m.apply_on_parse = true
 
+local p = m:section( SimpleSection )
 p.template = "openvpn/pageswitch"
 p.mode     = "advanced"
 p.instance = arg[1]
@@ -764,8 +832,44 @@ for _, option in ipairs(params) do
 		option[2], option[4]
 	)
 
+	o.optional = true
+
 	if option[1] == DummyValue then
 		o.value = option[3]
+	elseif option[1] == FileUpload then
+
+		function o.cfgvalue(self, section)
+			local cfg_val = AbstractValue.cfgvalue(self, section)
+
+			if cfg_val then
+				return cfg_val
+			end
+		end
+
+		function o.formvalue(self, section)
+			local sel_val = AbstractValue.formvalue(self, section)
+			local txt_val = luci.http.formvalue("cbid."..self.map.config.."."..section.."."..self.option..".textbox")
+
+			if sel_val and sel_val ~= "" then
+				return sel_val
+			end
+
+			if txt_val and txt_val ~= "" then
+				return txt_val
+			end
+		end
+
+		function o.remove(self, section)
+			local cfg_val = AbstractValue.cfgvalue(self, section)
+			local txt_val = luci.http.formvalue("cbid."..self.map.config.."."..section.."."..self.option..".textbox")
+
+			if cfg_val and fs.access(cfg_val) and txt_val == "" then
+				fs.unlink(cfg_val)
+			end
+			return AbstractValue.remove(self, section)
+		end
+	elseif option[1] == Flag then
+		o.default = nil
 	else
 		if option[1] == DynamicList then
 			function o.cfgvalue(...)
@@ -773,8 +877,6 @@ for _, option in ipairs(params) do
 				return ( val and type(val) ~= "table" ) and { val } or val
 			end
 		end
-
-		o.optional = true
 
 		if type(option[3]) == "table" then
 			if o.optional then o:value("", "-- remove --") end
