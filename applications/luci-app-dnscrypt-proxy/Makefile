@@ -37,7 +37,7 @@ define Package/luci-app-dnscrypt-proxy
 	TITLE:=DNSCrypt Proxy LuCI interface
 	URL:=https://github.com/peter-tank/luci-app-dnscrypt-proxy
 	PKGARCH:=all
-	DEPENDS:=+PACKAGE_$(PKG_NAME)_INCLUDE_minisign:minisign
+	DEPENDS:=+PACKAGE_$(PKG_NAME)_INCLUDE_minisign:minisign +dnscrypt-proxy2
 endef
 
 define Package/luci-app-dnscrypt-proxy/description
