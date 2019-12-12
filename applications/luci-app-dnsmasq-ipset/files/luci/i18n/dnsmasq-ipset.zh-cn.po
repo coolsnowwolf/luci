@@ -1,0 +1,23 @@
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\n"
+
+msgstr "IP-Set settings for DNSMasq-full"
+msgstr "DNSMasq-full IP-Set 设置"
+
+msgid "IP-Set Settings"
+msgstr "IP-Set 设置"
+
+msgid "IP-Set Name"
+msgstr "IP-Set 名称"
+
+msgid "Enabled"
+msgstr "已启用"
+
+msgid "Forward DNS Lookups"
+msgstr "转发DNS请求"
+
+msgid "Upstream DNS Server"
+msgstr "上游DNS服务器"
+
+msgid "Managed Domain List"
+msgstr "已配置域名列表"
