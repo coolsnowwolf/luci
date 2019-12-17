@@ -48,7 +48,7 @@
 
 		local rv = {
 			uptime     = sysinfo.uptime or 0,
-			localtime  = os.date(),
+			localtime  = os.date("%Y年%m月%d日") .. " " .. translate(os.date("%A")) .. " " .. os.date("%X"),
 			loadavg    = sysinfo.load or { 0, 0, 0 },
 			memory     = meminfo,
 			memcached  = mem_cached,
@@ -57,7 +57,8 @@
 			conncount  = conn_count,
 			leases     = stat.dhcp_leases(),
 			leases6    = stat.dhcp6_leases(),
-			wifinets   = stat.wifi_networks()
+			wifinets   = stat.wifi_networks(),
+			cpu_free   = tonumber(luci.sys.exec("echo `top -n 1 | grep CPU | grep -v grep | head -n 1 | awk '{print $8}' | sed 's/\\(.*\\)\\(.\\)$/\\1/'`"))
 		}
 
 		if wan then
@@ -629,8 +630,26 @@
 			if (e = document.getElementById('localtime'))
 				e.innerHTML = info.localtime;
 
-			if (e = document.getElementById('uptime'))
-				e.innerHTML = String.format('%t', info.uptime);
+			if (e = document.getElementById('uptime')) {
+				var time = parseInt(info.uptime) + "秒";
+				if(parseInt(info.uptime)> 60){
+					var second = parseInt(info.uptime) % 60;
+					var min = parseInt(info.uptime / 60);
+					time = min + "分" + second + "秒";
+					if( min > 60 ){
+						min = parseInt(info.uptime / 60) % 60;
+						var hour = parseInt( parseInt(info.uptime / 60) /60 );
+						time = hour + "小时" + min + "分" + second + "秒";
+						if( hour > 24 ) {
+							hour = parseInt( parseInt(info.uptime / 60) /60 ) % 24;
+							var day = parseInt( parseInt( parseInt(info.uptime / 60) /60 ) / 24 );
+							time = day + "天" + hour + "小时" + min + "分" + second + "秒";
+						}
+					}
+				}
+				e.innerHTML = time;
+				//e.innerHTML = String.format('%t', info.uptime);
+			}
 
 			if (e = document.getElementById('loadavg'))
 				e.innerHTML = String.format(
@@ -638,6 +657,12 @@
 					info.loadavg[0] / 65535.0,
 					info.loadavg[1] / 65535.0,
 					info.loadavg[2] / 65535.0
+				);
+				
+			if (e = document.getElementById('cpu_free'))
+				e.innerHTML = progressbar(
+					info.cpu_free + "%",
+					100 + "%"
 				);
 
 			if (e = document.getElementById('memtotal'))
@@ -688,6 +713,14 @@
 		<tr><td width="33%"><%:Local Time%></td><td id="localtime">-</td></tr>
 		<tr><td width="33%"><%:Uptime%></td><td id="uptime">-</td></tr>
 		<tr><td width="33%"><%:Load Average%></td><td id="loadavg">-</td></tr>
+	</table>
+</fieldset>
+
+<fieldset class="cbi-section">
+	<legend><%:CPU%></legend>
+
+	<table width="100%" cellspacing="10">
+		<tr><td width="33%"><%:Total Available%></td><td id="cpu_free">-</td></tr>
 	</table>
 </fieldset>
 
