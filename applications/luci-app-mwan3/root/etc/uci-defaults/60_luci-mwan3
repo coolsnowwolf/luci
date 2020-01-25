@@ -15,6 +15,9 @@ uci -q get mwan3.globals >/dev/null || {
 	uci commit mwan3
 }
 
+sed -i 's/IPT6=/# IPT6=/' /lib/mwan3/mwan3.sh
+sed -i '/LOG=/i IPT6="\/bin\/true"' /lib/mwan3/mwan3.sh
+
 # remove LuCI cache
 rm -rf /tmp/luci-indexcache /tmp/luci-modulecache
 
