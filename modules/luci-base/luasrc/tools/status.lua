@@ -29,7 +29,7 @@ local function dhcp_leases_common(family)
 				local expire = tonumber(ts) or 0
 				if ts and mac and ip and name and duid then
 					if family == 4 and not ip:match(":") then
-						rv[#rv+1] = {
+						rv[#rv+2] = {
 							expires  = (expire ~= 0) and os.difftime(expire, os.time()),
 							macaddr  = mac,
 							ipaddr   = ip,
