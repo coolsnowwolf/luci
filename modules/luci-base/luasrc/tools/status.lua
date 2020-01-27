@@ -25,11 +25,11 @@ local function dhcp_leases_common(family)
 			if not ln then
 				break
 			else
-				local ts, mac, ip, name, comments, duid = ln:match("^(%d+) (%S+) (%S+) (%S+) (%S+)")
+				local ts, mac, ip, name, comments, duid = ln:match("^(%d+) (%S+) (%S+) (%S+) (%S+) (%S+)")
 				local expire = tonumber(ts) or 0
 				if ts and mac and ip and name and duid then
 					if family == 4 and not ip:match(":") then
-						rv[#rv+2] = {
+						rv[#rv+1] = {
 							expires  = (expire ~= 0) and os.difftime(expire, os.time()),
 							macaddr  = mac,
 							ipaddr   = ip,
