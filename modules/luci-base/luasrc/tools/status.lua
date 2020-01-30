@@ -7,7 +7,6 @@ local uci = require "luci.model.uci".cursor()
 
 local function dhcp_leases_common(family)
 	local rv = { }
-	local rc = { }
 	local nfs = require "nixio.fs"
 	local leasefile = "/tmp/dhcp.leases"
 
