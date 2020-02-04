@@ -4,7 +4,7 @@
 module("luci.tools.status", package.seeall)
 
 local uci = require "luci.model.uci".cursor()
-
+local sys = require "luci.sys"
 local function dhcp_leases_common(family)
 	local rv = { }
 	local nfs = require "nixio.fs"
@@ -49,6 +49,21 @@ local function dhcp_leases_common(family)
 				end
 				fc:close()
 				
+				local online
+				function device_status(m)
+					local status
+					luci.ip.neighbors({ family = 4, mac = m }, 
+					function(n) 
+						status = (n.reachable)
+					end)
+					if status then
+						return "0"
+					else
+						return "1"
+					end
+				end
+				online = device_status(mac)
+				
 				local expire = tonumber(ts) or 0
 				if ts and mac and ip and name and duid then
 					if family == 4 and not ip:match(":") then
@@ -57,7 +72,8 @@ local function dhcp_leases_common(family)
 							macaddr  = mac,
 							ipaddr   = ip,
 							hostname = (name ~= "*") and name,
-							comments = comments
+							comments = comments,
+							online   = online
 						}
 					elseif family == 6 and ip:match(":") then
 						rv[#rv+1] = {
