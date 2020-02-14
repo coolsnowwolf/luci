@@ -1,5 +1,16 @@
 <% if not self.embedded then %>
-<form method="post" enctype="multipart/form-data" action="<%=REQUEST_URI%>">
+<form method="post" enctype="multipart/form-data" action="<%=REQUEST_URI%>"<%=
+			attr("data-strings", luci.util.serialize_json({
+				label = {
+					choose = translate('-- Please choose --'),
+					custom = translate('-- custom --'),
+				},
+				path = {
+					resource = resource,
+					browser  = url("admin/filebrowser")
+				}
+			}))
+		%>>
 	<div>
 		<script type="text/javascript" src="<%=resource%>/cbi.js"></script>
 		<input type="hidden" name="token" value="<%=token%>" />
@@ -52,7 +63,7 @@
 		<%- if not self.cancel then -%><%-:Cancel-%><%-else-%><%=self.cancel%><%end-%>
 	" />
 <% end %>
-		<script type="text/javascript">cbi_d_update();</script>
 	</div>
 </form>
 <% end %>
+<script type="text/javascript">cbi_init();</script>
