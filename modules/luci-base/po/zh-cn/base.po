@@ -245,8 +245,14 @@ msgstr "添加新接口..."
 msgid "Additional Hosts files"
 msgstr "额外的 HOSTS 文件"
 
-msgid "Additional servers file"
-msgstr "额外的 SERVERS 文件"
+msgid "Additional Hosts files"
+msgstr "额外的 HOSTS 文件"
+
+msgid "Disable IPv6 DNS forwards"
+msgstr "禁止解释 IPv6 DNS 记录"
+
+msgid "Filter IPv6(AAAA) DNS Query Name Resolve"
+msgstr "过滤掉 IPv6(AAAA) ，只返回 IPv4 DNS 域名记录"
 
 msgid "Address"
 msgstr "地址"
@@ -997,6 +1003,7 @@ msgid ""
 "Enable <abbr title=\"Internet Group Management Protocol\">IGMP</abbr> "
 "snooping"
 msgstr ""
+"启用 <abbr title=\"Internet Group Management Protocol\">IGMP</abbr> 嗅探"
 
 msgid "Enable <abbr title=\"Spanning Tree Protocol\">STP</abbr>"
 msgstr "开启 <abbr title=\"Spanning Tree Protocol\">STP</abbr>"
