@@ -7,7 +7,6 @@ local uci = require "luci.model.uci".cursor()
 
 local function dhcp_leases_common(family)
 	local rv = { }
-	local rc = { }
 	local nfs = require "nixio.fs"
 	local leasefile = "/tmp/dhcp.leases"
 
@@ -27,29 +26,6 @@ local function dhcp_leases_common(family)
 				break
 			else
 				local ts, mac, ip, name, duid = ln:match("^(%d+) (%S+) (%S+) (%S+) (%S+)")
-				local comments
-				local fc = io.open("/tmp/dhcp_comments.conf", "r")
-				if fc then
-					local lc
-					while true do
-						lc =  fc:read("*l")
-						if not lc then break end
-						local comment, macs, ips = lc:match("(%S+) (%S+) (%S+)")		
-						if macs ~= "-" then
-							if macs == mac then 
-								comments = comment
-								break
-							end
-						else
-							if ips == ip then
-								comments = comment
-								break
-							end
-						end
-					end
-				end
-				fc:close()
-				
 				local expire = tonumber(ts) or 0
 				if ts and mac and ip and name and duid then
 					if family == 4 and not ip:match(":") then
@@ -57,8 +33,7 @@ local function dhcp_leases_common(family)
 							expires  = (expire ~= 0) and os.difftime(expire, os.time()),
 							macaddr  = mac,
 							ipaddr   = ip,
-							hostname = (name ~= "*") and name,
-							comments = comments
+							hostname = (name ~= "*") and name
 						}
 					elseif family == 6 and ip:match(":") then
 						rv[#rv+1] = {
