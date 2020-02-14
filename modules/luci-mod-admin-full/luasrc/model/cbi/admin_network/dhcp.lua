@@ -307,6 +307,9 @@ function name.remove(self, section)
 	m:del(section, "dns")
 end
 
+comments = s:option(Value, "comments", translate("Comments"))
+comments.rmempty  = true
+
 mac = s:option(Value, "mac", translate("<abbr title=\"Media Access Control\">MAC</abbr>-Address"))
 mac.datatype = "list(macaddr)"
 mac.rmempty  = true
