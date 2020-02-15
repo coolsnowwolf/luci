@@ -47,8 +47,19 @@
 		):match("%d+")) or 4096
 		
 		local user_info = tonumber(luci.sys.exec("cat /proc/net/arp | grep '0x2' | wc -l")) or 0
+		
+		local cpu_usage
+		
+		if fs.readfile("/tmp/cpuusage")  then
+				cpu_usage = luci.sys.exec("cat /tmp/cpuusage")
+		else
+				cpu_usage = "6.6%"
+		end
+		
+		luci.sys.exec("/bin/getcpu &")
 
 		local rv = {
+			cpuusage    = cpu_usage,
 			userinfo    = user_info,
 			uptime     = sysinfo.uptime or 0,
 			localtime  = os.date(),
@@ -637,6 +648,9 @@
 				
 			if (e = document.getElementById('userinfo'))
 				e.innerHTML = info.userinfo;
+				
+			if (e = document.getElementById('cpuusage'))
+				e.innerHTML = info.cpuusage;
 
 			if (e = document.getElementById('loadavg'))
 				e.innerHTML = String.format(
@@ -694,6 +708,7 @@
 		<tr><td width="33%"><%:Local Time%></td><td id="localtime">-</td></tr>
 		<tr><td width="33%"><%:Uptime%></td><td id="uptime">-</td></tr>
 		<tr><td width="33%"><%:Load Average%></td><td id="loadavg">-</td></tr>
+		<tr><td width="33%"><%:CPU usage (%)%></td><td id="cpuusage">-</td></tr>
 	</table>
 </fieldset>
 
