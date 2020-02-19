@@ -228,9 +228,9 @@ cs.placeholder = 150
 
 minittl = s:taboption("advanced", Value, "mini_ttl",
 	translate("Minimum TTL to send to clients"),
-	translate("Modify DNS entries minimum TTL (max is 3600, 0 is no modify)"))
+	translate("Modify DNS entries minimum TTL (max is 86400, 0 is no modify)"))
 minittl.optional = true
-minittl.datatype = "range(0,3600)"
+minittl.datatype = "range(0,86400)"
 minittl.placeholder = 0
 
 s:taboption("tftp", Flag, "enable_tftp",
