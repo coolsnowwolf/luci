@@ -264,7 +264,7 @@ msgid "Additional servers file"
 msgstr "额外的 SERVERS 文件"
 
 msgid "Modify DNS entries minimum TTL (max is 86400, 0 is no modify)"
-msgstr "修改发送到客户端的域名记录的 TTL 时间 (最大 864000, 0 表示不修改)"
+msgstr "修改发送到客户端的域名记录的 TTL 时间 (最大 86400, 0 表示不修改)"
 
 msgid "Address"
 msgstr "地址"
