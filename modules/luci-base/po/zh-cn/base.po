@@ -252,7 +252,7 @@ msgid "Additional Hosts files"
 msgstr "额外的 HOSTS 文件"
 
 msgid "Disable IPv6 DNS forwards"
-msgstr "禁止解释 IPv6 DNS 记录"
+msgstr "禁止解析 IPv6 DNS 记录"
 
 msgid "Filter IPv6(AAAA) DNS Query Name Resolve"
 msgstr "过滤掉 IPv6(AAAA) ，只返回 IPv4 DNS 域名记录"
