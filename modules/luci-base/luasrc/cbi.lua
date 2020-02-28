@@ -1536,6 +1536,36 @@ function Value.parse(self, section, novld)
 	AbstractValue.parse(self, section, novld)
 end
 
+--[[
+Datepicker - A one-line value
+	maxlength:	The maximum length
+]]--
+Datepicker = class(AbstractValue)
+
+function Datepicker.__init__(self, ...)
+	AbstractValue.__init__(self, ...)
+	self.template  = "cbi/datepicker"
+	self.keylist = {}
+	self.vallist = {}
+	self.readonly = nil
+end
+
+function Datepicker.reset_values(self)
+	self.keylist = {}
+	self.vallist = {}
+end
+
+function Datepicker.value(self, key, val)
+	val = val or key
+	table.insert(self.keylist, tostring(key))
+	table.insert(self.vallist, tostring(val))
+end
+
+function Datepicker.parse(self, section, novld)
+	if self.readonly then return end
+	AbstractValue.parse(self, section, novld)
+end
+
 -- DummyValue - This does nothing except being there
 DummyValue = class(AbstractValue)
 

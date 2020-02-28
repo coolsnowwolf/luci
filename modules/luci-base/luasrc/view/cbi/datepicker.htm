@@ -1,0 +1,16 @@
+<%+cbi/valueheader%>
+	<input data-update="change"<%=
+		attr("id", cbid) ..
+		attr("name", cbid) ..
+		attr("type", "text") ..
+		attr("class", "cbi-input-text" and cbid) ..
+		attr("value", self:cfgvalue(section) or self.default) ..
+		ifattr(self.size, "size") ..
+		ifattr(self.placeholder, "placeholder") ..
+		ifattr(self.readonly, "readonly") ..
+		ifattr(self.maxlength, "maxlength") ..
+		ifattr(self.datatype, "data-type", self.datatype) ..
+		ifattr(self.datatype, "data-optional", self.optional or self.rmempty) ..
+		ifattr(self.combobox_manual, "data-manual", self.combobox_manual) ..
+		ifattr(#self.keylist > 0, "data-choices", { self.keylist, self.vallist })
+	%> />
