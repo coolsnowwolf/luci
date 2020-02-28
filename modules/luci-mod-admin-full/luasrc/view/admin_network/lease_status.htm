@@ -80,7 +80,7 @@
 					var host = hosts[duid2mac(st[1][i].duid)];
 					if (host)
 						tr.insertCell(-1).innerHTML = String.format(
-							'<div style="max-width:200px;overflow:hidden;text-overflow:ellipsis">%s</div>',
+							'%s',
 							((host.name && (host.ipv4 || host.ipv6))
 								? '%h (%s)'.format(host.name, host.ipv4 || host.ipv6)
 								: '%h'.format(host.name || host.ipv4 || host.ipv6)).nobr()
