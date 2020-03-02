@@ -13,7 +13,22 @@
     height: 100%;
     width: 100%;
 }
-.atie-calendar {
+.atie-calendar-timePicker {
+    position: relative;
+    outline: none;
+    width: 160px;
+    border: 1px solid #fff;
+    list-style: none;
+    font-size: 14px;
+    text-align: left;
+    background-color: #fff;
+    border-radius: 4px;
+    -webkit-box-shadow: 0 2px 8px rgba(0,0,0,.15);
+    box-shadow: 0 2px 8px rgba(0,0,0,.15);
+    background-clip: padding-box;
+    line-height: 1.5;
+}
+.atie-calendar-datePicker {
     position: relative;
     outline: none;
     width: 280px;
@@ -82,6 +97,13 @@
 .atie-calendar-body {
     padding: 8px 12px;
 }
+
+.atie-calendar-hour-body,.atie-calendar-minute-body {
+    height: 100px; 
+    overflow-y: scroll;
+  		position: relative;
+}
+
 .atie-calendar table, .atie-calendar td, .atie-calendar th {
     border: 0;
     text-align: center;
@@ -126,13 +148,21 @@
     border-color: #1890ff;
     font-weight: 700;
     color: #1890ff;
+  
+}
+.atie-calendar-hour-body .atie-calendar-now-hour,.atie-calendar-minute-body .atie-calendar-now-minute{
+    border-color: #1890ff;
+    font-weight: bold;
+    background: #1890ff;
+    color: #fff;
+    border: 1px solid transparent;
 }
 .atie-calendar-selected-date .atie-calendar-date, .atie-calendar-selected-start-date .atie-calendar-date, .atie-calendar-selected-end-date .atie-calendar-date {
     background: #1890ff;
     color: #fff;
     border: 1px solid transparent;
 }
-.atie-calendar-date {
+.atie-calendar-date,.atie-calendar-time {
     display: block;
     margin: 0 auto;
     color: rgba(0,0,0,.65);
@@ -161,4 +191,14 @@
     text-align: center;
     color: #1890ff;
     cursor: pointer;
+}
+
+.atie-calendar-confirm-btn {
+    display: inline-block;
+    position:absolute;
+    right:10px;
+    color: #1890ff;
+    cursor: pointer;
+    border-color: #1890ff;
+    font-weight: 1000;
 }

@@ -62,7 +62,301 @@
         },
     };
 
-    function Calendar(elem) {
+    function TimePicker(elem) {
+        // 参数
+        this.bindElem = elem; // 绑定的元素
+        this.elem_wrap = null; // calendar-wrap
+        this.timer = null; // 本插件异步全都用macroTask中的setTimeout来处理
+        this.isSelected = false; // 是否触发了选择时间动作
+        var date = new Date();
+        this.timeOpt = {
+			_hour: date.getHours(), 		//Time-----------
+			_minute: date.getMinutes(), 	//Time-----------
+			selectHour: date.getHours(),		//Time-----------
+            selectMinute: date.getMinutes(),	//Time-----------
+        }
+
+        this.elem_container = document.querySelector('body');
+        this.init();
+
+    };
+    TimePicker.create = function(opt) {
+        for(var prop in opt){
+            TimePicker.Opt[prop] = opt[prop];
+        };
+        var elemArr = document.getElementsByClassName(TimePicker.Opt.classN);
+
+        for(var i=0;i<elemArr.length;i++){
+            elemArr[i].calendar = new TimePicker(elemArr[i]);
+        }
+    }
+    TimePicker.originOpt = {
+        PICKERNAME: 'calendar-btn',
+        PANELKEY: 'self-panel-key', // 存储picker对应的calendar的唯一key
+        PANELSTR: 'calendar-panel_',
+        PANELWRAPCLASS: 'calendar-wrap'
+    }
+    TimePicker.Opt = {
+        classN: '',
+        callBack: function(bindElem, selectTime) {}
+    };
+    TimePicker.version = '1.0.0';
+
+    TimePicker.prototype = {
+        constructor: TimePicker,
+        init: function () {
+            var _this = this;
+            this.initState();
+            this.bindElem.addEventListener('click', function(e) {
+                _this.openPanel(this);
+                e.stopPropagation();
+            }, false);
+        },
+        openPanel: function (target) {
+            if (utils.hasClass(target, TimePicker.originOpt.PICKERNAME)) { // 说明该元素已经挂载
+                var only_key = utils.attr(target, TimePicker.originOpt.PANELKEY);
+                this.elem_wrap = document.querySelector('.' + TimePicker.originOpt.PANELSTR + only_key);
+                if (utils.attr(this.elem_wrap, 'isShow') == 'off') utils.show(this.elem_wrap);
+                else utils.fadeOut(this.elem_wrap);
+            } else {
+                this.create(target);
+            }
+        },
+		create: function (target) {
+            var only_key = +new Date();
+            var div = document.createElement('div');
+
+            utils.attr(target, TimePicker.originOpt.PANELKEY, only_key);
+            utils.addClass(target, TimePicker.originOpt.PICKERNAME);
+
+            div.className = TimePicker.originOpt.PANELWRAPCLASS + ' ' + TimePicker.originOpt.PANELSTR + only_key;
+            div.innerHTML = this.getTemplate1() + this.getTbodyTemplate(this.timeOpt.hour, this.timeOpt.minute) + this.getTemplate2();
+            utils.attr(div, 'isShow', 'on');
+            this.elem_wrap = div; // 控件容器
+            this.elem_panel = div.children[0]; // 控件面板
+
+            // 设置定位位置
+            var elem = target;
+            var top = elem.offsetTop;
+            var left = elem.offsetLeft;
+            while(elem.offsetParent) {
+                top += elem.offsetParent.offsetTop;
+                left += elem.offsetParent.offsetLeft;
+                elem = elem.offsetParent;
+            }
+
+            utils.css(this.elem_panel,{
+                "position": "absolute",
+                 "z-index": 2,
+                 "top": top + target.offsetHeight + 10 + "px",
+                 "left": left + "px"
+            });
+
+            this.elem_container.appendChild(div);
+            this.initEvent();
+        },
+		getTemplate1: function () {
+            var selectTime = utils.formatDate(this.timeOpt.hour + 1) + ':' + utils.formatDate(this.timeOpt.time);
+            return '<div class="atie-calendar atie-calendar-timePicker" tabindex="0">' +
+                '<div class="atie-calendar-panel">' +
+                '<input class="atie-calendar-input " placeholder="请选择日期" style="display:none;" value="' + selectTime + '">' +
+                '<div class="atie-calendar-date-panel">' +
+                '<div class="atie-calendar-body">' +
+                '<table class="atie-calendar-table" cellspacing="0" role="grid">' +
+                '<thead>' +
+                '<tr role="row">' +
+                '<th role="columnheader" title="小时" class="atie-calendar-column-header">' +
+                '<span class="atie-calendar-column-header-inner">时</span>' +
+                '</th>' +
+                '<th role="columnheader" title="分钟" class="atie-calendar-column-header">' +
+                '<span class="atie-calendar-column-header-inner">分</span>' +
+                '</th>' +
+                '</tr>' +
+                '</thead>' +
+                '<tbody class="atie-calendar-tbody">';
+        },
+        getTemplate2: function () {
+            return '</tbody>' +
+                '</table>' +
+                '</div>' +
+                '<div class="atie-calendar-footer">' +
+                '<span class="atie-calendar-footer-btn">' +
+                '<a class="atie-calendar-today-btn" role="button" title="'+ this.timeOpt.curHour +'时'+ this.timeOpt.curMinute +'分">当前时间</a>' +
+				'<a class="atie-calendar-confirm-btn" role="button" title="确定">确定</a>' +
+                '</span>' +
+                '</div>' +
+                '</div>' +
+                '</div>' +
+                '</div>';
+        },
+		getTbodyTemplate: function () {
+			var htmlMinute="";
+			var htmlHour="";
+			for(i=0;i<24;i++){
+           if (i<10) i = "0" + i;
+				var className = 'atie-calendar-hour';
+				if (this.timeOpt.hour == i) className = 'atie-calendar-now-hour';
+				htmlHour += '<tr><div class="atie-calendar-cell ' + className + '">' + i + '</div></tr>';
+			}
+			for(i=0;i<60;i++){
+           if (i<10) i = "0" + i;
+				var className = 'atie-calendar-minute';
+				if (this.timeOpt.minute == i) className = 'atie-calendar-now-minute';
+				htmlMinute += '<tr><div class="atie-calendar-cell ' + className + '">' + i + '</div></tr>';
+			}
+            return 	'<tr>' +
+					'<td><div class="atie-calendar-hour-body">'+
+					'<table>' +
+					htmlHour +
+					'</table>' +
+					'</div></td>'+
+					'<td><div class="atie-calendar-minute-body">'+
+					'<table>' +
+					htmlMinute +
+					'</table>' +
+					'</div></td>'+
+					'</tr>';
+        },
+        initState: function () {
+            var self = this;
+			Object.defineProperty(this.timeOpt, 'curHour', {
+                get: function () {
+                    return new Date().getHours();
+                },
+            })
+			Object.defineProperty(this.timeOpt, 'curMinute', {
+                get: function () {
+                    return new Date().getMinutes();
+                },
+            })
+            Object.defineProperty(this.timeOpt, 'hour', {
+                get: function () {
+                    return this._hour;
+                },
+                set: function (newVal) {
+                    this._hour = newVal;
+                    self.render();
+                }
+            })
+			Object.defineProperty(this.timeOpt, 'minute', {
+                get: function () {
+                    return this._minute;
+                },
+                set: function (newVal) {
+                    this._minute = newVal;
+                    self.render();
+                }
+            })
+        },
+        initEvent: function () {
+            var self = this;
+            this.elem_wrap.addEventListener('click', function (e) {
+                e.stopPropagation();
+                var target = e.target;
+                if (utils.hasClass(target, TimePicker.Opt.classN)) {
+                    self.openPanel(target);
+                } else if (utils.hasClass(target, 'atie-calendar-hour')) {
+                    self.handleSelect1(target);
+				} else if (utils.hasClass(target, 'atie-calendar-minute')) {
+                    self.handleSelect2(target);
+				} else if (utils.hasClass(target, 'atie-calendar-today-btn')) {
+                    self.turnToNow(target);
+                } else if (utils.hasClass(target, 'atie-calendar-confirm-btn')) {
+                    self.confirmUpdate(target);
+                }
+            }, false);
+            document.addEventListener('click', function() {
+                utils.fadeOut(self.elem_wrap);
+            }, false);
+            // 点击遮罩隐藏
+            // this.elem_mask.addEventListener('click', function() {
+            //     utils.fadeOut(self.elem_wrap);
+            // }, false);
+            // 表单输入
+            this.elem_wrap.addEventListener('input', function (e) {
+                var target = e.target;
+                if (utils.hasClass(target, 'atie-calendar-input')) {
+                    self.handleInput(target);
+                }
+            }, false);
+        },
+        updateHtml: function () {
+            if (this.isSelected) {
+                this.timeOpt.selectHour = this.timeOpt.hour;
+                this.timeOpt.selectMinute = this.timeOpt.minute;
+                this.elem_wrap.querySelector('.atie-calendar-input ').value = utils.formatDate(this.timeOpt._hour) + ':' + utils.formatDate(this.timeOpt._minute);
+                // callback
+                TimePicker.Opt.callBack && TimePicker.Opt.callBack(this.bindElem, {
+                    hour: this.timeOpt.selectHour,
+                    minute: this.timeOpt.selectMinute
+                });
+            }
+            this.elem_wrap.querySelector('tbody').innerHTML = this.getTbodyTemplate();
+                    var obj1 = this.elem_wrap.querySelector(".atie-calendar-now-hour"); //将选中数字置顶
+					this.elem_wrap.querySelector(".atie-calendar-hour-body").scrollTop = obj1.offsetTop; //将选中数字置顶
+          var obj2 = this.elem_wrap.querySelector(".atie-calendar-now-minute"); //将选中数字置顶
+					this.elem_wrap.querySelector(".atie-calendar-minute-body").scrollTop = obj2.offsetTop; //将选中数字置顶
+
+            this.resetOnoff();
+        },
+        // 重置开关状态
+        resetOnoff: function () {
+            this.isSelected = false;
+            this.isHourChange = false;
+            this.isMinuteChange = false;
+        },
+        render: function () {
+            if (this.timer) return;
+            var self = this;
+
+            var fn = function () {
+                if (self.isSelected) {
+                    // 渲染1、4
+                    self.updateHtml('timeChange');
+                }
+                self.timer = null;
+            }
+            // 宏任务渲染
+            if (typeof setImmediate !== 'undefined') {
+                self.timer = setImmediate(fn);
+            } else {
+                self.timer = setTimeout(fn, 0);
+            }
+        },
+		handleSelect1: function (target) {
+            this.isSelected = true;
+            var parentElem = target.parentNode;
+            this.timeOpt.hour = parseInt(target.innerHTML);
+        },
+		handleSelect2: function (target) {
+            this.isSelected = true;
+            var parentElem = target.parentNode;
+            this.timeOpt.minute = parseInt(target.innerHTML);
+        },
+		confirmUpdate: function(target) {
+			this.isSelected = true;
+			utils.fadeOut(this.elem_wrap);
+		},
+        turnToNow: function () {
+            this.isSelected = true;
+            var date = new Date();
+            this.timeOpt.hour = date.getHours();
+            this.timeOpt.minute = date.getMinutes();
+            utils.fadeOut(this.elem_wrap);
+        },
+        handleInput: function (target) {
+            var value = target.value;
+            var reg = /^(0[1-9]|1[0-2]):(0[1-9]|[1-2][0-9]|3[0-1])$/;
+            var regExp = new RegExp(reg);
+            if (regExp.test(value)) {
+                dateArr = value.split(':');
+                this.isSelected = true;
+                this.timeOpt.hour = parseInt(dateArr[0]);
+                this.timeOpt.minute = parseInt(dateArr[1]);
+            }
+        }
+    }
+	function Calendar(elem) {
         // 参数
         this.bindElem = elem; // 绑定的元素
         this.elem_wrap = null; // calendar-wrap
@@ -161,13 +455,9 @@
         },
         getTemplate1: function () {
             var selectDate = this.dateOpt.year + '-' + utils.formatDate(this.dateOpt.month + 1) + '-' + utils.formatDate(this.dateOpt.date);
-            return '<div class="atie-calendar" tabindex="0">' +
+            return '<div class="atie-calendar atie-calendar-datePicker" tabindex="0">' +
                 '<div class="atie-calendar-panel">' +
-                '<div class="atie-calendar-input-wrap">' +
-                '<div class="atie-calendar-date-input-wrap">' +
-                '<input class="atie-calendar-input " placeholder="请选择日期" value="' + selectDate + '">' +
-                '</div>' +
-                '</div>' +
+                '<input class="atie-calendar-input " placeholder="请选择日期" style="display:none;" value="' + selectDate + '">' +
                 '<div class="atie-calendar-date-panel">' +
                 '<div class="atie-calendar-header">' +
                 '<div style="position: relative;">' +
@@ -353,7 +643,7 @@
             this.elem_wrap.addEventListener('input', function (e) {
                 var target = e.target;
                 if (utils.hasClass(target, 'atie-calendar-input')) {
-                    self.handleInput(target);
+                    self.dateHandleInput(target);
                 }
             }, false);
         },
@@ -434,7 +724,7 @@
             this.dateOpt.date = date.getDate();
             utils.fadeOut(this.elem_wrap);
         },
-        handleInput: function (target) {
+        dateHandleInput: function (target) {
             var value = target.value;
             var reg = /^[1-9]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/;
             var regExp = new RegExp(reg);
@@ -449,4 +739,5 @@
         }
     }
     window.Calendar = Calendar;
+    window.TimePicker = TimePicker;
 })()
