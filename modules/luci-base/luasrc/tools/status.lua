@@ -27,28 +27,32 @@ local function dhcp_leases_common(family)
 			else
 				local ts, mac, ip, name, duid = ln:match("^(%d+) (%S+) (%S+) (%S+) (%S+)")
 				local comments
-				local fc = io.open("/tmp/dhcp_comments.conf", "r")
-				if fc then
-					local lc
-					while true do
-						lc =  fc:read("*l")
-						if not lc then break end
-						local comment, macs, ips = lc:match("(%S+) (%S+) (%S+)")		
-						if macs ~= "-" then
-							if macs == mac then 
-								comments = comment
-								break
-							end
-						else
-							if ips == ip then
-								comments = comment
-								break
+				if io.open("/tmp/dhcp_comments.conf") then
+					local fc = io.open("/tmp/dhcp_comments.conf", "r")
+					if fc then
+						local lc
+						while true do
+							lc =  fc:read("*l")
+							if not lc then break end
+							local comment, macs, ips = lc:match("(%S+) (%S+) (%S+)")		
+							if macs ~= "-" then
+								if macs == mac then 
+									comments = comment
+									break
+								end
+							else
+								if ips == ip then
+									comments = comment
+									break
+								end
 							end
 						end
 					end
+					fc:close()
+				else
+					comments = "-"
 				end
-				fc:close()
-				
+					
 				local online
 				function device_status(m)
 					local status
