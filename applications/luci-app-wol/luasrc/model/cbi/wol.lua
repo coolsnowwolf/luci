@@ -32,30 +32,24 @@ if has_ewk then
 	if has_wol then
 		iface:depends("binary", "/usr/bin/etherwake")
 	end
-	iface.default = "br-lan"
-	iface:value("", translate("Broadcast on all interfaces"))
 
+	iface:value("", translate("Broadcast on all interfaces"))
+	
 	for _, e in ipairs(sys.net.devices()) do
 		if e ~= "lo" then iface:value(e) end
 	end
+	
+	iface.default="br-lan"
 end
 
 
-host = s:option(ListValue, "mac", translate("Host to wake up"),
+host = s:option(Value, "mac", translate("Host to wake up"),
 	translate("Choose the host to wake up or enter a custom MAC address to use"))
 
 sys.net.mac_hints(function(mac, name)
 	host:value(mac, "%s (%s)" %{ mac, name })
 end)
 
-if has_ewk then
-	broadcast = s:option(Flag, "broadcast",
-		translate("Send to broadcast address"))
-	broadcast.default = "1"
-	if has_wol then
-		broadcast:depends("binary", "/usr/bin/etherwake")
-	end
-end
 
 function host.write(self, s, val)
 	local host = luci.http.formvalue("cbid.wol.1.mac")
@@ -67,10 +61,8 @@ function host.write(self, s, val)
 
 		if util == "/usr/bin/etherwake" then
 			local iface = luci.http.formvalue("cbid.wol.1.iface")
-			local broadcast = luci.http.formvalue("cbid.wol.1.broadcast")
-			cmd = "%s -D%s %s %q" %{
-				util, (iface ~= "" and " -i %q" % iface or ""),
-				(broadcast == "1" and " -b" or ""), host
+			cmd = "%s -D%s %q" %{
+				util, (iface ~= "" and " -i %q" % iface or ""), host
 			}
 		else
 			cmd = "%s -v %q" %{ util, host }
