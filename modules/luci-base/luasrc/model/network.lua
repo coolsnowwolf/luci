@@ -670,6 +670,7 @@ end
 
 function get_status_by_route(self, addr, mask)
 	local _, object
+	local route_statuses = { }
 	for _, object in ipairs(utl.ubus()) do
 		local net = object:match("^network%.interface%.(.+)")
 		if net then
@@ -678,12 +679,14 @@ function get_status_by_route(self, addr, mask)
 				local rt
 				for _, rt in ipairs(s.route) do
 					if not rt.table and rt.target == addr and rt.mask == mask then
-						return net, s
+						route_statuses[net] = s
 					end
 				end
 			end
 		end
 	end
+
+	return route_statuses
 end
 
 function get_status_by_address(self, addr)
@@ -712,24 +715,24 @@ function get_status_by_address(self, addr)
 	end
 end
 
-function get_wannet(self)
-	local net, stat = self:get_status_by_route("0.0.0.0", 0)
-	return net and network(net, stat.proto)
+function get_wan_networks(self)
+	local k, v
+	local wan_nets = { }
+	local route_statuses = self:get_status_by_route("0.0.0.0", 0)
+	for k,v in pairs(route_statuses) do
+		wan_nets[#wan_nets+1] = network(k, v.proto)
+	end
+	return wan_nets
 end
 
-function get_wandev(self)
-	local _, stat = self:get_status_by_route("0.0.0.0", 0)
-	return stat and interface(stat.l3_device or stat.device)
-end
-
-function get_wan6net(self)
-	local net, stat = self:get_status_by_route("::", 0)
-	return net and network(net, stat.proto)
-end
-
-function get_wan6dev(self)
-	local _, stat = self:get_status_by_route("::", 0)
-	return stat and interface(stat.l3_device or stat.device)
+function get_wan6_networks(self)
+	local k, v
+	local wan6_nets = { }
+	local route_statuses = self:get_status_by_route("::", 0)
+	for k,v in pairs(route_statuses) do
+		wan6_nets[#wan6_nets+1] = network(k, v.prote)
+	end
+	return wan_nets
 end
 
 function get_switch_topologies(self)
