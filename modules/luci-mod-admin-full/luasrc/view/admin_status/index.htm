@@ -46,7 +46,7 @@
 			"sysctl -n -e net.nf_conntrack_max net.ipv4.netfilter.ip_conntrack_max"
 		):match("%d+")) or 4096
 		
-		local user_info = tonumber(luci.sys.exec("cat /proc/net/arp | grep '0x2' | wc -l")) or 0
+		local user_info = tonumber(luci.sys.exec("cat /proc/net/arp | grep 'br-lan' | grep '0x2' | wc -l"))
 		
 		local cpu_usage = fs.readfile("/tmp/cpuusage") or "6.6%"
 		
