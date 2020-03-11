@@ -36,8 +36,8 @@
 
 	if luci.http.formvalue("status") == "1" then
 		local ntm = require "luci.model.network".init()
-		local wan = ntm:get_wan_networks()
-		local wan6 = ntm:get_wan6_networks()
+		local wan = ntm:get_wannet()
+		local wan6 = ntm:get_wan6net()
 
 		local conn_count = tonumber(
 			fs.readfile("/proc/sys/net/netfilter/nf_conntrack_count") or "") or 0
@@ -68,45 +68,31 @@
 			wifinets   = stat.wifi_networks()
 		}
 
-		if #wan_nets > 0 then
-			local k, v
-			rv.wan = { }
-			for k, v in pairs(wan_nets) do
-				local dev = v:get_interface()
-				local link = dev and ipc.link(dev:name())
-				local wan_info = {
-					ipaddr  = v:ipaddr(),
-					gwaddr  = v:gwaddr(),
-					netmask = v:netmask(),
-					dns     = v:dnsaddrs(),
-					expires = v:expires(),
-					uptime  = v:uptime(),
-					proto   = v:proto(),
-					ifname  = v:ifname(),
-					link    = v:adminlink()
-				}
-				rv.wan[#rv.wan+1] = wan_info
-			end
+		if wan then
+			rv.wan = {
+				ipaddr  = wan:ipaddr(),
+				gwaddr  = wan:gwaddr(),
+				netmask = wan:netmask(),
+				dns     = wan:dnsaddrs(),
+				expires = wan:expires(),
+				uptime  = wan:uptime(),
+				proto   = wan:proto(),
+				ifname  = wan:ifname(),
+				link    = wan:adminlink()
+			}
 		end
 
-		if #wan6_nets > 0 then
-			local k, v
-			rv.wan6 = { }
-			for k, v in pairs(wan6_nets) do
-				local dev = v:get_interface()
-				local link = dev and ipc.link(dev:name())
-				local wan6_info = {
-					ip6addr   = v:ip6addr(),
-					gw6addr   = v:gw6addr(),
-					dns       = v:dns6addrs(),
-					ip6prefix = v:ip6prefix(),
-					uptime    = v:uptime(),
-					proto     = v:proto(),
-					ifname    = v:ifname(),
-					link      = v:adminlink()
-				}
-				rv.wan6[#rv.wan6+1] = wan6_info
-			end
+		if wan6 then
+			rv.wan6 = {
+				ip6addr   = wan6:ip6addr(),
+				gw6addr   = wan6:gw6addr(),
+				dns       = wan6:dns6addrs(),
+				ip6prefix = wan6:ip6prefix(),
+				uptime    = wan6:uptime(),
+				proto     = wan6:proto(),
+				ifname    = wan6:ifname(),
+				link      = wan6:adminlink()
+			}
 		end
 
 		if has_dsl then
@@ -197,59 +183,51 @@
 
 			var si = document.getElementById('wan4_i');
 			var ss = document.getElementById('wan4_s');
-			var wan_list = info.wan || [];
-			var wan_list_len = wan_list.length;
+			var ifc = info.wan;
 
-			if (wan_list_len > 0)
+			if (ifc && ifc.ifname && ifc.proto != 'none')
 			{
-				for (var i = 0; i < wan_list_len; i++)
+				var s = String.format(
+					'<strong><%:Type%>: </strong>%s<br />' +
+					'<strong><%:Address%>: </strong>%s<br />' +
+					'<strong><%:Netmask%>: </strong>%s<br />' +
+					'<strong><%:Gateway%>: </strong>%s<br />',
+						ifc.proto,
+						(ifc.ipaddr) ? ifc.ipaddr : '0.0.0.0',
+						(ifc.netmask && ifc.netmask != ifc.ipaddr) ? ifc.netmask : '255.255.255.255',
+						(ifc.gwaddr) ? ifc.gwaddr : '0.0.0.0'
+				);
+
+				for (var i = 0; i < ifc.dns.length; i++)
 				{
-					var ifc = wan_list[i];
-					if (ifc && ifc.ifname && ifc.proto != 'none')
-					{
-						var s = String.format(
-							'<strong><%:Type%>: </strong>%s<br />' +
-							'<strong><%:Address%>: </strong>%s<br />' +
-							'<strong><%:Netmask%>: </strong>%s<br />' +
-							'<strong><%:Gateway%>: </strong>%s<br />',
-								ifc.proto,
-								(ifc.ipaddr) ? ifc.ipaddr : '0.0.0.0',
-								(ifc.netmask && ifc.netmask != ifc.ipaddr) ? ifc.netmask : '255.255.255.255',
-								(ifc.gwaddr) ? ifc.gwaddr : '0.0.0.0'
-						);
-
-						for (var i = 0; i < ifc.dns.length; i++)
-						{
-							s += String.format(
-								'<strong><%:DNS%> %d: </strong>%s<br />',
-								i + 1, ifc.dns[i]
-							);
-						}
-
-						if (ifc.expires > -1)
-						{
-							s += String.format(
-								'<strong><%:Expires%>: </strong>%t<br />',
-								ifc.expires
-							);
-						}
-
-						if (ifc.uptime > 0)
-						{
-							s += String.format(
-								'<strong><%:Connected%>: </strong>%t<br />',
-								ifc.uptime
-							);
-						}
-
-						ss.innerHTML = String.format('<small>%s</small>', s);
-						si.innerHTML = String.format(
-							'<img src="<%=resource%>/icons/ethernet.png" />' +
-							'<br /><small><a href="%s">%s</a></small>',
-								ifc.link, ifc.ifname
-						);
-					}
+					s += String.format(
+						'<strong><%:DNS%> %d: </strong>%s<br />',
+						i + 1, ifc.dns[i]
+					);
 				}
+
+				if (ifc.expires > -1)
+				{
+					s += String.format(
+						'<strong><%:Expires%>: </strong>%t<br />',
+						ifc.expires
+					);
+				}
+
+				if (ifc.uptime > 0)
+				{
+					s += String.format(
+						'<strong><%:Connected%>: </strong>%t<br />',
+						ifc.uptime
+					);
+				}
+
+				ss.innerHTML = String.format('<small>%s</small>', s);
+				si.innerHTML = String.format(
+					'<img src="<%=resource%>/icons/ethernet.png" />' +
+					'<br /><small><a href="%s">%s</a></small>',
+						ifc.link, ifc.ifname
+				);
 			}
 			else
 			{
@@ -260,72 +238,64 @@
 			<% if has_ipv6 then %>
 			var si6 = document.getElementById('wan6_i');
 			var ss6 = document.getElementById('wan6_s');
-			var wan6_list = info.wan6 || [];
-			var wan6_list_len = wan6_list.length;
+			var ifc6 = info.wan6;
 
-			if (wan6_list_len > 0)
+			if (ifc6 && ifc6.ifname && ifc6.proto != 'none')
 			{
-				for (var i = 0; i < wan6_list_len; i++)
+				var s = String.format(
+					'<strong><%:Type%>: </strong>%s%s<br />',
+						ifc6.proto, (ifc6.ip6prefix) ? '-pd' : ''
+				);
+				
+				if (!ifc6.ip6prefix)
 				{
-					var ifc6 = wan6_list[i];
-					if (ifc6 && ifc6.ifname && ifc6.proto != 'none')
+					s += String.format(
+						'<strong><%:Address%>: </strong>%s<br />',
+						(ifc6.ip6addr) ? ifc6.ip6addr : '::'
+					);
+				}
+				else
+				{
+					s += String.format(
+						'<strong><%:Prefix Delegated%>: </strong>%s<br />',
+						ifc6.ip6prefix
+					);
+					if (ifc6.ip6addr)
 					{
-						var s = String.format(
-							'<strong><%:Type%>: </strong>%s%s<br />',
-								ifc6.proto, (ifc6.ip6prefix) ? '-pd' : ''
-						);
-						
-						if (!ifc6.ip6prefix)
-						{
-							s += String.format(
-								'<strong><%:Address%>: </strong>%s<br />',
-								(ifc6.ip6addr) ? ifc6.ip6addr : '::'
-							);
-						}
-						else
-						{
-							s += String.format(
-								'<strong><%:Prefix Delegated%>: </strong>%s<br />',
-								ifc6.ip6prefix
-							);
-							if (ifc6.ip6addr)
-							{
-								s += String.format(
-									'<strong><%:Address%>: </strong>%s<br />',
-									ifc6.ip6addr
-								);
-							}
-						}
-
 						s += String.format(
-							'<strong><%:Gateway%>: </strong>%s<br />',
-								(ifc6.gw6addr) ? ifc6.gw6addr : '::'
-						);
-
-						for (var i = 0; i < ifc6.dns.length; i++)
-						{
-							s += String.format(
-								'<strong><%:DNS%> %d: </strong>%s<br />',
-								i + 1, ifc6.dns[i]
-							);
-						}
-
-						if (ifc6.uptime > 0)
-						{
-							s += String.format(
-								'<strong><%:Connected%>: </strong>%t<br />',
-								ifc6.uptime
-							);
-						}
-
-						ss6.innerHTML = String.format('<small>%s</small>', s);
-						si6.innerHTML = String.format(
-							'<img src="<%=resource%>/icons/ethernet.png" />' +
-							'<br /><small><a href="%s">%s</a></small>',
-								ifc6.link, ifc6.ifname
+							'<strong><%:Address%>: </strong>%s<br />',
+							ifc6.ip6addr
 						);
 					}
 				}
+
+				s += String.format(
+					'<strong><%:Gateway%>: </strong>%s<br />',
+						(ifc6.gw6addr) ? ifc6.gw6addr : '::'
+				);
+
+				for (var i = 0; i < ifc6.dns.length; i++)
+				{
+					s += String.format(
+						'<strong><%:DNS%> %d: </strong>%s<br />',
+						i + 1, ifc6.dns[i]
+					);
+				}
+
+				if (ifc6.uptime > 0)
+				{
+					s += String.format(
+						'<strong><%:Connected%>: </strong>%t<br />',
+						ifc6.uptime
+					);
+				}
+
+				ss6.innerHTML = String.format('<small>%s</small>', s);
+				si6.innerHTML = String.format(
+					'<img src="<%=resource%>/icons/ethernet.png" />' +
+					'<br /><small><a href="%s">%s</a></small>',
+						ifc6.link, ifc6.ifname
+				);
 			}
 			else
 			{
@@ -460,12 +430,12 @@
 					if (!info.leases6[i].hostname)
 						tr.insertCell(-1).innerHTML =
 							(host && (host.name || host.ipv4 || host.ipv6))
-								? '? (%h)'.format(host.name || host.ipv4 || host.ipv6)
+								? '<div style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space: nowrap">? (%h)</div>'.format(host.name || host.ipv4 || host.ipv6)
 								: '?';
 					else
 						tr.insertCell(-1).innerHTML =
 							(host && host.name && info.leases6[i].hostname != host.name)
-								? '%h (%h)'.format(info.leases6[i].hostname, host.name)
+								? '<div style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space: nowrap">%h (%h)</div>'.format(info.leases6[i].hostname, host.name)
 								: info.leases6[i].hostname;
 
 					tr.insertCell(-1).innerHTML = info.leases6[i].ip6addr;
