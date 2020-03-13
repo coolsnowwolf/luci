@@ -453,6 +453,30 @@ msgstr "或更高"
 msgid "required"
 msgstr "需要"
 
+msgid "config file editor"
+msgstr "配置文件编辑器"
+
+msgid "This file is default.action"
+msgstr "default.action文件"
+
+msgid "This file is default.filter"
+msgstr "default.filter文件"
+
+msgid "This file is match-all.action"
+msgstr "match-all.action文件"
+
+msgid "This file is regression-tests.action"
+msgstr "regression-tests.action文件"
+
+msgid "This file is user.action"
+msgstr "user.action文件"
+
+msgid "This file is user.filter"
+msgstr "user.filter文件"
+
+msgid "This file is user.trust"
+msgstr "user.trust文件"
+
 #~ msgid "Local Set-up"
 #~ msgstr "本地设置"
 

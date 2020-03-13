@@ -104,6 +104,10 @@ ns:tab("debug",
 	translate("Logging"),
 	nil )
 
+ns:tab("configfile",
+	translate("config file editor"),
+	nil )
+	
 ns:tab("logview",
 	translate("Log File Viewer"),
 	nil )
@@ -901,6 +905,127 @@ d16.title	= string.format(HELP, "DEBUG", "Debug 65536" )
 d16.description	= translate("Log the applying actions")
 d16.rmempty	= true
 
+-- tab: configfile -- ############################################################
+
+local dacf="/etc/privoxy/default.action"
+dac=s:taboption("configfile",TextValue,"deac_File")
+dac.description=translate("This file is default.action")
+dac.rows=18
+dac.wrap="off"
+function dac.cfgvalue(s,s)
+sylogtext=""
+if dacf and nixio.fs.access(dacf)then
+deac_File=luci.sys.exec("tail -n 100 %s"%dacf)
+end
+return deac_File
+end
+function dac.write(t,t,e)
+e=e:gsub("\r\n?","\n")
+nixio.fs.writefile("/etc/privoxy/default.action",e)
+end
+
+local daf="/etc/privoxy/default.filter"
+def=s:taboption("configfile",TextValue,"def_File")
+def.description=translate("This file is default.filter")
+def.rows=18
+def.wrap="off"
+function def.cfgvalue(s,s)
+sylogtext=""
+if daf and nixio.fs.access(daf)then
+def_File=luci.sys.exec("tail -n 100 %s"%daf)
+end
+return def_File
+end
+function def.write(t,t,e)
+e=e:gsub("\r\n?","\n")
+nixio.fs.writefile("/etc/privoxy/default.filter",e)
+end
+
+local maac="/etc/privoxy/match-all.action"
+mac=s:taboption("configfile",TextValue,"maac_File")
+mac.description=translate("This file is match-all.action")
+mac.rows=18
+mac.wrap="off"
+function mac.cfgvalue(s,s)
+sylogtext=""
+if maac and nixio.fs.access(maac)then
+maac_File=luci.sys.exec("tail -n 100 %s"%maac)
+end
+return maac_File
+end
+function mac.write(t,t,e)
+e=e:gsub("\r\n?","\n")
+nixio.fs.writefile("/etc/privoxy/match-all.action",e)
+end
+
+local rtac="/etc/privoxy/regression-tests.action"
+rtc=s:taboption("configfile",TextValue,"rtac_File")
+rtc.description=translate("This file is regression-tests.action")
+rtc.rows=18
+rtc.wrap="off"
+function rtc.cfgvalue(s,s)
+sylogtext=""
+if rtac and nixio.fs.access(rtac)then
+rtac_File=luci.sys.exec("tail -n 100 %s"%rtac)
+end
+return rtac_File
+end
+function rtc.write(t,t,e)
+e=e:gsub("\r\n?","\n")
+nixio.fs.writefile("/etc/privoxy/regression-tests.action",e)
+end
+
+local usac="/etc/privoxy/user.action"
+uac=s:taboption("configfile",TextValue,"usac_File")
+uac.description=translate("This file is user.action")
+uac.rows=18
+uac.wrap="off"
+function uac.cfgvalue(s,s)
+sylogtext=""
+if usac and nixio.fs.access(usac)then
+usac_File=luci.sys.exec("tail -n 100 %s"%usac)
+end
+return usac_File
+end
+function uac.write(t,t,e)
+e=e:gsub("\r\n?","\n")
+nixio.fs.writefile("/etc/privoxy/user.action",e)
+end
+
+local usft="/etc/privoxy/user.filter"
+usf=s:taboption("configfile",TextValue,"usft_File")
+usf.description=translate("This file is user.filter")
+usf.rows=18
+usf.wrap="off"
+function usf.cfgvalue(s,s)
+sylogtext=""
+if usft and nixio.fs.access(usft)then
+usft_File=luci.sys.exec("tail -n 100 %s"%usft)
+end
+return usft_File
+end
+function usf.write(t,t,e)
+e=e:gsub("\r\n?","\n")
+nixio.fs.writefile("/etc/privoxy/user.filter",e)
+end
+
+local ustr="/etc/privoxy/user.trust"
+ust=s:taboption("configfile",TextValue,"ustr_File")
+ust.description=translate("This file is user.trust")
+ust.rows=18
+ust.wrap="off"
+function ust.cfgvalue(s,s)
+sylogtext=""
+if ustr and nixio.fs.access(ustr)then
+ustr_File=luci.sys.exec("tail -n 100 %s"%ustr)
+end
+return ustr_File
+end
+function ust.write(t,t,e)
+e=e:gsub("\r\n?","\n")
+nixio.fs.writefile("/etc/privoxy/user.trust",e)
+end
+
 -- tab: logview -- #############################################################
 
 local lv	= ns:taboption("logview", DummyValue, "_logview")
@@ -915,4 +1040,6 @@ function lv.cfgvalue(self, section)
 	return lfile .. "\n" .. translate("File not found or empty")
 end
 
+
 return m
+
