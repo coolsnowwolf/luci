@@ -908,7 +908,7 @@ d16.rmempty	= true
 -- tab: configfile -- ############################################################
 
 local dacf="/etc/privoxy/default.action"
-dac=s:taboption("configfile",TextValue,"deac_File")
+dac=ns:taboption("configfile",TextValue,"deac_File")
 dac.description=translate("This file is default.action")
 dac.rows=18
 dac.wrap="off"
@@ -925,7 +925,7 @@ nixio.fs.writefile("/etc/privoxy/default.action",e)
 end
 
 local daf="/etc/privoxy/default.filter"
-def=s:taboption("configfile",TextValue,"def_File")
+def=ns:taboption("configfile",TextValue,"def_File")
 def.description=translate("This file is default.filter")
 def.rows=18
 def.wrap="off"
@@ -942,7 +942,7 @@ nixio.fs.writefile("/etc/privoxy/default.filter",e)
 end
 
 local maac="/etc/privoxy/match-all.action"
-mac=s:taboption("configfile",TextValue,"maac_File")
+mac=ns:taboption("configfile",TextValue,"maac_File")
 mac.description=translate("This file is match-all.action")
 mac.rows=18
 mac.wrap="off"
@@ -959,7 +959,7 @@ nixio.fs.writefile("/etc/privoxy/match-all.action",e)
 end
 
 local rtac="/etc/privoxy/regression-tests.action"
-rtc=s:taboption("configfile",TextValue,"rtac_File")
+rtc=ns:taboption("configfile",TextValue,"rtac_File")
 rtc.description=translate("This file is regression-tests.action")
 rtc.rows=18
 rtc.wrap="off"
@@ -976,7 +976,7 @@ nixio.fs.writefile("/etc/privoxy/regression-tests.action",e)
 end
 
 local usac="/etc/privoxy/user.action"
-uac=s:taboption("configfile",TextValue,"usac_File")
+uac=ns:taboption("configfile",TextValue,"usac_File")
 uac.description=translate("This file is user.action")
 uac.rows=18
 uac.wrap="off"
@@ -993,7 +993,7 @@ nixio.fs.writefile("/etc/privoxy/user.action",e)
 end
 
 local usft="/etc/privoxy/user.filter"
-usf=s:taboption("configfile",TextValue,"usft_File")
+usf=ns:taboption("configfile",TextValue,"usft_File")
 usf.description=translate("This file is user.filter")
 usf.rows=18
 usf.wrap="off"
@@ -1010,7 +1010,7 @@ nixio.fs.writefile("/etc/privoxy/user.filter",e)
 end
 
 local ustr="/etc/privoxy/user.trust"
-ust=s:taboption("configfile",TextValue,"ustr_File")
+ust=ns:taboption("configfile",TextValue,"ustr_File")
 ust.description=translate("This file is user.trust")
 ust.rows=18
 ust.wrap="off"
