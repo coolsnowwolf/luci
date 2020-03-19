@@ -19,12 +19,7 @@ end
 has_wgetssl	= (SYS.call( [[which wget-ssl >/dev/null 2>&1]] ) == 0)	-- and true or nil
 has_curl	= (SYS.call( [[which curl >/dev/null 2>&1]] ) == 0)
 has_curlssl	= (SYS.call( [[$(which curl) -V 2>&1 | grep "Protocols:" | grep -qF "https"]] ) ~= 0)
-if NXFS.stat('/tmp/lua_curlproxy_check', 'type') == 'reg' then
-	has_curlpxy	= NXFS.readfile('/tmp/lua_curlproxy_check')
-else
-	has_curlpxy	= (SYS.call( [[grep -i "all_proxy" /usr/lib/libcurl.so* >/dev/null 2>&1]] ) == 0)
-	NXFS.writefile('/tmp/lua_curlproxy_check', has_curlpxy)
-endif
+has_curlpxy	= (SYS.call( [[grep -i "all_proxy" /usr/lib/libcurl.so* >/dev/null 2>&1]] ) == 0)
 has_fetch	= (SYS.call( [[which uclient-fetch >/dev/null 2>&1]] ) == 0)
 has_fetchssl	= NXFS.access("/lib/libustream-ssl.so")
 has_bbwget	= (SYS.call( [[$(which wget) -V 2>&1 | grep -iqF "busybox"]] ) == 0)
