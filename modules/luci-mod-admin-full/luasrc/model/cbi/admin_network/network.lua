@@ -102,14 +102,17 @@ if fs.access("/usr/sbin/br2684ctl") then
 	m.pageaction = true
 end
 
+s = m:section(NamedSection, "globals", "globals", translate("Global network options"))
+m.pageaction = true
+
 local network = require "luci.model.network"
 if network:has_ipv6() then
-	local s = m:section(NamedSection, "globals", "globals", translate("Global network options"))
 	local o = s:option(Value, "ula_prefix", translate("IPv6 ULA-Prefix"))
 	o.datatype = "ip6addr"
 	o.rmempty = true
-	m.pageaction = true
 end
 
+o = s:option(Flag, "packet_steering", translate("Packet Steering"), translate("Enable packet steering across all CPUs. May help or hinder network speed."))
+o.optional = true
 
 return m
