@@ -1574,7 +1574,7 @@ Timepicker = class(AbstractValue)
 
 function Timepicker.__init__(self, ...)
 	AbstractValue.__init__(self, ...)
-	self.template  = "cbi/Timepicker"
+	self.template  = "cbi/timepicker"
 	self.keylist = {}
 	self.vallist = {}
 	self.readonly = nil
