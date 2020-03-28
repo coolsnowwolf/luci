@@ -1,21 +1,20 @@
 -- Copyright 2014-2018 Christian Schoenebeck <christian dot schoenebeck at gmail dot com>
 -- Licensed to the public under the Apache License 2.0.
 
-local NXFS = require "nixio.fs"
 local DISP = require "luci.dispatcher"
 local HTTP = require "luci.http"
 local SYS  = require "luci.sys"
 local CTRL = require "luci.controller.ddns"	-- this application's controller
 local DDNS = require "luci.tools.ddns"		-- ddns multiused functions
 
-local show_hints = not (DDNS.has_ipv6		-- IPv6 support
-		    and DDNS.has_ssl		-- HTTPS support
-		    and DDNS.has_proxy		-- Proxy support
-		    and DDNS.has_bindhost	-- DNS TCP support
-		    and DDNS.has_forceip	-- Force IP version
-		    and DDNS.has_dnsserver	-- DNS server support
-		    and DDNS.has_bindnet	-- Bind to network/interface
-		    and DDNS.has_cacerts	-- certificates installed at /etc/ssl/certs
+local show_hints = not (DDNS.env_info("has_ipv6")		-- IPv6 support
+				   and  DDNS.env_info("has_ssl")		-- HTTPS support
+				   and  DDNS.env_info("has_proxy")		-- Proxy support
+				   and  DDNS.env_info("has_bindhost")	-- DNS TCP support
+				   and  DDNS.env_info("has_forceip")	-- Force IP version
+				   and  DDNS.env_info("has_dnsserver")	-- DNS server support
+				   and  DDNS.env_info("has_bindnet")	-- Bind to network/interface
+				   and  DDNS.env_info("has_cacerts")	-- certificates installed at /etc/ssl/certs
 		)
 local not_enabled = not SYS.init.enabled("ddns")
 local need_update = not CTRL.service_ok()
@@ -123,7 +122,7 @@ function dom.set_one(self, section)
 end
 function dom.set_two(self, section)
 	local chk_sec  = DDNS.calc_seconds(
-				tonumber(self.map:get(section, "check_interval") or "") or 10,
+				tonumber(self.map:get(section, "check_interval")) or 10,
 				self.map:get(section, "check_unit") or "minutes" )
 	local ip = DDNS.get_regip(section, chk_sec)
 	if ip == "NOFILE" then
