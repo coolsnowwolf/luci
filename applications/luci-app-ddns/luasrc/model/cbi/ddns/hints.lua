@@ -27,7 +27,7 @@ s = m:section( SimpleSection,
 -- ddns-scripts needs to be updated for full functionality
 if not CTRL.service_ok() then
 	local so = s:option(DummyValue, "_update_needed")
-	so.titleref = DISP.build_url("admin", "system", "opkg")
+	so.titleref = DISP.build_url("admin", "system", "packages")
 	so.rawhtml  = true
 	so.title = font_red .. bold_on ..
 		translate("Software update required") .. bold_off .. font_off
