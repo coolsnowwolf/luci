@@ -96,5 +96,8 @@ msgstr "自动共享"
 msgid "Auto share local disk which connected"
 msgstr "自动匿名共享路由器所连接的硬盘"
 
+msgid "Setting"
+msgstr "设置"
+
 #~ msgid "Physical Path"
 #~ msgstr "物理路径"
