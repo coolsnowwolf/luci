@@ -1,0 +1,35 @@
+#!/bin/sh
+function cron(){
+	local update_time=`uci get aria2.main.update_time 2>/dev/null`
+	local enabled=`uci get aria2.main.enabled 2>/dev/null`
+	if [ ! -z "$update_time" ] && [ ! -z "$enabled" ] && [ "$enabled" -ne "0" ] ; then
+		if ( echo `crontab -l` | grep "trackers-list-aria2" | grep -q " $update_time " ); then
+			return
+		elif ( echo `crontab -l` | grep -q "trackers-list-aria2" ); then
+			crontab -l > conf && sed -i "/trackers-list-aria2/d" conf && crontab conf && rm -f conf >/dev/null 2>&1
+			crontab -l > conf && echo -e "0 $update_time * * * /usr/bin/trackers-list-aria2 &" >> conf && crontab conf && rm -f conf >/dev/null 2>&1
+		else
+			crontab -l > conf && echo -e "0 $update_time * * * /usr/bin/trackers-list-aria2 &" >> conf && crontab conf && rm -f conf >/dev/null 2>&1
+		fi
+	else
+		if ( echo `crontab -l` | grep -q "trackers-list-aria2" ); then
+			crontab -l > conf && sed -i "/trackers-list-aria2/d" conf && crontab conf && rm -f conf >/dev/null 2>&1
+		fi
+	fi		
+	/etc/init.d/cron stop
+	/etc/init.d/cron start
+}
+
+if [ "$1" ] ;then
+	if [ $1 = "crontab" ] ;then cron;fi
+	exit
+fi
+
+bt_tracker_url=`uci get aria2.main.bt_tracker_url`
+list=`wget -qO- ${bt_tracker_url}|awk NF|sed ":a;N;s/\n/  /g;ta"`
+uci del aria2.main.bt_tracker
+uci add_list aria2.main.bt_tracker="$list"
+uci commit aria2
+/etc/init.d/aria2 stop
+sleep 1
+/etc/init.d/aria2 start
