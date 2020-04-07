@@ -14,7 +14,7 @@
 	// called by XHR.poll and onclick_startstop
 	function _data2elements(data) {
 		// Service sections
-		for( i = 1; i < data.length; i++ )
+		for( var i = 1; i < data.length; i++ )
 		{
 			var section = data[i].section	// Section to handle
 			var cbx = document.getElementById("cbid.ddns." + section + ".enabled");		// Enabled
@@ -141,7 +141,7 @@
 				if (x.responseText == "_uncommitted_") {
 					// we need a trick to display Ampersand "&" in stead of "&#38;" or "&amp;"
 					// after translation
-					txt="<%:Please [Save & Apply] your changes first%>";
+					var txt="<%:Please [Save & Apply] your changes first%>";
 					alert( txt.replace(new RegExp("<%:&%>", "g"), "&") );
 				} else {
 					// should have data because status changed
@@ -164,7 +164,7 @@
 	// define only ONE XHR.poll in a page because if one is running it blocks the other one
 	// optimum is to define on Map or Section Level from here you can reach all elements
 	// we need update every 15 seconds only
-	XHR.poll(5, '<%=url([[admin]], [[services]], [[ddns]], [[status]])%>', null,
+	XHR.poll(-1, '<%=url([[admin]], [[services]], [[ddns]], [[status]])%>', null,
 		function(x, data) {
 			if (data) { _data2elements(data); }
 		}
