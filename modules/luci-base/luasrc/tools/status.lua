@@ -9,7 +9,7 @@ local function dhcp_leases_common(family)
 	local rv = { }
 	local nfs = require "nixio.fs"
 	local leasefile = "/tmp/dhcp.leases"
-
+	local commentsfile = "/tmp/dhcp_comments.conf"
 	uci:foreach("dhcp", "dnsmasq",
 		function(s)
 			if s.leasefile and nfs.access(s.leasefile) then
@@ -26,13 +26,12 @@ local function dhcp_leases_common(family)
 				break
 			else
 				local ts, mac, ip, name, duid = ln:match("^(%d+) (%S+) (%S+) (%S+) (%S+)")
-				local comments
-				if io.open("/tmp/dhcp_comments.conf") then
-					local fc = io.open("/tmp/dhcp_comments.conf", "r")
+				local comments = "-"
+				if io.open(commentsfile) then
+					local fc = io.open(commentsfile, "r")
 					if fc then
-						local lc
 						while true do
-							lc =  fc:read("*l")
+							local lc =  fc:read("*l")
 							if not lc then break end
 							local comment, macs, ips = lc:match("(%S+) (%S+) (%S+)")		
 							if macs ~= "-" then
@@ -49,8 +48,6 @@ local function dhcp_leases_common(family)
 						end
 					end
 					fc:close()
-				else
-					comments = "-"
 				end
 					
 				local online
