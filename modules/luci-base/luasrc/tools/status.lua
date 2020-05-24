@@ -35,7 +35,7 @@ local function dhcp_leases_common(family)
 							if not lc then break end
 							local comment, macs, ips = lc:match("(%S+) (%S+) (%S+)")		
 							if macs ~= "-" then
-								if macs == mac then 
+								if string.upper(macs) == mac or string.lower(macs) == mac then 
 									comments = comment
 									break
 								end
