@@ -3,6 +3,12 @@
  Licensed to the public under the Apache License 2.0.
 -%>
 
+<% 
+local sys = require "luci.sys"
+local dhcp = {}
+dhcp.comments = sys.exec("cat /tmp/dhcp_comments.conf | awk '{{printf \"%s,\",\$0}}'")
+%>
+
 <% css = [[
 
 	#chartjs-tooltip {
@@ -198,7 +204,15 @@
 <script type="text/javascript" src="<%=resource%>/cbi.js"></script>
 <script type="text/javascript" src="<%=resource%>/nlbw.chart.min.js"></script>
 <script type="text/javascript">//<![CDATA[
-
+//添加设备备注名适配
+var comments="<%=dhcp.comments%>",
+	hostCom= new Array(),
+	hostComs= new Array();
+hostCom=comments.split(","); //字符分割
+for(var i=0;i<hostCom.length;i++){
+	hostComs[i] = hostCom[i].split(" ");
+	}
+//				
 var chartRegistry = {},
 	trafficPeriods = [],
 	trafficData = { columns: [], data: [] },
@@ -591,6 +605,25 @@ function renderHostData()
 		    key = (mac !== '00:00:00:00:00:00') ? mac : rec.ip,
 		    dns = hostInfo[mac] ? hostInfo[mac].name : null;
 
+		var deviceComments = "no";
+		for (var j=0; j<hostComs.length-1; j++){
+			if(rec.mac.toUpperCase() === "00:00:00:00:00:00"){
+				break;
+			}
+			if(hostComs[j][1] === "-") {
+				if(hostComs[j][2] === rec.ip){
+					deviceComments = hostComs[j][0];
+					break;
+				}
+			}
+			else {
+				if(hostComs[j][1].toUpperCase() === rec.mac.toUpperCase()){
+					deviceComments = hostComs[j][0];
+					break;
+				}
+			}
+		}
+			
 		var link1 = document.createElement('a');
 		    link1.onclick = renderHostDetail;
 		    link1.href = '#' + rec.mac;
@@ -605,7 +638,7 @@ function renderHostData()
 		    link2.setAttribute('data-label', '<%:Protocol%>');
 		    link2.innerHTML = "%1000.2m".format(rec.conns);
 
-		cell.innerHTML = formatHostname(dns);
+		cell.innerHTML = deviceComments !== "no" ? deviceComments : formatHostname(dns);
 		cell.className = 'hostname';
 
 		row.insertCell(-1).appendChild(link1);
@@ -785,9 +818,25 @@ function renderIPv6Data()
 		    dns = hostInfo[mac] ? hostInfo[mac].name : null,
 		    rec4 = records[mac][4],
 		    rec6 = records[mac][6];
-
+			
+		var deviceComments = "no";
+		for (var j=0; j<hostComs.length-1; j++){
+			if(hostComs[j][1] === "-") {
+				if(hostComs[j][2] === rec4.ip){
+					deviceComments = hostComs[j][0];
+					break;
+				}
+			}
+			else {
+				if(hostComs[j][1].toUpperCase() === rec4.mac.toUpperCase()){
+					deviceComments = hostComs[j][0];
+					break;
+				}
+			}
+		}
+		
 		cell1.setAttribute('rowspan', 2);
-		cell1.innerHTML = formatHostname(dns);
+		cell1.innerHTML = deviceComments !== "no" ? deviceComments : formatHostname(dns);
 		cell1.className = 'hostname';
 
 		cell2.setAttribute('rowspan', 2);
