@@ -3,7 +3,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Project-Id-Version: LuCI: travelmate\n"
 "POT-Creation-Date: 2017-12-07 21:00+0300\n"
-"PO-Revision-Date: 2018-01-26 18:04+0300\n"
+"PO-Revision-Date: 2018-01-18 23:36+0300\n"
 "Language-Team: http://cyber-place.ru\n"
 "MIME-Version: 1.0\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -46,26 +46,13 @@ msgstr "BSSID"
 msgid "Back to overview"
 msgstr "Назад в меню"
 
-msgid "Captive Portal Detection"
-msgstr ""
-
-msgid ""
-"Check the internet availability, log captive portal redirections and keep "
-"the uplink connection 'alive'."
-msgstr ""
-
 msgid "Cipher"
-msgstr "Алгоритм шифрования"
+msgstr "Ключ шифрования"
 
 msgid ""
 "Configuration of the travelmate package to to enable travel router "
 "functionality."
 msgstr "Настройка утилиты TravelMate - помощника путешественника. "
-
-msgid ""
-"Connect your Android or iOS devices to your router's WiFi using the shown QR "
-"code."
-msgstr ""
 
 msgid "Connection Limit"
 msgstr "Ограничение соединений"
@@ -112,6 +99,9 @@ msgstr "Редактировать настройки беспроводной �
 msgid "Edit this Uplink"
 msgstr "Редактировать настройки сети"
 
+msgid "Enable 'automatic' mode"
+msgstr "Включить режим 'автоматически'"
+
 msgid "Enable travelmate"
 msgstr "Включить Travelmate"
 
@@ -125,7 +115,7 @@ msgid "Extra options"
 msgstr "Дополнительные настройки"
 
 msgid "Find and join network on"
-msgstr "Найти сеть для подключения используя"
+msgstr "Найти сеть и подключится к ней"
 
 msgid ""
 "For further information <a href=\"%s\" target=\"_blank\">see online "
@@ -143,15 +133,18 @@ msgstr "Назначить TKIP"
 msgid "Force TKIP and CCMP (AES)"
 msgstr "Назначить TKIP и CCMP (AES)"
 
-msgid ""
-"Here you'll find the QR codes from all of your configured Access Points. It "
-"allows you to connect your Android or iOS devices to your router's WiFi "
-"using the QR code shown below."
+msgid "Force a manual uplink rescan / reconnect in 'trigger' mode."
 msgstr ""
+"Принудительно выполнить повторное сканирование/повторное подключение внешних "
+"сетей в режиме 'ручной'."
 
-msgid ""
-"How long should travelmate wait for a successful wlan uplink connection."
+msgid "How long should travelmate wait for a successful wlan interface reload."
 msgstr ""
+"Временная задержка необходима TravelMate для полной перезагрузки wlan "
+"интерфейса."
+
+msgid "How many times should travelmate try to connect to an Uplink."
+msgstr "Сколько раз TravelMate должен пытаться подключиться к сети. "
 
 msgid "Identity"
 msgstr "Идентификация EAP"
@@ -168,13 +161,18 @@ msgstr "Временная задержка интерфейса"
 msgid "Interface Wizard"
 msgstr "Помощник настройки интерфейса"
 
+msgid ""
+"Keep travelmate in an active state. Check every n seconds the connection "
+"status, i.e. the uplink availability."
+msgstr ""
+"Поддержка TravelMate в активном состоянии.<br />Проверка состояния "
+"соединения каждые n секунд, т.е. доступность внешней сети."
+
 msgid "Last rundate"
 msgstr "Дата последнего запуска"
 
-msgid ""
-"Minimum signal quality threshold as percent for conditional uplink (dis-) "
-"connections."
-msgstr ""
+msgid "Manual Rescan"
+msgstr "Пересканировать вручную"
 
 msgid "Move down"
 msgstr "Переместить вниз"
@@ -197,9 +195,6 @@ msgstr ""
 msgid "Overall Timeout"
 msgstr "Общее время ожидания"
 
-msgid "Overall retry timeout in seconds."
-msgstr ""
-
 msgid "Overview"
 msgstr "Главное меню"
 
@@ -210,7 +205,7 @@ msgid "Password"
 msgstr "Пароль"
 
 msgid "Password of Private Key"
-msgstr "Пароль к Приватному ключу"
+msgstr "Пароль к Личному Ключу"
 
 msgid "Path to CA-Certificate"
 msgstr "Путь к CA-Сертификату"
@@ -219,7 +214,7 @@ msgid "Path to Client-Certificate"
 msgstr "Путь к Client-Сертификату"
 
 msgid "Path to Private Key"
-msgstr "Путь к Приватному ключу"
+msgstr "Путь к Личному Ключу"
 
 msgid ""
 "Provides an overview of all configured uplinks for the travelmate interface "
@@ -228,23 +223,20 @@ msgid ""
 msgstr ""
 "Общие сведения обо всех настроенных внешних сетевых соединениях интерфейса "
 "TravelMate (%s).<br />Вы можете редактировать, удалять или пере "
-"упорядочивать существующий список внешних сетей или выполнять их поиск.<br /"
-">Используемое сетевое соединение выделено синим цветом."
-
-msgid "QR-Codes"
-msgstr ""
+"упорядочивать существующие внешние сети или сканировать их.<br /"
+">Используемое сетевое соединение подчеркнуто синим цветом."
 
 msgid "Radio selection"
 msgstr "Выбор Wi-Fi устройства"
 
 msgid "Repeat scan"
-msgstr "Повторить поиск"
+msgstr "Повторить сканирование"
+
+msgid "Rescan"
+msgstr "Пересканировать"
 
 msgid "Restrict travelmate to a dedicated radio, e.g. 'radio0'."
 msgstr "Выделить TravelMate-у конкретное Wi-Fi устройство, например 'radio0'."
-
-msgid "Retry limit to connect to an uplink."
-msgstr ""
 
 msgid "Runtime Information"
 msgstr "Информация о состоянии"
@@ -259,10 +251,7 @@ msgid "Save"
 msgstr "Сохранить"
 
 msgid "Scan"
-msgstr "Поиск"
-
-msgid "Signal Quality Threshold"
-msgstr ""
+msgstr "Сканировать"
 
 msgid "Signal strength"
 msgstr "Мощность сигнала"
@@ -275,10 +264,6 @@ msgstr "Интерфейс клиента"
 
 msgid "Station Radio"
 msgstr "Wi-Fi устройство клиента"
-
-msgid ""
-"The BSSID information '%s' is optional and only required for hidden networks"
-msgstr ""
 
 msgid ""
 "This form allows you to modify the content of the main firewall "
@@ -315,20 +300,30 @@ msgstr ""
 "Страница просмотра системного журнала, показаны только события связанные с "
 "работой утилиты TravelMate."
 
+msgid "Timeout in seconds between retries in 'automatic' mode."
+msgstr ""
+"Время ожидания в секундах между повторными попытками соединения в режиме "
+"'автоматически'."
+
+msgid "To disable this feature set it to '0' which means unlimited retries."
+msgstr ""
+"<br />Чтобы отключить эту функцию, установите значение '0', что означает "
+"неограниченное количество попыток."
+
 msgid "Travelmate"
 msgstr "TravelMate"
 
 msgid "Travelmate Logfile"
 msgstr "Системный журнал TravelMate"
 
-msgid "Travelmate Status (Quality)"
-msgstr ""
+msgid "Travelmate Status"
+msgstr "Состояние Travelmate"
 
 msgid "Travelmate Version"
 msgstr "Версия TravelMate"
 
-msgid "Trigger Delay"
-msgstr ""
+msgid "Trigger delay"
+msgstr "Задержка запуска"
 
 msgid "Unknown"
 msgstr "Неизвестно"
@@ -344,9 +339,6 @@ msgstr "SSID внешней сети"
 
 msgid "Uplink interface"
 msgstr "Интерфейс внешней сети"
-
-msgid "View AP QR-Codes"
-msgstr ""
 
 msgid "View Logfile"
 msgstr "Показать системный журнал"
@@ -370,7 +362,7 @@ msgid "WPA2"
 msgstr "WPA2"
 
 msgid "Wireless Scan"
-msgstr "Найденные точки доступа Wi-Fi"
+msgstr "Сканирование беспроводных сетей"
 
 msgid "Wireless Stations"
 msgstr "Клиенты беспроводной сети"
@@ -379,66 +371,20 @@ msgid ""
 "add it to the wan zone of the firewall. This step has only to be done once."
 msgstr "добавить в wan зону межсетевого экрана. Можно сделать только один раз."
 
+msgid "connected"
+msgstr "подключен"
+
+msgid "error"
+msgstr "ошибка"
+
 msgid "hidden"
 msgstr "скрытый"
 
 msgid "n/a"
 msgstr "нет данных"
 
-#~ msgid "Enable 'automatic' mode"
-#~ msgstr "Включить режим 'автоматически'"
+msgid "not connected"
+msgstr "не подключено"
 
-#~ msgid "Force a manual uplink rescan / reconnect in 'trigger' mode."
-#~ msgstr ""
-#~ "Принудительно выполнить повторное сканирование/повторное подключение "
-#~ "внешних сетей в режиме 'ручной'."
-
-#~ msgid ""
-#~ "Keep travelmate in an active state. Check every n seconds the connection "
-#~ "status, i.e. the uplink availability."
-#~ msgstr ""
-#~ "Поддержка TravelMate в активном состоянии.<br />Проверка состояния "
-#~ "соединения каждые n секунд, т.е. доступность внешней сети."
-
-#~ msgid "Manual Rescan"
-#~ msgstr "Поиск сети вручную"
-
-#~ msgid "Rescan"
-#~ msgstr "Пересканировать"
-
-#~ msgid "Timeout in seconds between retries in 'automatic' mode."
-#~ msgstr ""
-#~ "Время ожидания в секундах между повторными попытками соединения в режиме "
-#~ "'автоматически'."
-
-#~ msgid ""
-#~ "How long should travelmate wait for a successful wlan interface reload."
-#~ msgstr ""
-#~ "Временная задержка необходима TravelMate для полной перезагрузки wlan "
-#~ "интерфейса."
-
-#~ msgid "How many times should travelmate try to connect to an Uplink."
-#~ msgstr "Сколько раз TravelMate должен пытаться подключиться к сети. "
-
-#~ msgid "To disable this feature set it to '0' which means unlimited retries."
-#~ msgstr ""
-#~ "<br />Чтобы отключить эту функцию, установите значение '0', что означает "
-#~ "неограниченное количество попыток."
-
-#~ msgid "Travelmate Status"
-#~ msgstr "Состояние Travelmate"
-
-#~ msgid "Trigger delay"
-#~ msgstr "Задержка запуска"
-
-#~ msgid "connected"
-#~ msgstr "подключен"
-
-#~ msgid "error"
-#~ msgstr "ошибка"
-
-#~ msgid "not connected"
-#~ msgstr "не подключено"
-
-#~ msgid "running"
-#~ msgstr "работает"
+msgid "running"
+msgstr "работает"

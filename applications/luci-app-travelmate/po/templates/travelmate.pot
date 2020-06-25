@@ -32,25 +32,12 @@ msgstr ""
 msgid "Back to overview"
 msgstr ""
 
-msgid "Captive Portal Detection"
-msgstr ""
-
-msgid ""
-"Check the internet availability, log captive portal redirections and keep "
-"the uplink connection 'alive'."
-msgstr ""
-
 msgid "Cipher"
 msgstr ""
 
 msgid ""
 "Configuration of the travelmate package to to enable travel router "
 "functionality."
-msgstr ""
-
-msgid ""
-"Connect your Android or iOS devices to your router's WiFi using the shown QR "
-"code."
 msgstr ""
 
 msgid "Connection Limit"
@@ -96,6 +83,9 @@ msgstr ""
 msgid "Edit this Uplink"
 msgstr ""
 
+msgid "Enable 'automatic' mode"
+msgstr ""
+
 msgid "Enable travelmate"
 msgstr ""
 
@@ -125,14 +115,13 @@ msgstr ""
 msgid "Force TKIP and CCMP (AES)"
 msgstr ""
 
-msgid ""
-"Here you'll find the QR codes from all of your configured Access Points. It "
-"allows you to connect your Android or iOS devices to your router's WiFi "
-"using the QR code shown below."
+msgid "Force a manual uplink rescan / reconnect in 'trigger' mode."
 msgstr ""
 
-msgid ""
-"How long should travelmate wait for a successful wlan uplink connection."
+msgid "How long should travelmate wait for a successful wlan interface reload."
+msgstr ""
+
+msgid "How many times should travelmate try to connect to an Uplink."
 msgstr ""
 
 msgid "Identity"
@@ -150,12 +139,15 @@ msgstr ""
 msgid "Interface Wizard"
 msgstr ""
 
+msgid ""
+"Keep travelmate in an active state. Check every n seconds the connection "
+"status, i.e. the uplink availability."
+msgstr ""
+
 msgid "Last rundate"
 msgstr ""
 
-msgid ""
-"Minimum signal quality threshold as percent for conditional uplink (dis-) "
-"connections."
+msgid "Manual Rescan"
 msgstr ""
 
 msgid "Move down"
@@ -175,9 +167,6 @@ msgid ""
 msgstr ""
 
 msgid "Overall Timeout"
-msgstr ""
-
-msgid "Overall retry timeout in seconds."
 msgstr ""
 
 msgid "Overview"
@@ -207,19 +196,16 @@ msgid ""
 "one. The currently used uplink is emphasized in blue."
 msgstr ""
 
-msgid "QR-Codes"
-msgstr ""
-
 msgid "Radio selection"
 msgstr ""
 
 msgid "Repeat scan"
 msgstr ""
 
-msgid "Restrict travelmate to a dedicated radio, e.g. 'radio0'."
+msgid "Rescan"
 msgstr ""
 
-msgid "Retry limit to connect to an uplink."
+msgid "Restrict travelmate to a dedicated radio, e.g. 'radio0'."
 msgstr ""
 
 msgid "Runtime Information"
@@ -237,9 +223,6 @@ msgstr ""
 msgid "Scan"
 msgstr ""
 
-msgid "Signal Quality Threshold"
-msgstr ""
-
 msgid "Signal strength"
 msgstr ""
 
@@ -250,10 +233,6 @@ msgid "Station Interface"
 msgstr ""
 
 msgid "Station Radio"
-msgstr ""
-
-msgid ""
-"The BSSID information '%s' is optional and only required for hidden networks"
 msgstr ""
 
 msgid ""
@@ -281,19 +260,25 @@ msgid ""
 "messages only."
 msgstr ""
 
+msgid "Timeout in seconds between retries in 'automatic' mode."
+msgstr ""
+
+msgid "To disable this feature set it to '0' which means unlimited retries."
+msgstr ""
+
 msgid "Travelmate"
 msgstr ""
 
 msgid "Travelmate Logfile"
 msgstr ""
 
-msgid "Travelmate Status (Quality)"
+msgid "Travelmate Status"
 msgstr ""
 
 msgid "Travelmate Version"
 msgstr ""
 
-msgid "Trigger Delay"
+msgid "Trigger delay"
 msgstr ""
 
 msgid "Unknown"
@@ -309,9 +294,6 @@ msgid "Uplink SSID"
 msgstr ""
 
 msgid "Uplink interface"
-msgstr ""
-
-msgid "View AP QR-Codes"
 msgstr ""
 
 msgid "View Logfile"
@@ -345,8 +327,20 @@ msgid ""
 "add it to the wan zone of the firewall. This step has only to be done once."
 msgstr ""
 
+msgid "connected"
+msgstr ""
+
+msgid "error"
+msgstr ""
+
 msgid "hidden"
 msgstr ""
 
 msgid "n/a"
+msgstr ""
+
+msgid "not connected"
+msgstr ""
+
+msgid "running"
 msgstr ""

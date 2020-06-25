@@ -4,7 +4,7 @@
 local fs       = require("nixio.fs")
 local uci      = require("luci.model.uci").cursor()
 local http     = require("luci.http")
-local trmiface = uci:get("travelmate", "global", "trm_iface") or "trm_wwan"
+local trmiface = uci.get("travelmate", "global", "trm_iface") or "trm_wwan"
 local encr_psk = {"psk", "psk2", "psk-mixed"}
 local encr_wpa = {"wpa", "wpa2", "wpa-mixed"}
 
@@ -26,23 +26,18 @@ m.hidden = {
 	wpa_version = http.formvalue("wpa_version")
 }
 
-if m.hidden.ssid == "" then
-	wssid = m:field(Value, "ssid", translate("SSID (hidden)"))
-else
+if m.hidden.ssid ~= "" then
 	wssid = m:field(Value, "ssid", translate("SSID"))
+	wssid.datatype = "rangelength(1,32)"
+	wssid.default = m.hidden.ssid or ""
+else
+	wssid = m:field(Value, "ssid", translate("SSID (hidden)"))
 end
-wssid.datatype = "rangelength(1,32)"
-wssid.default = m.hidden.ssid or ""
 
 nobssid = m:field(Flag, "no_bssid", translate("Ignore BSSID"))
-if m.hidden.ssid == "" then
-	nobssid.default = nobssid.disabled
-else
-	nobssid.default = nobssid.enabled
-end
+nobssid.default = nobssid.enabled
 
-bssid = m:field(Value, "bssid", translate("BSSID"),
-	translatef("The BSSID information '%s' is optional and only required for hidden networks", m.hidden.bssid or ""))
+bssid = m:field(Value, "bssid", translate("BSSID"))
 bssid:depends("no_bssid", 0)
 bssid.datatype = "macaddr"
 bssid.default = m.hidden.bssid or ""
@@ -176,7 +171,6 @@ function wssid.write(self, section, value)
 	end
 	uci:save("wireless")
 	uci:commit("wireless")
-	luci.sys.call("env -i /bin/ubus call network reload >/dev/null 2>&1")
 	http.redirect(luci.dispatcher.build_url("admin/services/travelmate/stations"))
 end
 

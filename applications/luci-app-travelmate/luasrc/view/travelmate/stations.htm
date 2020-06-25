@@ -12,8 +12,9 @@ This is free software, licensed under the Apache License, Version 2.0
 <%+header%>
 
 <div class="cbi-map">
+<h2 name="content"><%:Wireless Stations%></h2>
 <div class="cbi-map-descr">
-  <%=translatef("Provides an overview of all configured uplinks for the travelmate interface (%s). You can edit, delete or re-order existing uplinks or scan for a new one. The currently used uplink is emphasized in blue.", trmiface)%>
+	<%=translatef("Provides an overview of all configured uplinks for the travelmate interface (%s). You can edit, delete or re-order existing uplinks or scan for a new one. The currently used uplink is emphasized in blue, faulty stations in red.", trmiface)%>
 </div>
 
 <fieldset class="cbi-section">
@@ -46,8 +47,8 @@ This is free software, licensed under the Apache License, Version 2.0
       <td style="<%=style%>"><%=bssid%></td>
       <td style="<%=style%>"><%=encryption%></td>
       <td class="cbi-value-field" style="width:80px">
-        <input class="cbi-button cbi-button-up" type="button" value="" onclick="location.href='<%=luci.dispatcher.build_url('admin/services/travelmate/wifiorder')%>?cfg=<%=section%>&dir=up'" alt="<%:Move up%>" title="<%:Move up%>"/>
-        <input class="cbi-button cbi-button-down" type="button" value="" onclick="location.href='<%=luci.dispatcher.build_url('admin/services/travelmate/wifiorder')%>?cfg=<%=section%>&dir=down'" alt="<%:Move down%>" title="<%:Move down%>"/>
+        <input class="cbi-button cbi-button-up" type="button" value="" onclick="location.href='<%=luci.dispatcher.build_url('admin/services/travelmate/wifiorder')%>?cfg=<%=section%>;dir=up'" alt="<%:Move up%>" title="<%:Move up%>"/>
+        <input class="cbi-button cbi-button-down" type="button" value="" onclick="location.href='<%=luci.dispatcher.build_url('admin/services/travelmate/wifiorder')%>?cfg=<%=section%>;dir=down'" alt="<%:Move down%>" title="<%:Move down%>"/>
       </td>
       <td class="cbi-value-field" style="width:150px">
         <input type="button" class="cbi-button cbi-button-edit" onclick="location.href='<%=luci.dispatcher.build_url('admin/services/travelmate/wifiedit')%>?cfg=<%=section%>'" title="<%:Edit this Uplink%>" value="<%:Edit%>"/>
@@ -68,7 +69,7 @@ This is free software, licensed under the Apache License, Version 2.0
   <form class="inline" action="<%=luci.dispatcher.build_url('admin/services/travelmate/wifiscan')%>" method="post">
     <input type="hidden" name="device" value="<%=device%>"/>
     <input type="hidden" name="token" value="<%=token%>"/>
-    <input type="submit" class="cbi-button cbi-button-find" title="<%:Find and join network on%> <%=device%>" value="<%:Scan%> <%=device%>"/>
+    <input type="submit" class="cbi-button cbi-button-find" title="<%:Find and join network on %><%=device%>" value="<%:Scan %><%=device%>"/>
   </form>
 <%
   end)
