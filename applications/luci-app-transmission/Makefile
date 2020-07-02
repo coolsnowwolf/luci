@@ -7,7 +7,7 @@
 include $(TOPDIR)/rules.mk
 
 LUCI_TITLE:=LuCI Support for Transmission
-LUCI_DEPENDS:=+transmission-daemon-openssl +transmission-web-control
+LUCI_DEPENDS:=
 
 include ../../luci.mk
 
