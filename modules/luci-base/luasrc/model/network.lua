@@ -1598,7 +1598,7 @@ end
 
 function wifinet.channel(self)
 	return self.iwinfo.channel or self:ubus("dev", "config", "channel") or
-		tonumber(self:get("channel"))
+		tonumber(self:get("channel") or "")
 end
 
 function wifinet.signal(self)
