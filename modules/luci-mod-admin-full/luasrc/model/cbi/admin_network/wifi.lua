@@ -776,7 +776,7 @@ wepslot:value("3", translatef("Key #%d", 3))
 wepslot:value("4", translatef("Key #%d", 4))
 
 wepslot.cfgvalue = function(self, section)
-	local slot = tonumber(m.uci:get("wireless", section, "key"))
+	local slot = tonumber(m.uci:get("wireless", section, "key") or "")
 	if not slot or slot < 1 or slot > 4 then
 		return 1
 	end
