@@ -18,10 +18,6 @@ s:tab("advanced", translate("Advanced Settings"))
 o = s:taboption("general", Flag, "enabled", translate("Enable:"))
 o.rmempty = false
 
-function o.cfgvalue(self, section)
-	return luci.sys.init.enabled("minidlna") and self.enabled or self.disabled
-end
-
 function o.write(self, section, value)
 	if value == "1" then
 		luci.sys.init.enable("minidlna")
