@@ -94,6 +94,36 @@ XHR = function()
 		xhr.send(code);
 	}
 
+	this.posts = function(url,data,callback)
+	{
+		this.reinit();
+
+		var xhr  = this._xmlHttp;
+		var code = this._encode(data);
+		url = location.protocol + '//' + location.host + url;
+
+		xhr.onreadystatechange = function()
+		{
+			if (xhr.readyState == 4) {
+				var json = null;
+				if (xhr.getResponseHeader("Content-Type") == "application/json") {
+					try {
+						json = eval('(' + xhr.responseText + ')');
+					}
+					catch(e) {
+						json = null;
+					}
+				}
+
+				callback(xhr, json);
+			}
+		}
+
+		xhr.open('POST', url, true);
+		xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+		xhr.send(code);
+	}
+
 	this.cancel = function()
 	{
 		this._xmlHttp.onreadystatechange = function(){};
@@ -166,6 +196,11 @@ XHR = function()
 XHR.get = function(url, data, callback)
 {
 	(new XHR()).get(url, data, callback);
+}
+
+XHR.posts = function(url, data, callback)
+{
+	(new XHR()).posts(url, data, callback);
 }
 
 XHR.poll = function(interval, url, data, callback)
