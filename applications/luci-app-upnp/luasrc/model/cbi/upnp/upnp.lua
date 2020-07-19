@@ -38,6 +38,9 @@ s:taboption("general", Flag, "secure_mode", translate("Enable secure mode"),
 s:taboption("general", Flag, "igdv1", translate("Enable IGDv1 mode"),
 	translate("Advertise as IGDv1 device instead of IGDv2")).default = "0"
 
+s:taboption("general", Flag, "ipv6", translate("IPV6 disable"),
+	translate("Disable forwarding IPv6")).default = "0"
+
 s:taboption("general", Flag, "log_output", translate("Enable additional logging"),
 	translate("Puts extra debugging information into the system log"))
 
