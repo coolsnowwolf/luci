@@ -72,6 +72,12 @@ msgstr "下行速率"
 msgid "Enable IGDv1 mode"
 msgstr "启用 IGDv1 模式"
 
+msgid "IPV6 disable"
+msgstr "禁止IPV6"
+
+msgid "Disable forwarding IPv6"
+msgstr "禁止转发IPV6"
+
 msgid "Enable NAT-PMP functionality"
 msgstr "启用 NAT-PMP 功能"
 
