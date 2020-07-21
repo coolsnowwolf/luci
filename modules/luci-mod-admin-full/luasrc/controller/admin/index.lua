@@ -26,8 +26,6 @@ function index()
 	
 	entry({"admin", "vpn"}, firstchild(), _("VPN"), 44).index = true
 	
-	entry({"admin", "appControl"}, firstchild(), _("appControl"), 50).index = true
-
 	entry({"admin", "logout"}, call("action_logout"), _("Logout"), 90)
 end
 
