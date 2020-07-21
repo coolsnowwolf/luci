@@ -19,7 +19,7 @@
 <% end %>
 
 <div class="cbi-page-actions">
-	<form class="inline" method="get" action="/cgi-bin/luci/<%=luci.util.pcdata(luci.http.formvalue("redir"))%>">
+	<form class="inline" method="get" action="<%=controller%>/<%=luci.util.pcdata(luci.http.formvalue("redir"))%>">
 		<input class="cbi-button cbi-button-link" style="margin:0" type="submit" value="<%:Back%>" />
 	</form>
 </div>
