@@ -122,7 +122,7 @@ function dom.set_one(self, section)
 end
 function dom.set_two(self, section)
 	local chk_sec  = DDNS.calc_seconds(
-				tonumber(self.map:get(section, "check_interval")) or 10,
+				tonumber(self.map:get(section, "check_interval") or "") or 10,
 				self.map:get(section, "check_unit") or "minutes" )
 	local ip = DDNS.get_regip(section, chk_sec)
 	if ip == "NOFILE" then

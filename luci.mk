@@ -110,7 +110,7 @@ ifeq ($(PKG_NAME),luci-base)
  define Package/luci-base/config
    config LUCI_SRCDIET
 	bool "Minify Lua sources"
-	default y
+	default n
 
    menu "Translations"$(foreach lang,$(LUCI_LANGUAGES),
 

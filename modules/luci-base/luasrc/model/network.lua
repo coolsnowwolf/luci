@@ -1598,7 +1598,7 @@ end
 
 function wifinet.channel(self)
 	return self.iwinfo.channel or self:ubus("dev", "config", "channel") or
-		tonumber(self:get("channel"))
+		tonumber(self:get("channel") or "")
 end
 
 function wifinet.signal(self)
@@ -1610,7 +1610,7 @@ function wifinet.noise(self)
 end
 
 function wifinet.country(self)
-	return self.iwinfo.country or self:ubus("dev", "config", "country") or "00"
+	return self.iwinfo.country or self:ubus("dev", "config", "country") or "US"
 end
 
 function wifinet.txpower(self)
