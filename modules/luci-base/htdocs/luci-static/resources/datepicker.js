@@ -147,7 +147,7 @@
 
             utils.css(this.elem_panel,{
                 "position": "absolute",
-                 "z-index": 2,
+                 "z-index": 9999,
                  "top": top + target.offsetHeight + 10 + "px",
                  "left": left + "px"
             });
@@ -445,7 +445,7 @@
 
             utils.css(this.elem_panel,{
                 "position": "absolute",
-                 "z-index": 2,
+                 "z-index": 9999,
                  "top": top + target.offsetHeight + 10 + "px",
                  "left": left + "px"
             });
