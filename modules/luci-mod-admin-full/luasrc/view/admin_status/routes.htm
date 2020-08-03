@@ -28,20 +28,35 @@
 			end
 		end
 	end
+local COMFILE = luci.sys.exec("cat /tmp/dhcp_comments.conf | sed \":a;N;s/\\n/,/g;ba\" | xargs echo -n")
 -%>
 
 <%+header%>
 
+<script>
+	var COMFILE="<%=COMFILE%>"
+	var COMARRAY=COMFILE.split(",")
+	function find_comments(m){
+		for(j = 0,len=COMARRAY.length; j < len; j++) {
+			var a = new RegExp(m,'i')
+			if (COMARRAY[j].match(a)) {
+				temp=COMARRAY[j].split(" ")
+				document.write(temp[0])
+			}
+		}
+	}
+</script>
+
 <div class="cbi-map" id="cbi-network">
 	<h2 name="content"><%:Routes%></h2>
 	<div class="cbi-map-descr"><%:The following rules are currently active on this system.%></div>
-
 	<fieldset class="cbi-section">
 		<legend>ARP</legend>
 		<div class="cbi-section-node">
 			<table class="cbi-section-table">
 				<tr class="cbi-section-table-titles">
 					<th class="cbi-section-table-cell"><%_<abbr title="Internet Protocol Version 4">IPv4</abbr>-Address%></th>
+					<th class="cbi-section-table-cell"><%:Comments%></th>		
 					<th class="cbi-section-table-cell"><%_<abbr title="Media Access Control">MAC</abbr>-Address%></th>
 					<th class="cbi-section-table-cell"><%:Interface%></th>
 				</tr>
@@ -50,8 +65,12 @@
 					for _, v in ipairs(ip.neighbors({ family = 4 })) do
 						if v.mac then
 				%>
+				<script>
+				var kk4="<%=v.mac%>"
+				</script>
 				<tr class="cbi-section-table-row cbi-rowstyle-<%=(style and 1 or 2)%>">
 					<td class="cbi-value-field"><%=v.dest%></td>
+					<td class="cbi-value-field"><%_<script>find_comments(kk4)</script>%></td>
 					<td class="cbi-value-field"><%=v.mac%></td>
 					<td class="cbi-value-field"><%=v.dev%></td>
 				</tr>
@@ -64,7 +83,6 @@
 		</div>
 	</fieldset>
 	<br />
-
 	<fieldset class="cbi-section">
 		<legend><%_Active <abbr title="Internet Protocol Version 4">IPv4</abbr>-Routes%></legend>
 
@@ -135,6 +153,7 @@
 			<table class="cbi-section-table">
 				<tr class="cbi-section-table-titles">
 					<th class="cbi-section-table-cell"><%:IPv6-Address%></th>
+					<th class="cbi-section-table-cell"><%:Comments%></th>		
 					<th class="cbi-section-table-cell"><%:MAC-Address%></th>
 					<th class="cbi-section-table-cell"><%:Interface%></th>
 				</tr>
@@ -142,8 +161,12 @@
 					for _, v in ipairs(ip.neighbors({ family = 6 })) do
 						if v.dest and not v.dest:is6linklocal() and v.mac then
 				%>
+				<script>
+				var kk6="<%=v.mac%>"
+				</script>
 				<tr class="cbi-section-table-row cbi-rowstyle-<%=(style and 1 or 2)%>">
 					<td class="cbi-value-field"><%=v.dest%></td>
+					<td class="cbi-value-field"><%_<script>find_comments(kk6)</script>%></td>
 					<td class="cbi-value-field"><%=v.mac%></td>
 					<td class="cbi-value-field"><%=luci.tools.webadmin.iface_get_network(v.dev) or '(' .. v.dev .. ')'%></td>
 				</tr>
