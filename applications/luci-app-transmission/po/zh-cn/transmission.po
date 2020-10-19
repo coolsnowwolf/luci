@@ -241,6 +241,9 @@ msgid "Rename partial files"
 msgstr "重命名未完成文件"
 
 msgid "Run daemon as user"
+msgstr "用户名"
+
+msgid "Run daemon as group"
 msgstr "用户组"
 
 msgid "Scheduling"
