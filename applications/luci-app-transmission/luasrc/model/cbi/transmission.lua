@@ -35,6 +35,10 @@ local p_user
 for _, p_user in luci.util.vspairs(luci.util.split(luci.sys.exec("cat /etc/passwd | cut -f 1 -d :"))) do
 	user:value(p_user)
 end
+local p_group
+for _, p_group in luci.util.vspairs(luci.util.split(luci.sys.exec("cat /etc/group | cut -f 1 -d :"))) do
+	group:value(p_group)
+end
 cache_size_mb=s:taboption("global" ,Value, "cache_size_mb", translate("Cache size in MB"))
 
 
