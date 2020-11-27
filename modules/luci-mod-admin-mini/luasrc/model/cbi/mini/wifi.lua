@@ -252,6 +252,10 @@ elseif hwtype == "broadcom" then
 	encr:value("psk", "WPA-PSK")
 	encr:value("psk2", "WPA2-PSK")
 	encr:value("psk+psk2", "WPA-PSK/WPA2-PSK Mixed Mode")
+elseif hwtype == "mt_dbdc" then
+	encr:value("psk", "WPA-PSK")
+	encr:value("psk2", "WPA2-PSK")
+	encr:value("psk-mixed", "WPA-PSK/WPA2-PSK Mixed Mode")
 end
 
 key = s:option(Value, "key", translate("Key"))
