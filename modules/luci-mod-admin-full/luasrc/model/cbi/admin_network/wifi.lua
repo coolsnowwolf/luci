@@ -350,6 +350,42 @@ if hwtype == "prism2" then
 end
 
 
+--------------------- MT7615 Device ---------------------
+if hwtype == "mt_dbdc" then
+	if #tx_power_list > 0 then
+		tp = s:taboption("general", ListValue,
+			"txpower", translate("Transmit Power"), "dBm")
+		tp.rmempty = true
+		tp.default = tx_power_cur
+		function tp.cfgvalue(...)
+			return txpower_current(Value.cfgvalue(...), tx_power_list)
+		end
+
+		tp:value("", translate("auto"))
+		for _, p in ipairs(tx_power_list) do
+			tp:value(p.driver_dbm, "%i dBm (%i mW)"
+				%{ p.display_dbm, p.display_mw })
+		end
+	end
+	wmm = s:taboption("general", Flag, "wmm", translate("WMM Mode"))
+	wmm.default = wmm.enabled
+
+	local cl = iw and iw.countrylist
+	if cl and #cl > 0 then
+		cc = s:taboption("advanced", ListValue, "country", translate("Country Code"), translate("Use ISO/IEC 3166 alpha2 country codes."))
+		cc.default = tostring(iw and iw.country or "00")
+		for _, c in ipairs(cl) do
+			cc:value(c.alpha2, "%s - %s" %{ c.alpha2, c.name })
+		end
+	else
+		s:taboption("advanced", Value, "country", translate("Country Code"), translate("Use ISO/IEC 3166 alpha2 country codes."))
+	end
+
+	s:taboption("advanced", Value, "frag", translate("Fragmentation Threshold"))
+	s:taboption("advanced", Value, "rts", translate("RTS/CTS Threshold"))
+	s:taboption("advanced", Flag, "txburst", translate("TX Bursting"))
+end
+
 ----------------------- Interface -----------------------
 
 s = m:section(NamedSection, wnet.sid, "wifi-iface", translate("Interface Configuration"))
@@ -557,6 +593,35 @@ if hwtype == "prism2" then
 end
 
 
+----------------------- MT7615 Interface ---------------------
+if hwtype == "mt_dbdc" then
+	bssid:depends({mode="sta"})
+
+	mp = s:taboption("macfilter", ListValue, "macfilter", translate("MAC-Address Filter"))
+	mp:depends({mode="ap"})
+	mp:value("", translate("disable"))
+	mp:value("allow", translate("Allow listed only"))
+	mp:value("deny", translate("Allow all except listed"))
+
+	ml = s:taboption("macfilter", DynamicList, "maclist", translate("MAC-List"))
+	ml.datatype = "macaddr"
+	ml:depends({macfilter="allow"})
+	ml:depends({macfilter="deny"})
+	nt.mac_hints(function(mac, name) ml:value(mac, "%s (%s)" %{ mac, name }) end)
+
+	hidden = s:taboption("general", Flag, "hidden", translate("Hide <abbr title=\"Extended Service Set Identifier\">ESSID</abbr>"))
+	hidden:depends({mode="ap"})
+
+	isolate = s:taboption("advanced", Flag, "isolate", translate("Isolate Clients"),
+	 translate("Prevents client-to-client communication"))
+	isolate:depends({mode="ap"})
+
+	s:taboption("advanced", Flag, "doth", "802.11h")
+
+	disassoc_low_ack = s:taboption("general", Flag, "disassoc_low_ack", translate("Disassociate On Low Acknowledgement"),translate("Allow AP mode to disconnect STAs based on low ACK condition"))
+	disassoc_low_ack.default = disassoc_low_ack.enabled
+end
+
 ------------------- WiFI-Encryption -------------------
 
 encr = s:taboption("encryption", ListValue, "encryption", translate("Encryption"))
@@ -692,6 +757,10 @@ elseif hwtype == "broadcom" then
 	encr:value("psk", "WPA-PSK")
 	encr:value("psk2", "WPA2-PSK")
 	encr:value("psk+psk2", "WPA-PSK/WPA2-PSK Mixed Mode")
+elseif hwtype == "mt_dbdc" then
+	encr:value("psk", "WPA-PSK")
+	encr:value("psk2", "WPA2-PSK")
+	encr:value("psk-mixed", "WPA-PSK/WPA2-PSK Mixed Mode")
 end
 
 auth_server = s:taboption("encryption", Value, "auth_server", translate("Radius-Authentication-Server"))
@@ -1120,6 +1189,19 @@ if hwtype == "mac80211" or hwtype == "prism2" then
 	password:depends({mode="sta-wds", eap_type="ttls", encryption="wpa"})
 	password.rmempty = true
 	password.password = true
+end
+
+if hwtype == "mt_dbdc" then
+	ieee80211r = s:taboption("encryption", Flag, "ieee80211r",
+		translate("802.11r Fast Transition"),
+		translate("Enables fast roaming among access points that belong " ..
+			"to the same Mobility Domain"))
+	ieee80211r:depends({mode="ap", encryption="wpa"})
+	ieee80211r:depends({mode="ap", encryption="wpa2"})
+	ieee80211r:depends({mode="ap", encryption="psk"})
+	ieee80211r:depends({mode="ap", encryption="psk2"})
+	ieee80211r:depends({mode="ap", encryption="psk-mixed"})
+	ieee80211r.rmempty = true
 end
 
 -- ieee802.11w options
