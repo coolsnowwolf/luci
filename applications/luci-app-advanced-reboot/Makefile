@@ -3,7 +3,7 @@
 
 include $(TOPDIR)/rules.mk
 
-PKG_LICENSE:=GPL-3.0+
+PKG_LICENSE:=GPL-3.0-or-later
 PKG_MAINTAINER:=Stan Grishin <stangri@melmac.net>
 
 LUCI_TITLE:=Advanced Linksys Reboot Web UI
@@ -13,7 +13,7 @@ LUCI_DESCRIPTION:=Provides Web UI (found under System/Advanced Reboot) to reboot
 
 LUCI_DEPENDS:=+luci-mod-admin-full
 LUCI_PKGARCH:=all
-PKG_RELEASE:=42
+PKG_RELEASE:=54
 
 include ../../luci.mk
 
