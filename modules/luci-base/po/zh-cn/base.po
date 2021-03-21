@@ -3523,6 +3523,9 @@ msgstr "使用广播标签"
 msgid "Use builtin IPv6-management"
 msgstr "使用内置的 IPv6 管理"
 
+msgid "Obtain IPv6-Address"
+msgstr "获取IPv6地址"
+
 msgid "Use custom DNS servers"
 msgstr "使用自定义的 DNS 服务器"
 
