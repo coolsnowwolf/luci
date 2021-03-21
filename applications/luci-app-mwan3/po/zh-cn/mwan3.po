@@ -449,7 +449,7 @@ msgid "Waiting for command to complete..."
 msgstr "正在等待命令完成…"
 
 msgid "Weight"
-msgstr "比重"
+msgstr "权重"
 
 msgid ""
 "When all policy members are offline use this behavior for matched traffic"
