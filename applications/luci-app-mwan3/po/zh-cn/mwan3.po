@@ -41,6 +41,9 @@ msgstr "取值范围：1-256。如果不填写，默认值为 1"
 msgid "Check IP rules"
 msgstr "检查 IP 规则"
 
+msgid "Check link quality"
+msgstr "检查连接质量"
+
 msgid "Check routing table"
 msgstr "检查路由表"
 
