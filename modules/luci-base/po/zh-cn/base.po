@@ -1075,7 +1075,7 @@ msgid "Enabled"
 msgstr "启用"
 
 msgid "Enables IGMP snooping on this bridge"
-msgstr ""
+msgstr "在此桥接上启用 IGMP 窥探"
 
 msgid ""
 "Enables fast roaming among access points that belong to the same Mobility "
