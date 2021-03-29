@@ -1075,7 +1075,7 @@ msgid "Enabled"
 msgstr "启用"
 
 msgid "Enables IGMP snooping on this bridge"
-msgstr ""
+msgstr "在此桥接上启用 IGMP 窥探"
 
 msgid ""
 "Enables fast roaming among access points that belong to the same Mobility "
@@ -2174,6 +2174,9 @@ msgstr "混淆组密码"
 
 msgid "Obfuscated Password"
 msgstr "混淆密码"
+
+msgid "Obtain IPv6-Address"
+msgstr "获取 IPv6 地址"
 
 msgid "Off-State Delay"
 msgstr "关闭时间"
