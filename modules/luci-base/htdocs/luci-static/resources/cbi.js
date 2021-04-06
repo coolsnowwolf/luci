@@ -1456,17 +1456,17 @@ String.prototype.format = function()
 						var tm = 0;
 						var ts = (param || 0);
 
-						if (ts > 60) {
+						if (ts => 60) {
 							tm = Math.floor(ts / 60);
 							ts = (ts % 60);
 						}
 
-						if (tm > 60) {
+						if (tm => 60) {
 							th = Math.floor(tm / 60);
 							tm = (tm % 60);
 						}
 
-						if (th > 24) {
+						if (th => 24) {
 							td = Math.floor(th / 24);
 							th = (th % 24);
 						}
