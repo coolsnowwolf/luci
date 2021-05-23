@@ -30,7 +30,7 @@ msgstr "基本设置"
 msgid ""
 "Create log file for this SQM instance under /var/run/sqm/${Interface_name}."
 "[start|stop]-sqm.log."
-msgstr "创建日志文件(/var/run/sqm/${Interface_name}.[start|stop]-sqm.log)。"
+msgstr "创建日志文件到/var/run/sqm/<br />${Inerface_name}.[start|stop]-sqm.log)。"
 
 #: applications/luci-app-sqm/luasrc/model/cbi/sqm.lua:80
 msgid ""
@@ -180,7 +180,7 @@ msgstr "上传速度(kbit/s)(0-无限制)："
 
 #: applications/luci-app-sqm/luasrc/model/cbi/sqm.lua:92
 msgid "Verbosity of SQM's output into the system log."
-msgstr "日志等级。"
+msgstr "SQM输出到系统日志的详细程度"
 
 #: applications/luci-app-sqm/luasrc/model/cbi/sqm.lua:211
 msgid "Which link layer to account for:"
