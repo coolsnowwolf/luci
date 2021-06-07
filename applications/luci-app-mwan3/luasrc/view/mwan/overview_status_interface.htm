@@ -5,7 +5,18 @@
 -%>
 
 <script type="text/javascript">//<![CDATA[
-XHR.poll(5, '<%=luci.dispatcher.build_url("admin", "status", "mwan", "interface_status")%>', null,
+
+function secondsToString(time) {
+	var seconds = parseInt(time, 10);
+
+	var hrs   = Math.floor(seconds / 3600);
+	seconds  -= hrs*3600;
+	var mnts = Math.floor(seconds / 60);
+	seconds  -= mnts*60;
+	return String.format("%sh:%sm:%ss", hrs, mnts, seconds);
+}
+
+XHR.poll(-1, '<%=luci.dispatcher.build_url("admin", "status", "mwan", "interface_status")%>', null,
 		function(x, status)
 		{
 			var statusDiv = document.getElementById('mwan_status_text');
@@ -15,19 +26,43 @@ XHR.poll(5, '<%=luci.dispatcher.build_url("admin", "status", "mwan", "interface_
 				for ( var iface in status.interfaces)
 				{
 					var state = '';
-					var css = ''
+					var css = '';
+					var time = '';
 					switch (status.interfaces[iface].status)
 					{
 						case 'online':
 							state = '<%:Online%>';
+							time = String.format(
+								'<div><strong><%:Uptime%>:&nbsp;</strong>%s</div>',
+								secondsToString(status.interfaces[iface].online)
+							);
 							css = 'success';
 							break;
 						case 'offline':
 							state = '<%:Offline%>';
+							time = String.format(
+								'<div><strong><%:Downtime%>:&nbsp;</strong>%s</div>',
+								secondsToString(status.interfaces[iface].offline)
+							);
 							css = 'danger';
+							break;
+						case 'notracking':
+							state = '<%:No Tracking%>';
+							if ((status.interfaces[iface].uptime) > 0) {
+								time = String.format(
+									'<div><strong><%:Uptime%>:&nbsp;</strong>%s</div>',
+									secondsToString(status.interfaces[iface].uptime)
+								);
+								css = 'success';
+							}
+							else {
+								time = '<div>&nbsp;</div>'
+								css = 'warning';
+							}
 							break;
 						default:
 							state = '<%:Disabled%>';
+							time = '<div>&nbsp;</div>'
 							css = 'warning';
 							break;
 					}
@@ -36,13 +71,17 @@ XHR.poll(5, '<%=luci.dispatcher.build_url("admin", "status", "mwan", "interface_
 						css
 					);
 					statusview += String.format(
-						'<div><strong>Interface: </strong>%s</div>',
+						'<div><strong><%:Interface%>:&nbsp;</strong>%s</div>',
 						iface
 					);
 					statusview += String.format(
-						'<div><strong>Status: </strong>%s</div>',
+						'<div><strong><%:Status%>:&nbsp;</strong>%s</div>',
 						state
 					);
+					if (time)
+					{
+						statusview += time;
+					}
 					statusview += '</div>'
 				}
 				statusDiv.innerHTML = statusview;
@@ -60,7 +99,7 @@ XHR.poll(5, '<%=luci.dispatcher.build_url("admin", "status", "mwan", "interface_
 		display: inline-block;
 		margin: 1rem;
 		padding: 1rem;
-		width: 10rem;
+		width: 15rem;
 		float: left;
 		line-height: 125%;
 	}

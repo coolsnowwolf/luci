@@ -2,9 +2,10 @@
 -- Copyright 2018 Florian Eckert <fe@dev.tdt.de>
 -- Licensed to the public under the GNU General Public License v2.
 
-dsp = require "luci.dispatcher"
-uci = require "uci"
+local dsp = require "luci.dispatcher"
+local uci = require "uci"
 
+local m, mwan_rule, src_ip, src_port, dest_ip, dest_port, proto, use_policy
 
 function ruleCheck()
 	local rule_error = {}
@@ -38,11 +39,11 @@ function ruleWarn(rule_error)
 	return warnings
 end
 
-m5 = Map("mwan3", translate("MWAN - Rules"),
+m = Map("mwan3", translate("MWAN - Rules"),
 	ruleWarn(ruleCheck())
 	)
 
-mwan_rule = m5:section(TypedSection, "rule", nil,
+mwan_rule = m:section(TypedSection, "rule", nil,
 	translate("Rules specify which traffic will use a particular MWAN policy<br />" ..
 	"Rules are based on IP address, port or protocol<br />" ..
 	"Rules are matched from top to bottom<br />" ..
@@ -60,9 +61,13 @@ mwan_rule.sortable = true
 mwan_rule.template = "cbi/tblsection"
 mwan_rule.extedit = dsp.build_url("admin", "network", "mwan", "rule", "%s")
 function mwan_rule.create(self, section)
-	TypedSection.create(self, section)
-	m5.uci:save("mwan3")
-	luci.http.redirect(dsp.build_url("admin", "network", "mwan", "rule", section))
+	if #section > 15 then
+		self.invalid_cts = true
+	else
+		TypedSection.create(self, section)
+		m.uci:save("mwan3")
+		luci.http.redirect(dsp.build_url("admin", "network", "mwan", "rule", section))
+	end
 end
 
 src_ip = mwan_rule:option(DummyValue, "src_ip", translate("Source address"))
@@ -101,4 +106,4 @@ function use_policy.cfgvalue(self, s)
 	return self.map:get(s, "use_policy") or "&#8212;"
 end
 
-return m5
+return m
