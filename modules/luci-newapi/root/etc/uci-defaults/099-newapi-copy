@@ -1,5 +1,5 @@
 #!/bin/sh
 
-cp -a /etc/newapi/ /
+cp -a /etc/newapi/* /
 
 exit 0
