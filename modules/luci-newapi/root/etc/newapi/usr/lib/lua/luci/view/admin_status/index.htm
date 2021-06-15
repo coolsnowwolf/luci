@@ -520,10 +520,8 @@
 						if (is_assoc)
 						{
 							s += String.format(
-								'<strong><%:BSSID%>:</strong> %s<br />' +
-								'<strong><%:Encryption%>:</strong> %s',
-									net.bssid || '?',
-									net.encryption
+								'<strong><%:BSSID%>:</strong> %s<br />' ,
+									net.bssid || '?'
 							);
 						}
 						else
