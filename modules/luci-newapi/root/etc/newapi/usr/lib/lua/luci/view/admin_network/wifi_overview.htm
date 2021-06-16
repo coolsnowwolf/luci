@@ -271,8 +271,10 @@
 							info.innerHTML = String.format(
 								'<strong><%:SSID%>:</strong> %h | ' +
 								'<strong><%:Mode%>:</strong> %s<br />' +
-								'<strong><%:BSSID%>:</strong> %s ' ,
-									iw.ssid, iw.mode, iw.bssid
+								'<strong><%:BSSID%>:</strong> %s | ' +
+								'<strong><%:Encryption%>:</strong> %s',
+									iw.ssid, iw.mode, iw.bssid,
+									iw.encryption ? iw.encryption : '<%:None%>'
 							);
 						else
 							info.innerHTML = String.format(
