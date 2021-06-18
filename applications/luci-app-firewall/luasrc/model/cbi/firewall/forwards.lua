@@ -78,8 +78,8 @@ end
 local function forward_src_txt(self, s)
 	local z = ft.fmt_zone(self.map:get(s, "src"), translate("any zone"))
 	local a = ft.fmt_ip(self.map:get(s, "src_ip"), translate("any host"))
-	local p = ft.fmt_port(self.map:get(s, "src_port"))
-	local m = ft.fmt_mac(self.map:get(s, "src_mac"))
+	local p = ft.fmt_port(self.map:get(s, "src_port") or "")
+	local m = ft.fmt_mac(self.map:get(s, "src_mac") or "")
 
 	if p and m then
 		return translatef("From %s in %s with source %s and %s", a, z, p, m)
@@ -92,7 +92,7 @@ end
 
 local function forward_via_txt(self, s)
 	local a = ft.fmt_ip(self.map:get(s, "src_dip"), translate("any router IP"))
-	local p = ft.fmt_port(self.map:get(s, "src_dport"))
+	local p = ft.fmt_port(self.map:get(s, "src_dport") or "")
 
 	if p then
 		return translatef("Via %s at %s", a, p)
