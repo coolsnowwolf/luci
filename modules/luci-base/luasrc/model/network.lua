@@ -1377,7 +1377,8 @@ function wifidev.get_i18n(self)
 	if l.b then m = m .. "b" end
 	if l.g then m = m .. "g" end
 	if l.n then m = m .. "n" end
-	if l.ac then m = "ac" end
+	if l.ac then m = m .. "ac" end
+	if l.ax then m = "ax" end
 
 	return "%s 802.11%s Wireless Controller (%s)" %{ t, m, self:name() }
 end

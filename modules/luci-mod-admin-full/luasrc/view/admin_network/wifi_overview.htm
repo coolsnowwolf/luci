@@ -30,6 +30,7 @@
 				if bl.g then bands = bands .. "g" end
 				if bl.n then bands = bands .. "n" end
 				if bl.ac then bands = bands .. "ac" end
+				if bl.ax then bands = bands .. "ax" end
 			end
 
 			local hw = dev.iwinfo.hardware_name
@@ -73,10 +74,10 @@
 		-- hermes
 		elseif name == "eth" then
 			return translate("Hermes 802.11b Wireless Controller")
-			
+
 		elseif name == "host" then
 			return translate("Quantenna 802.11ac Wireless Controller")
-			
+
 		-- hostap
 		elseif name == "wlan" and fs.stat("/proc/net/hostap/" .. ifname, "type") == "dir" then
 			return translate("Prism2/2.5/3 802.11b Wireless Controller")
@@ -110,7 +111,7 @@
 	</div>
 <% end %>
 
-<script type="text/javascript" src="<%=resource%>/cbi.js"></script>
+<script type="text/javascript" src="<%=resource%>/cbi.js?v=git-21.165.14196-d25a9d2"></script>
 <script type="text/javascript">//<![CDATA[
 	var wifidevs = <%=luci.http.write_json(netdevs)%>;
 
@@ -126,13 +127,22 @@
 					.format(bss[p+'rate'] / 1000, bss[p+'mhz']),
 		    ht = bss[p+'ht'], vht = bss[p+'vht'],
 			mhz = bss[p+'mhz'], nss = bss[p+'nss'],
-			mcs = bss[p+'mcs'], sgi = bss[p+'short_gi'];
+			mcs = bss[p+'mcs'], sgi = bss[p+'short_gi'],
+			he = bss[p+'he'], he_gi = bss[p+'he_gi'],
+			he_dcm = bss[p+'he_dcm'];
 
 		if (ht || vht) {
 			if (vht) s += ', VHT-MCS %d'.format(mcs);
 			if (nss) s += ', VHT-NSS %d'.format(nss);
 			if (ht)  s += ', MCS %s'.format(mcs);
 			if (sgi) s += ', <%:Short GI%>';
+		}
+
+		if (he) {
+			s += ', HE-MCS %d'.format(mcs);
+			if (nss) s += ', HE-NSS %d'.format(nss);
+			if (he_gi) s += ', HE-GI %d'.format(he_gi);
+			if (he_dcm) s += ', HE-DCM %d'.format(he_dcm);
 		}
 
 		return s;
