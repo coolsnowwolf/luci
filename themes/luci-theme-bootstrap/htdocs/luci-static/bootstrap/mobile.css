@@ -85,6 +85,7 @@ header h3 a, header .brand {
 		margin-left: 0% !important;
 	}
 	.cbi-value-field input[type="text"],
+	.cbi-value-field input[type="password"],
 	.cbi-value-field select {
 		width: 100%;
 	}

@@ -91,8 +91,8 @@ end
 local function rule_src_txt(self, s)
 	local z = ft.fmt_zone(self.map:get(s, "src"), translate("any zone"))
 	local a = ft.fmt_ip(self.map:get(s, "src_ip"), translate("any host"))
-	local p = ft.fmt_port(self.map:get(s, "src_port"))
-	local m = ft.fmt_mac(self.map:get(s, "src_mac"))
+	local p = ft.fmt_port(self.map:get(s, "src_port") or "")
+	local m = ft.fmt_mac(self.map:get(s, "src_mac") or "")
 
 	if p and m then
 		return translatef("From %s in %s with source %s and %s", a, z, p, m)
@@ -104,8 +104,8 @@ local function rule_src_txt(self, s)
 end
 
 local function rule_dest_txt(self, s)
-	local z = ft.fmt_zone(self.map:get(s, "dest"))
-	local p = ft.fmt_port(self.map:get(s, "dest_port"))
+	local z = ft.fmt_zone(self.map:get(s, "dest") or "")
+	local p = ft.fmt_port(self.map:get(s, "dest_port") or "")
 
 	-- Forward
 	if z then
