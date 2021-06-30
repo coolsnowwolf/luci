@@ -4075,3 +4075,9 @@ msgstr "启用 256-QAM"
 
 msgid "802.11n 2.4Ghz Only"
 msgstr "只适合 802.11n 2.4Ghz"
+
+msgid "tagged"
+msgstr "已标记"
+
+msgid "untagged"
+msgstr "未标记"
