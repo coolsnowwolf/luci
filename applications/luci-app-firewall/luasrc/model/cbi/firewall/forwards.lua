@@ -119,8 +119,8 @@ dest.width   = "40%"
 function dest.cfgvalue(self, s)
 	local z = ft.fmt_zone(self.map:get(s, "dest"), translate("any zone"))
 	local a = ft.fmt_ip(self.map:get(s, "dest_ip"), translate("any host"))
-	local p = ft.fmt_port(self.map:get(s, "dest_port")) or
-		ft.fmt_port(self.map:get(s, "src_dport"))
+	local p = ft.fmt_port(self.map:get(s, "dest_port") or "") or
+		ft.fmt_port(self.map:get(s, "src_dport") or "")
 
 	if p then
 		return translatef("%s, %s in %s", a, p, z)
