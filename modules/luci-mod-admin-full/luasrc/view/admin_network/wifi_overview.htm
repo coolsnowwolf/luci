@@ -75,7 +75,7 @@
 		elseif name == "eth" then
 			return translate("Hermes 802.11b Wireless Controller")
 
-		elseif name == "host" then
+		elseif fs.access("/etc/modules.d/qtn-pcie2") then
 			return translate("Quantenna 802.11ac Wireless Controller")
 
 		-- hostap
