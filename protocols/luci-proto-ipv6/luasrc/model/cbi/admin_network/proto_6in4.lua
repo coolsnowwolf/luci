@@ -46,7 +46,7 @@ update.disabled = "0"
 function update.write() end
 function update.remove() end
 function update.cfgvalue(self, section)
-	return (tonumber(m:get(section, "tunnelid")) ~= nil)
+	return (tonumber(m:get(section, "tunnelid") or "") ~= nil)
 		and self.enabled or self.disabled
 end
 
