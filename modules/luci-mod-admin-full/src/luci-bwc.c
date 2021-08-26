@@ -42,7 +42,7 @@
 
 #define DB_PATH		"/var/lib/luci-bwc"
 #define DB_IF_FILE	DB_PATH "/if/%s"
-#define DB_RD_FILE	DB_PATH "/radio/%s"
+#define DB_RD_FILE	DB_PATH "/if/%s"
 #define DB_CN_FILE	DB_PATH "/connections"
 #define DB_LD_FILE	DB_PATH "/load"
 
