@@ -27,12 +27,12 @@ s = m:section(NamedSection, "global", "adblock")
 
 local parse = json.parse(fs.readfile(adbinput) or "")
 if parse then
-	status  = parse.data.adblock_status
-	version = parse.data.adblock_version
-	domains = parse.data.overall_domains
-	fetch   = parse.data.fetch_utility
-	backend = parse.data.dns_backend
-	rundate = parse.data.last_rundate
+	status  = parse.adblock_status
+	version = parse.adblock_version
+	domains = parse.overall_domains
+	fetch   = parse.fetch_utility
+	backend = parse.dns_backend
+	rundate = parse.last_rundate
 end
 
 o1 = s:option(Flag, "adb_enabled", translate("Enable Adblock"))
