@@ -102,6 +102,11 @@ end
 function httpdispatch(request, prefix)
 	http.context.request = request
 
+	if luci.http.getenv("REQUEST_URI") == "/" then
+		luci.http.redirect('/cgi-bin/luci/')
+		return
+	end
+
 	local r = {}
 	context.request = r
 
