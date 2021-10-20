@@ -12,14 +12,13 @@ function s.render(self, sid)
 			local status = require "luci.tools.ieee80211"
 			local utl = require "luci.util"
 			local sys = require "luci.sys"
-			local xml = require "luci.xml"
 			local hosts = sys.net.host_hints()
 			local stat = utl.ubus("dawn", "get_network", { })
 			local name, macs
 			for name, macs in pairs(stat) do
 		%>
 			<div class="cbi-section-node">
-				<h3>SSID: <%= xml.pcdata(name) %></h3>
+				<h3>SSID: <%= name %></h3>
 				<table class="table" id="network_overview_main">
 					<tr class="tr table-titles">
 						<th class="th">AP</th>
@@ -43,8 +42,8 @@ function s.render(self, sid)
 										<th class="th">VHT Sup</th>
 									</tr>
 									<tr class="tr">
-										<td class="td"><%= xml.pcdata(data.hostname) %></td>
-										<td class="td"><%= xml.pcdata(data.iface) %></td>
+										<td class="td"><%= data.hostname %></td>
+										<td class="td"><%= data.iface %></td>
 										<td class="td"><%= mac %></td>
 										<td class="td"><%= "%.2f" %(data.channel_utilization / 2.55) %> %</td>
 										<td class="td"><%= "%.3f" %( data.freq / 1000 ) %> GHz (Channel: <%= "%d" %( status.frequency_to_channel(data.freq) ) %>)</td>
