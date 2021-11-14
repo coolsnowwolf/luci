@@ -8,15 +8,13 @@ function s.render(self, sid)
 	tpl.render_string([[
 		<%
 			local utl = require "luci.util"
-			local xml = require "luci.xml"
 			local status = require "luci.tools.ieee80211"
 			local stat = utl.ubus("dawn", "get_hearing_map", { })
 			local name, macs
-
 			for name, macs in pairs(stat) do
 		%>
 			<div class="cbi-section-node">
-				<h3>SSID: <%= xml.pcdata(name) %></h3>
+				<h3>SSID: <%= name %></h3>
 				<table class="table" id="dawn_hearing_map">
 					<tr class="tr table-titles">
 						<th class="th">Client MAC</th>
@@ -34,7 +32,6 @@ function s.render(self, sid)
 					<%
 						local mac, data
 						for mac, data in pairs(macs) do
-
 							local mac2, data2
 							local count_loop = 0
 							for mac2, data2 in pairs(data) do
