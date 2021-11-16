@@ -52,7 +52,7 @@ for _, p in ipairs({"ppp", "pptp", "pppoe", "pppoa", "3g", "l2tp", "pppossh"}) d
 		if p == "pppoa" then
 			return (nixio.fs.glob("/usr/lib/pppd/*/pppoatm.so")() ~= nil)
 		elseif p == "pppoe" then
-			return (nixio.fs.glob("/usr/lib/pppd/*/rp-pppoe.so")() ~= nil) or return (nixio.fs.glob("/usr/lib/pppd/*/pppoe.so")() ~= nil)
+			return ((nixio.fs.glob("/usr/lib/pppd/*/rp-pppoe.so")() ~= nil) or (nixio.fs.glob("/usr/lib/pppd/*/pppoe.so")() ~= nil))
 		elseif p == "pptp" then
 			return (nixio.fs.glob("/usr/lib/pppd/*/pptp.so")() ~= nil)
 		elseif p == "3g" then
