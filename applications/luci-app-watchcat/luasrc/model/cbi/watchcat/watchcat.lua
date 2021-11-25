@@ -1,7 +1,7 @@
 -- Copyright 2012 Christian Gagneraud <chris@techworks.ie>
 -- Licensed to the public under the Apache License 2.0.
 
-m = Map("system", 
+m = Map("watchcat", 
 	translate("Watchcat"), 
 	translate("Watchcat allows configuring a periodic reboot when the " ..
 		  "Internet connection has been lost for a certain period of time."
