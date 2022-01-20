@@ -260,6 +260,18 @@ msgstr "禁止解析 IPv6 DNS 记录"
 msgid "Filter IPv6(AAAA) DNS Query Name Resolve"
 msgstr "过滤掉 IPv6(AAAA) ，只返回 IPv4 DNS 域名记录"
 
+msgid "Disable HTTPS DNS Type forwards"
+msgstr "禁止解析 HTTPS 类型的记录"
+
+msgid "Filter HTTPS DNS Query Type Name Resolve"
+msgstr "过滤掉 HTTPS 类型65的查询 ，避免iOS设备绕过常规DNS服务"
+
+msgid "Disable Unknown DNS Type forwards"
+msgstr "禁止解析 Unknown 类型的记录"
+
+msgid "Filter Unknown DNS Query Type Name Resolve"
+msgstr "过滤掉 Unknown 未知类型的查询"
+
 msgid "Minimum TTL to send to clients"
 msgstr "客户端缓存的最小 DNS TTL"
 
