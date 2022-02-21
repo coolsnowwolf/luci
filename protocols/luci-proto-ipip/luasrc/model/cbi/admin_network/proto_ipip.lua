@@ -14,7 +14,7 @@ ipaddr.optional = true
 ipaddr.datatype = "ip4addr"
 
 tunlink = section:taboption("general", Value, "tunlink", translate("Bind interface"), translate("Bind the tunnel to this interface (optional)."))
-ipaddr.optional = true
+tunlink.optional = true
 
 
 mtu = section:taboption("advanced", Value, "mtu", translate("Override MTU"), translate("Specify an MTU (Maximum Transmission Unit) other than the default (1280 bytes)."))
