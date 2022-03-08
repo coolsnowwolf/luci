@@ -121,6 +121,8 @@ if has_zram then
 	o.placeholder = lzo
 	o:value("lzo", "lzo")
 	o:value("lz4", "lz4")
+	o:value("lz4hc", "lz4hc")
+	o:value("zstd", "zstd")
 	o:value("deflate", "deflate")
 	
 	o = s:taboption("zram", Value, "zram_comp_streams", translate("ZRam Compression Streams"), translate("Number of parallel threads used for compression"))
