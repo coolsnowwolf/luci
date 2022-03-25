@@ -11,6 +11,20 @@
 		return null;
 	}
 
+	var compare = function (prop) {
+		return function (obj1, obj2) {
+			var val1 = Number(obj1[prop].replaceAll(".",""));
+			var val2 = Number(obj2[prop].replaceAll(".",""));
+			if (val1 < val2) {
+				return -1;
+			} else if (val1 > val2) {
+				return 1;
+			} else {
+				return 0;
+			}
+		}
+	}
+
 	var hosts = <%=luci.http.write_json(luci.sys.net.host_hints())%>;
 
 	XHR.poll(5, '<%=url('admin/network/dhcplease_status')%>', null,
@@ -19,6 +33,7 @@
 			var tb = document.getElementById('lease_status_table');
 			if (st && st[0] && tb)
 			{
+				st[0] = st[0].sort(compare("ipaddr"));
 				/* clear all rows */
 				while( tb.rows.length > 1 )
 					tb.deleteRow(1);
