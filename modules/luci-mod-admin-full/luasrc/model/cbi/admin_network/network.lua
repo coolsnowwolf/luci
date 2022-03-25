@@ -111,7 +111,5 @@ if network:has_ipv6() then
 	m.pageaction = true
 end
 
-o = s:option(Flag, "packet_steering", translate("Packet Steering"), translate("Enable packet steering across all CPUs. May help or hinder network speed."))
-o.optional = true
 
 return m
