@@ -4110,3 +4110,10 @@ msgstr "已标记"
 
 msgid "untagged"
 msgstr "未标记"
+
+msgid "Packet Steering"
+msgstr "数据包负载均衡"
+
+msgid ""
+"Enable packet steering across all CPUs. May help or hinder network speed."
+msgstr "启用数据包多核负载均衡。 可能会增强网络转发性能。"
