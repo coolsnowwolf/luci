@@ -1087,7 +1087,7 @@ msgstr "启用流出数据包镜像"
 
 msgid ""
 "Enable packet steering across all CPUs. May help or hinder network speed."
-msgstr "启用所有CPU的数据包控制。 可能有助于或阻碍网络速度。"
+msgstr "启用数据包多核负载均衡。 可能会增强网络转发性能。"
 
 msgid "Enable the DF (Don't Fragment) flag of the encapsulating packets."
 msgstr "启用后报文的 DF（禁止分片）标志。"
@@ -2410,7 +2410,7 @@ msgid "Package name"
 msgstr "软件包名称"
 
 msgid "Packet Steering"
-msgstr "数据包引导"
+msgstr "数据包负载均衡"
 
 msgid "Packets"
 msgstr "数据包"
