@@ -112,7 +112,5 @@ if network:has_ipv6() then
 	o.rmempty = true
 end
 
-o = s:option(Flag, "packet_steering", translate("Packet Steering"), translate("Enable packet steering across all CPUs. May help or hinder network speed."))
-o.optional = true
 
 return m
