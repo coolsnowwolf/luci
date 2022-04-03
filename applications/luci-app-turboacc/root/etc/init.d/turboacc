@@ -2,6 +2,7 @@
 # Copyright (C) 2018 Lean <coolsnowwolf@gmail.com>
 # Copyright (C) 2019-2021 Tianling Shen <cnsztl@immortalwrt.org>
 
+USE_PROCD=1
 START=90
 STOP=10
 
@@ -145,7 +146,6 @@ EOF
 
 	[ -d "/var/sbin" ] || mkdir -p "/var/sbin"
 	cp -a "/usr/sbin/pdnsd" "/var/sbin/dnscache"
-	/var/sbin/dnscache -c "/var/run/dnscache/dnscache.conf" > "/var/log/dnscache.file" 2>&1 &
 	echo "PDNSD: Start DNS Caching"
 }
 
@@ -187,7 +187,6 @@ EOF
 
 	[ -d "/var/sbin" ] || mkdir -p "/var/sbin"
 	cp -a "/usr/bin/dnsforwarder" "/var/sbin/dnscache"
-	/var/sbin/dnscache -f "/var/run/dnscache/dnscache.conf" > "/var/log/dnscache.file" 2>&1 &
 	echo "DnsForwarder: Start DNS Caching"
 
 }
@@ -198,34 +197,266 @@ start_dnsproxy() {
 
 	[ -d "/var/sbin" ] || mkdir -p "/var/sbin"
 	cp -a "/usr/bin/dnsproxy" "/var/sbin/dnscache"
-	/var/sbin/dnscache -l "127.0.0.1" -p "5333" -b "tls://9.9.9.9" -f "tls://8.8.8.8" -u "/var/run/dnscache/dnscache.conf" --all-servers --cache --cache-min-ttl=3600 > "/var/log/dnscache.file" 2>&1 &
 	echo "DNSProxy: Start DNS Caching"
 }
 
+start_AdGuardHome() {
+	inital_conf
+
+	[ -d "/etc/AdGuardHome" ] || mkdir -p "/etc/AdGuardHome"
+
+	[ ! -f "/etc/AdGuardHome/AdGuardHome.yaml" ] && cat > "/etc/AdGuardHome/AdGuardHome.yaml" <<"EOF"
+bind_host: 0.0.0.0
+bind_port: 3333
+beta_bind_port: 0
+users:
+- name: AdGuardHome
+  password: $2a$10$a55qnLfK5XnOdLj68fHMEex1FVeUSVcIdZBl0g0QM9qHRYf1IVuKe
+auth_attempts: 5
+block_auth_min: 15
+http_proxy: ""
+language: zh-cn
+debug_pprof: false
+web_session_ttl: 720
+dns:
+  bind_hosts:
+  - 0.0.0.0
+  port: 5333
+  statistics_interval: 7
+  querylog_enabled: true
+  querylog_file_enabled: true
+  querylog_interval: 168h
+  querylog_size_memory: 1000
+  anonymize_client_ip: false
+  protection_enabled: true
+  blocking_mode: default
+  blocking_ipv4: ""
+  blocking_ipv6: ""
+  blocked_response_ttl: 10
+  parental_block_host: family-block.dns.adguard.com
+  safebrowsing_block_host: standard-block.dns.adguard.com
+  ratelimit: 0
+  ratelimit_whitelist: []
+  refuse_any: true
+  upstream_dns:
+  - tls://dns.adguard.com
+  - tls://dns-unfiltered.adguard.com
+  - tls://dns.google
+  - tls://1dot1dot1dot1.cloudflare-dns.com
+  - tls://security.cloudflare-dns.com
+  - tls://family.cloudflare-dns.com
+  - tls://dns.quad9.net
+  - tls://dns10.quad9.net
+  - tls://dns11.quad9.net
+  - tls://dns.alidns.com
+  - tls://dns.cfiec.net
+  - tls://dot.pub
+  upstream_dns_file: ""
+  bootstrap_dns:
+  - 223.5.5.5
+  - 223.6.6.6
+  - 114.114.114.114
+  - 114.114.115.115
+  - tcp://8.8.8.8
+  - tcp://8.8.4.4
+  - tcp://1.1.1.1
+  - tcp://1.0.0.1
+  - tcp://1.1.1.2
+  - tcp://1.0.0.2
+  - tcp://1.1.1.3
+  - tcp://1.0.0.3
+  - tcp://9.9.9.9
+  - tcp://149.112.112.112
+  - 2001:4860:4860::8888
+  - 2001:4860:4860::8844
+  - 2606:4700:4700::1111
+  - 2606:4700:4700::1001
+  - 2606:4700:4700::1112
+  - 2606:4700:4700::1002
+  - 2606:4700:4700::1113
+  - 2606:4700:4700::1003
+  - 2620:fe::fe
+  - 2620:fe::fe:9
+  - 2400:3200::1
+  - 2400:3200:baba::1
+  - 240C::6666
+  - 240C::6644
+  all_servers: true
+  fastest_addr: false
+  fastest_timeout: 1s
+  allowed_clients: []
+  disallowed_clients: []
+  blocked_hosts:
+  - version.bind
+  - id.server
+  - hostname.bind
+  trusted_proxies:
+  - 127.0.0.0/8
+  - ::1/128
+  cache_size: 4194304
+  cache_ttl_min: 3600
+  cache_ttl_max: 86400
+  cache_optimistic: false
+  bogus_nxdomain: []
+  aaaa_disabled: false
+  enable_dnssec: false
+  edns_client_subnet: false
+  max_goroutines: 300
+  ipset: []
+  filtering_enabled: true
+  filters_update_interval: 24
+  parental_enabled: false
+  safesearch_enabled: false
+  safebrowsing_enabled: false
+  safebrowsing_cache_size: 1048576
+  safesearch_cache_size: 1048576
+  parental_cache_size: 1048576
+  cache_time: 30
+  rewrites: []
+  blocked_services: []
+  upstream_timeout: 10s
+  local_domain_name: lan
+  resolve_clients: true
+  use_private_ptr_resolvers: true
+  local_ptr_upstreams: []
+tls:
+  enabled: false
+  server_name: ""
+  force_https: false
+  port_https: 443
+  port_dns_over_tls: 853
+  port_dns_over_quic: 784
+  port_dnscrypt: 0
+  dnscrypt_config_file: ""
+  allow_unencrypted_doh: false
+  strict_sni_check: false
+  certificate_chain: ""
+  private_key: ""
+  certificate_path: ""
+  private_key_path: ""
+filters:
+- enabled: false
+  url: https://adguardteam.github.io/AdGuardSDNSFilter/Filters/filter.txt
+  name: AdGuard Simplified Domain Names filter
+  id: 1
+- enabled: false
+  url: https://adaway.org/hosts.txt
+  name: AdAway
+  id: 2
+- enabled: false
+  url: https://gitee.com/xinggsf/Adblock-Rule/raw/master/rule.txt
+  name: 乘风
+  id: 1648298773
+- enabled: false
+  url: https://anti-ad.net/easylist.txt
+  name: anti-AD
+  id: 1648298774
+- enabled: false
+  url: https://easylist-downloads.adblockplus.org/easyprivacy.txt
+  name: EasyList
+  id: 1648298775
+- enabled: false
+  url: https://raw.githubusercontent.com/banbendalao/ADgk/master/ADgk.txt
+  name: ADgk
+  id: 1648298776
+whitelist_filters: []
+user_rules:
+- '@@||sp0.baidu.com^'
+- '@@||sp1.baidu.com^'
+dhcp:
+  enabled: false
+  interface_name: ""
+  dhcpv4:
+    gateway_ip: ""
+    subnet_mask: ""
+    range_start: ""
+    range_end: ""
+    lease_duration: 0
+    icmp_timeout_msec: 1000
+    options: []
+  dhcpv6:
+    range_start: ""
+    lease_duration: 86400
+    ra_slaac_only: false
+    ra_allow_slaac: false
+clients: []
+log_compress: false
+log_localtime: false
+log_max_backups: 0
+log_max_size: 100
+log_max_age: 3
+log_file: ""
+verbose: false
+os:
+  group: ""
+  user: ""
+  rlimit_nofile: 0
+schema_version: 12
+
+EOF
+
+	if [ "${dns_caching_mode}" = "5" ];  then
+		sed -i 's/'"  port"':.*/'"  port"':'" 53"'/g' "/etc/AdGuardHome/AdGuardHome.yaml"
+	else
+		sed -i 's/'"  port"':.*/'"  port"':'" 5333"'/g' "/etc/AdGuardHome/AdGuardHome.yaml"
+	fi
+
+	[ -d "/var/run/dnscache/AdGuardHome" ] || mkdir -p "/var/run/dnscache/AdGuardHome"
+	ln -s /etc/AdGuardHome/AdGuardHome.yaml /var/run/dnscache/AdGuardHome/AdGuardHome.yaml
+	[ -d "/var/sbin" ] || mkdir -p "/var/sbin"
+	[ -f "/var/sbin/dnscache" ] && rm -rf /var/sbin/dnscache
+	ln -s "/usr/bin/AdGuardHome" "/var/sbin/dnscache"
+	echo "AdGuardHome: Start DNS Caching"
+
+}
+
+start_instance() {
+	inital_conf
+
+	procd_open_instance
+	if [ "${dns_caching_mode}" = "1" ];  then
+		procd_set_param command /var/sbin/dnscache -c /var/run/dnscache/dnscache.conf
+	elif [ "${dns_caching_mode}" = "2" ];  then
+		procd_set_param command /var/sbin/dnscache -f /var/run/dnscache/dnscache.conf
+	elif [ "${dns_caching_mode}" = "3" ];  then
+		procd_set_param command /var/sbin/dnscache -l "127.0.0.1" -p "5333" -b "tls://9.9.9.9" -f "tls://8.8.8.8" -u "/var/run/dnscache/dnscache.conf" --all-servers --cache --cache-min-ttl=3600
+	elif [ "${dns_caching_mode}" = "4" ] || [ "${dns_caching_mode}" = "5" ];  then
+		procd_set_param command /var/sbin/dnscache -c /var/run/dnscache/AdGuardHome/AdGuardHome.yaml -w /var/run/dnscache/AdGuardHome -h 0.0.0.0 -p 3333 -l /var/log/dnscache.file --no-check-update
+	fi
+	procd_set_param stdout 1
+	procd_set_param stderr 1
+	procd_set_param respawn
+	procd_close_instance
+}
 stop_dnscache() {
-	$PS -w | grep dnscache | grep -v "grep" | awk '{print $1}' | xargs kill -9 >/dev/null 2>&1 &
-	$PS -w | grep dnscache-while.sh | grep -v "grep" | awk '{print $1}' | xargs kill -9 >/dev/null 2>&1 &
-	killall -q -9 dnscache
 	rm -rf "/var/dnscache" "/var/run/dnscache"
 	echo "Stop DNS Caching"
 }
 
 change_dns() {
- 	uci -q delete dhcp.@dnsmasq[0].server
-	uci add_list dhcp.@dnsmasq[0].server="127.0.0.1#5333"
+	inital_conf
+
+	uci -q delete dhcp.@dnsmasq[0].server
+	if [ "${dns_caching_mode}" = "5" ];  then
+		uci add_list dhcp.@dnsmasq[0].port="5330"
+	else
+		uci -q delete dhcp.@dnsmasq[0].port
+		uci add_list dhcp.@dnsmasq[0].server="127.0.0.1#5333"
+	fi
 	uci set dhcp.@dnsmasq[0].noresolv="1"
 	uci commit dhcp
 
 }
 
 revert_dns() {
+	uci -q delete dhcp.@dnsmasq[0].port				
 	uci -q del_list dhcp.@dnsmasq[0].server="127.0.0.1#5333"
 	uci set dhcp.@dnsmasq[0].resolvfile="/tmp/resolv.conf.d/resolv.conf.auto"
 	uci set dhcp.@dnsmasq[0].noresolv="0"
 	uci commit dhcp
 }
 
-start(){
+start_service(){
 	inital_conf
 
 	uci set firewall.@defaults[0].flow_offloading="${sw_flow}"
@@ -262,14 +493,19 @@ start(){
 		rm -f "/var/log/dnscache.file"
 		if [ "${dns_caching_mode}" = "1" ];  then
 			start_pdnsd
+			start_instance
 		elif [ "${dns_caching_mode}" = "2" ];  then
 			start_dnsforwarder
+			start_instance
 		elif [ "${dns_caching_mode}" = "3" ];  then
 			start_dnsproxy
+			start_instance
+		elif [ "${dns_caching_mode}" = "4" ] || [ "${dns_caching_mode}" = "5" ];  then
+			start_AdGuardHome
+			start_instance
 		fi
 
 		change_dns
-		/usr/share/dnscache/dnscache-while.sh > "/var/log/dnscache.file" 2>&1 &
 	else
 		stop_dnscache
 		revert_dns
@@ -281,7 +517,7 @@ start(){
 	fi
 }
 
-stop(){
+stop_service(){
 	inital_conf
 
 	uci set firewall.@defaults[0].flow_offloading="${sw_flow}"
@@ -307,8 +543,8 @@ stop(){
 
 restart(){
 	restart_utils="false"
-	stop
-	start
+	stop_service
+	start_service
 	/etc/init.d/dnsmasq restart >"/dev/null" 2>&1 && echo "DNSMASQ restart"
 	/etc/init.d/firewall restart >"/dev/null" 2>&1
 }
