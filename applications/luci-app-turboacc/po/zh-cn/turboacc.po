@@ -64,15 +64,23 @@ msgstr "DNS 解析方式"
 msgid "DNS Program"
 msgstr "DNS 解析程序"
 
+msgid "AdGuardHome management page IP: 3333 Management account password: AdGuardHome"
+msgstr "AdGuardHome管理页面IP:3333 管理账号密码：AdGuardHome"
+
 msgid "Using PDNSD to query and cache"
 msgstr "使用 PDNSD 解析"
-
 
 msgid "Using DNSForwarder to query and cache"
 msgstr "使用 DNSForwarder 解析"
 
 msgid "Using DNSProxy to query and cache"
 msgstr "使用 DNSProxy 解析"
+
+msgid "Using AdGuardHome to query and cache"
+msgstr "使用 AdGuardHome 解析"
+
+msgid "Using AdGuardHome:53 to query and cache"
+msgstr "使用 AdGuardHome:53端口 解析"
 
 msgid "Upsteam DNS Server"
 msgstr "上游 DNS 服务器"
