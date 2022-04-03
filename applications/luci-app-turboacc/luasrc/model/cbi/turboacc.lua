@@ -1,4 +1,10 @@
 local kernel_version = luci.sys.exec("echo -n $(uname -r)")
+local trport = 3333
+local button = ""
+
+if luci.sys.call("pidof AdGuardHome >/dev/null") == 0 then
+	button = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type=\"button\" value=\" " .. translate("Open Web Interface") .. " \" onclick=\"window.open('http://'+window.location.hostname+':" .. trport .. "')\"/>"
+end
 
 m = Map("turboacc")
 m.title	= translate("Turbo ACC Acceleration Settings")
@@ -48,7 +54,7 @@ dns_caching.default = 0
 dns_caching.rmempty = false
 dns_caching.description = translate("Enable DNS Caching and anti ISP DNS pollution")
 
-dns_caching_mode = s:option(ListValue, "dns_caching_mode", translate("Resolve DNS Mode"), translate("DNS Program"))
+dns_caching_mode = s:option(ListValue, "dns_caching_mode", translate("Resolve DNS Mode"), translate("AdGuardHome After setting up, shut down DNS acceleration normally and save configuration file") .. button)
 dns_caching_mode:value("1", translate("Using PDNSD to query and cache"))
 if nixio.fs.access("/usr/bin/dnsforwarder") then
 dns_caching_mode:value("2", translate("Using DNSForwarder to query and cache"))
@@ -56,12 +62,18 @@ end
 if nixio.fs.access("/usr/bin/dnsproxy") then
 dns_caching_mode:value("3", translate("Using DNSProxy to query and cache"))
 end
+if nixio.fs.access("/usr/bin/AdGuardHome") then
+dns_caching_mode:value("4", translate("Using AdGuardHome to query and cache"))
+dns_caching_mode:value("5", translate("Using AdGuardHome:53 to query and cache"))
+end
 dns_caching_mode.default = 1
 dns_caching_mode:depends("dns_caching", 1)
 
 dns_caching_dns = s:option(Value, "dns_caching_dns", translate("Upsteam DNS Server"))
 dns_caching_dns.default = "114.114.114.114,114.114.115.115,223.5.5.5,223.6.6.6,180.76.76.76,119.29.29.29,119.28.28.28,1.2.4.8,210.2.4.8"
 dns_caching_dns.description = translate("Muitiple DNS server can saperate with ','")
-dns_caching_dns:depends("dns_caching", 1)
+dns_caching_dns:depends("dns_caching_mode", 1)
+dns_caching_dns:depends("dns_caching_mode", 2)
+dns_caching_dns:depends("dns_caching_mode", 3)
 
 return m
