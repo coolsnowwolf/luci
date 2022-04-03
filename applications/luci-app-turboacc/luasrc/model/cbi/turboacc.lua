@@ -54,7 +54,7 @@ dns_caching.default = 0
 dns_caching.rmempty = false
 dns_caching.description = translate("Enable DNS Caching and anti ISP DNS pollution")
 
-dns_caching_mode = s:option(ListValue, "dns_caching_mode", translate("Resolve DNS Mode"), translate("AdGuardHome After setting up, shut down DNS acceleration normally and save configuration file") .. button)
+dns_caching_mode = s:option(ListValue, "dns_caching_mode", translate("Resolve DNS Mode"), translate("AdGuardHome management page IP: 3333 Management account password: AdGuardHome") .. button)
 dns_caching_mode:value("1", translate("Using PDNSD to query and cache"))
 if nixio.fs.access("/usr/bin/dnsforwarder") then
 dns_caching_mode:value("2", translate("Using DNSForwarder to query and cache"))
