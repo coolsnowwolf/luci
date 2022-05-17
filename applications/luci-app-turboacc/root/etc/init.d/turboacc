@@ -312,9 +312,23 @@ restart(){
 }
 
 have_ecm_init() {
-	[ -d "/etc/init.d/qca-nss-ecm" ] && echo 1 && return
+	[ -e "/etc/init.d/qca-nss-ecm" ] && echo 1 && return
 	echo 0
 }
+
+ecm_mode(){
+	config_load "ecm"
+	config_get front_end global acceleration_engine
+	case $front_end in
+	auto | nss | sfe | hybrid)
+		[ -d /sys/kernel/debug/ecm/ecm_nss_ipv4 ] && echo 'NSS: Enabled ' || echo 'NSS: Disabled '
+		[ -d /sys/kernel/debug/ecm/ecm_sfe_ipv4 ] && echo 'SFE: Enabled' || echo 'SFE: Disabled'
+		;;
+	*)
+		echo 'Unknown'
+	esac
+}
+
 
 check_status(){
 	case "$1" in
@@ -323,7 +337,7 @@ check_status(){
 			echo -n "Flow Offloading"
 			exit 0
 		elif lsmod | grep -q "ecm"; then
-			echo -n "QCA-NSS-ECM"
+			echo -n "QCA-ECM Engine: "$(ecm_mode)
 			exit 0
 		elif lsmod | grep -q "shortcut_fe_cm"; then
 			echo -n "Shortcut-FE"
