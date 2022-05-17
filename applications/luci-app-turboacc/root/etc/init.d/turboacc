@@ -233,8 +233,6 @@ start(){
 	uci set firewall.@defaults[0].fullcone="${fullcone_nat}"
 	uci commit firewall
 
-	/etc/init.d/turboacc_fss start
-
 	[ "${sw_flow}" -ne "1" ] && {
 		[ "${sfe_flow}" -eq "1" ] && {
 			[ "$(have_ecm_init)" = "0" ] && {
@@ -314,9 +312,23 @@ restart(){
 }
 
 have_ecm_init() {
-	[ -d "/etc/init.d/qca-nss-ecm" ] && echo 1 && return
+	[ -e "/etc/init.d/qca-nss-ecm" ] && echo 1 && return
 	echo 0
 }
+
+ecm_mode(){
+	config_load "ecm"
+	config_get front_end global acceleration_engine
+	case $front_end in
+	auto | nss | sfe | hybrid)
+		[ -d /sys/kernel/debug/ecm/ecm_nss_ipv4 ] && echo 'NSS: Enabled ' || echo 'NSS: Disabled '
+		[ -d /sys/kernel/debug/ecm/ecm_sfe_ipv4 ] && echo 'SFE: Enabled' || echo 'SFE: Disabled'
+		;;
+	*)
+		echo 'Unknown'
+	esac
+}
+
 
 check_status(){
 	case "$1" in
@@ -325,13 +337,8 @@ check_status(){
 			echo -n "Flow Offloading"
 			exit 0
 		elif lsmod | grep -q "ecm"; then
-			if lsmod | grep -q "shortcut_fe_drv"; then
-				echo -n "QCA-NSS-ECM-SFE"
-				exit 0
-			else
-				echo -n "QCA-NSS-ECM"
-				exit 0
-			fi
+			echo -n "QCA-ECM Engine: "$(ecm_mode)
+			exit 0
 		elif lsmod | grep -q "shortcut_fe_cm"; then
 			echo -n "Shortcut-FE"
 			exit 0
