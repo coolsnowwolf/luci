@@ -57,6 +57,16 @@ config PACKAGE_$(PKG_NAME)_INCLUDE_DNSPROXY
 	default n
 endef
 
+define Package/$(PKG_NAME)/preinst
+#!/bin/sh
+sed -i 's/s:option(Flag, "fullcone", translate("Enable FullCone NAT"))/-- e:option(Flag,"fullcone",translate("Enable FullCone NAT"))/g' $${IPKG_INSTROOT}/usr/lib/lua/luci/model/cbi/firewall/zones.lua
+endef
+
+define Package/$(PKG_NAME)/postrm
+#!/bin/sh
+sed -i 's/-- s:option(Flag, "fullcone", translate("Enable FullCone NAT"))/s:option(Flag, "fullcone", translate("Enable FullCone NAT"))/g' $${IPKG_INSTROOT}/usr/lib/lua/luci/model/cbi/firewall/zones.lua
+endef
+
 include ../../luci.mk
 
 # call BuildPackage - OpenWrt buildroot signature
