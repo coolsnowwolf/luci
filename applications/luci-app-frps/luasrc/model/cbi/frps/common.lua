@@ -7,7 +7,7 @@ m = Map("frps")
 m.title = translate("Frps - Common Settings")
 m.description = translate("Frp is a fast reverse proxy to help you expose a local server behind a NAT or firewall to the internet.<br/><a href=\"https://github.com/fatedier/frp\" target=\"_blank\">Project GitHub URL</a>")
 
-m:section(SimpleSection).template = "frps/frps_status"
+m:section(SimpleSection).template  = "frps/frps_status"
 
 s = m:section(NamedSection, "main", "frps")
 s.addremove = false
@@ -38,11 +38,11 @@ o.default = "/var/log/frps.log"
 
 o = s:taboption("general", ListValue, "log_level", translate("Log level"))
 o:depends("enable_logging", "1")
-o:value("trace",translate("Trace"))
-o:value("debug",translate("Debug"))
-o:value("info",translate("Info"))
-o:value("warn",translate("Warning"))
-o:value("error",translate("Error"))
+o:value("trace", translate("Trace"))
+o:value("debug", translate("Debug"))
+o:value("info", translate("Info"))
+o:value("warn", translate("Warning"))
+o:value("error", translate("Error"))
 o.default = "Warn"
 
 o = s:taboption("general", ListValue, "log_max_days", translate("Log max days"))
