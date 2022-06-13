@@ -10,8 +10,6 @@ EXTRA_HELP="	check_status Check running status of utils"
 
 restart_utils="true"
 
-PS="/bin/busybox ps"
-
 inital_conf(){
 	config_load "turboacc"
 	config_get "sw_flow" "config" "sw_flow" "0"
@@ -203,9 +201,8 @@ start_dnsproxy() {
 }
 
 stop_dnscache() {
-	$PS -w | grep dnscache | grep -v "grep" | awk '{print $1}' | xargs kill -9 >/dev/null 2>&1 &
-	$PS -w | grep dnscache-while.sh | grep -v "grep" | awk '{print $1}' | xargs kill -9 >/dev/null 2>&1 &
-	killall -q -9 dnscache
+	killall -9 "dnscache"
+	kill -9 $(ps -w | grep dnscache-while.sh | grep -v "grep" | awk '{print $1}')
 	rm -rf "/var/dnscache" "/var/run/dnscache"
 	echo "Stop DNS Caching"
 }
@@ -216,13 +213,18 @@ change_dns() {
 	uci set dhcp.@dnsmasq[0].noresolv="1"
 	uci commit dhcp
 
+	touch "/var/run/dnscache/.dns-changed"
 }
 
 revert_dns() {
+	[ -e "/var/run/dnscache/.dns-changed" ] || return 1
+
 	uci -q del_list dhcp.@dnsmasq[0].server="127.0.0.1#5333"
 	uci set dhcp.@dnsmasq[0].resolvfile="/tmp/resolv.conf.d/resolv.conf.auto"
 	uci set dhcp.@dnsmasq[0].noresolv="0"
 	uci commit dhcp
+
+	rm -f "/var/run/dnscache/.dns-changed"
 }
 
 start(){
@@ -233,18 +235,8 @@ start(){
 	uci set firewall.@defaults[0].fullcone="${fullcone_nat}"
 	uci commit firewall
 
-	[ "${sw_flow}" -ne "1" ] && {
-		[ "${sfe_flow}" -eq "1" ] && {
-			[ "$(have_ecm_init)" = "0" ] && {
-				/etc/init.d/shortcut-fe enabled || /etc/init.d/shortcut-fe enable
-				/etc/init.d/shortcut-fe start
-			}
-		}
-		[ "${sfe_flow}" -eq "0" ] && [ -e "/etc/init.d/shortcut-fe" ] && [ "$(have_ecm_init)" = "0" ] && \
-		/etc/init.d/shortcut-fe enabled && {
-			/etc/init.d/shortcut-fe stop 2>"/dev/null"
-			/etc/init.d/shortcut-fe disable
-		}
+	[ "${sw_flow}" -ne "1" ] && [ "${sfe_flow}" -eq "1" ] && {
+		/etc/init.d/shortcut-fe start
 	}
 
 	if [ "${bbr_cca}" -eq "1" ];  then
@@ -267,14 +259,16 @@ start(){
 		fi
 
 		change_dns
+
 		/usr/share/dnscache/dnscache-while.sh > "/var/log/dnscache.file" 2>&1 &
 	else
-		stop_dnscache
 		revert_dns
+		stop_dnscache
 	fi
 
 	if [ "${restart_utils}" = "true" ]; then
-		/etc/init.d/dnsmasq restart >"/dev/null" 2>&1 && echo "DNSMASQ change"
+		echo "DNSMASQ change"
+		/etc/init.d/dnsmasq restart >"/dev/null" 2>&1
 		/etc/init.d/firewall restart >"/dev/null" 2>&1
 	fi
 }
@@ -287,48 +281,30 @@ stop(){
 	uci set firewall.@defaults[0].fullcone="${fullcone_nat}"
 	uci commit firewall
 
-	[ "${sfe_flow}" -ne "1" ] && {
-		[ -e "/etc/init.d/shortcut-fe" ] && [ "$(have_ecm_init)" = "0" ] && {
-			/etc/init.d/shortcut-fe stop 2>"/dev/null"
-			/etc/init.d/shortcut-fe enabled && /etc/init.d/shortcut-fe disable
-		}
+	[ "${sfe_flow}" -eq "1" ] || {
+		/etc/init.d/shortcut-fe stop 2>"/dev/null"
 	}
 
 	stop_dnscache
 	revert_dns
 
 	if [ "${restart_utils}" = "true" ]; then
-		/etc/init.d/dnsmasq restart >"/dev/null" 2>&1 && echo "DNSMASQ revert"
+		echo "DNSMASQ revert"
+		/etc/init.d/dnsmasq restart >"/dev/null" 2>&1
 		/etc/init.d/firewall restart >"/dev/null" 2>&1
 	fi
 }
 
 restart(){
 	restart_utils="false"
+
 	stop
 	start
-	/etc/init.d/dnsmasq restart >"/dev/null" 2>&1 && echo "DNSMASQ restart"
+
+	echo "DNSMASQ restart"
+	/etc/init.d/dnsmasq restart >"/dev/null" 2>&1
 	/etc/init.d/firewall restart >"/dev/null" 2>&1
 }
-
-have_ecm_init() {
-	[ -e "/etc/init.d/qca-nss-ecm" ] && echo 1 && return
-	echo 0
-}
-
-ecm_mode(){
-	config_load "ecm"
-	config_get front_end global acceleration_engine
-	case $front_end in
-	auto | nss | sfe | hybrid)
-		[ -d /sys/kernel/debug/ecm/ecm_nss_ipv4 ] && echo 'NSS: Enabled ' || echo 'NSS: Disabled '
-		[ -d /sys/kernel/debug/ecm/ecm_sfe_ipv4 ] && echo 'SFE: Enabled' || echo 'SFE: Disabled'
-		;;
-	*)
-		echo 'Unknown'
-	esac
-}
-
 
 check_status(){
 	case "$1" in
@@ -336,10 +312,13 @@ check_status(){
 		if [ "$(cat "/sys/module/xt_FLOWOFFLOAD/refcnt" 2>"/dev/null" || echo 0)" -ne "0" ]; then
 			echo -n "Flow Offloading"
 			exit 0
-		elif lsmod | grep -q "ecm"; then
-			echo -n "QCA-ECM Engine: "$(ecm_mode)
+		elif [ -d /sys/kernel/debug/ecm/ecm_nss_ipv4 ]; then
+			echo -n "QCA-NSS-ECM"
 			exit 0
-		elif lsmod | grep -q "shortcut_fe_cm"; then
+		elif [ -d /sys/kernel/debug/ecm/ecm_sfe_ipv4 ]; then
+			echo -n "QCA-ECM-SFE"
+			exit 0
+		elif [ -e /sys/sfe_ipv4/debug_dev ]; then
 			echo -n "Shortcut-FE"
 			exit 0
 		else
