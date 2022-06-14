@@ -21,6 +21,7 @@ inital_conf(){
 	config_get "dns_caching_mode" "config" "dns_caching_mode" "0"
 	config_get "dns_caching_dns" "config" "dns_caching_dns"
 
+	[ -e "/lib/modules/$(uname -r)/mtkhnat.ko" ] && { sw_flow="0"; hw_flow="1"; }
 	[ ! -e "/lib/modules/$(uname -r)/xt_FLOWOFFLOAD.ko" ] && { sw_flow="0"; hw_flow="0"; }
 	[ ! -e "/lib/modules/$(uname -r)/shortcut-fe-cm.ko" ] && sfe_flow="0"
 	[ ! -e "/lib/modules/$(uname -r)/tcp_bbr.ko" ] && bbr_cca="0"
@@ -235,6 +236,10 @@ start(){
 	uci set firewall.@defaults[0].fullcone="${fullcone_nat}"
 	uci commit firewall
 
+	[ "${sw_flow}" -eq "0" ] && [ "${hw_flow}" -eq "1" ] && {
+		lsmod | grep -q mtkhnat || modprobe mtkhnat
+	}
+
 	[ "${sw_flow}" -ne "1" ] && [ "${sfe_flow}" -eq "1" ] && {
 		/etc/init.d/shortcut-fe start
 	}
@@ -243,7 +248,7 @@ start(){
 		sysctl -w net.ipv4.tcp_congestion_control="bbr"
 	else
 		sysctl -w net.ipv4.tcp_congestion_control="cubic"
-	fi	
+	fi
 
 	if [ "${dns_caching}" -eq "1" ];  then
 		stop_dnscache
@@ -281,6 +286,10 @@ stop(){
 	uci set firewall.@defaults[0].fullcone="${fullcone_nat}"
 	uci commit firewall
 
+	[ "${hw_flow}" -eq "0" ] && {
+		lsmod | grep -q mtkhnat && rmmod mtkhnat
+	}
+
 	[ "${sfe_flow}" -eq "1" ] || {
 		/etc/init.d/shortcut-fe stop 2>"/dev/null"
 	}
@@ -311,6 +320,10 @@ check_status(){
 	"fastpath")
 		if [ "$(cat "/sys/module/xt_FLOWOFFLOAD/refcnt" 2>"/dev/null" || echo 0)" -ne "0" ]; then
 			echo -n "Flow Offloading"
+			exit 0
+		elif [ "$(cat "/sys/module/xt_FLOWOFFLOAD/refcnt" 2>"/dev/null")" -eq "0" ] && \
+		    [ -e /sys/kernel/debug/hnat/hnat_version ]; then
+			echo -n "MediaTek HWNAT"
 			exit 0
 		elif [ -d /sys/kernel/debug/ecm/ecm_nss_ipv4 ]; then
 			echo -n "QCA-NSS-ECM"
