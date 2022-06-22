@@ -873,8 +873,19 @@ for slot=1,4 do
 	end
 end
 
+if hwtype == "mt_dbdc" then
+	wps = s:taboption("encryption", ListValue, "wps", translate("WPS Mode"))
+	wps:value("", translate("disable"))
+	wps:value("pbc", translate("PBC"))
+	wps:value("pin", translate("PIN"))
+	pin = s:taboption("encryption", Value, "pin", translate("WPS PIN"))
+	wps:depends({mode="ap", encryption="psk"})
+	wps:depends({mode="ap", encryption="psk2"})
+	wps:depends({mode="ap", encryption="psk-mixed"})
+	pin:depends({wps="pin"})
+end
 
-if hwtype == "mac80211" or hwtype == "prism2" then
+if hwtype == "mac80211" or hwtype == "prism2" or hwtype == "mt_dbdc" then
   
 	-- Probe 802.11k support
 	ieee80211k = s:taboption("encryption", Flag, "ieee80211k", translate("802.11k"), translate("Enables The 802.11k standard provides information to discover the best available access point"))
@@ -1028,6 +1039,14 @@ if hwtype == "mac80211" or hwtype == "prism2" then
 	r1_key_holder.placeholder = "00004f577274"
 	r1_key_holder.datatype = "and(hexstring,rangelength(12,12))"
 	r1_key_holder.rmempty = true
+
+	reassociation_deadline = s:taboption("encryption", Value, "reassociation_deadline",
+		translate("Reassociation Deadline"),
+		translate("time units (TUs / 1.024 ms) [1000-65535]"))
+	reassociation_deadline:depends({ieee80211r="1", ft_psk_generate_local=""})
+	reassociation_deadline.placeholder = "1000"
+	reassociation_deadline.datatype = "range(1000,65535)"
+	reassociation_deadline.rmempty = true
 
 	pmk_r1_push = s:taboption("encryption", Flag, "pmk_r1_push", translate("PMK R1 Push"))
 	pmk_r1_push:depends({ieee80211r="1", ft_psk_generate_local=""})
@@ -1191,21 +1210,8 @@ if hwtype == "mac80211" or hwtype == "prism2" then
 	password.password = true
 end
 
-if hwtype == "mt_dbdc" then
-	ieee80211r = s:taboption("encryption", Flag, "ieee80211r",
-		translate("802.11r Fast Transition"),
-		translate("Enables fast roaming among access points that belong " ..
-			"to the same Mobility Domain"))
-	ieee80211r:depends({mode="ap", encryption="wpa"})
-	ieee80211r:depends({mode="ap", encryption="wpa2"})
-	ieee80211r:depends({mode="ap", encryption="psk"})
-	ieee80211r:depends({mode="ap", encryption="psk2"})
-	ieee80211r:depends({mode="ap", encryption="psk-mixed"})
-	ieee80211r.rmempty = true
-end
-
 -- ieee802.11w options
-if hwtype == "mac80211" then
+if hwtype == "mac80211" or hwtype == "mt_dbdc" then
 	local has_80211w = (os.execute("hostapd -v11w 2>/dev/null || hostapd -veap 2>/dev/null") == 0)
 	if has_80211w then
 		ieee80211w = s:taboption("encryption", ListValue, "ieee80211w",
@@ -1264,7 +1270,7 @@ if hwtype == "mac80211" then
 	key_retries:depends({mode="ap-wds", encryption="sae-mixed"})
 end
 
-if hwtype == "mac80211" or hwtype == "prism2" then
+if hwtype == "mac80211" or hwtype == "prism2" or hwtype == "mt_dbdc" then
 	local wpasupplicant = fs.access("/usr/sbin/wpa_supplicant")
 	local hostcli = fs.access("/usr/sbin/hostapd_cli")
 	if hostcli and wpasupplicant then
