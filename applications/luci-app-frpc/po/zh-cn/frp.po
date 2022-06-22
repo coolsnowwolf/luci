@@ -202,6 +202,9 @@ msgstr "使用子域名时，必须预先在服务端配置主域名(subdomain_h
 msgid "STCP Role"
 msgstr "SFTP 服务类型"
 
+msgid "XTCP Role"
+msgstr "XFTP 服务类型"
+
 msgid "Use Plugin"
 msgstr "使用插件"
 
@@ -212,6 +215,12 @@ msgid "STCP Screct Key"
 msgstr "SFTP 密钥"
 
 msgid "STCP Server Name"
+msgstr "SFTP 服务名称"
+
+msgid "XTCP Screct Key"
+msgstr "SFTP 密钥"
+
+msgid "XTCP Server Name"
 msgstr "SFTP 服务名称"
 
 msgid "Enable URL routing"
@@ -270,6 +279,9 @@ msgstr "将用户的真实IP发送到本地服务的代理协议。"
 
 msgid "STCP Server Name is Service Remark Name of STCP Server"
 msgstr "STCP服务器别名"
+
+msgid "XTCP Server Name is Service Remark Name of XTCP Server"
+msgstr "XTCP服务器别名"
 
 msgid "<font color=\"red\">Please ensure the remark name is unique.</font>"
 msgstr "<font color=\"red\">确保备注名唯一</font>"
