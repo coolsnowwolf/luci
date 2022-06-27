@@ -891,9 +891,6 @@ msgstr "设备正在重启..."
 msgid "Device unreachable"
 msgstr "无法连接到设备"
 
-msgid "Diagnostics"
-msgstr "网络诊断"
-
 msgid "Dial number"
 msgstr "拨号号码"
 
