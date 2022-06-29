@@ -75,10 +75,8 @@ conf_proxy_add() {
 	[ -n "$custom_domains" ] && echo "custom_domains=$custom_domains" >>$tmpconf
 	[ -n "$subdomain" ] && echo "subdomain=$subdomain" >>$tmpconf
 	[ -n "$remote_port" ] && echo "remote_port=$remote_port" >>$tmpconf
-	[ -z "$stcp_role" ] && [ -n "$local_ip" ] && echo "local_ip=$local_ip" >>$tmpconf
-	[ -z "$stcp_role" ] && [ -n "$local_port" ] && echo "local_port=$local_port" >>$tmpconf
-	[ -z "$xtcp_role" ] && [ -n "$local_ip" ] && echo "local_ip=$local_ip" >>$tmpconf
-	[ -z "$xtcp_role" ] && [ -n "$local_port" ] && echo "local_port=$local_port" >>$tmpconf
+	[ -z "$stcp_role" ] && [ -z "$xtcp_role" ] && [ -n "$local_ip" ] && echo "local_ip=$local_ip" >>$tmpconf
+	[ -z "$stcp_role" ] && [ -z "$xtcp_role" ] && [ -n "$local_port" ] && echo "local_port=$local_port" >>$tmpconf
 	[ -n "$locations" ] && echo "locations=$locations" >>$tmpconf
 	[ -n "$http_user" -a -n "$http_pwd" ] && {
 		echo "http_user=$http_user" >>$tmpconf
