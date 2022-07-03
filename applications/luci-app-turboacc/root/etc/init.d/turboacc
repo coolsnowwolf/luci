@@ -294,8 +294,9 @@ stop(){
 		/etc/init.d/shortcut-fe stop 2>"/dev/null"
 	}
 
+        revert_dns
 	stop_dnscache
-	revert_dns
+	
 
 	if [ "${restart_utils}" = "true" ]; then
 		echo "DNSMASQ revert"
