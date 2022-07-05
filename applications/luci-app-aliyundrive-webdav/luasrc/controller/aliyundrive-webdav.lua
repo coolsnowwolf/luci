@@ -15,6 +15,8 @@ function index()
 
 	entry({"admin", "services", "aliyundrive-webdav", "status"}, call("action_status")).leaf = true -- 运行状态
 	entry({"admin", "services", "aliyundrive-webdav", "logtail"}, call("action_logtail")).leaf = true -- 日志采集
+	entry({"admin", "services", "aliyundrive-webdav", "qrcode"}, call("action_generate_qrcode")).leaf = true -- 生成扫码登录二维码地址和参数
+	entry({"admin", "services", "aliyundrive-webdav", "query"}, call("action_query_qrcode")).leaf = true -- 查询扫码登录结果
 end
 
 function action_status()
@@ -37,4 +39,20 @@ function action_logtail()
 	end
 	luci.http.prepare_content("application/json")
 	luci.http.write_json(e)
+end
+
+function action_generate_qrcode()
+	local output = luci.sys.exec("aliyundrive-webdav qr generate")
+	luci.http.prepare_content("application/json")
+	luci.http.write(output)
+end
+
+function action_query_qrcode()
+	local data = luci.http.formvalue()
+	local t = data.t
+	local ck = data.ck
+	local output = {}
+	output.refresh_token = luci.sys.exec("aliyundrive-webdav qr query --t " .. t .. " --ck " .. ck)
+	luci.http.prepare_content("application/json")
+	luci.http.write_json(output)
 end
