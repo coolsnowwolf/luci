@@ -4117,3 +4117,7 @@ msgstr "已标记"
 
 msgid "untagged"
 msgstr "未标记"
+
+msgid "Logo"
+msgstr "图标"
+
