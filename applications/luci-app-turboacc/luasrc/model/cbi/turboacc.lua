@@ -71,4 +71,9 @@ end
 dns_caching_mode.default = 1
 dns_caching_mode:depends("dns_caching", 1)
 
+dns_caching_dns = s:option(Value, "dns_caching_dns", translate("Upsteam DNS Server"))
+dns_caching_dns.default = "114.114.114.114,114.114.115.115,223.5.5.5,223.6.6.6,180.76.76.76,119.29.29.29,119.28.28.28,1.2.4.8,210.2.4.8"
+dns_caching_dns.description = translate("Muitiple DNS server can saperate with ','")
+dns_caching_dns:depends("dns_caching", 1)
+
 return m
