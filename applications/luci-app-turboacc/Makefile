@@ -1,7 +1,7 @@
 # SPDX-Identifier-License: GPL-3.0-only
 #
 # Copyright (C) 2022 Lean <coolsnowwolf@gmail.com>
-# Copyright (C) 2019-2021 ImmortalWrt.org
+# Copyright (C) 2019-2022 ImmortalWrt.org
 
 include $(TOPDIR)/rules.mk
 
@@ -20,7 +20,7 @@ PKG_CONFIG_DEPENDS:= \
 	CONFIG_PACKAGE_$(PKG_NAME)_INCLUDE_SHORTCUT_FE_DRV
 
 LUCI_TITLE:=LuCI support for Flow Offload / Shortcut-FE
-LUCI_DEPENDS:=+pdnsd-alt \
+LUCI_DEPENDS:=+PACKAGE_$(PKG_NAME)_INCLUDE_PDNSD:pdnsd-alt \
 	+PACKAGE_$(PKG_NAME)_INCLUDE_BBR_CCA:kmod-tcp-bbr \
 	+PACKAGE_$(PKG_NAME)_INCLUDE_DNSFORWARDER:dnsforwarder \
 	+PACKAGE_$(PKG_NAME)_INCLUDE_DNSPROXY:dnsproxy \
@@ -48,6 +48,10 @@ config PACKAGE_$(PKG_NAME)_INCLUDE_SHORTCUT_FE_CM
 
 config PACKAGE_$(PKG_NAME)_INCLUDE_BBR_CCA
 	bool "Include BBR CCA"
+	default y
+	
+config PACKAGE_$(PKG_NAME)_INCLUDE_PDNSD
+	bool "Include Pdnsd"
 	default y
 
 config PACKAGE_$(PKG_NAME)_INCLUDE_DNSFORWARDER

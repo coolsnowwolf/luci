@@ -290,9 +290,7 @@ stop(){
 		lsmod | grep -q mtkhnat && rmmod mtkhnat
 	}
 
-	[ "${sfe_flow}" -eq "1" ] || {
-		/etc/init.d/shortcut-fe stop 2>"/dev/null"
-	}
+	[ -f "/etc/init.d/shortcut-fe" ] && /etc/init.d/shortcut-fe stop
 
 	stop_dnscache
 	revert_dns
