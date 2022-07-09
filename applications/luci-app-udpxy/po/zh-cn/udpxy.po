@@ -10,19 +10,19 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Weblate 4.6-dev\n"
 
-#: applications/luci-app-udpxy/luasrc/model/cbi/udpxy.lua:23
+#: applications/luci-app-udpxy/luasrc/model/cbi/udpxy.lua:24
 msgid "Bind IP/Interface"
 msgstr "绑定 IP/接口"
 
-#: applications/luci-app-udpxy/luasrc/model/cbi/udpxy.lua:47
+#: applications/luci-app-udpxy/luasrc/model/cbi/udpxy.lua:48
 msgid "Buffer messages"
 msgstr "缓冲区消息"
 
-#: applications/luci-app-udpxy/luasrc/model/cbi/udpxy.lua:43
+#: applications/luci-app-udpxy/luasrc/model/cbi/udpxy.lua:44
 msgid "Buffer size"
 msgstr "缓冲区大小"
 
-#: applications/luci-app-udpxy/luasrc/model/cbi/udpxy.lua:51
+#: applications/luci-app-udpxy/luasrc/model/cbi/udpxy.lua:52
 msgid "Buffer time"
 msgstr "缓冲时间"
 
@@ -30,47 +30,43 @@ msgstr "缓冲时间"
 msgid "Enabled"
 msgstr "已启用"
 
-#: applications/luci-app-udpxy/root/usr/share/rpcd/acl.d/luci-app-udpxy.json:3
-msgid "Grant UCI access for luci-app-udpxy"
-msgstr "授予UCI访问luci-app-udpxy的权限"
-
-#: applications/luci-app-udpxy/luasrc/model/cbi/udpxy.lua:39
+#: applications/luci-app-udpxy/luasrc/model/cbi/udpxy.lua:40
 msgid "Log file"
 msgstr "日志文件"
 
-#: applications/luci-app-udpxy/luasrc/model/cbi/udpxy.lua:35
+#: applications/luci-app-udpxy/luasrc/model/cbi/udpxy.lua:36
 msgid "Max clients"
 msgstr "最大客户端数量"
 
-#: applications/luci-app-udpxy/luasrc/model/cbi/udpxy.lua:59
+#: applications/luci-app-udpxy/luasrc/model/cbi/udpxy.lua:60
 msgid "Multicast subscription renew"
 msgstr "组播订阅续订"
 
-#: applications/luci-app-udpxy/luasrc/model/cbi/udpxy.lua:55
+#: applications/luci-app-udpxy/luasrc/model/cbi/udpxy.lua:56
 msgid "Nice increment"
 msgstr "优先级增量"
 
-#: applications/luci-app-udpxy/luasrc/model/cbi/udpxy.lua:27
+#: applications/luci-app-udpxy/luasrc/model/cbi/udpxy.lua:28
 msgid "Port"
 msgstr "端口"
 
-#: applications/luci-app-udpxy/luasrc/model/cbi/udpxy.lua:15
+#: applications/luci-app-udpxy/luasrc/model/cbi/udpxy.lua:16
 msgid "Respawn"
 msgstr "刷新"
 
-#: applications/luci-app-udpxy/luasrc/model/cbi/udpxy.lua:31
+#: applications/luci-app-udpxy/luasrc/model/cbi/udpxy.lua:24
 msgid "Source IP/Interface"
 msgstr "源 IP/接口"
 
-#: applications/luci-app-udpxy/luasrc/model/cbi/udpxy.lua:21
+#: applications/luci-app-udpxy/luasrc/model/cbi/udpxy.lua:22
 msgid "Status"
 msgstr "状态"
 
-#: applications/luci-app-udpxy/luasrc/model/cbi/udpxy.lua:18
+#: applications/luci-app-udpxy/luasrc/model/cbi/udpxy.lua:19
 msgid "Verbose"
 msgstr "记录详细日志"
 
-#: applications/luci-app-udpxy/root/usr/share/luci/menu.d/luci-app-udpxy.json:3
+#: applications/luci-app-udpxy/luasrc/controller/udpxy.lua:11
 msgid "udpxy"
 msgstr "udpxy"
 
