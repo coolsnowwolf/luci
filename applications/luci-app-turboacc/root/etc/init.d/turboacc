@@ -1,5 +1,5 @@
 #!/bin/sh /etc/rc.common
-# Copyright (C) 2018 Lean <coolsnowwolf@gmail.com>
+# Copyright (C) 2022 Lean <coolsnowwolf@gmail.com>
 # Copyright (C) 2019-2021 Tianling Shen <cnsztl@immortalwrt.org>
 
 START=90
@@ -23,7 +23,6 @@ inital_conf(){
 
 	[ -e "/lib/modules/$(uname -r)/mtkhnat.ko" ] && { sw_flow="0"; hw_flow="1"; }
 	[ ! -e "/lib/modules/$(uname -r)/xt_FLOWOFFLOAD.ko" ] && { sw_flow="0"; hw_flow="0"; }
-	[ ! -e "/lib/modules/$(uname -r)/shortcut-fe-cm.ko" ] && sfe_flow="0"
 	[ ! -e "/lib/modules/$(uname -r)/tcp_bbr.ko" ] && bbr_cca="0"
 	[ ! -e "/lib/modules/$(uname -r)/xt_FULLCONENAT.ko" ] && fullcone_nat="0"
 }
@@ -231,8 +230,7 @@ revert_dns() {
 load_sfe() {
 	local kernel_version=$(uname -r)
 
-	[ -e "/lib/modules/$kernel_version/shortcut-fe-cm.ko" ] && modprobe shortcut-fe-cm && echo 1 && return
-	
+	[ -e "/lib/modules/$kernel_version/shortcut-fe-cm.ko" ] && modprobe shortcut-fe-cm
 	[ -e "/lib/modules/$kernel_version/fast-classifier.ko" ] && modprobe fast-classifier
 }
 
@@ -342,7 +340,10 @@ check_status(){
 		elif [ -d /sys/kernel/debug/ecm/ecm_sfe_ipv4 ]; then
 			echo -n "QCA-ECM-SFE"
 			exit 0
-		elif [ -n "$(lsmod | grep shortcut_fe_cm)" ]; then
+		elif [ -d /sys/module/fast_classifier ]; then
+			echo -n "Shortcut-FE"
+			exit 0
+		elif [ -d /sys/module/shortcut_fe_cm ]; then
 			echo -n "Shortcut-FE ECM"
 			exit 0
 		else
