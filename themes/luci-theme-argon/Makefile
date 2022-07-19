@@ -9,9 +9,9 @@ include $(TOPDIR)/rules.mk
 LUCI_TITLE:=Argon Theme
 LUCI_DEPENDS:=
 PKG_VERSION:=1.7.3
-PKG_RELEASE:=20220421
+PKG_RELEASE:=20220615
 
-include ../../luci.mk
+include $(TOPDIR)/feeds/luci/luci.mk
 
 
 define Package/luci-theme-argon/postinst

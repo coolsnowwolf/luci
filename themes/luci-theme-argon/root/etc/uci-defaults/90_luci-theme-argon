@@ -6,7 +6,6 @@ rm -Rf /var/luci-modulecache
 rm -Rf /var/luci-indexcache
 uci batch <<-EOF
 	set luci.themes.Argon=/luci-static/argon
-	set luci.main.mediaurlbase=/luci-static/argon
 	commit luci
 EOF
 exit 0
