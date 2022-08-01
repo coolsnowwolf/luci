@@ -126,32 +126,6 @@ function index()
 			page.target = cbi("admin_network/hosts")
 			page.title  = _("Hostnames")
 			page.order  = 40
-		end
-
-		page  = node("admin", "network", "routes")
-		page.target = cbi("admin_network/routes")
-		page.title  = _("Static Routes")
-		page.order  = 50
-
-		page = node("admin", "network", "diagnostics")
-		page.target = template("admin_network/diagnostics")
-		page.title  = _("Diagnostics")
-		page.order  = 60
-
-		page = entry({"admin", "network", "diag_ping"}, post("diag_ping"), nil)
-		page.leaf = true
-
-		page = entry({"admin", "network", "diag_nslookup"}, post("diag_nslookup"), nil)
-		page.leaf = true
-
-		page = entry({"admin", "network", "diag_traceroute"}, post("diag_traceroute"), nil)
-		page.leaf = true
-
-		page = entry({"admin", "network", "diag_ping6"}, post("diag_ping6"), nil)
-		page.leaf = true
-
-		page = entry({"admin", "network", "diag_traceroute6"}, post("diag_traceroute6"), nil)
-		page.leaf = true
 --	end
 end
 
@@ -412,24 +386,4 @@ function diag_command(cmd, addr)
 	end
 
 	luci.http.status(500, "Bad address")
-end
-
-function diag_ping(addr)
-	diag_command("ping -c 5 -W 1 %q 2>&1", addr)
-end
-
-function diag_traceroute(addr)
-	diag_command("traceroute -q 1 -w 1 -n %q 2>&1", addr)
-end
-
-function diag_nslookup(addr)
-	diag_command("nslookup %q 2>&1", addr)
-end
-
-function diag_ping6(addr)
-	diag_command("ping6 -c 5 %q 2>&1", addr)
-end
-
-function diag_traceroute6(addr)
-	diag_command("traceroute6 -q 1 -w 2 -n %q 2>&1", addr)
 end
