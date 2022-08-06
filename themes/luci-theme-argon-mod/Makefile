@@ -11,8 +11,7 @@ LUCI_DEPENDS:=
 PKG_VERSION:=1.7.3
 PKG_RELEASE:=20220421
 
-include $(TOPDIR)/feeds/luci/luci.mk
-
+include ../../luci.mk
 
 define Package/luci-theme-argon-mod/postinst
 #!/bin/sh
