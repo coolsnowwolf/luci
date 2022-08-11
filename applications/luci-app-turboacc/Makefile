@@ -9,7 +9,7 @@ PKG_NAME:=luci-app-turboacc
 PKG_RELEASE:=$(COMMITCOUNT)
 
 PKG_LICENSE:=GPL-3.0-only
-PKG_MAINTAINER:=Tianling Shen <cnsztl@immortalwrt.org> & Lean <coolsnowwolf@gmail.com>
+PKG_MAINTAINER:=Lean <coolsnowwolf@gmail.com>
 
 PKG_CONFIG_DEPENDS:= \
 	CONFIG_PACKAGE_$(PKG_NAME)_INCLUDE_BBR_CCA \
@@ -34,29 +34,29 @@ LUCI_PKGARCH:=all
 define Package/$(PKG_NAME)/config
 config PACKAGE_$(PKG_NAME)_INCLUDE_OFFLOADING
 	bool "Include Flow Offload"
-	default y if (TARGET_mediatek||TARGET_ramips||TARGET_rockchip)
+	default y if !TARGET_x86
+
+config PACKAGE_$(PKG_NAME)_INCLUDE_SHORTCUT_FE
+	bool "Include Shortcut-FE"
+	depends on PACKAGE_$(PKG_NAME)_INCLUDE_OFFLOADING=n
+	default n
+
+config PACKAGE_$(PKG_NAME)_INCLUDE_SHORTCUT_FE_CM
+	bool "Include Shortcut-FE CM"
+	depends on PACKAGE_$(PKG_NAME)_INCLUDE_OFFLOADING=n
+	default y if !(TARGET_ipq60xx||TARGET_ipq806x||TARGET_ipq807x)
 
 config PACKAGE_$(PKG_NAME)_INCLUDE_SHORTCUT_FE_DRV
-	bool "Include Shortcut-FE for ECM"
+	bool "Include Shortcut-FE ECM"
 	depends on PACKAGE_$(PKG_NAME)_INCLUDE_OFFLOADING=n
 	depends on PACKAGE_$(PKG_NAME)_INCLUDE_SHORTCUT_FE_CM=n
 	depends on (TARGET_ipq60xx||TARGET_ipq806x||TARGET_ipq807x)
 	default y
 
-config PACKAGE_$(PKG_NAME)_INCLUDE_SHORTCUT_FE_CM
-	bool "Include Shortcut-FE ECM"
-	depends on PACKAGE_$(PKG_NAME)_INCLUDE_OFFLOADING=n
-	default y if !(TARGET_ipq60xx||TARGET_ipq806x||TARGET_ipq807x||TARGET_rockchip)
-	
-config PACKAGE_$(PKG_NAME)_INCLUDE_SHORTCUT_FE
-	bool "Include Shortcut-FE"
-	depends on PACKAGE_$(PKG_NAME)_INCLUDE_OFFLOADING=n
-	default n 
-
 config PACKAGE_$(PKG_NAME)_INCLUDE_BBR_CCA
 	bool "Include BBR CCA"
 	default y
-	
+
 config PACKAGE_$(PKG_NAME)_INCLUDE_PDNSD
 	bool "Include Pdnsd"
 	default y
