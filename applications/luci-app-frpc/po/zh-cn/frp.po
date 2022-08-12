@@ -200,7 +200,10 @@ msgid "subdomain_host must be configured in server: frps in advance."
 msgstr "使用子域名时，必须预先在服务端配置主域名(subdomain_host)参数。"
 
 msgid "STCP Role"
-msgstr "SFTP 服务类型"
+msgstr "STCP 服务类型"
+
+msgid "XTCP Role"
+msgstr "XTCP 服务类型"
 
 msgid "Use Plugin"
 msgstr "使用插件"
@@ -209,10 +212,16 @@ msgid "If plugin is defined, local_ip and local_port is useless, plugin will han
 msgstr "使用插件使用插件模式时，本地 IP 地址和端口无需配置，插件将会处理来自服务端的链接请求。"
 
 msgid "STCP Screct Key"
-msgstr "SFTP 密钥"
+msgstr "STCP 密钥"
 
 msgid "STCP Server Name"
-msgstr "SFTP 服务名称"
+msgstr "STCP 服务名称"
+
+msgid "XTCP Screct Key"
+msgstr "XTCP 密钥"
+
+msgid "XTCP Server Name"
+msgstr "XTCP 服务名称"
 
 msgid "Enable URL routing"
 msgstr "启用 URL 路由"
@@ -270,6 +279,9 @@ msgstr "将用户的真实IP发送到本地服务的代理协议。"
 
 msgid "STCP Server Name is Service Remark Name of STCP Server"
 msgstr "STCP服务器别名"
+
+msgid "XTCP Server Name is Service Remark Name of XTCP Server"
+msgstr "XTCP服务器别名"
 
 msgid "<font color=\"red\">Please ensure the remark name is unique.</font>"
 msgstr "<font color=\"red\">确保备注名唯一</font>"

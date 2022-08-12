@@ -8,11 +8,7 @@ function index()
 		return
 	end
 
-	local page
-
-	page = entry({"admin", "services", "minidlna"}, cbi("minidlna"), _("miniDLNA"))
-	page.dependent = true
-
+	entry({"admin", "services", "minidlna"}, cbi("minidlna"), _("miniDLNA")).dependent = true
 	entry({"admin", "services", "minidlna_status"}, call("minidlna_status"))
 end
 

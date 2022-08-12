@@ -1029,6 +1029,10 @@ msgstr ""
 msgid "Enable mirroring of outgoing packets"
 msgstr ""
 
+msgid ""
+"Enable packet steering across all CPUs. May help or hinder network speed."
+msgstr ""
+
 msgid "Enable the DF (Don't Fragment) flag of the encapsulating packets."
 msgstr ""
 
@@ -2317,6 +2321,9 @@ msgstr ""
 
 msgid "Package name"
 msgstr "Package name"
+
+msgid "Packet Steering"
+msgstr ""
 
 msgid "Packets"
 msgstr "Packets"
