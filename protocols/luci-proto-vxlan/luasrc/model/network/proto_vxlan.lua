@@ -8,7 +8,11 @@ function proto.get_i18n(self)
 end
 
 function proto.ifname(self)
-	return "vxlan-" .. self.sid
+	return self.sid
+end
+
+function proto.get_interface(self)
+	return interface(self:ifname(), self)
 end
 
 function proto.opkg_package(self)
@@ -34,5 +38,3 @@ end
 function proto.contains_interface(self, ifc)
 	 return (netmod:ifnameof(ifc) == self:ifname())
 end
-
-netmod:register_pattern_virtual("^vxlan%-%w")
