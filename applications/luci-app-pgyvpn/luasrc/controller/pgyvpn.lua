@@ -103,9 +103,18 @@ function logout()
 	h.redirect(dsp.build_url("admin", "services", "pgyvpn"))
 end
 
+
+
+function restart()
+	h.redirect(dsp.build_url("admin", "services", "pgyvpn"))
+	restart_cmd = "/etc/init.d/pgyvpn restart"
+	os.execute(restart_cmd)
+end
+
+
+
 function index()
 	local page
-
 	if not nixio.fs.access("/etc/config/pgyvpn") then
 		return
 	end
@@ -135,5 +144,6 @@ function index()
 	entry({"admin", "services", "status"}, template("pgyvpn/status"), nil) -- 状态页面
 	entry({"admin", "services", "login"}, call("login"), nil)  -- 登入
 	entry({"admin", "services", "logout"}, call("logout"), nil) -- 登出
+	entry({"admin","services","restart"},call("restart"),nil) --重启vpn
 	entry({"admin", "services", "check"}, call("check"), nil) -- 检测vpn 链接状态
 end

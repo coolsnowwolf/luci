@@ -43,6 +43,9 @@
 				<input class="cbi-button cbi-button-reset" type="submit" value="退出登录" size="0" />
 			</div>
 		</form>
+		<form action="<%=luci.dispatcher.build_url("admin", "services", "restart")%>" method="post">
+			<input class="cbi-button cbi-button-restart" type="submit" value="重启蒲公英路由器" size="0" />
+		</form>
 	</fieldset>
 	<% else %>
 	<meta http-equiv="refresh" content="1; url=/cgi-bin/luci/admin/services/pgyvpn" />
