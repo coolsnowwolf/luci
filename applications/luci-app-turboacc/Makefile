@@ -34,7 +34,7 @@ LUCI_PKGARCH:=all
 define Package/$(PKG_NAME)/config
 config PACKAGE_$(PKG_NAME)_INCLUDE_OFFLOADING
 	bool "Include Flow Offload"
-	default y if !TARGET_x86
+	default y if !(TARGET_x86||TARGET_ipq60xx||TARGET_ipq806x||TARGET_ipq807x)
 
 config PACKAGE_$(PKG_NAME)_INCLUDE_SHORTCUT_FE
 	bool "Include Shortcut-FE"
