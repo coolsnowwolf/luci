@@ -196,14 +196,13 @@ else
 		m:set(section, "channel", value[2])
 		m:set(section, "htmode", value[3])
 	end
-	
-  noscan = s:taboption("general", Flag, "noscan", translate("Force 40MHz mode"),
-  translate("Always use 40MHz channels even if the secondary channel overlaps. Using this option does not comply with IEEE 802.11n-2009!"))
-  noscan.default = noscan.disabled
-  
-  vendor_vht = s:taboption("general", Flag, "vendor_vht", translate("Enable 256-QAM"),translate("802.11n 2.4Ghz Only"))
-  vendor_vht.default = vendor_vht.disabled
-  
+
+	noscan = s:taboption("general", Flag, "noscan", translate("Force 40MHz mode"),
+		translate("Always use 40MHz channels even if the secondary channel overlaps. Using this option does not comply with IEEE 802.11n-2009!"))
+	noscan.default = noscan.disabled
+
+	vendor_vht = s:taboption("general", Flag, "vendor_vht", translate("Enable 256-QAM"),translate("802.11n 2.4Ghz Only"))
+	vendor_vht.default = vendor_vht.disabled
 end
 
 ------------------- MAC80211 Device ------------------
@@ -239,7 +238,7 @@ if hwtype == "mac80211" then
 	legacyrates = s:taboption("advanced", Flag, "legacy_rates", translate("Allow legacy 802.11b rates"))
 	legacyrates.rmempty = false
 	legacyrates.default = "1"
-	
+
 	mubeamformer = s:taboption("advanced", Flag, "mu_beamformer", translate("MU-MIMO"))
 	mubeamformer.rmempty = false
 	mubeamformer.default = "0"
@@ -698,7 +697,7 @@ if hwtype == "mac80211" or hwtype == "prism2" then
 	-- Probe EAP support
 	local has_ap_eap  = (os.execute("hostapd -veap >/dev/null 2>/dev/null") == 0)
 	local has_sta_eap = (os.execute("wpa_supplicant -veap >/dev/null 2>/dev/null") == 0)
-	
+
 		-- Probe SAE support
 	local has_ap_sae  = (os.execute("hostapd -vsae >/dev/null 2>/dev/null") == 0)
 	local has_sta_sae = (os.execute("wpa_supplicant -vsae >/dev/null 2>/dev/null") == 0)
@@ -886,7 +885,7 @@ if hwtype == "mt_dbdc" then
 end
 
 if hwtype == "mac80211" or hwtype == "prism2" or hwtype == "mt_dbdc" then
-  
+
 	-- Probe 802.11k support
 	ieee80211k = s:taboption("encryption", Flag, "ieee80211k", translate("802.11k"), translate("Enables The 802.11k standard provides information to discover the best available access point"))
 	ieee80211k:depends({mode="ap", encryption="wpa"})
@@ -904,7 +903,7 @@ if hwtype == "mac80211" or hwtype == "prism2" or hwtype == "mt_dbdc" then
 	ieee80211k:depends({mode="ap-wds", encryption="sae"})
 	ieee80211k:depends({mode="ap-wds", encryption="sae-mixed"})
 	ieee80211k.rmempty = true
-	
+
 	rrmneighborreport = s:taboption("encryption", Flag, "rrm_neighbor_report", translate("Enable neighbor report via radio measurements"))
 	rrmneighborreport.default = rrmneighborreport.enabled
 	rrmneighborreport:depends({ieee80211k="1"})
@@ -933,7 +932,7 @@ if hwtype == "mac80211" or hwtype == "prism2" or hwtype == "mt_dbdc" then
 	ieee80211v:depends({mode="ap-wds", encryption="sae"})
 	ieee80211v:depends({mode="ap-wds", encryption="sae-mixed"})
 	ieee80211v.rmempty = true
-	
+
 
 	wnmsleepmode = s:taboption("encryption", Flag, "wnm_sleep_mode", translate("extended sleep mode for stations"))
 	wnmsleepmode.default = wnmsleepmode.disabled
