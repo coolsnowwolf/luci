@@ -4121,3 +4121,10 @@ msgstr "未标记"
 msgid "Logo"
 msgstr "图标"
 
+msgid "Compatible Mode"
+msgstr "兼容模式"
+
+msgid "High Performing Mode"
+msgstr "高性能模式"
+
+
