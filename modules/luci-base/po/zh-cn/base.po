@@ -4127,4 +4127,5 @@ msgstr "兼容模式"
 msgid "High Performing Mode"
 msgstr "高性能模式"
 
-
+msgid "Target Platform"
+msgstr "目标平台"
