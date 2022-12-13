@@ -1,0 +1,7 @@
+#!/bin/sh
+
+if [ -f /etc/init.d/zerotier -a -f /etc/init.d/luci-zerotier ]; then
+	mv /etc/init.d/zerotier /etc/init.d/zerotier-opkg
+	mv /etc/init.d/luci-zerotier /etc/init.d/zerotier
+fi
+exit 0
