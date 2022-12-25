@@ -55,10 +55,12 @@ plugins:
       maximum_ttl: maximum_ttl_custom
 
   - tag: "forward_local"
-    type: fast_forward
+    type: forward
     args:
       upstream:
         - addr: local_dns
+      bootstrap:
+        - "bootstrap_dns"
 
   - tag: "forward_remote"
     type: fast_forward
@@ -100,7 +102,7 @@ plugins:
     type: query_matcher
     args:
       domain:
-        - "provider:geosite:cn,apple-cn,icloud,google-cn,tld-cn"
+        - "provider:geosite:cn"
 
   - tag: query_is_non_local_domain
     type: query_matcher
