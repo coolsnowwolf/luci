@@ -227,11 +227,13 @@ revert_dns() {
 load_sfe() {
 	local kernel_version=$(uname -r)
 
+	[ -e "/lib/modules/$kernel_version/qca-nss-sfe.ko" ] && modprobe qca-nss-sfe
 	[ -e "/lib/modules/$kernel_version/shortcut-fe-cm.ko" ] && modprobe shortcut-fe-cm
 	[ -e "/lib/modules/$kernel_version/fast-classifier.ko" ] && modprobe fast-classifier
 }
 
 unload_sfe() {
+	[ -d /sys/module/qca_nss_sfe ] && rmmod qca-nss-sfe
 	[ -d /sys/module/shortcut_fe_cm ] && rmmod shortcut_fe_cm 
 	[ -d /sys/module/fast_classifier ] && rmmod fast_classifier
 }
@@ -336,6 +338,9 @@ check_status(){
 			exit 0
 		elif [ -d /sys/kernel/debug/ecm/ecm_sfe_ipv4 ]; then
 			echo -n "QCA-ECM-SFE"
+			exit 0
+		elif [ -d /sys/module/qca_nss_sfe ]; then
+			echo -n "QCA-NSS-SFE"
 			exit 0
 		elif [ -d /sys/module/fast_classifier ]; then
 			echo -n "Shortcut-FE"

@@ -32,7 +32,8 @@ hw_flow:depends("sw_flow", 1)
 end
 end
 
-if nixio.fs.access("/lib/modules/" .. kernel_version .. "/shortcut-fe-cm.ko")
+if nixio.fs.access("/lib/modules/" .. kernel_version .. "/qca-nss-sfe.ko")
+or nixio.fs.access("/lib/modules/" .. kernel_version .. "/shortcut-fe-cm.ko")
 or nixio.fs.access("/lib/modules/" .. kernel_version .. "/fast-classifier.ko")
 then
 sfe_flow = s:option(Flag, "sfe_flow", translate("Shortcut-FE flow offloading"))
