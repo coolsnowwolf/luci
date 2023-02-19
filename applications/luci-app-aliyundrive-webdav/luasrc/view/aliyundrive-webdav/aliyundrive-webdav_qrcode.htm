@@ -9,6 +9,7 @@
         background: rgba(255, 255, 255, .8);
     }
     #mask-box #code-box {
+        color: #000000;
         width: 288px;
         height: 325px;
         border: 1px solid #585858;
@@ -50,31 +51,31 @@
 
 <script type="text/javascript">
 (function( window, document, undefined ) {
-    // Ñ¡È¡ DOM ÔªËØ
+    // é€‰å– DOM å…ƒç´ 
     var selector, section = document.querySelector("[id$='refresh_token']");
 
-    // ÕÚÕÖÈİÆ÷
+    // é®ç½©å®¹å™¨
     var mask = document.createElement('div');
     mask.id = 'mask-box';
 
-    // ¶şÎ¬ÂëÈİÆ÷
+    // äºŒç»´ç å®¹å™¨
     var code = document.createElement('div');
     code.id = 'code-box';
-    code.innerHTML = "ÇëÊ¹ÓÃ °¢ÀïÔÆÅÌ App ½øĞĞÉ¨ÂëÈÏÖ¤";
+    code.innerHTML = "è¯·ä½¿ç”¨ é˜¿é‡Œäº‘ç›˜ App è¿›è¡Œæ‰«ç è®¤è¯";
 
-    // Ë¢ĞÂ°´Å¥
+    // åˆ·æ–°æŒ‰é’®
     var load = document.createElement('a');
     load.id = 'load-link';
-    load.innerHTML = "Ë¢ĞÂ";
+    load.innerHTML = "åˆ·æ–°";
 
-    // ´´½¨¶şÎ¬Âë
+    // åˆ›å»ºäºŒç»´ç 
     var make = new QRCode( code, { correctLevel: QRCode.CorrectLevel.L });
     make.clear = function() {
         code.getElementsByTagName("img").item(0).removeAttribute('src');
         this._oDrawing.clear();
     }
 
-    // ¹Ø±Õ°´Å¥
+    // å…³é—­æŒ‰é’®
     var link = document.createElement('a');
     link.id = 'close-link';
     link.addEventListener('click', ( e ) => {
@@ -84,12 +85,12 @@
         return false;
     });
 
-    // ¶şÎ¬Âë²ã¾ÓÖĞ
+    // äºŒç»´ç å±‚å±…ä¸­
     var center = function() {
-        // µ÷ÕûÕÚÕÖ²ã¸²¸Ç·¶Î§
+        // è°ƒæ•´é®ç½©å±‚è¦†ç›–èŒƒå›´
         mask.style.width = section.clientWidth + "px";
         mask.style.height = section.clientHeight + "px";
-        // ¶şÎ¬Âë²ã¾ÓÖĞ
+        // äºŒç»´ç å±‚å±…ä¸­
         var top = selector.offsetTop - selector.parentNode.offsetTop;
         if ( selector.offsetTop <= 380 ) {
             code.style.top = top + selector.offsetHeight + "px";
@@ -99,27 +100,27 @@
         code.style.left = ( ( section.offsetWidth - code.offsetWidth ) / 2 ) + parseInt( ( selector.currentStyle || window.getComputedStyle( selector ) ).marginLeft ) + "px";
     };
 
-    // »ñÈ¡¶şÎ¬Âë
+    // è·å–äºŒç»´ç 
     var feedback = function() {
-        // Çå³ı¶şÎ¬Âë
+        // æ¸…é™¤äºŒç»´ç 
         make.clear();
-        // »ñÈ¡Í¨ĞÅÊı¾İ
+        // è·å–é€šä¿¡æ•°æ®
         XHR.get( '<%=luci.dispatcher.build_url("admin", "services", "aliyundrive-webdav","qrcode")%>', null, ( x, d ) => {
             if ( x.status != 200 ) {
-                alert('»ñÈ¡¶şÎ¬ÂëÊ§°Ü!');
+                alert('è·å–äºŒç»´ç å¤±è´¥!');
                 return false;
             }
-            // ÒÆ³ıË¢ĞÂ
+            // ç§»é™¤åˆ·æ–°
             load.remove();
-            // ´´½¨¶şÎ¬Âë
+            // åˆ›å»ºäºŒç»´ç 
             make.makeCode( d.codeContent );
-            // ¼àÌıÉ¨Âë·´À¡
+            // ç›‘å¬æ‰«ç åé¦ˆ
             XHR.poll( 3, '<%=luci.dispatcher.build_url("admin", "services", "aliyundrive-webdav", "query")%>', { t: d.t, ck: d.ck }, ( x, d ) => {
                 if ( d.refresh_token.trim() ) {
-                    // Çå³ıÏß³Ì
+                    // æ¸…é™¤çº¿ç¨‹
                     XHR.halt();
                     XHR._q = [];
-                    // »ØĞ´ Cookie Êı¾İ
+                    // å›å†™ Cookie æ•°æ®
                     mask.remove();
                     selector.value = d.refresh_token.trim();
                 }
@@ -127,9 +128,9 @@
         });
     };
 
-    // Êó±êÊÂ¼ş
+    // é¼ æ ‡äº‹ä»¶
     var event = function( e ) {
-        // Çø·Öµ¥»÷¡¢Ë«»÷ÊÂ¼ş
+        // åŒºåˆ†å•å‡»ã€åŒå‡»äº‹ä»¶
         if ( e.target.tagName == "INPUT" && e.type == "dblclick" ) {
             selector = e.target;
         } else if ( e.target.tagName == "IMG" && e.type == "click" && /add/ig.test( e.target.src ) ) {
@@ -138,18 +139,18 @@
         } else {
             return false;
         }
-        // ²åÈëÈİÆ÷
+        // æ’å…¥å®¹å™¨
         if ( !document.contains( mask ) ) {
             section.prepend( mask );
             mask.prepend( code );
             code.prepend( link );
             center();
         }
-        // »ñÈ¡¼°¼àÌıÉ¨ÂëÊÂ¼ş
+        // è·å–åŠç›‘å¬æ‰«ç äº‹ä»¶
         feedback();
     };
 
-    // °ó¶¨ÊÂ¼ş
+    // ç»‘å®šäº‹ä»¶
     section.addEventListener( 'click', event );
     section.addEventListener( 'dblclick', event );
 })( window, document );
