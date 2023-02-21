@@ -26,9 +26,9 @@ function check()
 	if vpn_status == "99" then
 		os.execute("sleep 1")
 		if login_status == "0" then
-			h.redirect(dsp.build_url("admin", "services", "check"))
+			h.redirect(dsp.build_url("admin", "services", "pgyvpn", "check"))
 		else
-			h.redirect(dsp.build_url("admin", "services", "status"))
+			h.redirect(dsp.build_url("admin", "services", "pgyvpn", "status"))
 		end
 
 	-- login err or not in group
@@ -36,7 +36,7 @@ function check()
 
 		-- no in group
 		if err_code == "0" then
-			h.redirect(dsp.build_url("admin", "services", "status"))
+			h.redirect(dsp.build_url("admin", "services", "pgyvpn", "status"))
 		end
 
 		-- login err and redirecut to login page
@@ -48,16 +48,16 @@ function check()
 
 		-- login err and redirecut to status page
 		elseif err_code == "-6" or err_code == "-7" then
-			h.redirect(dsp.build_url("admin", "services", "status"))
+			h.redirect(dsp.build_url("admin", "services", "pgyvpn", "status"))
 
 		else
 			os.execute("sleep 1")
-			h.redirect(dsp.build_url("admin", "services", "check"))
+			h.redirect(dsp.build_url("admin", "services", "pgyvpn", "check"))
 		end
 
 	-- login success redirecut to status page
 	elseif vpn_status == "1" then
-		h.redirect(dsp.build_url("admin", "services", "status"))
+		h.redirect(dsp.build_url("admin", "services", "pgyvpn", "status"))
 
 	end
 end
@@ -88,7 +88,7 @@ function login()
 		cbi:save("pgyvpn")
 		cbi:commit("pgyvpn")
 		os.execute("/etc/init.d/pgyvpn restart  > /dev/null");
-		h.redirect(dsp.build_url("admin", "services", "check"))
+		h.redirect(dsp.build_url("admin", "services", "pgyvpn", "check"))
 	end
 end
 
@@ -132,8 +132,9 @@ function index()
 	end
 
 	-- 定义一些基本的入口
-	entry({"admin", "services", "status"}, template("pgyvpn/status"), nil) -- 状态页面
-	entry({"admin", "services", "login"}, call("login"), nil)  -- 登入
-	entry({"admin", "services", "logout"}, call("logout"), nil) -- 登出
-	entry({"admin", "services", "check"}, call("check"), nil) -- 检测vpn 链接状态
+	entry({"admin", "services", "pgyvpn", "status"}, template("pgyvpn/status"), nil) -- 状态页面
+	entry({"admin", "services", "pgyvpn", "vpn"}, template("pgyvpn/vpn"), nil) -- 登录页面
+	entry({"admin", "services", "pgyvpn", "login"}, call("login"), nil)  -- 登入
+	entry({"admin", "services", "pgyvpn", "logout"}, call("logout"), nil) -- 登出
+	entry({"admin", "services", "pgyvpn", "check"}, call("check"), nil) -- 检测vpn 链接状态
 end

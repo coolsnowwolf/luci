@@ -31,7 +31,7 @@
 	<% elseif login_status == '1' then %>
 	<fieldset class="cbi-section">
 		<legend>状态</legend>
-		<form action="<%=luci.dispatcher.build_url("admin", "services", "logout")%>" method="post">
+		<form action="<%=luci.dispatcher.build_url("admin", "services", "pgyvpn", "logout")%>" method="post">
 			<table width="100%" cellspacing="10">
 				<tbody>
 					<tr><td width="33%">SN码</td><td><%=user%></td></tr>
