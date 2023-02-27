@@ -15,7 +15,7 @@
     --mainbg: #fff;
     --bgwhite: #fff;
     --activeColor: #5ea69b;
-    --activeBottom: #51c291 2px solid;
+    --activeBottom: #5ea69b 2px solid;
     --textColor: rgb(132,119,116);
     --borderColor: rgba(0,0,0,.15);
     --navbgColor: rgba(255, 255, 255, .7);
@@ -48,7 +48,8 @@
     --alertColor: #000000;
     --alertBackground: rgb(230 230 230);
     --scrollbarColor:#d0d0d0;
-    --ifaceboxBorderColor: #b8b8b8bd
+    --ifaceboxBorderColor: #b8b8b8bd;
+    --ifaceboxFontColor: #1a1a1a;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -57,7 +58,7 @@
     --bgwhite: #000;
     --textColor: #fefefe;
     --activeColor: #5ea69b;
-    --activeBottom: #51c291 2px solid;
+    --activeBottom: #5ea69b 2px solid;
     --borderColor: #2C2C3A;
     --navbgColor: hsla(0, 0%, 7%, .8);
     --navBorder: 1px solid #1c1c1e;
@@ -89,7 +90,8 @@
     --alertColor: #ffffff;
     --alertBackground: rgb(30 30 30);
     --scrollbarColor:#222;
-    --ifaceboxBorderColor: #636363bd
+    --ifaceboxBorderColor: #636363bd;
+    --ifaceboxFontColor: #1a1a1a;
   }
 }
 
@@ -118,9 +120,6 @@
     font-family: 'Cocon-Regular-Font';
     src : url('../fonts/Cocon-Regular-Font.otf') format('opentype');
 }
-div{
-    font-family: 'HYk2gj';
-}
 
 ::-webkit-scrollbar {
     width: 4px;
@@ -130,6 +129,9 @@ div{
     border-radius: 2px;
 }
 
+div{
+    font-family: 'HYk2gj';
+}
 
 html {
     -webkit-text-size-adjust: 100%;
@@ -370,17 +372,20 @@ svg {
 } */
 
 /* fix .cbi-section .cbi-section */
-
 .cbi-section .cbi-section {
     margin: 10px;
 }
 
 /* fix node-services-vssr */
-
 .node-services-vssr .status-bar {
     bottom:calc(50px + constant(safe-area-inset-bottom));
     bottom:calc(50px + env(safe-area-inset-bottom));
     /* display: none; */
+    background-color: var(--navbgColor);
+}
+.node-services-vssr .container {
+    padding-bottom:calc(50px + constant(safe-area-inset-bottom));
+    padding-bottom:calc(50px + env(safe-area-inset-bottom));
 }
 
 .node-services-vssr .ssr-button {
@@ -747,14 +752,14 @@ img[src*="/luci-static/resources/icons/loading.gif"] {
 }
 
 .ifacebox-body img {
-    background-size: 22px 22px;
-    padding: 0 0 0 22px;
-    width:22px !important;
-    height:22px !important;
-    padding: 0 0 0 22px !important;
+    background-size: 20px 20px;
+    padding: 0 0 0 20px;
+    width:20px !important;
+    height:20px !important;
+    padding: 0 0 0 20px !important;
 }
 .ifacebox-head {
-    /* background-color: #1096db !important; */
+    /* background-color: #337ab7 !important; */
     border-radius: 4px 4px 0 0;
 }
 
@@ -1487,6 +1492,7 @@ fieldset > table > tbody > tr:nth-of-type(odd) {
 #memtotal > div > div {
     background-color: var(--progressbar) !important;
     color: var(--progressbartxtColor) !important;
+    border-radius: 3px;
 }
 
 #swaptotal div div,
@@ -1582,7 +1588,6 @@ div [id*="cbi-wireless"] [id*="-__status"] table td small {
 }
 
 /* fix node-status-routes */
-
 .node-status-routes .cbi-section-node{
     max-height: 500px;
     overflow-y: auto;
@@ -1590,7 +1595,6 @@ div [id*="cbi-wireless"] [id*="-__status"] table td small {
 }
 
 /* fix multiple table */
-
 table table {
     border: none;
 }
@@ -1645,6 +1649,7 @@ td#__status-ifc-signal {
     min-width: 80px;
     padding: 0px 8px 0px 8px;
     max-width: 160px;
+    border-radius: 8px;
     height: 35px;
     line-height: 35px;
 }
@@ -1700,8 +1705,8 @@ form.inline + form.inline,
 .cbi-input-reload,
 .cbi-button-reload {
     color: var(--bttextColor);
-    background-color: rgb(0,171,232) !important;
-    border-color: rgb(0,171,232) !important;
+    background-color: #337ab7 !important;
+    border-color: #337ab7 !important;
 }
 
 .cbi-button-link:hover,
@@ -1713,9 +1718,10 @@ form.inline + form.inline,
 .cbi-input-reload:hover,
 .cbi-button-reload:hover{
     color: #fff !important;
-    background-color: #337ab7 !important;
-    border-color: #337ab7 !important;
+    background-color: #6A82AE!important;
+    border-color: #6A82AE !important;
 }
+
 
 .cbi-input-apply,
 .cbi-button-apply,
@@ -1736,7 +1742,6 @@ form.inline + form.inline,
 }
 
 /* table */
-
 .tabs {
     margin: 15px 0;
     overflow-x: auto;
@@ -2462,12 +2467,12 @@ header > .container > .pull-right > * {
 
 .node-system-packages .cbi-section-node .cbi-value-last > div  {
     border: none !important;
+    border-radius: 3px;
 }
-
-
 
 .node-system-packages .cbi-section-node .cbi-value-last > div > div  {
     border: none !important;
+    border-radius: 3px;
 }
 
 .node-system-packages .cbi-section-node .cbi-value-last:nth-last-child(1)  {
@@ -3188,11 +3193,6 @@ body.lang_pl.node-main-login .cbi-value-title {
     display: unset !important;
 }
 
-.node-nlbw-usage table {
-    display: block;
-    overflow: auto;
-}
-
 /* fix node-status-realtime */
 .node-status-realtime .container {
     overflow:auto
@@ -3228,4 +3228,31 @@ form[action="/cgi-bin/luci/admin/network/wireless_join"] input[class="cbi-button
     width: 100% !important;
 }
 
+/* fix luci-app-fileassistant botton style */
+.fb-container .cbi-button {
+    border-radius: 8px;
+    margin: 3px 3px 3px 0;
+    height: unset !important;
+}
 
+/* fix luci-app-appfilter table overflow style */
+.node-services-appfilter .cbi-section.cbi-tblsection {
+    overflow: auto;
+}
+
+/* update node-system-commands style */
+.node-system-commands h3 {
+    text-transform: unset;
+}
+.node-system-commands .commandbox {
+    margin: 10px;
+}
+.node-system-commands .commandbox p {
+    word-break:keep-all;
+    white-space:nowrap;
+}
+
+.node-network-network .ifacebox strong{
+    color: var(--ifaceboxFontColor);
+    padding: 5px;
+}
