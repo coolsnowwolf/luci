@@ -9,8 +9,7 @@
  *
  *  Licensed to the public under the Apache License 2.0
  */
-
- :root {
+ [data-theme='light'] {
     --bg: #f1f4f5;
     --mainbg: #fff;
     --bgwhite: #fff;
@@ -28,7 +27,7 @@
     --tabmenuBorderLR: none;
     --tabmenubgColor: none;
     --tabmenuBottom: #e4eaec 1px solid;
-    --tabmenuRadius: 0;
+    --tabmenuRadius: 6px 6px 0 0;
     --sectionnodeBorder: #f7f7f7 1px solid;
     --cbilineColor: #f7f7f7 1px solid;
     --tabbgColor: #fff;
@@ -50,10 +49,12 @@
     --scrollbarColor:#d0d0d0;
     --ifaceboxBorderColor: #b8b8b8bd;
     --ifaceboxFontColor: #1a1a1a;
+    --liSelectedColor: #c5c5c5;
+    --vssrStatusColor: #525f7f;
+    --vssrBoxShadow: 0 0 2rem 0 rgb(136 152 170 / 30%);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
+[data-theme='dark'] {
     --bg: #000;
     --bgwhite: #000;
     --textColor: #fefefe;
@@ -92,7 +93,9 @@
     --scrollbarColor:#222;
     --ifaceboxBorderColor: #636363bd;
     --ifaceboxFontColor: #1a1a1a;
-  }
+    --liSelectedColor: #2f2f2f;
+    --vssrStatusColor: rgb(204, 204, 204);
+    --vssrBoxShadow: 0 0 1rem 0 rgb(0 0 0 / 30%);
 }
 
 @font-face {
@@ -383,14 +386,15 @@ svg {
 
 /* fix node-services-vssr */
 .node-services-vssr .status-bar {
-    bottom:calc(50px + constant(safe-area-inset-bottom));
-    bottom:calc(50px + env(safe-area-inset-bottom));
-    /* display: none; */
+    bottom:calc(var(--vssrBottom) + constant(safe-area-inset-bottom));
+    bottom:calc(var(--vssrBottom) + env(safe-area-inset-bottom));
     background-color: var(--navbgColor);
+    box-shadow: var(--vssrBoxShadow) !important;
+    color: var(--vssrStatusColor) !important;
 }
 .node-services-vssr .container {
-    padding-bottom:calc(50px + constant(safe-area-inset-bottom));
-    padding-bottom:calc(50px + env(safe-area-inset-bottom));
+    padding-bottom:calc(var(--vssrBottom) + constant(safe-area-inset-bottom));
+    padding-bottom:calc(var(--vssrBottom) + env(safe-area-inset-bottom));
 }
 
 .node-services-vssr .ssr-button {
@@ -2297,11 +2301,12 @@ header > .container > .pull-right > * {
 .notice {
     background-color: var(--activeColor);
     color: #fff;
-    font-size: 0.8rem;
-    padding: 3px 10px;
+    font-size: .8rem;
+    padding: 2.8px 10px;
     border-radius: 20px;
     z-index: 10;
     top: 22px;
+    margin-right: 30px;
 }
 
 #refresh_on, #refresh_off {
@@ -3224,7 +3229,8 @@ body.lang_pl.node-main-login .cbi-value-title {
 }
 
 /* fix node-network-network */
-.node-network-network div[onclick*="document.getElementById('cbid.network."] {
+.node-network-network div[onclick*="document.getElementById('cbid.network."],
+#cbi-network div[onclick*="document.getElementById('cbid.network."] {
     background-color: unset !important;
 }
 
@@ -3290,4 +3296,31 @@ form[action="/cgi-bin/luci/admin/network/wireless_join"] input[class="cbi-button
 .node-network-network .ifacebox strong{
     color: var(--ifaceboxFontColor);
     padding: 5px;
+}
+
+/* fix new version luci-app-openclash style */
+.node-services-openclash  ul li.selected {
+    background-color: var(--liSelectedColor) !important;
+}
+
+.node-services-openclash .cbi-button-reset, 
+.node-services-openclash .cbi-input-remove {
+    max-width: unset !important;
+}
+
+.node-services-openclash #tab-header ul li.selected,
+.node-services-openclash #tab-header ul li {
+    color: black !important;
+    background-color: unset !important
+}
+
+/* fix qBittorrent status style*/
+.node-nas-qbittorrent p#qBittorrent_status input {
+    line-height: unset;
+}
+
+/* fix node-system-diskman dialog-format-active */
+.node-system-diskman.dialog-format-active #dialog_format .dialog_box {
+    background: var(--alertBackground);
+    border-radius: 5px;
 }
