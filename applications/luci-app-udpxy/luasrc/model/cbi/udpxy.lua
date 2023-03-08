@@ -59,6 +59,6 @@ nice_increment.datatype = "or(and(max(-1), integer),and(min(1), integer))"
 
 mcsub_renew = s:option(Value, "mcsub_renew", translate("Multicast subscription renew"))
 mcsub_renew.rmempty = true
-mcsub_renew.datatype = "or(0, range(30, 64000))"
+mcsub_renew.datatype = "range(30, 64000)"
 
 return m
