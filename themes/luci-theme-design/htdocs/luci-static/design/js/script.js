@@ -19,57 +19,53 @@
  */
 (function ($) {
 
-    // 修复某些插件导致在https下env(safe-area-inset-bottom)为0的情况
+    // Fixed openclash plugin causing env(safe-area-inset-bottom) to be 0 under https
+    const appleUserAgentRegex = /(iPhone|iPad|iPod|iOS|Mac|Macintosh)/i;
     var url = self.location.href; 
-    if ((/(iPhone|iPad|iPod|iOS|Mac|Macintosh)/i.test(navigator.userAgent)) && url.indexOf("openclash") != -1 ) {
+    if (navigator.userAgent.match(appleUserAgentRegex) && url.indexOf("openclash") != -1 ) {
         var oMeta = document.createElement('meta');
         oMeta.content = 'width=device-width,initial-scale=1,maximum-scale=1,user-scalable=0,viewport-fit=cover';
         oMeta.name = 'viewport';
-        document.getElementsByTagName('head')[0].appendChild(oMeta);
+        document.querySelector('head').appendChild(oMeta);
     }
-
-    // .node-status-realtime embed[src="/luci-static/resources/bandwidth.svg"] + div + br + table
-    // .node-status-realtime embed[src="/luci-static/resources/wifirate.svg"] + div + br + table
-    // .node-status-realtime embed[src="/luci-static/resources/wireless.svg"] + div + br + table
-    $(document).ready(function(){
-        ["bandwidth", "wifirate", "wireless"].forEach(function (value) {
-            let target = $(".node-status-realtime embed[src=\"\/luci-static\/resources\/" + value + ".svg\"] + div + br + table");
-            if (target.length != 0) {
-                let div =  document.createElement("div");
-                div.style = "overflow-x: auto;"
-                target.before(div);
-                newTarget = target.clone();
-                target.remove();
-                div.append(newTarget.get(0))
-            }
-        })
-   });
-
-    // Fixed scrollbar styles for browsers on different platforms
-    settingGlobalScroll();
-
-    $(document).ready(function() {
-        settingGlobalScroll();
-    })
-
-    $(window).resize(function () {
-        settingGlobalScroll();
-    });
+    
 
     function settingGlobalScroll() {
-        let global = $('head #global-scroll')
-        if ((/(phone|pad|pod|iPhone|iPod|ios|iOS|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i.test(navigator.userAgent))) {
-            if (global.length > 0) {
-                global.remove();
-            }
-        } else  if (global.length == 0 ) {
-            var style = document.createElement('style');
-            style.type = 'text/css';
-            style.id = "global-scroll"
-            style.innerHTML="::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-thumb { background: var(--scrollbarColor); border-radius: 2px;}"
-            $("head").append(style)
+        const global = $('head #global-scroll');
+        const isMobile = /phone|pad|pod|iPhone|iPod|ios|iOS|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone/i.test(navigator.userAgent);
+        
+        if (!isMobile && global.length === 0) {
+          const style = document.createElement('style');
+          style.type = 'text/css';
+          style.id = 'global-scroll';
+          style.textContent = '::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-thumb { background: var(--scrollbarColor); border-radius: 2px; }';
+          $('head').append(style);
+        } else if (isMobile && global.length > 0) {
+          global.remove();
         }
     }
+
+    $(document).ready(() => {
+        // Fixed scrollbar styles for browsers on different platforms
+        settingGlobalScroll();
+        // .node-status-realtime embed[src="/luci-static/resources/bandwidth.svg"] + div + br + table
+        // .node-status-realtime embed[src="/luci-static/resources/wifirate.svg"] + div + br + table
+        // .node-status-realtime embed[src="/luci-static/resources/wireless.svg"] + div + br + table
+        if ($('.node-status-realtime').length != 0) {
+            const selectorValues = ["bandwidth", "wifirate", "wireless"];
+            selectorValues.forEach(value => {
+              const target = $(`.node-status-realtime embed[src="/luci-static/resources/${value}.svg"] + div + br + table`);
+              if (target.length) {
+                const div = document.createElement("div");
+                div.style.overflowX = "auto";
+                target.before(div);
+                const newTarget = target.clone();
+                target.remove();
+                div.appendChild(newTarget.get(0));
+              }
+            });
+        }
+    });
 
     /**
      * trim text, Remove spaces, wrap
@@ -243,6 +239,9 @@
     });
 
     $(window).resize(function () {
+        // Fixed scrollbar styles for browsers on different platforms
+        settingGlobalScroll();
+
         if ($(window).width() > 992) {
             $(".showSide").css("display", "");
             $(".main-left").css("width", "");
