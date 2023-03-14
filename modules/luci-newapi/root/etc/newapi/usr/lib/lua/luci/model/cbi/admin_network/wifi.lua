@@ -219,8 +219,8 @@ if hwtype == "mac80211" then
 
 		tp:value("", translate("auto"))
 		for _, p in ipairs(tx_power_list) do
-			tp:value(p.driver_dbm, "%i dBm (%i mW)"
-				%{ p.display_dbm, p.display_mw })
+			tp:value(p.driver_dbm, "%i dBm"
+				%{ p.display_dbm })
 		end
 	end
 
