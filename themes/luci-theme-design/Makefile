@@ -7,9 +7,9 @@ include $(TOPDIR)/rules.mk
 
 LUCI_TITLE:=Design Theme
 LUCI_DEPENDS:=
-PKG_VERSION:=5.4.3
-PKG_RELEASE:=20230310
+PKG_VERSION:=5.5.4
+PKG_RELEASE:=20230320
 
-include ../../luci.mk
+include $(TOPDIR)/feeds/luci/luci.mk
 
 # call BuildPackage - OpenWrt buildroot signature
