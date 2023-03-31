@@ -84,6 +84,44 @@ restart_service() {
     /etc/init.d/mosdns restart
 }
 
+ecs_local() {
+    ipaddr=$(curl -s -4 --connect-timeout 2 -H "Host:ip.3322.org" 118.184.169.32) || ipaddr=119.29.0.0
+    echo "ecs ${ipaddr%.*}.0/24"
+}
+
+ecs_remote() {
+    ipaddr=$(curl -s -4 --connect-timeout 2 -H "Host:icanhazip.com" 104.18.114.97) || ipaddr=103.103.65.0
+    echo "ecs ${ipaddr%.*}.0/24"
+}
+
+flush_cache() {
+    curl -s 127.0.0.1:$(uci -q get mosdns.config.listen_port_api)/plugins/lazy_cache/flush || exit 1
+}
+
+v2dat_dump() {
+    # env
+    v2dat_dir=/usr/share/v2ray
+    adblock=$(uci -q get mosdns.config.adblock)
+    ad_source=$(uci -q get mosdns.config.ad_source)
+    configfile=$(uci -q get mosdns.config.configfile)
+    mkdir -p /var/mosdns
+    rm -f /var/mosdns/geo*.txt
+    if [ "$configfile" = "/etc/mosdns/config.yaml" ]; then
+        # default config
+        v2dat unpack geoip -o /var/mosdns -f cn $v2dat_dir/geoip.dat
+        v2dat unpack geosite -o /var/mosdns -f cn -f 'geolocation-!cn' $v2dat_dir/geosite.dat
+        [ "$adblock" -eq 1 ] && [ "$ad_source" = "geosite.dat" ] && v2dat unpack geosite -o /var/mosdns -f category-ads-all $v2dat_dir/geosite.dat
+    else
+        # custom config
+        v2dat unpack geoip -o /var/mosdns -f cn $v2dat_dir/geoip.dat
+        v2dat unpack geosite -o /var/mosdns -f cn -f 'geolocation-!cn' $v2dat_dir/geosite.dat
+        geoip_tags=$(uci -q get mosdns.config.geoip_tags)
+        geosite_tags=$(uci -q get mosdns.config.geosite_tags)
+        [ -n "$geoip_tags" ] && v2dat unpack geoip -o /var/mosdns $(echo $geoip_tags | sed -r 's/\S+/-f &/g') $v2dat_dir/geoip.dat
+        [ -n "$geosite_tags" ] && v2dat unpack geosite -o /var/mosdns $(echo $geosite_tags | sed -r 's/\S+/-f &/g') $v2dat_dir/geosite.dat
+    fi
+}
+
 case $script_action in
     "dns")
         interface_dns
@@ -99,6 +137,18 @@ case $script_action in
     ;;
     "adlist_update")
         adlist_update && restart_service
+    ;;
+    "ecs_local")
+        ecs_local
+    ;;
+    "ecs_remote")
+        ecs_remote
+    ;;
+    "flush")
+        flush_cache
+    ;;
+    "v2dat_dump")
+        v2dat_dump
     ;;
     "version")
         mosdns version

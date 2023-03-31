@@ -114,6 +114,16 @@ o.rmempty = false
 o.default = false
 o:depends("configfile", "/etc/mosdns/config.yaml")
 
+o = s:taboption("advanced", Flag, "enable_http3", translate("Enable HTTP/3"), translate("Enable DoH HTTP/3 protocol support for remote DNS, Upstream DNS server support is required (Experimental)"))
+o.rmempty = false
+o.default = false
+o:depends("configfile", "/etc/mosdns/config.yaml")
+
+o = s:taboption("advanced", Flag, "enable_ecs_remote", translate("Enable EDNS client subnet"), translate("Add the EDNS Client Subnet option (ECS) to Remote DNS") .. '<br />' .. translate("MosDNS will auto identify the IP address subnet segment of your remote connection (.0/24)") .. '<br />' .. translate("If your remote access network changes, May need restart MosDNS to update the ECS request address"))
+o.rmempty = false
+o.default = false
+o:depends("configfile", "/etc/mosdns/config.yaml")
+
 o = s:taboption("advanced", Value, "cache_size", translate("DNS Cache Size"))
 o.datatype = "and(uinteger,min(0))"
 o.default = "20000"
@@ -160,7 +170,7 @@ o:value("https://raw.githubusercontent.com/QiuSimons/openwrt-mos/master/dat/serv
 
 o = s:taboption("basic",  Button, "_reload", translate("Reload Service"), translate("Reload service to take effect of new configuration"))
 o.write = function()
-  sys.exec("/etc/init.d/mosdns reload")
+    sys.exec("/etc/init.d/mosdns reload")
 end
 o:depends("configfile", "/etc/mosdns/config_custom.yaml")
 
@@ -179,15 +189,24 @@ function o.write(self, section, value)
     fs.writefile("/etc/mosdns/config_custom.yaml", value)
 end
 
-s:tab("api", translate("API Setting"))
-
-o = s:taboption("api", Flag, "enabled_api", translate("Enabled API"))
-o:depends("configfile", "/etc/mosdns/config.yaml")
-o.default = false
+s:tab("api", translate("API Options"))
 
 o = s:taboption("api", Value, "listen_port_api", translate("API Listen port"))
 o.datatype = "and(port,min(1))"
 o.default = 9091
 o:depends("configfile", "/etc/mosdns/config.yaml")
+
+o = s:taboption("api", Button, "flush_cache", translate("Flush Cache"), translate("Flushing Cache will clear any IP addresses or DNS records from MosDNS cache"))
+o.rawhtml = true
+o.template = "mosdns/mosdns_flush_cache"
+o:depends("configfile", "/etc/mosdns/config.yaml")
+
+s:tab("geodata", translate("GeoData Export"))
+
+o = s:taboption("geodata", DynamicList, "geosite_tags", translate("GeoSite Tags"), translate("Enter the GeoSite.dat category to be exported, Allow add multiple tags") .. '<br />' .. translate("Export directory: /var/mosdns"))
+o:depends("configfile", "/etc/mosdns/config_custom.yaml")
+
+o = s:taboption("geodata", DynamicList, "geoip_tags", translate("GeoIP Tags"), translate("Enter the GeoIP.dat category to be exported, Allow add multiple tags") .. '<br />' .. translate("Export directory: /var/mosdns"))
+o:depends("configfile", "/etc/mosdns/config_custom.yaml")
 
 return m
