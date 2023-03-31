@@ -44,6 +44,12 @@ plugins:
       files:
         - "/etc/mosdns/rule/greylist.txt"
 
+  - tag: ddnslist
+    type: domain_set
+    args:
+      files:
+        - "/etc/mosdns/rule/ddnslist.txt"
+
   - tag: hosts
     type: hosts
     args:
@@ -74,7 +80,7 @@ plugins:
       files:
         - "/usr/share/mosdns/sp_low.tdata"
 
-  - tag: cache
+  - tag: lazy_cache
     type: cache
     args:
       size: cache_size
@@ -99,6 +105,11 @@ plugins:
     args:
       - exec: ttl minimal_ttl_custom-maximum_ttl_custom
 
+  - tag: modify_ddns_ttl
+    type: sequence
+    args:
+      - exec: ttl 5-5
+
   - tag: local_sequence
     type: sequence
     args:
@@ -108,12 +119,16 @@ plugins:
     type: sequence
     args:
       - exec: prefer_ipv4
+      - exec: ecs_remote
       - exec: $forward_remote
 
   - tag: has_resp_sequence
     type: sequence
     args:
-      - exec: $modify_ttl
+      - matches: qname $ddnslist
+        exec: $modify_ddns_ttl
+      - matches: "!qname $ddnslist"
+        exec: $modify_ttl
       - matches: has_resp
         exec: accept
 
@@ -136,6 +151,12 @@ plugins:
       secondary: query_is_remote
       threshold: 500
       always_standby: true
+
+  - tag: query_is_ddns_domain
+    type: sequence
+    args:
+      - matches: qname $ddnslist
+        exec: $local_sequence
 
   - tag: query_is_local_domain
     type: sequence
@@ -182,12 +203,20 @@ plugins:
     args:
       - exec: $hosts
       - exec: jump has_resp_sequence
+      - matches:
+        - "!qname $ddnslist"
+        - "!qname $blocklist"
+        - "!qname $adlist"
+        - "!qname $sp_low"
+        - "!qname $local_ptr"
+        exec: $lazy_cache
       - exec: $redirect
+      - exec: jump has_resp_sequence
+      - exec: $query_is_ddns_domain
       - exec: jump has_resp_sequence
       - exec: $query_is_whitelist_domain
       - exec: jump has_resp_sequence
       - exec: $query_is_reject_domain
-      - exec: $cache
       - exec: jump has_resp_sequence
       - exec: $query_is_greylist_domain
       - exec: jump has_resp_sequence

@@ -7,6 +7,9 @@ msgstr "基本选项"
 msgid "Advanced Options"
 msgstr "高级选项"
 
+msgid "API Options"
+msgstr "API 选项"
+
 msgid "MosDNS is a 'programmable' DNS forwarder."
 msgstr "MosDNS 是一个插件化的 DNS 转发/分流器。"
 
@@ -25,14 +28,23 @@ msgstr "启用"
 msgid "Listen port"
 msgstr "监听端口"
 
-msgid "API Setting"
-msgstr "API 设置"
-
-msgid "Enabled API"
-msgstr "启用 API"
-
 msgid "API Listen port"
 msgstr "API 监听端口"
+
+msgid "Flush Cache"
+msgstr "刷新缓存"
+
+msgid "Flushing Cache will clear any IP addresses or DNS records from MosDNS cache"
+msgstr "刷新缓存会清空 MosDNS 所有 IP 地址和 DNS 解析缓存"
+
+msgid "Flushing..."
+msgstr "正在刷新..."
+
+msgid "Flushing Success"
+msgstr "刷新成功"
+
+msgid "Flushing Failed, Please check if MosDNS is enabled"
+msgstr "刷新失败，请检查 MosDNS 是否已启用"
 
 msgid "Log Level"
 msgstr "日志等级"
@@ -175,6 +187,24 @@ msgstr "禁用 TLS 证书"
 msgid "Disable TLS Servers certificate validation, Can be useful if system CA certificate expires or the system time is out of order"
 msgstr "禁用 TLS 服务器证书验证，当系统 CA 证书过期或系统时间错乱时，本选项可能会有用"
 
+msgid "Enable HTTP/3"
+msgstr "启用 HTTP/3"
+
+msgid "Enable DoH HTTP/3 protocol support for remote DNS, Upstream DNS server support is required (Experimental)"
+msgstr "为远程 DNS 启用 DoH HTTP/3 协议支持，需要上游 DNS 服务器支持（实验性，谨慎启用该功能）"
+
+msgid "Enable EDNS client subnet"
+msgstr "启用 EDNS 客户端子网"
+
+msgid "Add the EDNS Client Subnet option (ECS) to Remote DNS"
+msgstr "在远程 DNS 请求中加入 EDNS 客户端子网（即 ECS）选项（需要上游 DNS 服务器支持）"
+
+msgid "MosDNS will auto identify the IP address subnet segment of your remote connection (.0/24)"
+msgstr "MosDNS 将会自动获取您访问远程连接时使用的 IP 子网段（.0/24）"
+
+msgid "If your remote access network changes, May need restart MosDNS to update the ECS request address"
+msgstr "如果您的远程访问网络发生改变时可能需要重启 MosDNS 以更新 ECS 请求地址"
+
 msgid "DNS Cache Size"
 msgstr "DNS 缓存大小（条）"
 
@@ -235,6 +265,12 @@ msgstr "灰名单"
 msgid "These domains are always resolved using remote DNS. Please input the domain names of websites, every line can input only one website domain. For example: google.com."
 msgstr "加入的域名始终使用 “远程 DNS” 进行解析（每个域名一行，支持域名匹配规则）"
 
+msgid "DDNS Lists"
+msgstr "DDNS 域名"
+
+msgid "These domains are always resolved using local DNS. And force TTL 5 seconds, DNS resolution results will not enter the cache. For example: myddns.example.com."
+msgstr "加入的域名始终使用 “本地 DNS” 进行解析，并且强制 TTL 5 秒，解析结果不会进入缓存（每个域名一行，支持域名匹配规则）"
+
 msgid "Hosts For example: baidu.com 10.0.0.1"
 msgstr "自定义 Hosts 重写，如：baidu.com 10.0.0.1（每个规则一行）"
 
@@ -249,3 +285,21 @@ msgstr "PTR 黑名单"
 
 msgid "These domains are blocked from PTR requests"
 msgstr "加入的域名将阻止 PTR 请求（每个域名一行，支持域名匹配规则）"
+
+msgid "GeoData Export"
+msgstr "GeoData 导出"
+
+msgid "GeoSite Tags"
+msgstr "GeoSite 标签"
+
+msgid "Enter the GeoSite.dat category to be exported, Allow add multiple tags"
+msgstr "填写需要导出的 GeoSite.dat 类别条目，允许添加多个标签"
+
+msgid "GeoIP Tags"
+msgstr "GeoIP 标签"
+
+msgid "Enter the GeoIP.dat category to be exported, Allow add multiple tags"
+msgstr "输入需要导出的 GeoIP.dat 类别条目，允许添加多个标签"
+
+msgid "Export directory: /var/mosdns"
+msgstr "导出目录：/var/mosdns"
