@@ -30,6 +30,10 @@ define Package/$(PKG_NAME)/config
 	endchoice
 endef
 
+define Package/luci-app-qbittorrent-simple/conffiles
+/etc/qbittorrent/
+endef
+
 include ../../luci.mk
 
 # call BuildPackage - OpenWrt buildroot signature
