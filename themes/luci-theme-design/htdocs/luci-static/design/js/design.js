@@ -67,4 +67,3 @@ XHR._r();XHR._i=window.setInterval(XHR._r,1000);}}
 XHR.running=function()
 {return!!(XHR._r&&XHR._i);};(function($){function settingsStatusRealtimeOverflow(){if(self.location.pathname.includes("status/realtime")){const nodeStatusRealtime=$('.node-status-realtime');const selectorValues=['bandwidth','wifirate','wireless'];for(let i=0;i<selectorValues.length;i++){const value=selectorValues[i];const target=nodeStatusRealtime.find(`embed[src="/luci-static/resources/${value}.svg"] + div + br + table`);if(target.length){target.wrap('<div style="overflow-x: auto;"></div>');}}}}
 $(document).ready(()=>{settingsStatusRealtimeOverflow();});})(jQuery);
-
