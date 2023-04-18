@@ -9,6 +9,6 @@ LUCI_TITLE:=Design Theme
 LUCI_DEPENDS:=
 PKG_VERSION:=5.7.5-20230418
 
-include $(TOPDIR)/feeds/luci/luci.mk
+include ../../luci.mk
 
 # call BuildPackage - OpenWrt buildroot signature
