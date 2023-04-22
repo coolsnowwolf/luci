@@ -8,11 +8,18 @@ uci_write_config() {
 	[ -n "$6" ] && uci -q set cpufreq.cpufreq.upthreshold$1="$6"
 	uci -q commit cpufreq
 }
-
+CPU_FREQS="816000"
+if [ -f '/sys/devices/system/cpu/cpufreq/policy0/scaling_available_frequencies' ]; then
 CPU_FREQS="$(cat '/sys/devices/system/cpu/cpufreq/policy0/scaling_available_frequencies')"
+fi
 CPU_POLICYS="$(find '/sys/devices/system/cpu/cpufreq/policy'* -maxdepth 0 | grep -Eo '[0-9]+')"
 source "/etc/openwrt_release"
 case "$DISTRIB_TARGET" in
+	"x86/64")
+		CPU_MAX_FREQ=$(cat /sys/devices/system/cpu/cpufreq/policy0/cpuinfo_max_freq)
+		CPU_MIN_FREQ=$(cat /sys/devices/system/cpu/cpufreq/policy0/cpuinfo_min_freq)
+		uci_write_config 0 ondemand $CPU_MIN_FREQ $CPU_MAX_FREQ 10 70
+		;;
 	"bcm27xx/bcm2710")
 		uci_write_config 0 ondemand 600000 1200000 10 50
 		;;
