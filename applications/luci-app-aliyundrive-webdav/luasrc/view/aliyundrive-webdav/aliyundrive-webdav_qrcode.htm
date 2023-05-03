@@ -1,5 +1,5 @@
 <%+cbi/valueheader%>
-<script src="https://cdn.jsdelivr.net/npm/qrcode_js@1.0.0/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
     #mask-box {
         z-index: 1000;
@@ -113,9 +113,9 @@
             // 移除刷新
             load.remove();
             // 创建二维码
-            make.makeCode( d.codeContent );
+            make.makeCode("https://www.aliyundrive.com/o/oauth/authorize?sid=" + d.sid);
             // 监听扫码反馈
-            XHR.poll( 3, '<%=luci.dispatcher.build_url("admin", "services", "aliyundrive-webdav", "query")%>', { t: d.t, ck: d.ck }, ( x, d ) => {
+            XHR.poll( 3, '<%=luci.dispatcher.build_url("admin", "services", "aliyundrive-webdav", "query")%>', { sid: d.sid }, ( x, d ) => {
                 if ( d.refresh_token.trim() ) {
                     // 清除线程
                     XHR.halt();
