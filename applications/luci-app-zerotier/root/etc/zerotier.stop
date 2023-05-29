@@ -6,15 +6,16 @@ zt0="$(ifconfig | grep 'zt' | awk '{print $1}')"
 [ -x "$(command -v nft)" ] && FW="fw4" || FW="fw3"
 for i in ${zt0}
 do
+	ip_segment=""
+	ip_segment="$(ip route | grep "dev $i proto" | awk '{print $1}')"
 	[ "$FW" = "fw3" ] && {
-		ip_segment=""
 		iptables -D FORWARD -i "$i" -j ACCEPT 2>/dev/null
 		iptables -D FORWARD -o "$i" -j ACCEPT 2>/dev/null
 		iptables -t nat -D POSTROUTING -o "$i" -j MASQUERADE 2>/dev/null
-		ip_segment="$(ip route | grep "dev $i proto" | awk '{print $1}')"
 		iptables -t nat -D POSTROUTING -s "${ip_segment}" -j MASQUERADE 2>/dev/null
 	} || {
-		handles=$(nft -a list table inet fw4 | grep "$i" |cut -d '#' -f 2|cut -d ' ' -f3)
+		#handles=$(nft -a list chain inet fw4 forward | grep "$i" |cut -d ' ' -f 6)
+		handles=$(nft -a list table inet fw4 | grep -E "$i|$ip_segment" |cut -d '#' -f 2|cut -d ' ' -f3)
 		for h in $handles; do
 			nft delete rule inet fw4 forward handle $h
 		done
