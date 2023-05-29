@@ -14,7 +14,6 @@ do
 		iptables -t nat -D POSTROUTING -o "$i" -j MASQUERADE 2>/dev/null
 		iptables -t nat -D POSTROUTING -s "${ip_segment}" -j MASQUERADE 2>/dev/null
 	} || {
-		#handles=$(nft -a list chain inet fw4 forward | grep "$i" |cut -d ' ' -f 6)
 		handles=$(nft -a list table inet fw4 | grep -E "$i|$ip_segment" |cut -d '#' -f 2|cut -d ' ' -f3)
 		for h in $handles; do
 			nft delete rule inet fw4 forward handle $h
