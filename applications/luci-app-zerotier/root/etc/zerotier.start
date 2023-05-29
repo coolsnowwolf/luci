@@ -16,13 +16,19 @@ zt0="$(ifconfig | grep 'zt' | awk '{print $1}')"
 echo "${zt0}" > "/tmp/zt.nif"
 
 [ "${nat_enable}" -eq "1" ] && {
+	[ -x "$(command -v nft)" ] && FW="fw4" || FW="fw3"
 	for i in ${zt0}
 	do
 		ip_segment=""
-		iptables -I FORWARD -i "$i" -j ACCEPT
-		iptables -I FORWARD -o "$i" -j ACCEPT
-		iptables -t nat -I POSTROUTING -o "$i" -j MASQUERADE
 		ip_segment="$(ip route | grep "dev $i proto kernel" | awk '{print $1}')"
-		iptables -t nat -I POSTROUTING -s "${ip_segment}" -j MASQUERADE
+		[ "$FW" = "fw3" ] && {
+			iptables -I FORWARD -i "$i" -j ACCEPT
+			iptables -I FORWARD -o "$i" -j ACCEPT
+			iptables -t nat -I POSTROUTING -o "$i" -j MASQUERADE
+			iptables -t nat -I POSTROUTING -s "${ip_segment}" -j MASQUERADE
+		} || {
+			nft insert rule inet fw4 forward iifname "$i" accept
+			nft insert rule inet fw4 forward oifname "$i" accept
+		}
 	done
 }
