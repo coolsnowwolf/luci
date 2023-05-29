@@ -29,6 +29,8 @@ echo "${zt0}" > "/tmp/zt.nif"
 		} || {
 			nft insert rule inet fw4 forward iifname "$i" accept
 			nft insert rule inet fw4 forward oifname "$i" accept
+			nft insert rule inet fw4 srcnat oifname "$i" counter masquerade
+			nft insert rule inet fw4 srcnat ip saddr "${ip_segment}" counter masquerade
 		}
 	done
 }
