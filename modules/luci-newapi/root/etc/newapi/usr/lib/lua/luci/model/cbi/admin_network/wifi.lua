@@ -785,8 +785,8 @@ elseif hwtype == "mt_dbdc" then
 	encr:value("psk", "WPA-PSK")
 	encr:value("psk2", "WPA2-PSK")
 	encr:value("psk-mixed", "WPA-PSK/WPA2-PSK Mixed Mode")
-	encr:value("sae", "WPA3-PSK")
-	encr:value("sae-mixed", "WPA2-PSK/WPA3-PSK Mixed Mode")
+	encr:value("sae", "WPA3-SAE")
+	encr:value("sae-mixed", "WPA2-PSK/WPA3-SAE Mixed Mode")
 end
 
 auth_server = s:taboption("encryption", Value, "auth_server", translate("Radius-Authentication-Server"))
