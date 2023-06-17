@@ -244,6 +244,7 @@ load_wed() {
 		[ -e "/lib/modules/$kernel_version/mt7915e.ko" ] && {
 			sed -i '$aoptions mt7915e wed_enable=Y' /etc/modules.conf
 			rmmod mt7915e && sleep 1 && modprobe mt7915e && wifi up
+                        reboot
 		}
 }
 
@@ -255,6 +256,7 @@ unload_wed() {
 		[ -e "/lib/modules/$kernel_version/mt7915e.ko" ] && {
 			sed -i '/mt7915e/d' /etc/modules.conf
 			rmmod mt7915e && sleep 1 && modprobe mt7915e && wifi up
+                        reboot
 		}
 }
 
