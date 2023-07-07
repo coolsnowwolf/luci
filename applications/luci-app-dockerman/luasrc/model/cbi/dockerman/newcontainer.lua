@@ -372,7 +372,7 @@ elseif cmd_line and cmd_line:match("^duplicate/[^/]+$") then
 	if not create_body.HostConfig then
 		create_body.HostConfig = {}
 	end
-	
+
 	if next(create_body) ~= nil then
 		default_config.name = nil
 		default_config.image = create_body.Image
