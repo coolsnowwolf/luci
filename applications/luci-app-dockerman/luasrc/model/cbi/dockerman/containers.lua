@@ -90,7 +90,7 @@ function get_containers()
 			end
 		end
 		data[index]["_id_name"] = '<a href='..luci.dispatcher.build_url("admin/docker/container/"..v.Id)..'  class="dockerman_link" title="'..translate("Container detail")..'">'.. data[index]["_name"] .. "<br><font color='#9f9f9f'>ID: " ..	data[index]["_id"]
-		.. "</font></a><br>Image: " .. (data[index]["_image"] or "&lt;none&gt;")
+		.. "</font></a><br>Image: " .. (data[index]["_image"] or "&lt;none&gt;") 
 		.. "<br><font color='#9f9f9f' class='container_size_".. v.Id .."'></font>"
 
 		if type(v.Mounts) == "table" and next(v.Mounts) then

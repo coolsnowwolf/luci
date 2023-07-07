@@ -34,7 +34,7 @@ function get_volumes()
 		data[index]["_mountpoint"] = nil
 
 		for v1 in v.Mountpoint:gmatch('[^/]+') do
-			if v1 == index then
+			if v1 == index then 
 				data[index]["_mountpoint"] = data[index]["_mountpoint"] .."/" .. v1:sub(1,12) .. "..."
 			else
 				data[index]["_mountpoint"] = (data[index]["_mountpoint"] and data[index]["_mountpoint"] or "").."/".. v1
@@ -46,7 +46,6 @@ function get_volumes()
 
 	return data
 end
-
 if dk:_ping().code ~= 200 then
 	lost_state = true
 else
