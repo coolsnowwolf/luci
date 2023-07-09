@@ -188,8 +188,17 @@ local start_stop_remove = function(m, cmd)
 	end
 end
 
+local c_color
+if container_info.State.Status == 'running' then
+	c_color = 'green'
+elseif container_info.State.Status == 'restarting' then
+	c_color = 'yellow'
+else
+	c_color = 'red'
+end
+
 m=SimpleForm("docker",
-	translatef("Docker - Container (%s)", container_info.Name:sub(2)),
+	translatef("Docker - Container (<font color='%s'>%s</font>)", c_color, container_info.Name:sub(2)),
 	translate("On this page, the selected container can be managed."))
 m.redirect = luci.dispatcher.build_url("admin/docker/containers")
 
@@ -714,6 +723,15 @@ elseif action == "console" then
 			if not cmd_docker or not cmd_ttyd or cmd_docker:match("^%s+$") or cmd_ttyd:match("^%s+$") then
 				return
 			end
+			local uci = (require "luci.model.uci").cursor()
+
+			local ttyd_ssl = uci:get("ttyd", "@ttyd[0]", "ssl")
+			local ttyd_ssl_key = uci:get("ttyd", "@ttyd[0]", "ssl_key")
+			local ttyd_ssl_cert = uci:get("ttyd", "@ttyd[0]", "ssl_cert")
+
+			if ttyd_ssl == "1" and ttyd_ssl_cert and ttyd_ssl_key then
+				cmd_ttyd = string.format('%s -S -C %s -K %s', cmd_ttyd, ttyd_ssl_cert, ttyd_ssl_key)
+			end
 
 			local pid = luci.util.trim(luci.util.exec("netstat -lnpt | grep :7682 | grep ttyd | tr -s ' ' | cut -d ' ' -f7 | cut -d'/' -f1"))
 			if pid and pid ~= "" then
@@ -721,7 +739,6 @@ elseif action == "console" then
 			end
 
 			local hosts
-			local uci = (require "luci.model.uci").cursor()
 			local remote = uci:get_bool("dockerd", "dockerman", "remote_endpoint") or false
 			local host = nil
 			local port = nil

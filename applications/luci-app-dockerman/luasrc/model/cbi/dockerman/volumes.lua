@@ -46,7 +46,6 @@ function get_volumes()
 
 	return data
 end
-
 if dk:_ping().code ~= 200 then
 	lost_state = true
 else
