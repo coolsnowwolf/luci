@@ -4,9 +4,8 @@
 -%>
 
 <%+header%>
-
+<script type="text/javascript" src="<%=resource%>/cbi.js"></script>
 <script type="text/javascript">//<![CDATA[
-	var bwxhr = new XHR();
 
 	var RC = { };
 	var em = 0;
@@ -62,7 +61,28 @@
 				'%s Pkts.'.format(ra[i].packets),
 			]);
 		}
-		cbi_update_table(tbl, rs, '<em><%:No information available%></em>');
+
+		/* BEGIN: Workaround as "cbi_update_table" isn't working */
+		rs.forEach((element, i) => {
+			var r = document.createElement("TR");
+			r.innerHTML = `
+				<tr>
+					<td style="text-align: center;">${element[0]}</th>
+					<td style="text-align: center;">${element[1]}</td>
+					<td style="text-align: center;">${element[2]}</td>
+					<td style="text-align: center;">${element[3]}</td>
+				</tr>
+					`;
+			if (i%2){
+				r.classList.add('tr', 'cbi-rowstyle-2');
+			} else {
+				r.classList.add('tr', 'cbi-rowstyle-1');
+			}
+			
+			tbl.appendChild(r)
+			/* END: Workaround as "cbi_update_table" isn't working */
+		});
+
 	} /* function print_table(tbl, ra) */
 
 	/* wait for SVG */
