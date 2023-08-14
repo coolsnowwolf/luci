@@ -111,7 +111,7 @@ function httpdispatch(request, prefix)
 	context.request = r
 
 	local fs = require "nixio.fs"
-	local default_path_info = fs.access("/etc/config/wizard") and (not fs.access("/etc/config/finished")) and "admin/wizard" or ""
+	local default_path_info = fs.access("/etc/config/wizard") and (not fs.access("/etc/config/finished")) and (not fs.access("/usr/sbin/quickstart")) and "admin/wizard" or ""
 
 	local pathinfo = http.urldecode(request:getenv("PATH_INFO") or default_path_info, true)
 
