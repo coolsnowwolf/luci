@@ -12,7 +12,6 @@ LUCI_TYPE:=mod
 LUCI_BASENAME:=compat
 
 LUCI_TITLE:=LuCI compatibility libraries
-LUCI_DEPENDS:=+luci-base
 
 include ../../luci.mk
 
