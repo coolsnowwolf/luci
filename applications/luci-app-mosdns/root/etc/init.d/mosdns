@@ -35,10 +35,10 @@ get_config() {
     config_get enabled $1 enabled 0
     config_get adblock $1 adblock 0
     config_get ad_source $1 ad_source ""
-    config_get cache_size $1 cache_size 20000
+    config_get cache_size $1 cache_size 8000
     config_get cache_survival_time $1 cache_survival_time 86400
     config_get dump_file $1 dump_file 0
-    config_get dump_interval $1 dump_interval 600
+    config_get dump_interval $1 dump_interval 3600
     config_get enable_pipeline $1 enable_pipeline 0
     config_get geo_auto_update $1 geo_auto_update 0
     config_get geo_update_day_time $1 geo_update_day_time 2
@@ -59,6 +59,7 @@ get_config() {
     config_get idle_timeout $1 idle_timeout 30
     config_get enable_http3 $1 enable_http3 0
     config_get enable_ecs_remote $1 enable_ecs_remote 0
+    config_get dns_leak $1 dns_leak 0
 }
 
 init_yaml() {
@@ -68,9 +69,9 @@ init_yaml() {
     [ $insecure_skip_verify -eq 1 ] && insecure_skip_verify=true || insecure_skip_verify=false
     [ $enable_http3 -eq 1 ] && enable_http3=true || enable_http3=false
     [ "$custom_local_dns" -eq 1 ] && \
-    local_dns=$($MOSDNS_SCRIPT dns | awk '{for(i=1;i<=NF;i++)printf "%s- addr: %s\n%s  bootstrap: '${bootstrap_dns}'\n%s  enable_pipeline: '${enable_pipeline}'\n%s  max_conns: '${max_conns}'\n%s  insecure_skip_verify: '${insecure_skip_verify}'\n%s  idle_timeout: '${idle_timeout}'\n",s,$i,s,s,s,s,s}' s='        ') || \
-    local_dns=$($MOSDNS_SCRIPT dns | awk '{for(i=1;i<=NF;i++)printf "%s- addr: %s\n",s,$i,s}' s='        ')
-    remote_dns=$(echo $remote_dns | awk '{for(i=1;i<=NF;i++)printf "%s- addr: %s\n%s  bootstrap: '${bootstrap_dns}'\n%s  enable_pipeline: '${enable_pipeline}'\n%s  max_conns: '${max_conns}'\n%s  insecure_skip_verify: '${insecure_skip_verify}'\n%s  idle_timeout: '${idle_timeout}'\n%s  enable_http3: '${enable_http3}'\n",s,$i,s,s,s,s,s,s}' s='        ')
+    local_dns=$($MOSDNS_SCRIPT dns | awk '{for(i=1;i<=NF;i++)printf "%s- addr: \"%s\"\n%s  bootstrap: '${bootstrap_dns}'\n%s  enable_pipeline: '${enable_pipeline}'\n%s  max_conns: '${max_conns}'\n%s  insecure_skip_verify: '${insecure_skip_verify}'\n%s  idle_timeout: '${idle_timeout}'\n",s,$i,s,s,s,s,s}' s='        ') || \
+    local_dns=$($MOSDNS_SCRIPT dns | awk '{for(i=1;i<=NF;i++)printf "%s- addr: \"%s\"\n",s,$i,s}' s='        ')
+    remote_dns=$(echo $remote_dns | awk '{for(i=1;i<=NF;i++)printf "%s- addr: \"%s\"\n%s  bootstrap: '${bootstrap_dns}'\n%s  enable_pipeline: '${enable_pipeline}'\n%s  max_conns: '${max_conns}'\n%s  insecure_skip_verify: '${insecure_skip_verify}'\n%s  idle_timeout: '${idle_timeout}'\n%s  enable_http3: '${enable_http3}'\n",s,$i,s,s,s,s,s,s}' s='        ')
     sed "s,log_level,$log_level,g;s,log_file,$log_file,g; \
     s,listen_port,$listen_port,g;s,cache_size,$cache_size,g; \
     s,cache_survival_time,$cache_survival_time,g; \
@@ -85,11 +86,12 @@ init_yaml() {
     [ "$dump_file" -eq 1 ] && [ ! -f $DUMP_FILE ] && cp -a $DUMP_FILE_DEFAULT $DUMP_FILE
     [ "$dump_file" -eq 0 ] && \cp -a $DUMP_FILE_DEFAULT $DUMP_FILE
     if [ "$enable_ecs_remote" -eq 1 ]; then
-        ecs_remote=$(sh /usr/share/mosdns/mosdns.sh ecs_remote)
+        ecs_remote=$(sh $MOSDNS_SCRIPT ecs_remote)
         sed -i "s,ecs_remote,$ecs_remote,g" $CONF
     else
         sed -i "/ecs_remote/d;" $CONF
     fi
+    [ $dns_leak -eq 1 ] && sed -i "s,primary: query_is_local_ip,primary: query_is_remote,g" $CONF
     rm -rf $TMPDIR
 }
 

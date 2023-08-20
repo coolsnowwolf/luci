@@ -89,8 +89,7 @@ o:depends("configfile", "/etc/mosdns/config.yaml")
 s:tab("advanced", translate("Advanced Options"))
 
 o = s:taboption("advanced", Value, "concurrent", translate("Concurrent"), translate("DNS query request concurrency, The number of upstream DNS servers that are allowed to initiate requests at the same time"))
-o.datatype = "and(uinteger,min(1))"
-o.datatype = "and(uinteger,max(3))"
+o.datatype = "and(uinteger,min(1),max(3))"
 o.default = "1"
 o:depends("configfile", "/etc/mosdns/config.yaml")
 
@@ -119,14 +118,19 @@ o.rmempty = false
 o.default = false
 o:depends("configfile", "/etc/mosdns/config.yaml")
 
-o = s:taboption("advanced", Flag, "enable_ecs_remote", translate("Enable EDNS client subnet"), translate("Add the EDNS Client Subnet option (ECS) to Remote DNS") .. '<br />' .. translate("MosDNS will auto identify the IP address subnet segment of your remote connection (.0/24)") .. '<br />' .. translate("If your remote access network changes, May need restart MosDNS to update the ECS request address"))
+o = s:taboption("advanced", Flag, "enable_ecs_remote", translate("Enable EDNS client subnet"), translate("Add the EDNS Client Subnet option (ECS) to Remote DNS") .. '<br />' .. translate("MosDNS will auto identify the IP address subnet segment of your remote connection (0/24)") .. '<br />' .. translate("If your remote access network changes, May need restart MosDNS to update the ECS request address"))
+o.rmempty = false
+o.default = false
+o:depends("configfile", "/etc/mosdns/config.yaml")
+
+o = s:taboption("advanced", Flag, "dns_leak", translate("Prevent DNS Leaks"), translate("Enable this option fallback policy forces forwarding to remote DNS"))
 o.rmempty = false
 o.default = false
 o:depends("configfile", "/etc/mosdns/config.yaml")
 
 o = s:taboption("advanced", Value, "cache_size", translate("DNS Cache Size"))
 o.datatype = "and(uinteger,min(0))"
-o.default = "20000"
+o.default = "8000"
 o:depends("configfile", "/etc/mosdns/config.yaml")
 
 o = s:taboption("advanced", Value, "cache_survival_time", translate("Cache Survival Time"))
@@ -141,17 +145,16 @@ o:depends("configfile", "/etc/mosdns/config.yaml")
 
 o = s:taboption("advanced", Value, "dump_interval", translate("Auto Save Cache Interval"))
 o.datatype = "and(uinteger,min(0))"
-o.default = "600"
+o.default = "3600"
 o:depends("dump_file", "1")
 
 o = s:taboption("advanced", Value, "minimal_ttl", translate("Minimum TTL"), translate("Modify the Minimum TTL value (seconds) for DNS answer results, 0 indicating no modification"))
-o.datatype = "and(uinteger,min(0))"
-o.datatype = "and(uinteger,max(3600))"
+o.datatype = "and(uinteger,min(0),max(604800))"
 o.default = "0"
 o:depends("configfile", "/etc/mosdns/config.yaml")
 
 o = s:taboption("advanced", Value, "maximum_ttl", translate("Maximum TTL"), translate("Modify the Maximum TTL value (seconds) for DNS answer results, 0 indicating no modification"))
-o.datatype = "and(uinteger,min(0))"
+o.datatype = "and(uinteger,min(0),max(604800))"
 o.default = "0"
 o:depends("configfile", "/etc/mosdns/config.yaml")
 

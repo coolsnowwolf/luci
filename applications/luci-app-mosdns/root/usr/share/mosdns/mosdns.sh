@@ -64,18 +64,37 @@ adlist_update() (
 )
 
 geodat_update() (
-    geodat_download() (
-        google_status=$(curl -I -4 -m 3 -o /dev/null -s -w %{http_code} http://www.google.com/generate_204)
-        [ "$google_status" -ne "204" ] && mirror="https://ghproxy.com/"
-        echo -e "\e[1;32mDownloading "$mirror"https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/$1\e[0m"
-        curl --connect-timeout 60 -m 900 --ipv4 -kfSLo "$TMPDIR/$1" ""$mirror"https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/$1"
-    )
     TMPDIR=$(mktemp -d) || exit 1
-    geodat_download geoip.dat && geodat_download geosite.dat
-    if [ $? -ne 0 ]; then
+    google_status=$(curl -I -4 -m 3 -o /dev/null -s -w %{http_code} http://www.google.com/generate_204)
+    [ "$google_status" -ne "204" ] && mirror="https://ghproxy.com/"
+    # geoip.dat - cn-private
+    echo -e "\e[1;32mDownloading "$mirror"https://github.com/Loyalsoldier/geoip/releases/latest/download/geoip-only-cn-private.dat\e[0m"
+    curl --connect-timeout 60 -m 900 --ipv4 -kfSLo "$TMPDIR/geoip.dat" ""$mirror"https://github.com/Loyalsoldier/geoip/releases/latest/download/geoip-only-cn-private.dat"
+    [ $? -ne 0 ] && rm -rf "$TMPDIR" && exit 1
+    # checksum - geoip.dat
+    echo -e "\e[1;32mDownloading "$mirror"https://github.com/Loyalsoldier/geoip/releases/latest/download/geoip-only-cn-private.dat.sha256sum\e[0m"
+    curl --connect-timeout 60 -m 900 --ipv4 -kfSLo "$TMPDIR/geoip.dat.sha256sum" ""$mirror"https://github.com/Loyalsoldier/geoip/releases/latest/download/geoip-only-cn-private.dat.sha256sum"
+    [ $? -ne 0 ] && rm -rf "$TMPDIR" && exit 1
+    if [ "$(sha256sum "$TMPDIR/geoip.dat" | awk '{print $1}')" != "$(cat "$TMPDIR/geoip.dat.sha256sum" | awk '{print $1}')" ]; then
+        echo -e "\e[1;31mgeoip.dat checksum error\e[0m"
         rm -rf "$TMPDIR"
         exit 1
     fi
+
+    # geosite.dat
+    echo -e "\e[1;32mDownloading "$mirror"https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geosite.dat\e[0m"
+    curl --connect-timeout 60 -m 900 --ipv4 -kfSLo "$TMPDIR/geosite.dat" ""$mirror"https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geosite.dat"
+    [ $? -ne 0 ] && rm -rf "$TMPDIR" && exit 1
+    # checksum - geosite.dat
+    echo -e "\e[1;32mDownloading "$mirror"https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geosite.dat.sha256sum\e[0m"
+    curl --connect-timeout 60 -m 900 --ipv4 -kfSLo "$TMPDIR/geosite.dat.sha256sum" ""$mirror"https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geosite.dat.sha256sum"
+    [ $? -ne 0 ] && rm -rf "$TMPDIR" && exit 1
+    if [ "$(sha256sum "$TMPDIR/geosite.dat" | awk '{print $1}')" != "$(cat "$TMPDIR/geosite.dat.sha256sum" | awk '{print $1}')" ]; then
+        echo -e "\e[1;31mgeosite.dat checksum error\e[0m"
+        rm -rf "$TMPDIR"
+        exit 1
+    fi
+    rm -rf "$TMPDIR"/*.sha256sum
     cp -f "$TMPDIR"/* /usr/share/v2ray
     rm -rf "$TMPDIR"
 )
@@ -85,12 +104,12 @@ restart_service() {
 }
 
 ecs_local() {
-    ipaddr=$(curl -s -4 --connect-timeout 2 -H "Host:ip.3322.org" 118.184.169.32) || ipaddr=119.29.0.0
+    ipaddr=$(curl -s --connect-timeout 3 -H "Host:ip.3322.org" 118.184.169.32) || ipaddr=119.29.0.0
     echo "ecs ${ipaddr%.*}.0/24"
 }
 
 ecs_remote() {
-    ipaddr=$(curl -s -4 --connect-timeout 2 -H "Host:icanhazip.com" 104.18.114.97) || ipaddr=103.103.65.0
+    ipaddr=$(curl -s --connect-timeout 3 -H "Host:ifconfig.me" 34.160.111.145) || ipaddr=103.103.65.0
     echo "ecs ${ipaddr%.*}.0/24"
 }
 
