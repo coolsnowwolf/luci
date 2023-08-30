@@ -83,6 +83,8 @@ o:value("223.6.6.6", "223.6.6.6 (AliDNS Secondary)")
 o:value("114.114.114.114", "114.114.114.114 (114DNS Primary)")
 o:value("114.114.115.115", "114.114.115.115 (114DNS Secondary)")
 o:value("180.76.76.76", "180.76.76.76 (Baidu DNS)")
+o:value("8.8.8.8", "8.8.8.8 (Google DNS)")
+o:value("1.1.1.1", "1.1.1.1 (CloudFlare DNS)")
 o.default = "119.29.29.29"
 o:depends("configfile", "/etc/mosdns/config.yaml")
 
@@ -113,7 +115,12 @@ o.rmempty = false
 o.default = false
 o:depends("configfile", "/etc/mosdns/config.yaml")
 
-o = s:taboption("advanced", Flag, "enable_http3", translate("Enable HTTP/3"), translate("Enable DoH HTTP/3 protocol support for remote DNS, Upstream DNS server support is required (Experimental)"))
+o = s:taboption("advanced", Flag, "enable_http3_local", translate("Local DNS Enable HTTP/3"), translate("Enable DoH HTTP/3 protocol for Local DNS, Upstream DNS server support is required (Experimental)"))
+o.rmempty = false
+o.default = false
+o:depends("custom_local_dns", "1")
+
+o = s:taboption("advanced", Flag, "enable_http3_remote", translate("Remote DNS Enable HTTP/3"), translate("Enable DoH HTTP/3 protocol for Remote DNS, Upstream DNS server support is required (Experimental)"))
 o.rmempty = false
 o.default = false
 o:depends("configfile", "/etc/mosdns/config.yaml")
