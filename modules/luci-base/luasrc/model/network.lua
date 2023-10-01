@@ -17,6 +17,7 @@ local dsp = require "luci.dispatcher"
 local uci = require "luci.model.uci"
 local lng = require "luci.i18n"
 local jsc = require "luci.jsonc"
+local ip = require "luci.ip"
 
 module "luci.model.network"
 
@@ -712,12 +713,45 @@ function get_status_by_address(self, addr)
 	end
 end
 
+function get_network_by_interface(self, iface)
+	local link = ip.link(tostring(iface))
+	if link.master then
+		iface = link.master
+	end
+
+	local cur = uci.cursor()
+	local dump = utl.ubus("network.interface", "dump", { })
+	if dump then
+		local _, net
+		for _, net in ipairs(dump.interface) do
+			if net.l3_device == iface or net.device == iface then
+				local uciname = cur:get("network", net.interface, "ifname")
+				if type(uciname) == "string" and uciname:sub(1,1) ~= "@" or uciname then
+					return net
+				end
+			end
+		end
+	end
+end
+
 function get_wannet(self)
-	local net, stat = self:get_status_by_route("0.0.0.0", 0)
-	return net and network(net, stat.proto)
+	for _, route in ipairs(ip.routes({ dest_exact = "0.0.0.0/0", table = 254 })) do
+    local net = self:get_network_by_interface(route.dev)
+    if net then
+      return network(net.interface, net.proto)
+    end
+  end
+  local net, stat = self:get_status_by_route("0.0.0.0", 0)
+  return net and network(net, stat.proto)
 end
 
 function get_wandev(self)
+	for _, route in ipairs(ip.routes({ dest_exact = "0.0.0.0/0", table = 254 })) do
+    local net = self:get_network_by_interface(route.dev)
+    if net then
+      return interface(net.l3_device or net.device)
+    end
+  end
 	local _, stat = self:get_status_by_route("0.0.0.0", 0)
 	return stat and interface(stat.l3_device or stat.device)
 end
@@ -735,7 +769,6 @@ end
 function get_switch_topologies(self)
 	return _swtopo
 end
-
 
 function network(name, proto)
 	if name then
