@@ -206,7 +206,7 @@ e:depends("type", "http")
 e:depends("type", "https")
 
 e = t:taboption("base", Flag, "use_encryption", translate("Use Encryption"))
-e.description = translate("Encrypted the communication between frpc and frps, will effectively prevent the traffic intercepted.")
+e.description = translate("Encrypted the communication between frpc and frps, will effectively prevent the traffic intercepted (If Custom TLS Protocol Encryption is enabled, except that the protocol of xtcp is configured as kcp, you can no longer set Use Encryption to repeat encryption).")
 e.default = "1"
 e.rmempty = false
 

@@ -73,29 +73,29 @@ e.description = translate("if tls_enable is true, frpc will connect frps by tls.
 e.default = "0"
 e.rmempty = false
 
-e = t:taboption("other", Flag, "enable_custom_certificate", translate("Custom TLS certificates"))
+e = t:taboption("other", Flag, "enable_custom_certificate", translate("Custom TLS Protocol Encryption"))
 e.description = translate("Frp supports traffic encryption between frpc and frps through the TLS protocol, and supports client or server unidirectional and bidirectional authentication.")
 e.default = "0"
 e.rmempty = false
 e:depends("tls_enable", 1)
 
-e = t:taboption("other", Value, "tls_cert_file", translate("Client certificate file"))
+e = t:taboption("other", Value, "tls_cert_file", translate("Client Certificate File"))
 e.description = translate("Frps one-way verifies the identity of frpc.")
-e.default = "/var/etc/frp/client.crt"
+e.placeholder = "/var/etc/frp/client.crt"
 e.optional = false
-e:depends("tls_enable", 1)
+e:depends("enable_custom_certificate", 1)
 
-e = t:taboption("other", Value, "tls_key_file", translate("Client key file"))
+e = t:taboption("other", Value, "tls_key_file", translate("Client Key File"))
 e.description = translate("Frps one-way verifies the identity of frpc.")
-e.default = "/var/etc/frp/client.key"
+e.placeholder = "/var/etc/frp/client.key"
 e.optional = false
-e:depends("tls_enable", 1)
+e:depends("enable_custom_certificate", 1)
 
-e = t:taboption("other", Value, "tls_trusted_ca_file", translate("CA certificate file"))
+e = t:taboption("other", Value, "tls_trusted_ca_file", translate("CA Certificate File"))
 e.description = translate("Frpc one-way verifies the identity of frps.")
-e.default = "/var/etc/frp/ca.crt"
+e.placeholder = "/var/etc/frp/ca.crt"
 e.optional = false
-e:depends("tls_enable", 1)
+e:depends("enable_custom_certificate", 1)
 
 e = t:taboption("other", ListValue, "protocol", translate("Protocol Type"))
 e.description = translate("Frp support kcp protocol since v0.12.0")
