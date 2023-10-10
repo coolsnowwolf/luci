@@ -189,6 +189,7 @@ start() {
 	config_load "frp"
 	local enabled server_addr server_port time privilege_token user tcp_mux enable_cpool tls_enable
 	local pool_count log_level log_max_days login_fail_exit http_proxy protocol admin_port admin_user admin_pwd
+	local tls_cert_file tls_key_file tls_trusted_ca_file
 
 	config_get_bool enabled common enabled 1
 
@@ -208,6 +209,9 @@ start() {
 	config_get admin_port common admin_port
 	config_get admin_user common admin_user
 	config_get admin_pwd common admin_pwd
+	config_get tls_cert_file common tls_cert_file
+	config_get tls_key_file common tls_key_file
+	config_get tls_trusted_ca_file common tls_trusted_ca_file
 
 
 	mkdir -p /var/etc/frp
@@ -232,6 +236,8 @@ start() {
 	[ -n "$admin_port" ] && echo "admin_addr=0.0.0.0" >>$tmpconf && echo "admin_port=$admin_port" >>$tmpconf
 	[ -n "$admin_user" ] && echo "admin_user=$admin_user" >>$tmpconf
 	[ -n "$admin_pwd" ] && echo "admin_pwd=$admin_pwd" >>$tmpconf
+	[[ -n "$tls_cert_file" && -n "$tls_key_file" ]] && echo "tls_cert_file=$tls_cert_file" >>$tmpconf && echo "tls_key_file=$tls_key_file" >>$tmpconf
+	[ -n "$tls_trusted_ca_file" ] && echo "tls_trusted_ca_file=$tls_trusted_ca_file" >>$tmpconf
 
 
 	config_load "frp"
