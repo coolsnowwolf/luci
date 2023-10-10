@@ -287,7 +287,7 @@ msgid "Proxy-Protocol Version"
 msgstr "Proxy-Protocol 版本"
 
 msgid "Encrypted the communication between frpc and frps, will effectively prevent the traffic intercepted (If Custom TLS Protocol Encryption is enabled, except that the protocol of xtcp is configured as kcp, you can no longer set Use Encryption to repeat encryption)."
-msgstr "将 frpc 与 frps 之间的通信内容加密传输，将会有效防止流量被拦截（启用自定义TLS协议加密后除 xtcp 的 protocol 配置为 kcp 外，可以不用再设置此功能重复加密）。"
+msgstr "将 frpc 与 frps 之间的通信内容加密传输，将会有效防止流量被拦截（启用自定义TLS协议加密后除 xtcp 的 protocol 配置为 kcp 外，可不再设置此项重复加密）。"
 
 msgid "The contents will be compressed to speed up the traffic forwarding speed, but this will consume some additional cpu resources."
 msgstr "对传输内容进行压缩，加快流量转发速度，但是会额外消耗一些 cpu 资源。"
