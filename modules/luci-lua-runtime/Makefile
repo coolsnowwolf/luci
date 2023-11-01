@@ -12,7 +12,6 @@ LUCI_TYPE:=mod
 LUCI_BASENAME:=lua-runtime
 
 LUCI_TITLE:=LuCI Lua runtime libraries
-LUCI_DEPENDS:=+lua
 
 include ../../luci.mk
 
