@@ -3,7 +3,7 @@
 START=50
 STOP=10
 
-VERYSYNC="/usr/bin/verysync"
+VERYSYNC="/usr/bin/very_sync"
 
 start() {
 	local enabled="$(uci get verysync.config.enabled)"
