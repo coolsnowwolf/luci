@@ -45,7 +45,7 @@ case "$DISTRIB_TARGET" in
 	"meson/meson8b")
 		uci_write_config 0 schedutil 816000 $CPU_MAX_FREQ
 		;;
-	"rockchip/armv8")
+	"rockchip*")
 		uci_write_config 0 schedutil 600000 $CPU_MAX_FREQ
 		echo "$CPU_POLICYS" | grep -q "4" && \
 			uci_write_config 4 schedutil 600000 $CPU4_MAX_FREQ

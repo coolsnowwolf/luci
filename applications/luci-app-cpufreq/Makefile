@@ -8,7 +8,7 @@ LUCI_TITLE:=LuCI for CPU Freq Setting
 LUCI_DEPENDS:=@(arm||aarch64)
 
 PKG_NAME:=luci-app-cpufreq
-PKG_VERSION:=5
+PKG_VERSION:=6
 PKG_RELEASE:=$(COMMITCOUNT)
 
 include ../../luci.mk
