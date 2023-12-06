@@ -762,6 +762,8 @@ elseif hwtype == "mt_dbdc" then
 	encr:value("psk", "WPA-PSK")
 	encr:value("psk2", "WPA2-PSK")
 	encr:value("psk-mixed", "WPA-PSK/WPA2-PSK Mixed Mode")
+	encr:value("sae", "WPA3-PSK")
+	encr:value("sae-mixed", "WPA2-PSK/WPA3-PSK Mixed Mode")
 end
 
 auth_server = s:taboption("encryption", Value, "auth_server", translate("Radius-Authentication-Server"))
@@ -1199,6 +1201,8 @@ if hwtype == "mt_dbdc" then
 	ieee80211k:depends({mode="ap", encryption="psk"})
 	ieee80211k:depends({mode="ap", encryption="psk2"})
 	ieee80211k:depends({mode="ap", encryption="psk-mixed"})
+	ieee80211k:depends({mode="ap", encryption="sae"})
+	ieee80211k:depends({mode="ap", encryption="sae-mixed"})
 	
 	ieee80211v = s:taboption("encryption", Flag, "ieee80211v", translate("802.11v"), translate("Enables 802.11v allows client devices to exchange information about the network topology,tating overall improvement of the wireless network."))
 	ieee80211v:depends({mode="ap", encryption="wpa"})
@@ -1206,6 +1210,8 @@ if hwtype == "mt_dbdc" then
 	ieee80211v:depends({mode="ap", encryption="psk"})
 	ieee80211v:depends({mode="ap", encryption="psk2"})
 	ieee80211v:depends({mode="ap", encryption="psk-mixed"})
+	ieee80211v:depends({mode="ap", encryption="sae"})
+	ieee80211v:depends({mode="ap", encryption="sae-mixed"})
 	ieee80211v.rmempty = true
 	
 	ieee80211r = s:taboption("encryption", Flag, "ieee80211r",
@@ -1217,6 +1223,8 @@ if hwtype == "mt_dbdc" then
 	ieee80211r:depends({mode="ap", encryption="psk"})
 	ieee80211r:depends({mode="ap", encryption="psk2"})
 	ieee80211r:depends({mode="ap", encryption="psk-mixed"})
+	ieee80211r:depends({mode="ap", encryption="sae"})
+	ieee80211r:depends({mode="ap", encryption="sae-mixed"})
 	ieee80211r.rmempty = true
 end
 
