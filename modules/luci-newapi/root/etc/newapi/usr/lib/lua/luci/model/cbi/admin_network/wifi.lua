@@ -630,7 +630,20 @@ if hwtype == "mt_dbdc" then
 	s:taboption("advanced", Flag, "doth", "802.11h")
 
 	disassoc_low_ack = s:taboption("general", Flag, "disassoc_low_ack", translate("Disassociate On Low Acknowledgement"),translate("Allow AP mode to disconnect STAs based on low ACK condition"))
-	disassoc_low_ack.default = disassoc_low_ack.enabled
+	disassoc_low_ack.default = disassoc_low_ack.disabled
+	disassoc_low_ack:depends({mode="ap"})
+	
+	rssikick= s:taboption("general", Value, "rssikick", translate("Kick low RSSI station threshold"), translate("dBm"));
+	rssikick.optional    = true
+	rssikick.placeholder = 75
+	rssikick.datatype = "range(-100,0)"
+	rssikick:depends("disassoc_low_ack", "1")
+
+	rssiassoc= s:taboption("general", Value, "rssiassoc", translate("Station associate threshold"), translate("dBm"));
+	rssiassoc.optional    = true
+	rssiassoc.placeholder = 60
+	rssiassoc.datatype    = "range(-100,0)"
+	rssiassoc:depends("disassoc_low_ack", "1")
 end
 
 ------------------- WiFI-Encryption -------------------
