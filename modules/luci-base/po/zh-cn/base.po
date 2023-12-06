@@ -4126,3 +4126,6 @@ msgstr "高性能模式"
 
 msgid "Target Platform"
 msgstr "目标平台"
+
+msgid "Beacon Interval"
+msgstr "Beacon间隔"
