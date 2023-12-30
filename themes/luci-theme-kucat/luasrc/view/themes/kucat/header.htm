@@ -200,7 +200,6 @@
 	if not fs.access("/www" .. resource .. "/background/") then
 	   local theme_dir = media .. "/background/"
 	end
-  	local remote_bg_url="http://www.bing.com/HPImageArchive.aspx?format=js&idx=0&n=3&mkt=en-US"
 	local bingUrl = "http://www.bing.com/"
 	local dark_css = fs.readfile('/www/luci-static/kucat/css/dark.css')
 	local bg_url = media.."/img/bg1.jpg"
@@ -227,9 +226,10 @@
 	local primary_rgbs = '132,188,218'
 	local primary_rgbs_ts = '0.1'
 	local primary_opacity = '0'
-	local bkuse = '1'
+	local bkuse = '0'
+	local bk_use='none'
 	local bklock = '1'
-	local dayword = '1'
+	local dayword = '0'
 	if fs.access('/etc/config/advancedplus') then
 		primary_rgbbody = uci:get_first('advancedplus', 'basic', 'primary_rgbbody')
 		primary_rgbm = uci:get_first('advancedplus', 'basic', 'primary_rgbm')
@@ -258,20 +258,12 @@
 	if primary_opacity == '0' then
 	    primary_ufilter = 'none'
 	end
+	local bgqs_image = '-webkit-linear-gradient(45deg, rgba(255, 255, 255, 0.2) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, transparent 75%, transparent)'
+	local bgqs_color = 'rgba(var(--primary-rgbm),var(--primary-rgbm-ts))'
 	if bgqs == '1' then
-	    bgqs_image = 'none !important'	
-		bgqs_color = 'rgba(var(--primary-rgbm),var(--primary-rgbm-ts))'
-	else
-	    bgqs_image = '-webkit-linear-gradient(45deg, rgba(255, 255, 255, 0.2) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, transparent 75%, transparent)'
-		bgqs_color = 'rgba(var(--primary-rgbm),var(--primary-rgbm-ts))'
+	    bgqs_image = 'none'	
 	end
 
-function getBing()
-    local bing = sys.exec("curl -s 'http://www.bing.com/HPImageArchive.aspx?format=js&idx=0&n=3&mkt=en-US'" )
-    if (bing and bing ~= '') then
-        bg_url = bingUrl .. json.parse(bing).images[1].url
-    end
-end
 function downunsplashUrl()
     local check = 1
     if fs.access('/tmp/kucatunsplash.tmp') then
@@ -310,24 +302,6 @@ function downbingUrl()
     end
 end
 
-function downIcibaUrl()
-    local check = 1
-    if fs.access('/tmp/kucaticiba.tmp') then
-        local localtime = sys.exec("cat /tmp/kucaticiba.tmp | grep `date +%Y%m%d`")
-        if localtime ~= '' then 
-			 check = 0 
-        end
-    end
-	
-
-    if check == 1 or not fs.access('/www/luci-static/kucat/img/down4.jpg') then
-io.popen("curl -kLfsm 3 -o /www/luci-static/kucat/img/down4.jpg  $(curl -kLfsm 5 \"http://sentence.iciba.com/index.php?c=dailysentence&m=getdetail&title=$(date +%Y-%m-%d)\" |  awk -F 'picture2\":\"' '{print $2}' | awk -F '\"' '{print $1}' | sed 's#\\##g') ")
-        sys.exec("date +%Y%m%d  > /tmp/kucaticiba.tmp")
-    end
-    if fs.access('/www/luci-static/kucat/img/down4.jpg') then
-        bg_url = media .. "/img/down4.jpg"
-    end
-end
 function downIcibaword()
     local check = 1
     if fs.access('/tmp/kucaticibaword.tmp') then
@@ -400,8 +374,6 @@ if ( background == "0" ) then
 		    currentBg = bgs[math.random(1,bgcount)]
 		    bg_url = currentBg.url
 		end
-elseif  ( background == "1" )  then
-		    pcall(getBing)
 elseif  ( background == "2" )  then
 		    pcall(downunsplashUrl)
 elseif background == "3" then
@@ -409,7 +381,7 @@ elseif background == "3" then
 elseif background == "4" then
 		    pcall(downbirdUrl)
 end
-pcall(downIcibaword)
+
 if bklock == '1' then
 	bg_lock = bg_url
 else
@@ -435,6 +407,12 @@ else
 		    currentbk = bgs[math.random(1,bkcount)]
 		    bg_lock = currentbk.url
 		end
+end
+if dayword == '1' then
+   pcall(downIcibaword)
+end
+if bkuse == '1'  then
+   bk_use='url('..bg_lock..')'
 end
 %>
 
@@ -478,7 +456,6 @@ end
 	<% if mode == 'dark' then %>
 		<%=dark_css%>
 	<% end -%>
-	<% if  bkuse == '1'  then %>
 	:root {
 		--primary-rgbbody:<%=primary_rgbbody%>;
 		--primary-rgbm: <%=primary_rgbm%>;
@@ -489,26 +466,10 @@ end
 		--font-d: <%=fontd%>;
 		--font-z: <%=fontz%>;
 		--font-x: <%=fontx%>;
-		--theme-background: url(<%=bg_lock%>);
+		--theme-background: <%=bk_use%>;
 		--bgqs-image: <%=bgqs_image%>;
 		--bgqs-color: <%=bgqs_color%>;
 	}
-	<% else %>
-		:root {
-		--primary-rgbbody: <%=primary_rgbbody%>;
-		--primary-rgbm: <%=primary_rgbm%>;
-		--primary-rgbm-ts: 1;
-		--primary-rgbs: <%=primary_rgbs%>;
-		--primary-rgbs-ts: <%=primary_rgbs_ts%>;
-		--primary-ufilter: <%=primary_ufilter%>;
-		--font-d: <%=fontd%>;
-		--font-z: <%=fontz%>;
-		--font-x: <%=fontx%>;
-		--theme-background: none; 
-		--bgqs-image: <%=bg_image%>;
-		--bgqs-color: <%=bgqs_color%>;
-	}
-	<% end -%>
 	img[src*="/luci-static/resources/cbi/add.gif"] {
     background-image: url(<%=media%>/img/add.png);
 	}
