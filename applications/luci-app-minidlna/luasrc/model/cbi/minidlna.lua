@@ -8,7 +8,7 @@ m = Map("minidlna", translate("miniDLNA"),
 
 m:section(SimpleSection).template  = "minidlna_status"
 
-s = m:section(TypedSection, "minidlna", "miniDLNA Settings")
+s = m:section(TypedSection, "minidlna", translate("miniDLNA Settings"))
 s.addremove = false
 s.anonymous = true
 
