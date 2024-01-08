@@ -1,13 +1,19 @@
 <%+header%>
 <div class="cbi-map">
-        <h2 name="content"><%=translate("TTYD Terminal")%></h2>
         <iframe id="terminal" style="width: 100%; min-height: 500px; border: none; border-radius: 3px;"></iframe>
 </div>
 <script type="text/javascript">
-        document.getElementById("terminal").src = window.location.protocol + "//" + window.location.hostname + ":7681";
+    var port = "<%=uci.get('ttyd', '@ttyd[0]', 'port')%>";
+    var protocol = "<%=uci.get('ttyd', '@ttyd[0]', 'ssl')%>" === "1" ? "https" : "http";
+    
+    if (port === "0") {
+        alert("<%=translate('Random ttyd port (port=0) is not supported.\\nChange to a fixed port and try again.')%>");
+    } else {
+        document.getElementById("terminal").src = protocol + "://" + window.location.hostname + ":" + (port || "7681");
         document.getElementById("terminal").height = document.documentElement.clientHeight;
         window.onresize = function(){
             document.getElementById("terminal").height = document.documentElement.clientHeight;
         }
+    }
 </script>
 <%+footer%>

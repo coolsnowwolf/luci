@@ -1,0 +1,155 @@
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8"
+
+msgid "TTYD Terminal"
+msgstr "TTYD 终端"
+
+msgid "Terminal"
+msgstr "终端"
+
+msgid "Configuration"
+msgstr "配置"
+
+msgid "ttyd Instance"
+msgstr "TTYD 实例"
+
+msgid "Enable"
+msgstr "启用"
+
+msgid "Port"
+msgstr "端口"
+
+msgid "Port to listen (default: 7681, use `0` for random port)"
+msgstr "监听端口（默认：7681，使用 “0” 为随机端口）"
+
+msgid "Interface"
+msgstr "接口"
+
+msgid "Network interface to bind (eg: eth0), or UNIX domain socket path (eg: /var/run/ttyd.sock)"
+msgstr "绑定的网络接口（例如：eth0）或 UNIX 域套接字路径（例如：/var/run/ttyd.sock）"
+
+msgid "Credential"
+msgstr "凭据"
+
+msgid "Credential for Basic Authentication"
+msgstr "基本身份验证凭据"
+
+msgid "User ID"
+msgstr "用户 ID"
+
+msgid "User id to run with"
+msgstr "要运行的用户 ID"
+
+msgid "Group ID"
+msgstr "组 ID"
+
+msgid "Group id to run with"
+msgstr "要运行的组 ID"
+
+msgid "Signal"
+msgstr "信号"
+
+msgid "Signal to send to the command when exit it (default: 1, SIGHUP)"
+msgstr "退出命令时发送的信号（默认：1, SIGHUP）"
+
+msgid "Allow URL args"
+msgstr "允许 URL 参数"
+
+msgid "Allow client to send command line arguments in URL (eg: http://localhost:7681?arg=foo&arg=bar)"
+msgstr "允许客户端通过 URL 发送命令行参数（例如：http://localhost:7681?arg=foo&arg=bar）"
+
+msgid "Writable"
+msgstr "可写"
+
+msgid "Allow clients to write to the TTY (readonly by default)"
+msgstr "允许客户端写入 TTY（默认只读）"
+
+msgid "Client option"
+msgstr "客户端选项"
+
+msgid "Send option to client"
+msgstr "发送选项给客户端"
+
+msgid "Terminal type"
+msgstr "终端类型"
+
+msgid "Terminal type to report (default: xterm-256color)"
+msgstr "要报告的终端类型（默认：xterm-256color）"
+
+msgid "Check origin"
+msgstr "检查来源"
+
+msgid "Do not allow websocket connection from different origin"
+msgstr "不允许来自不同来源的 WebSocket 连接"
+
+msgid "Max clients"
+msgstr "最大客户端数"
+
+msgid "Maximum clients to support (default: 0, no limit)"
+msgstr "支持的最大客户端数（默认：0，无限制）"
+
+msgid "Once"
+msgstr "单客户端"
+
+msgid "Accept only one client and exit on disconnection"
+msgstr "仅接受一个客户端并在断开连接时退出"
+
+msgid "Index"
+msgstr "索引"
+
+msgid "Custom index.html path"
+msgstr "自定义 index.html 路径"
+
+msgid "IPv6"
+msgstr "IPv6"
+
+msgid "Enable IPv6 support"
+msgstr "启用 IPv6 支持"
+
+msgid "SSL"
+msgstr "SSL"
+
+msgid "Enable SSL"
+msgstr "启用 SSL"
+
+msgid "SSL cert"
+msgstr "SSL 证书"
+
+msgid "SSL certificate file path"
+msgstr "SSL 证书文件路径"
+
+msgid "SSL key"
+msgstr "SSL 密钥"
+
+msgid "SSL key file path"
+msgstr "SSL 密钥文件路径"
+
+msgid "SSL ca"
+msgstr "SSL CA"
+
+msgid "SSL CA file path for client certificate verification"
+msgstr "用于客户端证书验证的 SSL CA 文件路径"
+
+msgid "Debug"
+msgstr "调试"
+
+msgid "Set log level (default: 7)"
+msgstr "设置日志级别（默认：7）"
+
+msgid "Error"
+msgstr "错误"
+
+msgid "Warning"
+msgstr "警告"
+
+msgid "Notice"
+msgstr "注意"
+
+msgid "Info"
+msgstr "信息"
+
+msgid "Command"
+msgstr "命令"
+
+msgid "Random ttyd port (port=0) is not supported.\\nChange to a fixed port and try again."
+msgstr "不支持随机 ttyd 端口（端口=0）。\\n请更改为固定端口并重试。"
