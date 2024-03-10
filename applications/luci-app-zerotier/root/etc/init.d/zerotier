@@ -27,8 +27,9 @@ start_instance() {
 		return 1
 	fi
   
-  [ -d /etc/config/zero ] || mkdir -p /etc/config/zero
-  config_path=/etc/config/zero
+	config_path=${CONFIG_PATH}_$cfg
+	rm -rf $config_path
+	mkdir -p $config_path
   
 	config_get_bool port $cfg 'port'
 	config_get secret $cfg 'secret'
