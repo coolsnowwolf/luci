@@ -1525,6 +1525,15 @@ msgstr "IPv6 后缀"
 msgid "IPv6-Address"
 msgstr "IPv6 地址"
 
+msgid "Remote IPv6 address"
+msgstr "远程 IPv6 地址"
+
+msgid "Encapsulation limit"
+msgstr "封装限制"
+
+msgid "When delegating prefixes to multiple downstreams, interfaces with a higher preference value are considered first when allocating subnets."
+msgstr "将前缀委派给多个下游时，在分配子网时，将首先考虑具有较高优先级值的接口。"
+
 msgid "IPv6-PD"
 msgstr "IPv6-PD"
 

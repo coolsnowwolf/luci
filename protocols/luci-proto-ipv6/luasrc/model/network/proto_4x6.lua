@@ -5,13 +5,15 @@
 local netmod = luci.model.network
 
 local _, p
-for _, p in ipairs({"dslite", "map", "464xlat"}) do
+for _, p in ipairs({"dslite", "map", "464xlat", "ipip6"}) do
 
 	local proto = netmod:register_protocol(p)
 
 	function proto.get_i18n(self)
 		if p == "dslite" then
 			return luci.i18n.translate("Dual-Stack Lite (RFC6333)")
+		elseif p == "ipip6" then
+			return luci.i18n.translate("IPv4 over IPv6 (ipip6)")
 		elseif p == "map" then
 			return luci.i18n.translate("MAP / LW4over6")
 		elseif p == "464xlat" then
@@ -26,6 +28,8 @@ for _, p in ipairs({"dslite", "map", "464xlat"}) do
 	function proto.opkg_package(self)
 		if p == "dslite" then
 			return "ds-lite"
+		elseif p == "ipip6" then
+			return "ipip6"
 		elseif p == "map" then
 			return "map-t"
 		elseif p == "464xlat" then
@@ -55,6 +59,8 @@ for _, p in ipairs({"dslite", "map", "464xlat"}) do
 
 	if p == "dslite" then
 		netmod:register_pattern_virtual("^ds%-%w")
+	elseif p == "ipip6" then
+		netmod:register_pattern_virtual("^ipip6%-%w")
 	elseif p == "map" then
 		netmod:register_pattern_virtual("^map%-%w")
 	elseif p == "464xlat" then
