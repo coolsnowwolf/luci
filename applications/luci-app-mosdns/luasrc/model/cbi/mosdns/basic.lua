@@ -8,7 +8,7 @@ else
 end
 m = Map("mosdns")
 m.title = translate("MosDNS") .. " " .. mosdns_version
-m.description = translate("MosDNS is a 'programmable' DNS forwarder.")
+m.description = translate("MosDNS is a plugin-based DNS forwarder/traffic splitter.")
 
 m:section(SimpleSection).template = "mosdns/mosdns_status"
 
@@ -40,51 +40,61 @@ o.default = "info"
 o:depends("configfile", "/etc/mosdns/config.yaml")
 
 o = s:taboption("basic", Value, "logfile", translate("Log File"))
-o.placeholder = "/tmp/mosdns.log"
-o.default = "/tmp/mosdns.log"
+o.placeholder = "/var/log/mosdns.log"
+o.default = "/var/log/mosdns.log"
 o:depends("configfile", "/etc/mosdns/config.yaml")
 
 o = s:taboption("basic", Flag, "redirect", translate("DNS Forward"), translate("Forward Dnsmasq Domain Name resolution requests to MosDNS"))
 o.default = true
 
-o = s:taboption("basic", Flag, "custom_local_dns", translate("Local DNS"), translate("Follow WAN interface DNS if not enabled"))
+o = s:taboption("basic", Flag, "prefer_ipv4", translate("Remote DNS prefer IPv4"), translate("IPv4 is preferred for remote DNS resolution of dual-stack addresses, and is not affected when the destination is IPv6 only"))
+o:depends( "configfile", "/etc/mosdns/config.yaml")
+o.default = true
+
+o = s:taboption("basic", Flag, "custom_local_dns", translate("Custom China DNS"), translate("Follow WAN interface DNS if not enabled"))
 o:depends( "configfile", "/etc/mosdns/config.yaml")
 o.default = false
-o = s:taboption("basic", DynamicList, "local_dns", translate("Upstream DNS servers"))
-o:value("119.29.29.29", "119.29.29.29 (DNSPod Primary)")
-o:value("119.28.28.28", "119.28.28.28 (DNSPod Secondary)")
-o:value("223.5.5.5", "223.5.5.5 (AliDNS Primary)")
-o:value("223.6.6.6", "223.6.6.6 (AliDNS Secondary)")
-o:value("114.114.114.114", "114.114.114.114 (114DNS Primary)")
-o:value("114.114.115.115", "114.114.115.115 (114DNS Secondary)")
-o:value("180.76.76.76", "180.76.76.76 (Baidu DNS)")
-o:value("https://doh.pub/dns-query", "DNSPod DoH")
-o:value("https://dns.alidns.com/dns-query", "AliDNS DoH")
-o:value("https://doh.360.cn/dns-query", "360DNS DoH")
+
+o = s:taboption("basic", Flag, "apple_optimization", translate("Apple domains optimization"), translate("For Apple domains equipped with Chinese mainland CDN, always responsive to Chinese CDN IP addresses"))
+o:depends("custom_local_dns", "1")
+o.default = false
+
+o = s:taboption("basic", DynamicList, "local_dns", translate("China DNS server"))
+o:value("119.29.29.29", translate("Tencent Public DNS (119.29.29.29)"))
+o:value("119.28.28.28", translate("Tencent Public DNS (119.28.28.28)"))
+o:value("223.5.5.5", translate("Aliyun Public DNS (223.5.5.5)"))
+o:value("223.6.6.6", translate("Aliyun Public DNS (223.6.6.6)"))
+o:value("114.114.114.114", translate("Xinfeng Public DNS (114.114.114.114)"))
+o:value("114.114.115.115", translate("Xinfeng Public DNS (114.114.115.115)"))
+o:value("180.76.76.76", translate("Baidu Public DNS (180.76.76.76)"))
+o:value("https://doh.pub/dns-query", translate("Tencent Public DNS (DNS over HTTPS)"))
+o:value("quic://dns.alidns.com", translate("Aliyun Public DNS (DNS over QUIC)"))
+o:value("https://dns.alidns.com/dns-query", translate("Aliyun Public DNS (DNS over HTTPS)"))
+o:value("h3://dns.alidns.com/dns-query", translate("Aliyun Public DNS (DNS over HTTPS/3)"))
+o:value("https://doh.360.cn/dns-query", translate("360 Public DNS (DNS over HTTPS)"))
 o:depends("custom_local_dns", "1")
 
-o = s:taboption("basic", DynamicList, "remote_dns", translate("Remote DNS"))
-o:value("tls://1.1.1.1", "1.1.1.1 (CloudFlare DNS)")
-o:value("tls://1.0.0.1", "1.0.0.1 (CloudFlare DNS)")
-o:value("tls://8.8.8.8", "8.8.8.8 (Google DNS)")
-o:value("tls://8.8.4.4", "8.8.4.4 (Google DNS)")
-o:value("tls://9.9.9.9", "9.9.9.9 (Quad9 DNS)")
-o:value("tls://149.112.112.112", "149.112.112.112 (Quad9 DNS)")
-o:value("tls://45.11.45.11", "45.11.45.11 (DNS.SB)")
-o:value("tls://208.67.222.222", "208.67.222.222 (Open DNS)")
-o:value("tls://208.67.220.220", "208.67.220.220 (Open DNS)")
+o = s:taboption("basic", DynamicList, "remote_dns", translate("Remote DNS server"))
+o:value("tls://1.1.1.1", translate("CloudFlare Public DNS (1.1.1.1)"))
+o:value("tls://1.0.0.1", translate("CloudFlare Public DNS (1.0.0.1)"))
+o:value("tls://8.8.8.8", translate("Google Public DNS (8.8.8.8)"))
+o:value("tls://8.8.4.4", translate("Google Public DNS (8.8.4.4)"))
+o:value("tls://9.9.9.9", translate("Quad9 Public DNS (9.9.9.9)"))
+o:value("tls://149.112.112.112", translate("Quad9 Public DNS (149.112.112.112)"))
+o:value("tls://208.67.222.222", translate("Cisco Public DNS (208.67.222.222)"))
+o:value("tls://208.67.220.220", translate("Cisco Public DNS (208.67.220.220)"))
 o:depends("configfile", "/etc/mosdns/config.yaml")
 
 o = s:taboption("basic", ListValue, "bootstrap_dns", translate("Bootstrap DNS servers"), translate("Bootstrap DNS servers are used to resolve IP addresses of the DoH/DoT resolvers you specify as upstreams"))
-o:value("119.29.29.29", "119.29.29.29 (DNSPod Primary)")
-o:value("119.28.28.28", "119.28.28.28 (DNSPod Secondary)")
-o:value("223.5.5.5", "223.5.5.5 (AliDNS Primary)")
-o:value("223.6.6.6", "223.6.6.6 (AliDNS Secondary)")
-o:value("114.114.114.114", "114.114.114.114 (114DNS Primary)")
-o:value("114.114.115.115", "114.114.115.115 (114DNS Secondary)")
-o:value("180.76.76.76", "180.76.76.76 (Baidu DNS)")
-o:value("8.8.8.8", "8.8.8.8 (Google DNS)")
-o:value("1.1.1.1", "1.1.1.1 (CloudFlare DNS)")
+o:value("119.29.29.29", translate("Tencent Public DNS (119.29.29.29)"))
+o:value("119.28.28.28", translate("Tencent Public DNS (119.28.28.28)"))
+o:value("223.5.5.5", translate("Aliyun Public DNS (223.5.5.5)"))
+o:value("223.6.6.6", translate("Aliyun Public DNS (223.6.6.6)"))
+o:value("114.114.114.114", translate("Xinfeng Public DNS (114.114.114.114)"))
+o:value("114.114.115.115", translate("Xinfeng Public DNS (114.114.115.115)"))
+o:value("180.76.76.76", translate("Baidu Public DNS (180.76.76.76)"))
+o:value("8.8.8.8", translate("Google Public DNS (8.8.8.8)"))
+o:value("1.1.1.1", translate("CloudFlare Public DNS (1.1.1.1)"))
 o.default = "119.29.29.29"
 o:depends("configfile", "/etc/mosdns/config.yaml")
 
@@ -92,11 +102,6 @@ s:tab("advanced", translate("Advanced Options"))
 
 o = s:taboption("advanced", Value, "concurrent", translate("Concurrent"), translate("DNS query request concurrency, The number of upstream DNS servers that are allowed to initiate requests at the same time"))
 o.datatype = "and(uinteger,min(1),max(3))"
-o.default = "1"
-o:depends("configfile", "/etc/mosdns/config.yaml")
-
-o = s:taboption("advanced", Value, "max_conns", translate("Maximum Connections"), translate("Set the Maximum connections for DoH and pipeline's TCP/DoT, Except for the HTTP/3 protocol"))
-o.datatype = "and(uinteger,min(1))"
 o.default = "2"
 o:depends("configfile", "/etc/mosdns/config.yaml")
 
@@ -115,32 +120,26 @@ o.rmempty = false
 o.default = false
 o:depends("configfile", "/etc/mosdns/config.yaml")
 
-o = s:taboption("advanced", Flag, "enable_http3_local", translate("Local DNS Enable HTTP/3"), translate("Enable DoH HTTP/3 protocol for Local DNS, Upstream DNS server support is required (Experimental)"))
-o.rmempty = false
-o.default = false
-o:depends("custom_local_dns", "1")
-
-o = s:taboption("advanced", Flag, "enable_http3_remote", translate("Remote DNS Enable HTTP/3"), translate("Enable DoH HTTP/3 protocol for Remote DNS, Upstream DNS server support is required (Experimental)"))
+o = s:taboption("advanced", Flag, "enable_ecs_remote", translate("Enable EDNS client subnet"))
 o.rmempty = false
 o.default = false
 o:depends("configfile", "/etc/mosdns/config.yaml")
 
-o = s:taboption("advanced", Flag, "enable_ecs_remote", translate("Enable EDNS client subnet"), translate("Add the EDNS Client Subnet option (ECS) to Remote DNS") .. '<br />' .. translate("MosDNS will auto identify the IP address subnet segment of your remote connection (0/24)") .. '<br />' .. translate("If your remote access network changes, May need restart MosDNS to update the ECS request address"))
-o.rmempty = false
-o.default = false
-o:depends("configfile", "/etc/mosdns/config.yaml")
+o = s:taboption("advanced", Value, "remote_ecs_ip", translate("IP Address"), translate("Please provide the IP address you use when accessing foreign websites. This IP subnet (0/24) will be used as the ECS address for Remote DNS requests") .. '<br />' .. translate("This feature is typically used when using a self-built DNS server as an Remote DNS upstream (requires support from the upstream server)"))
+o.datatype = "ipaddr"
+o:depends("enable_ecs_remote", "1")
 
 o = s:taboption("advanced", Flag, "dns_leak", translate("Prevent DNS Leaks"), translate("Enable this option fallback policy forces forwarding to remote DNS"))
 o.rmempty = false
 o.default = false
 o:depends("configfile", "/etc/mosdns/config.yaml")
 
-o = s:taboption("advanced", Value, "cache_size", translate("DNS Cache Size"))
+o = s:taboption("advanced", Value, "cache_size", translate("DNS Cache Size"), translate("DNS cache size (in piece). To disable caching, please set to 0."))
 o.datatype = "and(uinteger,min(0))"
 o.default = "8000"
 o:depends("configfile", "/etc/mosdns/config.yaml")
 
-o = s:taboption("advanced", Value, "cache_survival_time", translate("Cache Survival Time"))
+o = s:taboption("advanced", Value, "cache_survival_time", translate("Lazy Cache TTL"), translate("Lazy cache survival time (in second). To disable Lazy Cache, please set to 0."))
 o.datatype = "and(uinteger,min(0))"
 o.default = "86400"
 o:depends("configfile", "/etc/mosdns/config.yaml")
@@ -169,34 +168,56 @@ o = s:taboption("advanced", Flag, "adblock", translate("Enable DNS ADblock"))
 o:depends("configfile", "/etc/mosdns/config.yaml")
 o.default = false
 
-o = s:taboption("advanced", Value, "ad_source", translate("ADblock Source"), translate("When using custom rule sources, use the rule types supported by MosDNS"))
+o = s:taboption("advanced", DynamicList, "ad_source", translate("ADblock Source"), translate("When using custom rule sources, please use rule types supported by MosDNS (domain lists).") .. '<br />' .. translate("Support for local files, such as: file:///var/mosdns/example.txt"))
 o:depends("adblock", "1")
-o.default = "https://raw.githubusercontent.com/privacy-protection-tools/anti-AD/master/anti-ad-domains.txt"
+o.default = "geosite.dat"
 o:value("geosite.dat", "v2ray-geosite")
 o:value("https://raw.githubusercontent.com/privacy-protection-tools/anti-AD/master/anti-ad-domains.txt", "anti-AD")
-o:value("https://raw.githubusercontent.com/ookangzheng/dbl-oisd-nl/master/dbl_light.txt", "oisd (small)")
-o:value("https://raw.githubusercontent.com/ookangzheng/dbl-oisd-nl/master/dbl.txt", "oisd (big)")
-o:value("https://raw.githubusercontent.com/QiuSimons/openwrt-mos/master/dat/serverlist.txt", "QiuSimons/openwrt-mos")
+o:value("https://raw.githubusercontent.com/Cats-Team/AdRules/main/mosdns_adrules.txt", "Cats-Team/AdRules")
+o:value("https://raw.githubusercontent.com/neodevpro/neodevhost/master/domain", "NEO DEV HOST")
 
-o = s:taboption("basic",  Button, "_reload", translate("Reload Service"), translate("Reload service to take effect of new configuration"))
+o = s:taboption("basic",  Button, "_reload", translate("Restart-Service"), translate("Restart the MosDNS process to take effect of new configuration"))
 o.write = function()
     sys.exec("/etc/init.d/mosdns reload")
 end
 o:depends("configfile", "/etc/mosdns/config_custom.yaml")
 
-o = s:taboption("basic", TextValue, "manual-config")
-o.description = translate("<font color=\"ff0000\"><strong>View the Custom YAML Configuration file used by this MosDNS. You can edit it as you own need.</strong></font>")
+o = s:taboption("basic", TextValue, "config_custom", translate("Configuration Editor"))
 o.template = "cbi/tvalue"
 o.rows = 25
 o:depends("configfile", "/etc/mosdns/config_custom.yaml")
-
 function o.cfgvalue(self, section)
     return fs.readfile("/etc/mosdns/config_custom.yaml")
 end
-
 function o.write(self, section, value)
     value = value:gsub("\r\n?", "\n")
     fs.writefile("/etc/mosdns/config_custom.yaml", value)
+end
+-- codemirror
+o = s:taboption("basic", DummyValue, "")
+o.template = "mosdns/mosdns_editor"
+
+s:tab("cloudflare", translate("Cloudflare Options"))
+o = s:taboption("cloudflare", Flag, "cloudflare", translate("Enabled"), translate("Match the parsing result with the Cloudflare IP ranges, and when there is a successful match, use the 'Custom IP' as the parsing result (experimental feature)"))
+o.rmempty = false
+o.default = false
+o:depends("configfile", "/etc/mosdns/config.yaml")
+
+o = s:taboption("cloudflare", DynamicList, "cloudflare_ip", translate("Custom IP"))
+o.datatype = "ipaddr"
+o:depends("configfile", "/etc/mosdns/config.yaml")
+
+o = s:taboption("cloudflare", TextValue, "cloudflare_cidr", translate("Cloudflare IP Ranges"))
+o.description = translate("IPv4 CIDR：") .. [[<a href="https://www.cloudflare.com/ips-v4" target="_blank">https://www.cloudflare.com/ips-v4</a>]] .. '<br />' .. translate("IPv6 CIDR：") .. [[<a href="https://www.cloudflare.com/ips-v6" target="_blank">https://www.cloudflare.com/ips-v6</a>]]
+o.template = "cbi/tvalue"
+o.rows = 15
+o:depends("configfile", "/etc/mosdns/config.yaml")
+function o.cfgvalue(self, section)
+    return fs.readfile("/etc/mosdns/rule/cloudflare-cidr.txt")
+end
+function o.write(self, section, value)
+    value = value:gsub("\r\n?", "\n")
+    fs.writefile("/etc/mosdns/rule/cloudflare-cidr.txt", value)
 end
 
 s:tab("api", translate("API Options"))
