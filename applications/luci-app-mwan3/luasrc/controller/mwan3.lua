@@ -16,7 +16,7 @@ function index()
 
 	entry({"admin", "status", "mwan"},
 		alias("admin", "status", "mwan", "overview"),
-		_("Load Balancing"), 600)
+		_("Load Balancing"), 600).acl_depends = { "luci-app-mwan3" }
 
 	entry({"admin", "status", "mwan", "overview"},
 		template("mwan/status_interface"))
@@ -38,7 +38,7 @@ function index()
 
 	entry({"admin", "network", "mwan"},
 		alias("admin", "network", "mwan", "interface"),
-		_("Load Balancing"), 600)
+		_("Load Balancing"), 600).acl_depends = { "luci-app-mwan3" }
 
 	entry({"admin", "network", "mwan", "globals"},
 		cbi("mwan/globalsconfig"),
@@ -101,6 +101,10 @@ function diagnosticsData(interface, task)
 		if addr and addr:match("^[a-zA-Z0-9%-%.:_]+$") then
 			local util = io.popen(cmd %{ut.shellquote(device), ut.shellquote(addr)})
 			if util then
+				luci.http.write("Command:\n")
+				luci.http.write(cmd %{ut.shellquote(device),
+					ut.shellquote(addr)} .. "\n\n")
+				luci.http.write("Result:\n")
 				while true do
 					local ln = util:read("*l")
 					if not ln then break end
@@ -113,7 +117,7 @@ function diagnosticsData(interface, task)
 		end
 	end
 
-	function get_gateway(inteface)
+	function get_gateway(interface)
 		local gateway = nil
 		local dump = nil
 
@@ -138,17 +142,21 @@ function diagnosticsData(interface, task)
 	local number = getInterfaceNumber(interface)
 
 	local uci = require "luci.model.uci".cursor(nil, "/var/state")
-	local device = uci:get("network", interface, "ifname")
+	local nw = require "luci.model.network".init()
+	local i18n = require "luci.i18n"
+	local network = nw:get_network(interface)
+	local device = network and network:get_interface()
+	device = device:name()
 
 	luci.http.prepare_content("text/plain")
-	if device ~= "" then
+	if device then
 		if task == "ping_gateway" then
 			local gateway = get_gateway(interface)
 			if gateway ~= nil then
 				diag_command("ping -I %s -c 5 -W 1 %s 2>&1", device, gateway)
 			else
 				luci.http.prepare_content("text/plain")
-				luci.http.write(string.format("No gateway for interface %s found.", interface))
+				luci.http.write(i18n.translatef("No gateway for interface %s found.", interface))
 			end
 		elseif task == "ping_trackips" then
 			local trackips = uci:get("mwan3", interface, "track_ip")
@@ -157,7 +165,7 @@ function diagnosticsData(interface, task)
 					diag_command("ping -I %s -c 5 -W 1 %s 2>&1", device, trackips[i])
 				end
 			else
-				luci.http.write(string.format("No tracking Hosts for interface %s defined.", interface))
+				luci.http.write(i18n.translatef("No tracking Hosts for interface %s defined.", interface))
 			end
 		elseif task == "check_rules" then
 			local number = getInterfaceNumber(interface)
@@ -166,30 +174,30 @@ function diagnosticsData(interface, task)
 			local iif_rule  = sys.exec(string.format("ip rule | grep %d", iif))
 			local fwmark_rule = sys.exec(string.format("ip rule | grep %d", fwmark))
 			if iif_rule ~= "" and fwmark_rule ~= "" then
-				luci.http.write(string.format("All required IP rules for interface %s found", interface))
+				luci.http.write(i18n.translatef("All required IP rules for interface %s found", interface))
 				luci.http.write("\n")
 				luci.http.write(fwmark_rule)
 				luci.http.write(iif_rule)
 			elseif iif_rule == "" and fwmark_rule ~= "" then
-				luci.http.write(string.format("Only one IP rules for interface %s found", interface))
+				luci.http.write(i18n.translatef("Only one IP rules for interface %s found", interface))
 				luci.http.write("\n")
 				luci.http.write(fwmark_rule)
 			elseif iif_rule ~= "" and fwmark_rule == "" then
-				luci.http.write(string.format("Only one IP rules for interface %s found", interface))
+				luci.http.write(i18n.translatef("Only one IP rules for interface %s found", interface))
 				luci.http.write("\n")
 				luci.http.write(iif_rule)
 			else
-				luci.http.write(string.format("Missing both IP rules for interface %s", interface))
+				luci.http.write(i18n.translatef("Missing both IP rules for interface %s", interface))
 			end
 		elseif task == "check_routes" then
 			local number = getInterfaceNumber(interface)
 			local routeTable = sys.exec(string.format("ip route list table %s", number))
 			if routeTable ~= "" then
-				luci.http.write(string.format("Routing table %s for interface %s found", number, interface))
+				luci.http.write(i18n.translatef("Routing table %s for interface %s found", number, interface))
 				luci.http.write("\n")
 				luci.http.write(routeTable)
 			else
-				luci.http.write(string.format("Routing table %s for interface %s not found", number, interface))
+				luci.http.write(i18n.translatef("Routing table %s for interface %s not found", number, interface))
 			end
 		elseif task == "hotplug_ifup" then
 			os.execute(string.format("/usr/sbin/mwan3 ifup %s", ut.shellquote(interface)))

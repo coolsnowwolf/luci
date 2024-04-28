@@ -2,21 +2,26 @@
 -- Copyright 2018 Florian Eckert <fe@dev.tdt.de>
 -- Licensed to the public under the GNU General Public License v2.
 
-dsp = require "luci.dispatcher"
+local dsp = require "luci.dispatcher"
+
+local m, mwan_interface, enabled, initial_state, family, track_ip
+local track_method, reliability, count, size, max_ttl
+local check_quality, failure_latency, failure_loss, recovery_latency
+local recovery_loss, timeout, interval, failure
+local keep_failure, recovery, down, up, flush, metric
+local httping_ssl
+
 arg[1] = arg[1] or ""
 
+m = Map("mwan3", translatef("MWAN Interface Configuration - %s", arg[1]))
+m.redirect = dsp.build_url("admin", "network", "mwan", "interface")
 
-m5 = Map("mwan3", translatef("MWAN Interface Configuration - %s", arg[1]))
-	m5.redirect = dsp.build_url("admin", "network", "mwan", "interface")
-
-mwan_interface = m5:section(NamedSection, arg[1], "interface", "")
+mwan_interface = m:section(NamedSection, arg[1], "interface", "")
 mwan_interface.addremove = false
 mwan_interface.dynamic = false
 
-enabled = mwan_interface:option(ListValue, "enabled", translate("Enabled"))
-enabled.default = "1"
-enabled:value("1", translate("Yes"))
-enabled:value("0", translate("No"))
+enabled = mwan_interface:option(Flag, "enabled", translate("Enabled"))
+enabled.default = false
 
 initial_state = mwan_interface:option(ListValue, "initial_state", translate("Initial state"),
 	translate("Expect interface state on up event"))
@@ -36,8 +41,26 @@ track_ip.datatype = "host"
 track_method = mwan_interface:option(ListValue, "track_method", translate("Tracking method"))
 track_method.default = "ping"
 track_method:value("ping")
-track_method:value("arping")
-track_method:value("httping")
+if os.execute("command -v nping 1>/dev/null") == 0 then
+	track_method:value("nping-tcp")
+	track_method:value("nping-udp")
+	track_method:value("nping-icmp")
+	track_method:value("nping-arp")
+end
+
+if os.execute("command -v arping 1>/dev/null") == 0 then
+	track_method:value("arping")
+end
+
+if os.execute("command -v httping 1>/dev/null") == 0 then
+	track_method:value("httping")
+end
+
+httping_ssl = mwan_interface:option(Flag, "httping_ssl", translate("Enable ssl tracking"),
+	translate("Enables https tracking on ssl port 443"))
+httping_ssl:depends("track_method", "httping")
+httping_ssl.rmempty = false
+httping_ssl.default = httping_ssl.enabled
 
 reliability = mwan_interface:option(Value, "reliability", translate("Tracking reliability"),
 	translate("Acceptable values: 1-100. This many Tracking IP addresses must respond for the link to be deemed up"))
@@ -65,14 +88,24 @@ size:value("1016")
 size:value("1472")
 size:value("2040")
 size.datatype = "range(1, 65507)"
-size.rmempty = false
-size.optional = false
+
+max_ttl = mwan_interface:option(Value, "max_ttl", translate("Max TTL"))
+max_ttl.default = "60"
+max_ttl:depends("track_method", "ping")
+max_ttl:value("10")
+max_ttl:value("20")
+max_ttl:value("30")
+max_ttl:value("40")
+max_ttl:value("50")
+max_ttl:value("60")
+max_ttl:value("70")
+max_ttl.datatype = "range(1, 255)"
 
 check_quality = mwan_interface:option(Flag, "check_quality", translate("Check link quality"))
 check_quality:depends("track_method", "ping")
 check_quality.default = false
 
-failure_latency = mwan_interface:option(Value, "failure_latency", translate("Max packet latency [ms]"))
+failure_latency = mwan_interface:option(Value, "failure_latency", translate("Failure latency [ms]"))
 failure_latency:depends("check_quality", 1)
 failure_latency.default = "1000"
 failure_latency:value("25")
@@ -84,16 +117,16 @@ failure_latency:value("200")
 failure_latency:value("250")
 failure_latency:value("300")
 
-failure_loss = mwan_interface:option(Value, "failure_loss", translate("Max packet loss [%]"))
+failure_loss = mwan_interface:option(Value, "failure_loss", translate("Failure packet loss [%]"))
 failure_loss:depends("check_quality", 1)
-failure_loss.default = "20"
+failure_loss.default = "40"
 failure_loss:value("2")
 failure_loss:value("5")
 failure_loss:value("10")
 failure_loss:value("20")
 failure_loss:value("25")
 
-recovery_latency = mwan_interface:option(Value, "recovery_latency", translate("Min packet latency [ms]"))
+recovery_latency = mwan_interface:option(Value, "recovery_latency", translate("Recovery latency [ms]"))
 recovery_latency:depends("check_quality", 1)
 recovery_latency.default = "500"
 recovery_latency:value("25")
@@ -105,9 +138,9 @@ recovery_latency:value("200")
 recovery_latency:value("250")
 recovery_latency:value("300")
 
-recovery_loss = mwan_interface:option(Value, "recovery_loss", translate("Min packet loss [%]"))
+recovery_loss = mwan_interface:option(Value, "recovery_loss", translate("Recovery packet loss [%]"))
 recovery_loss:depends("check_quality", 1)
-recovery_loss.default = "5"
+recovery_loss.default = "10"
 recovery_loss:value("2")
 recovery_loss:value("5")
 recovery_loss:value("10")
@@ -115,7 +148,7 @@ recovery_loss:value("20")
 recovery_loss:value("25")
 
 timeout = mwan_interface:option(ListValue, "timeout", translate("Ping timeout"))
-timeout.default = "2"
+timeout.default = "4"
 timeout:value("1", translatef("%d second", 1))
 timeout:value("2", translatef("%d seconds", 2))
 timeout:value("3", translatef("%d seconds", 3))
@@ -128,7 +161,7 @@ timeout:value("9", translatef("%d seconds", 9))
 timeout:value("10", translatef("%d seconds", 10))
 
 interval = mwan_interface:option(ListValue, "interval", translate("Ping interval"))
-interval.default = "5"
+interval.default = "10"
 interval:value("1", translatef("%d second", 1))
 interval:value("3", translatef("%d seconds", 3))
 interval:value("5", translatef("%d seconds", 5))
@@ -180,7 +213,7 @@ recovery:value("3600", translatef("%d hour", 1))
 
 down = mwan_interface:option(ListValue, "down", translate("Interface down"),
 	translate("Interface will be deemed down after this many failed ping tests"))
-down.default = "3"
+down.default = "5"
 down:value("1")
 down:value("2")
 down:value("3")
@@ -194,7 +227,7 @@ down:value("10")
 
 up = mwan_interface:option(ListValue, "up", translate("Interface up"),
 	translate("Downed interface will be deemed up after this many successful ping tests"))
-up.default = "3"
+up.default = "5"
 up:value("1")
 up:value("2")
 up:value("3")
@@ -206,13 +239,12 @@ up:value("8")
 up:value("9")
 up:value("10")
 
-flush = mwan_interface:option(ListValue, "flush_conntrack", translate("Flush conntrack table"),
+flush = mwan_interface:option(StaticList, "flush_conntrack", translate("Flush conntrack table"),
 	translate("Flush global firewall conntrack table on interface events"))
-flush.default = "never"
-flush:value("ifup", translate("ifup"))
-flush:value("ifdown", translate("ifdown"))
-flush:value("never", translate("never"))
-flush:value("always", translate("always"))
+flush:value("ifup", translate("ifup (netifd)"))
+flush:value("ifdown", translate("ifdown (netifd)"))
+flush:value("connected", translate("connected (mwan3)"))
+flush:value("disconnected", translate("disconnected (mwan3)"))
 
 metric = mwan_interface:option(DummyValue, "metric", translate("Metric"),
 	translate("This displays the metric assigned to this interface in /etc/config/network"))
@@ -227,4 +259,4 @@ function metric.cfgvalue(self, s)
 	end
 end
 
-return m5
+return m
