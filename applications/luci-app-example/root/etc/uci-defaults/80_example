@@ -1,0 +1,9 @@
+#!/bin/sh
+
+touch /etc/config/example
+uci set example.first=first
+uci set example.second=second
+uci set example.third=third
+uci commit
+
+return 0

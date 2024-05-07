@@ -1,19 +1,22 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"PO-Revision-Date: 2012-11-21 18:45+0200\n"
-"Last-Translator: Jo-Philipp <jow@openwrt.org>\n"
-"Language-Team: none\n"
+"PO-Revision-Date: 2023-06-20 16:22+0000\n"
+"Last-Translator: ssantos <ssantos@web.de>\n"
+"Language-Team: German <https://hosted.weblate.org/projects/openwrt/"
+"luciapplicationscommands/de/>\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Pootle 2.0.6\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 4.18.1\n"
 
+#: applications/luci-app-commands/htdocs/luci-static/resources/view/commands.js:19
 msgid "A short textual description of the configured command"
-msgstr "Kurze Beschreibung des abgespeicherten Kommandos"
+msgstr "Eine kurze Beschreibung des konfigurierten Befehls"
 
+#: applications/luci-app-commands/htdocs/luci-static/resources/view/commands.js:30
 msgid ""
 "Allow executing the command and downloading its output without prior "
 "authentication"
@@ -21,87 +24,121 @@ msgstr ""
 "Ausführen des Kommandos und Herunterladen der Ausgabe ohne vorherige "
 "Authentifizierung ermöglichen"
 
+#: applications/luci-app-commands/htdocs/luci-static/resources/view/commands.js:27
 msgid "Allow the user to provide additional command line arguments"
 msgstr "Erlaube dem Nutzer zusätzliche Kommandozeilenargumente zu übergeben"
 
+#: applications/luci-app-commands/ucode/template/commands.ut:156
 msgid "Arguments:"
 msgstr "Argumente:"
 
+#: applications/luci-app-commands/ucode/template/commands.ut:60
 msgid "Binary data not displayed, download instead."
-msgstr "Binärdaten ausgeblendet, laden Sie die Ausgaben stattdessen herunter"
+msgstr "Binärdaten ausgeblendet, laden Sie die Ausgaben stattdessen herunter."
 
+#: applications/luci-app-commands/ucode/template/commands.ut:65
 msgid "Code:"
 msgstr "Rückgabewert:"
 
+#: applications/luci-app-commands/ucode/template/commands.ut:174
 msgid "Collecting data..."
 msgstr "Sammle Daten..."
 
+#: applications/luci-app-commands/htdocs/luci-static/resources/view/commands.js:21
 msgid "Command"
-msgstr "Kommando"
+msgstr "Befehl"
 
+#: applications/luci-app-commands/ucode/template/commands_public.ut:32
 msgid "Command executed successfully."
-msgstr ""
+msgstr "Befehl erfolgreich ausgeführt."
 
-msgid "Command exited with status code"
-msgstr ""
+#: applications/luci-app-commands/ucode/template/commands_public.ut:34
+msgid "Command exited with status code %d"
+msgstr "Befehl wurde mit Statuscode %d beendet"
 
+#: applications/luci-app-commands/ucode/template/commands.ut:67
 msgid "Command failed"
-msgstr "Kommando fehlgeschlagen"
+msgstr "Befehl fehlgeschlagen"
 
+#: applications/luci-app-commands/htdocs/luci-static/resources/view/commands.js:21
 msgid "Command line to execute"
 msgstr "Auszuführende Kommandozeile"
 
+#: applications/luci-app-commands/ucode/template/commands.ut:67
 msgid "Command successful"
 msgstr "Kommando erfolgreich"
 
+#: applications/luci-app-commands/ucode/template/commands.ut:154
 msgid "Command:"
 msgstr "Kommando:"
 
+#: applications/luci-app-commands/root/usr/share/luci/menu.d/luci-app-commands.json:23
 msgid "Configure"
 msgstr "Konfigurieren"
 
+#: applications/luci-app-commands/htdocs/luci-static/resources/view/commands.js:10
+#: applications/luci-app-commands/root/usr/share/luci/menu.d/luci-app-commands.json:3
+#: applications/luci-app-commands/ucode/template/commands.ut:137
 msgid "Custom Commands"
 msgstr "Benutzerdefinierte Kommandos"
 
+#: applications/luci-app-commands/htdocs/luci-static/resources/view/commands.js:26
 msgid "Custom arguments"
 msgstr "Benutzerdefinierte Argumente"
 
+#: applications/luci-app-commands/root/usr/share/luci/menu.d/luci-app-commands.json:14
 msgid "Dashboard"
 msgstr "Übersicht"
 
+#: applications/luci-app-commands/htdocs/luci-static/resources/view/commands.js:18
 msgid "Description"
 msgstr "Beschreibung"
 
+#: applications/luci-app-commands/ucode/template/commands.ut:160
 msgid "Download"
 msgstr "Herunterladen"
 
+#: applications/luci-app-commands/ucode/template/commands.ut:117
 msgid "Download execution result"
-msgstr ""
+msgstr "Programmausgabe herunterladen"
 
+#: applications/luci-app-commands/ucode/template/commands.ut:73
 msgid "Failed to execute command!"
-msgstr "Kommando konnte nicht ausgeführt werden!"
+msgstr "Befehl konnte nicht ausgeführt werden!"
 
+#: applications/luci-app-commands/root/usr/share/rpcd/acl.d/luci-app-commands.json:3
+msgid "Grant UCI access for luci-app-commands"
+msgstr "Gewähre UCI Zugriff auf luci-app-commands"
+
+#: applications/luci-app-commands/ucode/template/commands.ut:162
 msgid "Link"
 msgstr "Link"
 
+#: applications/luci-app-commands/ucode/template/commands.ut:47
 msgid "Loading"
 msgstr "Lade"
 
+#: applications/luci-app-commands/ucode/template/commands.ut:117
 msgid "Or display result"
-msgstr ""
+msgstr "Oder Ergebnis anzeigen"
 
+#: applications/luci-app-commands/htdocs/luci-static/resources/view/commands.js:29
 msgid "Public access"
 msgstr "Öffentlicher Zugriff"
 
+#: applications/luci-app-commands/ucode/template/commands.ut:159
 msgid "Run"
 msgstr "Ausführen"
 
+#: applications/luci-app-commands/ucode/template/commands_public.ut:44
 msgid "Standard Error"
-msgstr ""
+msgstr "Fehlerausgabe"
 
+#: applications/luci-app-commands/ucode/template/commands_public.ut:39
 msgid "Standard Output"
-msgstr ""
+msgstr "Standardausgabe"
 
+#: applications/luci-app-commands/htdocs/luci-static/resources/view/commands.js:11
 msgid ""
 "This page allows you to configure custom shell commands which can be easily "
 "invoked from the web interface."
@@ -109,8 +146,10 @@ msgstr ""
 "Diese Seite ermöglicht die Konfiguration eigener Shell-Kommandos um diese "
 "einfach über das Webinterface ausführen zu können."
 
-msgid "Waiting for command to complete..."
-msgstr "Warte auf die Ausführung des Kommandos..."
+#: applications/luci-app-commands/ucode/template/commands.ut:144
+msgid "This section contains no values yet"
+msgstr "Dieser Abschnitt enthält noch keine Werte"
 
-#~ msgid "Access command with"
-#~ msgstr "Kommando aufrufen mit"
+#: applications/luci-app-commands/ucode/template/commands.ut:48
+msgid "Waiting for command to complete..."
+msgstr "Der Befehl wird ausgeführt..."

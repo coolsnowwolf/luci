@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2008-2015 The LuCI Team <luci@lists.subsignal.org>
+# Copyright (C) 2022 Jo-Philipp Wich <jo@mein.io>
 #
 # This is free software, licensed under the Apache License, Version 2.0 .
 #
@@ -11,21 +11,45 @@ PKG_NAME:=luci-base
 LUCI_TYPE:=mod
 LUCI_BASENAME:=base
 
-LUCI_TITLE:=LuCI core libraries
-LUCI_DEPENDS:=+lua +libuci-lua +luci-lib-nixio +luci-lib-ip +rpcd +libubus-lua +luci-lib-jsonc +luci-compat +luci-lua-runtime
+LUCI_TITLE:=LuCI core runtime
+LUCI_DEPENDS:=\
+	+rpcd \
+	+rpcd-mod-file \
+	+rpcd-mod-luci \
+	+rpcd-mod-ucode \
+	+cgi-io \
+	+ucode \
+	+ucode-mod-fs \
+	+ucode-mod-uci \
+	+ucode-mod-ubus \
+	+ucode-mod-math \
+	+ucode-mod-html \
+	+liblucihttp-ucode
 
-PKG_SOURCE:=LuaSrcDiet-0.12.1.tar.bz2
-PKG_SOURCE_URL:=https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/luasrcdiet
-PKG_HASH:=ed7680f2896269ae8633756e7edcf09050812f78c8f49e280e63c30d14f35aea
-PKG_LICENSE:=Apache-2.0
+PKG_LICENSE:=MIT
 
-HOST_BUILD_DIR:=$(BUILD_DIR_HOST)/LuaSrcDiet-0.12.1
+HOST_BUILD_DIR:=$(BUILD_DIR_HOST)/$(PKG_NAME)
 
 include $(INCLUDE_DIR)/host-build.mk
 
 define Package/luci-base/conffiles
 /etc/luci-uploads
 /etc/config/luci
+/etc/config/ucitrack
+endef
+
+define Package/luci-base/postinst
+#!/bin/sh
+
+if [ -z "$${PKG_INSTROOT}" ] && [ -f /etc/config/uhttpd ]; then
+	if ! uci -q get uhttpd.main.ucode_prefix | grep -sq /cgi-bin/luci; then
+		uci add_list uhttpd.main.ucode_prefix='/cgi-bin/luci=/usr/share/ucode/luci/uhttpd.uc'
+		uci commit uhttpd
+		service uhttpd reload
+	fi
+fi
+
+exit 0
 endef
 
 include ../../luci.mk
@@ -34,14 +58,13 @@ define Host/Configure
 endef
 
 define Host/Compile
-	$(MAKE) -C src/ clean po2lmo
-	$(MAKE) -C $(HOST_BUILD_DIR) bin/LuaSrcDiet.lua
+	$(MAKE) -C src/ clean po2lmo jsmin
 endef
 
 define Host/Install
 	$(INSTALL_DIR) $(1)/bin
 	$(INSTALL_BIN) src/po2lmo $(1)/bin/po2lmo
-	$(INSTALL_BIN) $(HOST_BUILD_DIR)/bin/LuaSrcDiet.lua $(1)/bin/LuaSrcDiet
+	$(INSTALL_BIN) src/jsmin $(1)/bin/jsmin
 endef
 
 $(eval $(call HostBuild))

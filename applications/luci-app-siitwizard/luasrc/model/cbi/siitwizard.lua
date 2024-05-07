@@ -49,8 +49,8 @@ ula = ula:add(find_ll())
 
 
 -------------------- View --------------------
-f = SimpleForm("siitwizward", "SIIT-Wizzard",
- "This wizzard helps to setup SIIT (IPv4-over-IPv6) translation according to RFC2765.")
+f = SimpleForm("siitwizard", "SIIT-Wizard",
+ "This wizard helps to set up SIIT (IPv4-over-IPv6) translation according to RFC2765.")
 
 f:field(DummyValue, "info_ula", "Mesh ULA address").value = ula:string()
 
@@ -167,7 +167,7 @@ function mode.write(self, section, value)
 	--	* wl0 gets an ipv6 address, in this case the fdca:ffee:babe::1:1/64
 	--	* we do a ::ffff:ffff:0/96 route into siit0, so everything from 6mesh goes into translation.
 	--	* an HNA6 of ::ffff:ffff:0:0/96 announces the mapped 0.0.0.0/0 ipv4 space.
-	--	* MTU on WAN, LAN down to 1400, ipv6 headers are slighly larger.
+	--	* MTU on WAN, LAN down to 1400, ipv6 headers are slightly larger.
 
 	if value == "gateway" then
 
@@ -342,9 +342,9 @@ function mode.write(self, section, value)
 	-- txtinfo v6 & olsrd nameservice
 	uci:foreach("olsrd", "LoadPlugin",
 		function(s)
-			if s.library == "olsrd_txtinfo.so.0.1" then
+			if s.library == "olsrd_txtinfo" then
 				uci:set("olsrd", s['.name'], "accept", "::1")
-			elseif s.library == "olsrd_nameservice.so.0.3" then
+			elseif s.library == "olsrd_nameservice" then
 				uci:set("olsrd", s['.name'], "name", hostname)
 			end
 		end)

@@ -71,10 +71,10 @@ yuv = s:taboption(this_tab, Flag, "yuv", translate("Enable YUYV format"), transl
 quality = s:taboption(this_tab, Value, "quality", translate("JPEG compression quality"), translate("Set the quality in percent. This setting activates YUYV format, disables MJPEG"))
     quality.datatype = "range(0, 100)"
 
-minimum_size = s:taboption(this_tab, Value, "minimum_size", translate("Drop frames smaller then this limit"),translate("Set the minimum size if the webcam produces small-sized garbage frames. May happen under low light conditions"))
+minimum_size = s:taboption(this_tab, Value, "minimum_size", translate("Drop frames smaller than this limit"),translate("Set the minimum size if the webcam produces small-sized garbage frames. May happen under low light conditions"))
     minimum_size.datatype = "uinteger"
 
-no_dynctrl = s:taboption(this_tab, Flag, "no_dynctrl", translate("Don't initalize dynctrls"), translate("Do not initalize dynctrls of Linux-UVC driver"))
+no_dynctrl = s:taboption(this_tab, Flag, "no_dynctrl", translate("Don't initialize dynctrls"), translate("Do not initialize dynctrls of Linux-UVC driver"))
 
 led = s:taboption(this_tab, ListValue, "led", translate("Led control"))
     led:value("on", translate("On"))
@@ -206,7 +206,7 @@ folder=s:taboption(this_tab, Value, "folder", translate("Folder"), translate("Se
 
 --mjpeg=s:taboption(this_tab, Value, "mjpeg", translate("Mjpeg output"), translate("Check to save the stream to an mjpeg file"))
 
-delay=s:taboption(this_tab, Value, "delay", translate("Interval between saving pictures"), translate("Set the inteval in millisecond"))
+delay=s:taboption(this_tab, Value, "delay", translate("Interval between saving pictures"), translate("Set the interval in millisecond"))
     delay.placeholder="5000"
     delay.datatype = "uinteger"
 
@@ -217,7 +217,8 @@ ringbuffer=s:taboption(this_tab, Value, "ringbuffer", translate("Ring buffer siz
 exceed=s:taboption(this_tab, Value, "exceed", translate("Exceed"), translate("Allow ringbuffer to exceed limit by this amount"))
     exceed.datatype = "uinteger"
 
-command=s:taboption(this_tab, Value, "command", translate("Command to run"), translate("Execute command after saving picture. Mjpg-streamer parse the filename as first parameter to your script."))
+command=s:taboption(this_tab, Value, "command", translate("Command to run"), translate("Execute command after saving picture. Mjpg-streamer parses the filename as first parameter to your script."))
 
+link=s:taboption(this_tab, Value, "link", translate("Link newest picture to fixed file name"), translate("Link the last picture in ringbuffer to fixed named file provided."))
 
 return m

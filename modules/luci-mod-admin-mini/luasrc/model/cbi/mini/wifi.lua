@@ -169,6 +169,7 @@ s.addremove = false
 s:option(Value, "ssid", translate("Network Name (<abbr title=\"Extended Service Set Identifier\">ESSID</abbr>)"))
 
 bssid = s:option(Value, "bssid", translate("<abbr title=\"Basic Service Set Identifier\">BSSID</abbr>"))
+bssid.datatype = "macaddr"
 
 local devs = {}
 luci.model.uci.cursor():foreach("wireless", "wifi-device",
@@ -241,7 +242,7 @@ if hwtype == "mac80211" then
 		encr.description = translate(
 			"WPA-Encryption requires wpa_supplicant (for client mode) or hostapd (for AP " ..
 			"and ad-hoc mode) to be installed."
-		)		
+		)
 	else
 		encr.description = translate(
 			"WPA-Encryption requires wpa_supplicant (for client mode) or hostapd (for AP " ..
@@ -252,10 +253,6 @@ elseif hwtype == "broadcom" then
 	encr:value("psk", "WPA-PSK")
 	encr:value("psk2", "WPA2-PSK")
 	encr:value("psk+psk2", "WPA-PSK/WPA2-PSK Mixed Mode")
-elseif hwtype == "mt_dbdc" then
-	encr:value("psk", "WPA-PSK")
-	encr:value("psk2", "WPA2-PSK")
-	encr:value("psk-mixed", "WPA-PSK/WPA2-PSK Mixed Mode")
 end
 
 key = s:option(Value, "key", translate("Key"))
@@ -331,7 +328,7 @@ if hwtype == "mac80211" then
 end
 
 
-if hwtype == "broadcom" or hwtype == "mt_dbdc" then
+if hwtype == "broadcom" then
 	iso = s:option(Flag, "isolate", translate("AP-Isolation"), translate("Prevents Client to Client communication"))
 	iso.rmempty = true
 	iso:depends("mode", "ap")

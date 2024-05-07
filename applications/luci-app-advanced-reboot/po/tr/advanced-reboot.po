@@ -1,0 +1,214 @@
+msgid ""
+msgstr ""
+"PO-Revision-Date: 2023-10-29 19:41+0000\n"
+"Last-Translator: semih <semiht@gmail.com>\n"
+"Language-Team: Turkish <https://hosted.weblate.org/projects/openwrt/"
+"luciapplicationsadvanced-reboot/tr/>\n"
+"Language: tr\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 5.2-dev\n"
+
+#: applications/luci-app-advanced-reboot/htdocs/luci-static/resources/view/system/advanced_reboot.js:193
+#: applications/luci-app-advanced-reboot/root/usr/share/luci/menu.d/luci-app-advanced-reboot.json:3
+msgid "Advanced Reboot"
+msgstr "Gelişmiş Yeniden Başlatma"
+
+#: applications/luci-app-advanced-reboot/htdocs/luci-static/resources/view/system/advanced_reboot.js:58
+#: applications/luci-app-advanced-reboot/htdocs/luci-static/resources/view/system/advanced_reboot.js:141
+msgid "Cancel"
+msgstr "İptal"
+
+#: applications/luci-app-advanced-reboot/htdocs/luci-static/resources/view/system/advanced_reboot.js:168
+msgid "Compressed"
+msgstr "Sıkıştırılmış"
+
+#: applications/luci-app-advanced-reboot/htdocs/luci-static/resources/view/system/advanced_reboot.js:130
+msgid "Confirm"
+msgstr "Onayla"
+
+#: applications/luci-app-advanced-reboot/htdocs/luci-static/resources/view/system/advanced_reboot.js:82
+#: applications/luci-app-advanced-reboot/htdocs/luci-static/resources/view/system/advanced_reboot.js:111
+msgid "Device unreachable! Still waiting for device..."
+msgstr "Aygıta ulaşılamıyor! Hala aygıt bekleniyor..."
+
+#: applications/luci-app-advanced-reboot/htdocs/luci-static/resources/view/system/advanced_reboot.js:203
+msgid "ERROR:"
+msgstr "HATA:"
+
+#: applications/luci-app-advanced-reboot/htdocs/luci-static/resources/view/system/advanced_reboot.js:211
+msgid "Firmware"
+msgstr "Cihaz yazılımı"
+
+#: applications/luci-app-advanced-reboot/root/usr/share/rpcd/acl.d/luci-app-advanced-reboot.json:3
+msgid "Grant UCI and file access for luci-app-advanced-reboot"
+msgstr "luci-app-advanced-reboot için UCI ve dosya erişimi verin"
+
+#: applications/luci-app-advanced-reboot/htdocs/luci-static/resources/view/system/advanced_reboot.js:127
+msgid "No access to fw_printenv or fw_printenv!"
+msgstr "fw_printenv'e veya fw_printenv'e erişim yok!"
+
+#: applications/luci-app-advanced-reboot/htdocs/luci-static/resources/view/system/advanced_reboot.js:209
+msgid "Partition"
+msgstr "Bölüm"
+
+#: applications/luci-app-advanced-reboot/htdocs/luci-static/resources/view/system/advanced_reboot.js:205
+msgid "Partitions"
+msgstr "Bölümler"
+
+#: applications/luci-app-advanced-reboot/htdocs/luci-static/resources/view/system/advanced_reboot.js:235
+msgid "Perform power off..."
+msgstr "Güç kapat..."
+
+#: applications/luci-app-advanced-reboot/htdocs/luci-static/resources/view/system/advanced_reboot.js:51
+msgid "Power Off Device"
+msgstr "Cihazın Gücünü Kapat"
+
+#: applications/luci-app-advanced-reboot/htdocs/luci-static/resources/view/system/advanced_reboot.js:62
+#: applications/luci-app-advanced-reboot/htdocs/luci-static/resources/view/system/advanced_reboot.js:145
+msgid "Proceed"
+msgstr "İlerle"
+
+#: applications/luci-app-advanced-reboot/htdocs/luci-static/resources/view/system/advanced_reboot.js:212
+msgid "Reboot"
+msgstr "Yeniden başlat"
+
+#: applications/luci-app-advanced-reboot/htdocs/luci-static/resources/view/system/advanced_reboot.js:130
+msgid "Reboot Device to an Alternative Partition"
+msgstr "Alternatif Bölüm için cihazı yeniden başlat"
+
+#: applications/luci-app-advanced-reboot/htdocs/luci-static/resources/view/system/advanced_reboot.js:162
+msgid "Reboot to alternative partition..."
+msgstr "alternatif bölüm için yeniden başlat..."
+
+#: applications/luci-app-advanced-reboot/htdocs/luci-static/resources/view/system/advanced_reboot.js:159
+msgid "Reboot to current partition"
+msgstr "Mevcut bölüm için yeniden başlat"
+
+#: applications/luci-app-advanced-reboot/htdocs/luci-static/resources/view/system/advanced_reboot.js:75
+#: applications/luci-app-advanced-reboot/htdocs/luci-static/resources/view/system/advanced_reboot.js:80
+#: applications/luci-app-advanced-reboot/htdocs/luci-static/resources/view/system/advanced_reboot.js:104
+#: applications/luci-app-advanced-reboot/htdocs/luci-static/resources/view/system/advanced_reboot.js:109
+msgid "Rebooting…"
+msgstr "Yeniden başlatılıyor…"
+
+#: applications/luci-app-advanced-reboot/htdocs/luci-static/resources/view/system/advanced_reboot.js:43
+msgid "Shutting down..."
+msgstr "Kapatılıyor..."
+
+#: applications/luci-app-advanced-reboot/htdocs/luci-static/resources/view/system/advanced_reboot.js:210
+msgid "Status"
+msgstr "Durum"
+
+#: applications/luci-app-advanced-reboot/htdocs/luci-static/resources/view/system/advanced_reboot.js:17
+msgid "The Dual Boot Flag Partition: %s is not a block device."
+msgstr "İkili Önyükleme İşareti Bölümü: %s bir blok aygıtı değil."
+
+#: applications/luci-app-advanced-reboot/htdocs/luci-static/resources/view/system/advanced_reboot.js:71
+#: applications/luci-app-advanced-reboot/htdocs/luci-static/resources/view/system/advanced_reboot.js:100
+msgid "The reboot command failed with code %d"
+msgstr "Yeniden başlatma komutu %d koduyla başarısız oldu"
+
+#: applications/luci-app-advanced-reboot/htdocs/luci-static/resources/view/system/advanced_reboot.js:105
+msgid ""
+"The system is rebooting to an alternative partition now.<br /> DO NOT POWER "
+"OFF THE DEVICE!<br /> Wait a few minutes before you try to reconnect. It "
+"might be necessary to renew the address of your computer to reach the device "
+"again, depending on your settings."
+msgstr ""
+"Sistem şimdi alternatif bir bölüme yeniden başlatılıyor.<br /> AYGITI "
+"KAPATMAYIN!<br /> Yeniden bağlanmayı denemeden önce birkaç dakika bekleyin. "
+"Ayarlarınıza bağlı olarak, aygıta tekrar erişmek için bilgisayarınızın "
+"adresini yenilemeniz gerekebilir."
+
+#: applications/luci-app-advanced-reboot/htdocs/luci-static/resources/view/system/advanced_reboot.js:44
+msgid ""
+"The system is shutting down now.<br /> DO NOT POWER OFF THE DEVICE!<br /> It "
+"might be necessary to renew the address of your computer to reach the device "
+"again, depending on your settings."
+msgstr ""
+"Sistem şimdi kapanıyor.<br /> LÜTFEN GÜCÜ KESMEYİN!<br /> Ayarlarınıza bağlı "
+"olarak, cihaza tekrar ulaşmak için bilgisayarınızın adresini yenilemeniz "
+"gerekebilir."
+
+#: applications/luci-app-advanced-reboot/htdocs/luci-static/resources/view/system/advanced_reboot.js:15
+msgid "Unable to find Device Board Name."
+msgstr "Aygıt Kartı Adı bulunamıyor."
+
+#: applications/luci-app-advanced-reboot/htdocs/luci-static/resources/view/system/advanced_reboot.js:16
+msgid "Unable to find Dual Boot Flag Partition."
+msgstr "Dual Boot Flag bölümü bulunamadı."
+
+#: applications/luci-app-advanced-reboot/htdocs/luci-static/resources/view/system/advanced_reboot.js:19
+msgid "Unable to obtain firmware environment variable: %s."
+msgstr "Yazılım ortam değişkeni alınamıyor: %s."
+
+#: applications/luci-app-advanced-reboot/htdocs/luci-static/resources/view/system/advanced_reboot.js:18
+msgid "Unable to set Dual Boot Flag Partition entry for partition: %s."
+msgstr "Bölüm için Çift Önyükleme İşareti ayarlanamıyor: %s."
+
+#: applications/luci-app-advanced-reboot/htdocs/luci-static/resources/view/system/advanced_reboot.js:20
+msgid "Unable to set firmware environment variable: %s to %s."
+msgstr "Yazılım ortam değişkeni ayarlanamıyor: %s'ten %s'e."
+
+#: applications/luci-app-advanced-reboot/htdocs/luci-static/resources/view/system/advanced_reboot.js:168
+msgid "Unknown"
+msgstr "Bilinmeyen"
+
+#: applications/luci-app-advanced-reboot/htdocs/luci-static/resources/view/system/advanced_reboot.js:131
+msgid ""
+"WARNING: An alternative partition might have its own settings and completely "
+"different firmware.<br /><br /> As your network configuration and WiFi SSID/"
+"password on alternative partition might be different, you might have to "
+"adjust your computer settings to be able to access your device once it "
+"reboots.<br /><br /> Please also be aware that alternative partition "
+"firmware might not provide an easy way to switch active partition and boot "
+"back to the currently active partition.<br /><br /> Click \"Proceed\" below "
+"to reboot device to an alternative partition."
+msgstr ""
+"UYARI: Alternatif bir bölümün kendi ayarları ve tamamen farklı ürün yazılımı "
+"olabilir. <br /> <br /> Alternatif bölümdeki ağ yapılandırmanız ve Kablosuz "
+"Ağ isim/parolanız farklı olabileceğinden, aygıt yeniden başlatıldığında "
+"bağlantı sağlayabilmek için bilgisayar ayarlarınızı düzenlemeniz "
+"gerekebilir. <br /> <br /> Lütfen alternatif bölüm yazılımının, etkin bölümü "
+"değiştirmek veya şu an etkin olan bölüme geri dönebilmek için kolay bir yol "
+"sağlamayabileceğini unutmayın.<br /> <br />Aygıtı alternatif bir bölümde "
+"yeniden başlatmak için lütfen aşağıdaki \"Devam Et\" düğmesine tıklayın."
+
+#: applications/luci-app-advanced-reboot/htdocs/luci-static/resources/view/system/advanced_reboot.js:52
+msgid ""
+"WARNING: Power off might result in a reboot on a device which doesn't "
+"support power off.<br /><br /> Click \"Proceed\" below to power off your "
+"device."
+msgstr ""
+"UYARI: Kapat seçeneği, kapatma fonksiyonunu desteklemeyen bir cihazın "
+"yeniden başlatma işlemi yapmasına neden olabilir. <br /> <br /> Cihazınızı "
+"kapatmak için aşağıdaki \"Devam et\" seçeneğine tıklayın."
+
+#: applications/luci-app-advanced-reboot/htdocs/luci-static/resources/view/system/advanced_reboot.js:76
+msgid "Waiting for device..."
+msgstr "Aygıt bekleniyor..."
+
+#: applications/luci-app-advanced-reboot/htdocs/luci-static/resources/view/system/advanced_reboot.js:221
+msgid ""
+"Warning: Device (%s) is unknown or isn't a dual-firmware device!%sIf you are "
+"seeing this on an OpenWrt dual-firmware supported device,%splease refer to "
+"%sHow to add a new device section of the README%s."
+msgstr ""
+"Uyarı: Cihaz (%s) bilinmiyor veya çift bellenimli bir cihaz değil!%sBunu "
+"OpenWrt çift bellenim destekli bir cihazda görüyorsanız,%slütfen "
+"README%s'nin %sYeni cihaz nasıl eklenir bölümüne bakın%s."
+
+#: applications/luci-app-advanced-reboot/htdocs/luci-static/resources/view/system/advanced_reboot.js:198
+msgid "Warning: There are unsaved changes that will get lost on reboot!"
+msgstr ""
+"Uyarı: Yeniden başlatılınca kaybedilecek kaydedilmemiş değişiklikler var!"
+
+#: applications/luci-app-advanced-reboot/htdocs/luci-static/resources/view/system/advanced_reboot.js:238
+msgid "Warning: This system does not support powering off!"
+msgstr "Uyarı: Bu sistem kapatmayı desteklemiyor!"
+
+#: applications/luci-app-advanced-reboot/htdocs/luci-static/resources/view/system/advanced_reboot.js:225
+msgid "Warning: Unable to obtain device information!"
+msgstr "Uyarı: Cihaz bilgileri getirilemedi!"

@@ -11,12 +11,17 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.0.6\n"
 
+#: applications/luci-app-diag-core/root/usr/share/luci/menu.d/luci-app-diag-core.json:3
 msgid "Configure Diagnostics"
 msgstr "Configurar diagnósticos"
 
+#: applications/luci-app-diag-core/luasrc/view/diag/index.htm:7
+#: applications/luci-app-diag-core/luasrc/view/diag/network_config_index.htm:7
 msgid "Diagnostics"
 msgstr "Diagnósticos"
 
+#: applications/luci-app-diag-core/luasrc/view/diag/index.htm:9
+#: applications/luci-app-diag-core/luasrc/view/diag/network_config_index.htm:9
 msgid ""
 "The diagnostics available under this menu depend on what modules you have "
 "installed on your device."
@@ -24,6 +29,7 @@ msgstr ""
 "Los diagnósticos disponibles bajo este menú dependen de qué módulos haya "
 "instalado en su dispositivo."
 
+#: applications/luci-app-diag-core/luasrc/view/diag/index.htm:8
 msgid ""
 "The entries in the menu allow you to perform diagnostic tests on your system "
 "to aid in troubleshooting."
@@ -31,12 +37,10 @@ msgstr ""
 "Este menú le permite realizar test de prueba de su sistema para ayudar en la "
 "resolución de problemas."
 
+#: applications/luci-app-diag-core/luasrc/view/diag/network_config_index.htm:8
 msgid ""
 "With this menu you can configure network diagnostics, such as network device "
 "scans and ping tests."
 msgstr ""
 "En este menú puede configurar diagnósticos de red como el escaneo de equipos "
 "en red o pings."
-
-#~ msgid "l_d_diag"
-#~ msgstr "Diagnośticos"

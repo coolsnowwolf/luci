@@ -50,8 +50,8 @@ if limit_up and limit_down then
 	"to this project.") .. "</p>"
 end
 
-local contact = translate('Get in %s with the operator of this access point.')
-contact = contact % ('<a href="' .. contacturl .. '">' .. translatef('Contact') .. '</a>')
+local contact = translate('%s with the operator of this access point.')
+contact = contact % ('<a href="' .. contacturl .. '">' .. translatef('Get in contact') .. '</a>')
 
 local accepttext = translate('By accepting these rules you can use this network for %s hour(s). After this time you need to accept these rules again.')
 accepttext = accepttext % leasetime
@@ -81,7 +81,7 @@ if has_custom_splash then
 	is limited and because of this we ask you not to do any of the following:%></p>
 	<ul>
 		<li><%:use filesharing applications on this network%></li>
-		<li><%:waste bandwidth with unneccesary downloads or streams%></li>
+		<li><%:waste bandwidth with unnecessary downloads or streams%></li>
 		<li><%:perform any kind of illegal activities%></li>
 	</ul>
 	<br />

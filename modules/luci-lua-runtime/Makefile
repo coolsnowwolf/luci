@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2019 Jo-Philipp Wich <jo@mein.io>
+# Copyright (C) 2022 Jo-Philipp Wich <jo@mein.io>
 #
 # This is free software, licensed under the Apache License, Version 2.0 .
 #
@@ -12,6 +12,16 @@ LUCI_TYPE:=mod
 LUCI_BASENAME:=lua-runtime
 
 LUCI_TITLE:=LuCI Lua runtime libraries
+LUCI_DEPENDS:= \
+	+luci-base \
+	+lua \
+	+luci-lib-base \
+	+luci-lib-nixio \
+	+luci-lib-ip \
+	+luci-lib-jsonc \
+	+libubus-lua \
+	+liblucihttp-lua \
+	+ucode-mod-lua
 
 include ../../luci.mk
 

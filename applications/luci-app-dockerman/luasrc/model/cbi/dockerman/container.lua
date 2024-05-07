@@ -25,12 +25,19 @@ else
 	return
 end
 
+res = dk.networks:list()
+if res.code < 300 then
+	networks = res.body
+else
+	return
+end
+
 local get_ports = function(d)
 	local data
 
 	if d.HostConfig and d.HostConfig.PortBindings then
 		for inter, out in pairs(d.HostConfig.PortBindings) do
-			data = (data and (data .. "<br>") or "") .. out[1]["HostPort"] .. ":" .. inter
+			data = (data and (data .. "<br />") or "") .. out[1]["HostPort"] .. ":" .. inter
 		end
 	end
 
@@ -42,7 +49,7 @@ local get_env = function(d)
 
 	if d.Config and d.Config.Env then
 		for _,v in ipairs(d.Config.Env) do
-			data = (data and (data .. "<br>") or "") .. v
+			data = (data and (data .. "<br />") or "") .. v
 		end
 	end
 
@@ -83,7 +90,7 @@ local get_mounts = function(d)
 					v_dest = v_dest .."/".. v_dest_d
 				end
 			end
-			data = (data and (data .. "<br>") or "") .. v_sorce .. ":" .. v["Destination"] .. (v["Mode"] ~= "" and (":" .. v["Mode"]) or "")
+			data = (data and (data .. "<br />") or "") .. v_sorce .. ":" .. v["Destination"] .. (v["Mode"] ~= "" and (":" .. v["Mode"]) or "")
 		end
 	end
 
@@ -95,7 +102,7 @@ local get_device = function(d)
 
 	if d.HostConfig and d.HostConfig.Devices then
 		for _,v in ipairs(d.HostConfig.Devices) do
-			data = (data and (data .. "<br>") or "") .. v["PathOnHost"] .. ":" .. v["PathInContainer"] .. (v["CgroupPermissions"] ~= "" and (":" .. v["CgroupPermissions"]) or "")
+			data = (data and (data .. "<br />") or "") .. v["PathOnHost"] .. ":" .. v["PathInContainer"] .. (v["CgroupPermissions"] ~= "" and (":" .. v["CgroupPermissions"]) or "")
 		end
 	end
 
@@ -107,7 +114,7 @@ local get_links = function(d)
 
 	if d.HostConfig and d.HostConfig.Links then
 		for _,v in ipairs(d.HostConfig.Links) do
-			data = (data and (data .. "<br>") or "") .. v
+			data = (data and (data .. "<br />") or "") .. v
 		end
 	end
 
@@ -119,7 +126,7 @@ local get_tmpfs = function(d)
 
 	if d.HostConfig and d.HostConfig.Tmpfs then
 		for k, v in pairs(d.HostConfig.Tmpfs) do
-			data = (data and (data .. "<br>") or "") .. k .. (v~="" and ":" or "")..v
+			data = (data and (data .. "<br />") or "") .. k .. (v~="" and ":" or "")..v
 		end
 	end
 
@@ -131,7 +138,7 @@ local get_dns = function(d)
 
 	if d.HostConfig and d.HostConfig.Dns then
 		for _, v in ipairs(d.HostConfig.Dns) do
-			data = (data and (data .. "<br>") or "") .. v
+			data = (data and (data .. "<br />") or "") .. v
 		end
 	end
 
@@ -143,7 +150,7 @@ local get_sysctl = function(d)
 
 	if d.HostConfig and d.HostConfig.Sysctls then
 		for k, v in pairs(d.HostConfig.Sysctls) do
-			data = (data and (data .. "<br>") or "") .. k..":"..v
+			data = (data and (data .. "<br />") or "") .. k..":"..v
 		end
 	end
 
@@ -188,24 +195,15 @@ local start_stop_remove = function(m, cmd)
 	end
 end
 
-local c_color
-if container_info.State.Status == 'running' then
-	c_color = 'green'
-elseif container_info.State.Status == 'restarting' then
-	c_color = 'yellow'
-else
-	c_color = 'red'
-end
-
 m=SimpleForm("docker",
-	translatef("Docker - Container (<font color='%s'>%s</font>)", c_color, container_info.Name:sub(2)),
+	translatef("Docker - Container (%s)", container_info.Name:sub(2)),
 	translate("On this page, the selected container can be managed."))
 m.redirect = luci.dispatcher.build_url("admin/docker/containers")
 
 s = m:section(SimpleSection)
 s.template = "dockerman/apply_widget"
 s.err=docker:read_status()
-s.err=s.err and s.err:gsub("\n","<br>"):gsub(" ","&nbsp;")
+s.err=s.err and s.err:gsub("\n","<br />"):gsub(" ","&#160;")
 if s.err then
 	docker:clear_status()
 end
@@ -251,15 +249,6 @@ o.write = function(self, section)
 	start_stop_remove(m,"kill")
 end
 
-o = s:option(Button, "_export")
-o.template = "dockerman/cbi/inlinebutton"
-o.inputtitle=translate("Export")
-o.inputstyle = "apply"
-o.forcewrite = true
-o.write = function(self, section)
-  luci.http.redirect(luci.dispatcher.build_url("admin/docker/container_export/"..container_id))
-end
-
 o = s:option(Button, "_upgrade")
 o.template = "dockerman/cbi/inlinebutton"
 o.inputtitle=translate("Upgrade")
@@ -291,12 +280,6 @@ s = m:section(SimpleSection)
 s.template = "dockerman/container"
 
 if action == "info" then
-	res = dk.networks:list()
-	if res.code < 300 then
-		networks = res.body
-	else
-		return
-	end
 	m.submit = false
 	m.reset  = false
 	table_info = {
@@ -311,7 +294,7 @@ if action == "info" then
 		},
 		["03image"] = {
 			_key = translate("Image"),
-			_value = container_info.Config.Image .. "<br>" .. container_info.Image
+			_value = container_info.Config.Image .. "<br />" .. container_info.Image
 		},
 		["04status"] = {
 			_key = translate("Status"),
@@ -388,7 +371,7 @@ if action == "info" then
 	info_networks = get_networks(container_info)
 	list_networks = {}
 	for _, v in ipairs (networks) do
-		if v and v.Name then
+		if v.Name then
 			local parent = v.Options and v.Options.parent or nil
 			local ip = v.IPAM and v.IPAM.Config and v.IPAM.Config[1] and v.IPAM.Config[1].Subnet or nil
 			ipv6 =  v.IPAM and v.IPAM.Config and v.IPAM.Config[2] and v.IPAM.Config[2].Subnet or nil
@@ -401,7 +384,7 @@ if action == "info" then
 		for k,v in pairs(info_networks) do
 			table_info["14network"..k] = {
 				_key = translate("Network"),
-				_value = k.. (v~="" and (" | ".. v) or ""),
+				value = k.. (v~="" and (" | ".. v) or ""),
 				_button=translate("Disconnect")
 			}
 			list_networks[k]=nil
@@ -647,12 +630,11 @@ elseif action == "resources" then
 	end
 
 elseif action == "file" then
+	s = m:section(SimpleSection)
+	s.template = "dockerman/container_file"
+	s.container = container_id
 	m.submit = false
 	m.reset  = false
-	s= m:section(SimpleSection)
-	s.template = "dockerman/container_file_manager"
-	s.container = container_id
-	m.redirect = nil
 elseif action == "inspect" then
 	s = m:section(SimpleSection)
 	s.syslog = luci.jsonc.stringify(container_info, true)
@@ -720,17 +702,8 @@ elseif action == "console" then
 			local cmd_docker = luci.util.exec("command -v docker"):match("^.+docker") or nil
 			local cmd_ttyd = luci.util.exec("command -v ttyd"):match("^.+ttyd") or nil
 
-			if not cmd_docker or not cmd_ttyd or cmd_docker:match("^%s+$") or cmd_ttyd:match("^%s+$") then
+			if not cmd_docker or not cmd_ttyd or cmd_docker:match("^%s+$") or cmd_ttyd:match("^%s+$")then
 				return
-			end
-			local uci = (require "luci.model.uci").cursor()
-
-			local ttyd_ssl = uci:get("ttyd", "@ttyd[0]", "ssl")
-			local ttyd_ssl_key = uci:get("ttyd", "@ttyd[0]", "ssl_key")
-			local ttyd_ssl_cert = uci:get("ttyd", "@ttyd[0]", "ssl_cert")
-
-			if ttyd_ssl == "1" and ttyd_ssl_cert and ttyd_ssl_key then
-				cmd_ttyd = string.format('%s -S -C %s -K %s', cmd_ttyd, ttyd_ssl_cert, ttyd_ssl_key)
 			end
 
 			local pid = luci.util.trim(luci.util.exec("netstat -lnpt | grep :7682 | grep ttyd | tr -s ' ' | cut -d ' ' -f7 | cut -d'/' -f1"))
@@ -739,22 +712,23 @@ elseif action == "console" then
 			end
 
 			local hosts
-			local remote = uci:get_bool("dockerd", "dockerman", "remote_endpoint") or false
+			local uci = require "luci.model.uci".cursor()
+			local remote = uci:get_bool("dockerd", "globals", "remote_endpoint") or false
 			local host = nil
 			local port = nil
 			local socket = nil
 
 			if remote then
-				host = uci:get("dockerd", "dockerman", "remote_host") or nil
-				port = uci:get("dockerd", "dockerman", "remote_port") or nil
+				host = uci:get("dockerd", "globals", "remote_host") or nil
+				port = uci:get("dockerd", "globals", "remote_port") or nil
 			else
-				socket = uci:get("dockerd", "dockerman", "socket_path") or "/var/run/docker.sock"
+				socket = uci:get("dockerd", "globals", "socket_path") or "/var/run/docker.sock"
 			end
 
 			if remote and host and port then
-				hosts = "tcp://" .. host .. ':'.. port
+				hosts = host .. ':'.. port
 			elseif socket then
-				hosts = "unix://" .. socket
+				hosts = socket
 			else
 				return
 			end
@@ -765,7 +739,7 @@ elseif action == "console" then
 				uid = ""
 			end
 
-			local start_cmd = string.format('%s -d 2 --once -p 7682 %s -H "%s" exec -it %s %s %s&', cmd_ttyd, cmd_docker, hosts, uid, container_id, cmd)
+			local start_cmd = string.format('%s -d 2 --once -p 7682 %s -H "unix://%s" exec -it %s %s %s&', cmd_ttyd, cmd_docker, hosts, uid, container_id, cmd)
 
 			os.execute(start_cmd)
 
@@ -778,35 +752,40 @@ elseif action == "stats" then
 	local response = dk.containers:top({id = container_id, query = {ps_args="-aux"}})
 	local container_top
 
-	if response.code == 200 then
-		container_top=response.body
-	else
-		response = dk.containers:top({id = container_id})
-		if response.code == 200 then
-			container_top=response.body
+	if response.code ~= 409 then
+		if response.code ~= 200 then
+			response = dk.containers:top({id = container_id})
 		end
-	end
 
-	if type(container_top) == "table" then
-		s = m:section(SimpleSection)
-		s.container_id = container_id
-		s.template = "dockerman/container_stats"
-		table_stats = {
-			cpu={
-				key=translate("CPU Useage"),
+		if response.code ~= 200 then
+			response = dk.containers:top({id = container_id, query = {ps_args="-ww"}})
+		end
+
+		if response.code == 200 then
+			container_top = response.body
+		end
+
+		local table_stats = {
+			cpu = {
+				key=translate("CPU Usage"),
 				value='-'
 			},
-			memory={
-				key=translate("Memory Useage"),
+			memory = {
+				key=translate("Memory Usage"),
 				value='-'
 			}
 		}
-
-		container_top = response.body
 		s = m:section(Table, table_stats, translate("Stats"))
 		s:option(DummyValue, "key", translate("Stats")).width="33%"
 		s:option(DummyValue, "value")
-		top_section = m:section(Table, container_top.Processes, translate("TOP"))
+
+		s = m:section(SimpleSection)
+		s.container_id = container_id
+		s.template = "dockerman/container_stats"
+	end
+
+	if type(container_top) == "table" then
+		local top_section = m:section(Table, container_top.Processes, translate("TOP"))
 		for i, v in ipairs(container_top.Titles) do
 			top_section:option(DummyValue, i, translate(v))
 		end

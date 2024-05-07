@@ -1,4 +1,4 @@
--- Copyright 2017 Dirk Brenken (dev@brenken.org)
+-- Copyright 2017-2019 Dirk Brenken (dev@brenken.org)
 -- This is free software, licensed under the Apache License, Version 2.0
 
 module("luci.controller.dnscrypt-proxy", package.seeall)
@@ -11,7 +11,11 @@ function index()
 	if not nixio.fs.access("/etc/config/dnscrypt-proxy") then
 		nixio.fs.writefile("/etc/config/dnscrypt-proxy", "")
 	end
-	entry({"admin", "services", "dnscrypt-proxy"}, firstchild(), _("DNSCrypt-Proxy"), 60).dependent = false
+
+	local e = entry({"admin", "services", "dnscrypt-proxy"}, firstchild(), _("DNSCrypt-Proxy"), 60)
+	e.dependent = false
+	e.acl_depends = { "luci-app-dnscrypt-proxy" }
+
 	entry({"admin", "services", "dnscrypt-proxy", "tab_from_cbi"}, cbi("dnscrypt-proxy/overview_tab", {hideresetbtn=true, hidesavebtn=true}), _("Overview"), 10).leaf = true
 	entry({"admin", "services", "dnscrypt-proxy", "logfile"}, call("logread"), _("View Logfile"), 20).leaf = true
 	entry({"admin", "services", "dnscrypt-proxy", "advanced"}, firstchild(), _("Advanced"), 100)
@@ -27,12 +31,10 @@ function view_reslist()
 end
 
 function logread()
-	local logfile
-
-	if nixio.fs.access("/var/log/messages") then
-		logfile = util.trim(util.exec("cat /var/log/messages | grep 'dnscrypt-proxy'"))
-	else
-		logfile = util.trim(util.exec("logread -e 'dnscrypt-proxy'"))
+	local logfile = util.trim(util.exec("logread -e 'dnscrypt-proxy' 2>/dev/null")) or ""
+	
+	if logfile == "" then
+		logfile = "No DNSCrypt-Proxy related logs yet!"
 	end
 	templ.render("dnscrypt-proxy/logread", {title = i18n.translate("DNSCrypt-Proxy Logfile"), content = logfile})
 end

@@ -1,0 +1,12 @@
+{
+
+	"olsr/olsr-viz": {
+		"title": "OLSR Visualization",
+		"order": 100,
+		"action": {
+			"type": "view",
+			"path": "olsr-viz/olsr-viz-view"
+		}
+	}
+
+}
