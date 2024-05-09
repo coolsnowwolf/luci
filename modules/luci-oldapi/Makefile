@@ -6,12 +6,12 @@
 
 include $(TOPDIR)/rules.mk
 
-PKG_NAME:=luci-newapi
+PKG_NAME:=luci-oldapi
 
 LUCI_TYPE:=mod
-LUCI_BASENAME:=newapi
+LUCI_BASENAME:=oldapi
 
-LUCI_TITLE:=LuCI NewAPI
+LUCI_TITLE:=LuCI Old API
 LUCI_DEPENDS:=+luci-base
 
 include ../../luci.mk

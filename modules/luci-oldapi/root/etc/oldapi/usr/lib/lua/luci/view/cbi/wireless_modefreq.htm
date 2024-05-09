@@ -6,44 +6,25 @@
 	var htmodes  = <%= luci.http.write_json(self.htmodes) %>;
 
 	var channels = {
-		'2g': [
+		'11g': [
 			'auto', 'auto', true
 		],
-		'5g': [
+		'11a': [
 			'auto', 'auto', true
-		],
-		'6g': [
-			'auto', 'auto', true
-		],
-		'60g': []
+		]
 	};
 
-	for (var i = 0; i < freqlist.length; i++) {
-		var band;
-
-		if (freqlist[i].mhz >= 2412 && freqlist[i].mhz <= 2484)
-			band = '2g';
-		else if (freqlist[i].mhz >= 5160 && freqlist[i].mhz <= 5885)
-			band = '5g';
-		else if (freqlist[i].mhz >= 5925 && freqlist[i].mhz <= 7125)
-			band = '6g';
-		else if (freqlist[i].mhz >= 58320 && freqlist[i].mhz <= 69120)
-			band = '60g';
-		else
-			continue;
-
-		channels[band].push(
+	for (var i = 0; i < freqlist.length; i++)
+		channels[(freqlist[i].mhz > 2484) ? '11a' : '11g'].push(
 			freqlist[i].channel,
 			'%d (%d MHz)'.format(freqlist[i].channel, freqlist[i].mhz),
 			!freqlist[i].restricted
 		);
-	}
 
 	var modes = [
 		'', 'Legacy', true,
 		'n', 'N', hwmodes.n,
-		'ac', 'AC', hwmodes.ac,
-		'ax', 'AX', hwmodes.ax
+		'ac', 'AC', hwmodes.ac
 	];
 
 	var htmodes = {
@@ -59,32 +40,20 @@
 			'VHT40', '40 MHz', htmodes.VHT40,
 			'VHT80', '80 MHz', htmodes.VHT80,
 			'VHT160', '160 MHz', htmodes.VHT160
-		],
-		'ax': [
-			'HE20', '20 MHz', htmodes.HE20,
-			'HE40', '40 MHz', htmodes.HE40,
-			'HE80', '80 MHz', htmodes.HE80,
-			'HE160', '160 MHz', htmodes.HE160
 		]
 	};
 
 	var bands = {
 		'':   [
-			'2g', '2.4 GHz', (channels['2g'].length > 3),
-			'5g', '5 GHz', (channels['5g'].length > 3),
-			'60g', '60 GHz', (channels['60g'].length > 0)
+			'11g', '2.4 GHz', (channels['11g'].length > 3),
+			'11a', '5 GHz', (channels['11a'].length > 3)
 		],
 		'n':  [
-			'2g', '2.4 GHz', (channels['2g'].length > 3),
-			'5g', '5 GHz', (channels['5g'].length > 3)
+			'11g', '2.4 GHz', (channels['11g'].length > 3),
+			'11a', '5 GHz', (channels['11a'].length > 3)
 		],
 		'ac': [
-			'5g', '5 GHz', true
-		],
-		'ax': [
-			'2g', '2.4 GHz', (channels['2g'].length > 3),
-			'5g', '5 GHz', (channels['5g'].length > 3),
-			'6g', '6 GHz', (channels['6g'].length > 3)
+			'11a', '5 GHz', true
 		]
 	};
 
@@ -155,9 +124,7 @@
 
 		cbi_set_values(mode, modes);
 
-		if (/HE20|HE40|HE80|HE160/.test(<%= luci.http.write_json(self.map:get(section, "htmode")) %>))
-			mode.value = 'ax';
-		else if (/VHT20|VHT40|VHT80|VHT160/.test(<%= luci.http.write_json(self.map:get(section, "htmode")) %>))
+		if (/VHT20|VHT40|VHT80|VHT160/.test(<%= luci.http.write_json(self.map:get(section, "htmode")) %>))
 			mode.value = 'ac';
 		else if (/HT20|HT40/.test(<%= luci.http.write_json(self.map:get(section, "htmode")) %>))
 			mode.value = 'n';
@@ -166,7 +133,10 @@
 
 		cbi_toggle_wifi_mode(id);
 
-		band.value = <%= luci.http.write_json(self.map:get(section, "band")) %>;
+		if (/a/.test(<%= luci.http.write_json(self.map:get(section, "hwmode")) %>))
+			band.value = '11a';
+		else
+			band.value = '11g';
 
 		cbi_toggle_wifi_band(id);
 
