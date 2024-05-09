@@ -129,6 +129,7 @@ demand = section:taboption("advanced", Value, "demand",
 demand.placeholder = "0"
 demand.datatype    = "uinteger"
 
+luci.tools.proto.opt_macaddr(section, ifc, translate("Override MAC address"))
 
 mtu = section:taboption("advanced", Value, "mtu", translate("Override MTU"))
 mtu.placeholder = "1500"
