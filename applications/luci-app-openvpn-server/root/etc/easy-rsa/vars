@@ -1,0 +1,22 @@
+# A little housekeeping: DO NOT EDIT THIS SECTION
+#
+# Easy-RSA 3.x does not source into the environment directly.
+# Complain if a user tries to do this:
+if [ -z "$EASYRSA_CALLER" ]; then
+	echo "You appear to be sourcing an Easy-RSA *vars* file. This is" >&2
+	echo "no longer necessary and is disallowed. See the section called" >&2
+	echo "*How to use this file* near the top comments for more details." >&2
+	return 1
+fi
+
+set_var EASYRSA_KEY_SIZE		2048
+set_var EASYRSA_ALGO			rsa
+set_var EASYRSA_CA_EXPIRE		3650
+set_var EASYRSA_CERT_EXPIRE		3650
+set_var EASYRSA_DN				"org"
+set_var EASYRSA_REQ_COUNTRY		"US"
+set_var EASYRSA_REQ_PROVINCE	"California"
+set_var EASYRSA_REQ_CITY		"San Francisco"
+set_var EASYRSA_REQ_ORG			"OpenVPN"
+set_var EASYRSA_REQ_EMAIL		"openvpn@openvpn.net"
+set_var EASYRSA_REQ_OU			"OpenVPN"
