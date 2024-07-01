@@ -380,12 +380,12 @@ return view.extend({
 
 		o = s.taboption('additional', form.Value, 'trm_maxwait', _('Interface Timeout'), _('How long should travelmate wait for a successful wlan uplink connection.'));
 		o.placeholder = '30';
-		o.datatype = 'range(20,40)';
+		o.datatype = 'range(1,40)';
 		o.rmempty = true;
 
 		o = s.taboption('additional', form.Value, 'trm_timeout', _('Overall Timeout'), _('Overall retry timeout in seconds.'));
 		o.placeholder = '60';
-		o.datatype = 'range(30,300)';
+		o.datatype = 'range(1,300)';
 		o.rmempty = true;
 
 		o = s.taboption('additional', form.ListValue, 'trm_captiveurl', _('Captive Portal URL'), _('The selected URL will be used for connectivity- and captive portal checks.'));
