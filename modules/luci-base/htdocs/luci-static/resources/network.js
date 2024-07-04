@@ -96,6 +96,13 @@ var callNetworkProtoHandlers = rpc.declare({
 	expect: { '': {} }
 });
 
+var callIwinfoInfo = rpc.declare({
+	object: 'iwinfo',
+	method: 'info',
+	params: [ 'device' ],
+	expect: { '' : {} }
+});
+
 var _init = null,
     _state = null,
     _protocols = {},
@@ -3262,7 +3269,6 @@ Device = baseclass.extend(/** @lends LuCI.network.Device.prototype */ {
 WifiDevice = baseclass.extend(/** @lends LuCI.network.WifiDevice.prototype */ {
 	__init__: function(name, radiostate) {
 		var uciWifiDevice = uci.get('wireless', name);
-
 		if (uciWifiDevice != null &&
 		    uciWifiDevice['.type'] == 'wifi-device' &&
 		    uciWifiDevice['.name'] != null) {
@@ -3358,7 +3364,7 @@ WifiDevice = baseclass.extend(/** @lends LuCI.network.WifiDevice.prototype */ {
 	 *  - `ax` - IEEE 802.11ax mode, 2.4 or 5 GHz
 	 */
 	getHWModes: function() {
-		var hwmodes = this.ubus('dev', 'iwinfo', 'hwmodes');
+		var hwmodes = this.ubus('dev', 'iwinfo', 'hwmodes') ? this.ubus('dev', 'iwinfo', 'hwmodes') : this.ubus("iwinfo", "hwmodes")
 		return Array.isArray(hwmodes) ? hwmodes : [ 'b', 'g' ];
 	},
 
@@ -3396,11 +3402,13 @@ WifiDevice = baseclass.extend(/** @lends LuCI.network.WifiDevice.prototype */ {
 	getI18n: function() {
 		var hw = this.ubus('dev', 'iwinfo', 'hardware'),
 		    type = L.isObject(hw) ? hw.name : null;
-		var modes = this.ubus('dev', 'iwinfo', 'hwmodes_text');
+		var modes = this.ubus('dev', 'iwinfo', 'hwmodes_text') ? this.ubus('dev', 'iwinfo', 'hwmodes_text') : this.getHWModes().join('/');
 
 		if (this.ubus('dev', 'iwinfo', 'type') == 'wl')
 			type = 'Broadcom';
 
+		if (this.ubus('radio') == 'ra' || this.ubus('radio') == 'rax')
+			type = 'Mediatek Ralink';
 		return '%s %s Wireless Controller (%s)'.format(
 			type || 'Generic',
 			modes ? '802.11' + modes : 'unknown',
@@ -3587,12 +3595,25 @@ WifiNetwork = baseclass.extend(/** @lends LuCI.network.WifiNetwork.prototype */ 
 	__init__: function(sid, radioname, radiostate, netid, netstate, hostapd) {
 		this.sid    = sid;
 		this.netid  = netid;
+		if (netstate == null)
+			netstate = {};
+		var ifname = netstate.hasOwnProperty('ifname') ? netstate.ifname : sid;
 		this._ubusdata = {
 			hostapd: hostapd,
 			radio:   radioname,
 			dev:     radiostate,
-			net:     netstate
+			net:     netstate,
+			iwinfo:  null
 		};
+		let _this = this;
+		//use promise call iwinfo info then add to this._ubusdata
+		callIwinfoInfo(ifname).then(
+			function(data){
+				_this._ubusdata.iwinfo = data;
+			}
+		);
+		
+		
 	},
 
 	ubus: function(/* ... */) {
@@ -3883,7 +3904,7 @@ WifiNetwork = baseclass.extend(/** @lends LuCI.network.WifiNetwork.prototype */ 
 	 * information.
 	 */
 	getActiveSSID: function() {
-		return this.ubus('net', 'iwinfo', 'ssid') || this.ubus('net', 'config', 'ssid') || this.get('ssid');
+		return this.ubus('net', 'iwinfo', 'ssid') || this.ubus('iwinfo', 'ssid') || this.ubus('net', 'config', 'ssid') || this.get('ssid');
 	},
 
 	/**
@@ -3894,7 +3915,7 @@ WifiNetwork = baseclass.extend(/** @lends LuCI.network.WifiNetwork.prototype */ 
 	 * information.
 	 */
 	getActiveBSSID: function() {
-		return this.ubus('net', 'iwinfo', 'bssid') || this.ubus('net', 'config', 'bssid') || this.get('bssid');
+		return this.ubus('net', 'iwinfo', 'bssid') || this.ubus('iwinfo', 'bssid') || this.ubus('net', 'config', 'bssid') || this.get('bssid');
 	},
 
 	/**
@@ -3905,7 +3926,7 @@ WifiNetwork = baseclass.extend(/** @lends LuCI.network.WifiNetwork.prototype */ 
 	 * encryption state could not be found in `ubus` runtime information.
 	 */
 	getActiveEncryption: function() {
-		return formatWifiEncryption(this.ubus('net', 'iwinfo', 'encryption')) || '-';
+		return formatWifiEncryption(this.ubus('net', 'iwinfo', 'encryption')) || formatWifiEncryption(this.ubus('iwinfo', 'encryption')) || '-';
 	},
 
 	/**
@@ -4116,8 +4137,7 @@ WifiNetwork = baseclass.extend(/** @lends LuCI.network.WifiNetwork.prototype */ 
 	 * available.
 	 */
 	getFrequency: function() {
-		var freq = this.ubus('net', 'iwinfo', 'frequency');
-
+		var freq = this.ubus('net', 'iwinfo', 'frequency') ? this.ubus('net', 'iwinfo', 'frequency') : this.ubus('iwinfo', 'frequency');
 		if (freq != null && freq > 0)
 			return '%.03f'.format(freq / 1000);
 
@@ -4134,8 +4154,7 @@ WifiNetwork = baseclass.extend(/** @lends LuCI.network.WifiNetwork.prototype */ 
 	 * is not available.
 	 */
 	getBitRate: function() {
-		var rate = this.ubus('net', 'iwinfo', 'bitrate');
-
+		var rate = this.ubus('net', 'iwinfo', 'bitrate') || this.ubus( 'iwinfo', 'bitrate');
 		if (rate != null && rate > 0)
 			return (rate / 1000);
 
@@ -4150,7 +4169,7 @@ WifiNetwork = baseclass.extend(/** @lends LuCI.network.WifiNetwork.prototype */ 
 	 * or `null` if it cannot be determined.
 	 */
 	getChannel: function() {
-		return this.ubus('net', 'iwinfo', 'channel') || this.ubus('dev', 'config', 'channel') || this.get('channel');
+		return this.ubus('net', 'iwinfo', 'channel') || this.ubus('iwinfo', 'channel') || this.ubus('dev', 'config', 'channel') || this.get('channel');
 	},
 
 	/**
@@ -4161,7 +4180,7 @@ WifiNetwork = baseclass.extend(/** @lends LuCI.network.WifiNetwork.prototype */ 
 	 * information or `null` if it cannot be determined.
 	 */
 	getSignal: function() {
-		return this.ubus('net', 'iwinfo', 'signal') || 0;
+		return this.ubus('net', 'iwinfo', 'signal') || this.ubus('iwinfo', 'signal') || 0;
 	},
 
 	/**
@@ -4172,7 +4191,7 @@ WifiNetwork = baseclass.extend(/** @lends LuCI.network.WifiNetwork.prototype */ 
 	 * information or `0` if it cannot be determined.
 	 */
 	getNoise: function() {
-		return this.ubus('net', 'iwinfo', 'noise') || 0;
+		return this.ubus('net', 'iwinfo', 'noise') || this.ubus( 'iwinfo', 'noise') || 0;
 	},
 
 	/**
@@ -4183,7 +4202,7 @@ WifiNetwork = baseclass.extend(/** @lends LuCI.network.WifiNetwork.prototype */ 
 	 * information or `00` if it cannot be determined.
 	 */
 	getCountryCode: function() {
-		return this.ubus('net', 'iwinfo', 'country') || this.ubus('dev', 'config', 'country') || '00';
+		return this.ubus('net', 'iwinfo', 'country') || this.ubus('iwinfo', 'country') || this.ubus('dev', 'config', 'country') || '00';
 	},
 
 	/**
@@ -4194,7 +4213,7 @@ WifiNetwork = baseclass.extend(/** @lends LuCI.network.WifiNetwork.prototype */ 
 	 * `ubus` runtime information or `null` if it cannot be determined.
 	 */
 	getTXPower: function() {
-		return this.ubus('net', 'iwinfo', 'txpower');
+		return this.ubus('net', 'iwinfo', 'txpower') || this.ubus( 'iwinfo', 'txpower');
 	},
 
 	/**
