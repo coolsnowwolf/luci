@@ -77,7 +77,7 @@ run_service() {
 	if [ "$protocol" == "port_forwards" ]; then
 		listen=${proto}${family}
 		[ "$family" == "" ] && listen=${proto}6
-		${CONFIG_PATH}/$1 ${listen}-listen:${listen_port}${ipv6only_params}${reuseaddr},fork ${dest_proto}:${dest_ip}:${dest_port} >/dev/null 2>&1 &
+		${CONFIG_PATH}/$1 ${listen}-listen:${listen_port}${ipv6only_params}${reuseaddr},fork ${dest_proto}:${dest_ip}:${dest_port} >/dev/null 2>&1
 	fi
 	
 	[ "$firewall_accept" == "1" ] && {
