@@ -8,8 +8,10 @@ LUCI_TITLE:=LuCI for Zerotier
 LUCI_DEPENDS:=+zerotier +jsonfilter +ucode
 LUCI_PKGARCH:=all
 
+define Package/$(PKG_NAME)/conffiles
+/etc/zerotier/
+endef
+
 include ../../luci.mk
 
 # call BuildPackage - OpenWrt buildroot signature
-
-
