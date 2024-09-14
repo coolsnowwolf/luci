@@ -24,11 +24,6 @@ o:value("64")
 o.default = "auto"
 
 
-o = section:taboption("general", Flag, "norelease",
-	translate("Do not send a Release when restarting"),
-	translate("Enable to minimise the chance of prefix change after a restart"))
-
-
 o = section:taboption("advanced", Flag, "defaultroute",
 	translate("Use default gateway"),
 	translate("If unchecked, no default route is configured"))

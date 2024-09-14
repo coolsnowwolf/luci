@@ -397,7 +397,7 @@ end
 -- Display DNS settings if dnsmasq is available
 --
 
-if has_dnsmasq then
+if has_dnsmasq and net:proto() == "static" then
 	m2 = Map("dhcp", "", "")
 
 	local has_section = false
