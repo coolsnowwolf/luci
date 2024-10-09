@@ -4,8 +4,8 @@ script_action=${1}
 
 logfile_path() (
     configfile=$(uci -q get mosdns.config.configfile)
-    if [ "$configfile" = "/etc/mosdns/config.yaml" ]; then
-        uci -q get mosdns.config.logfile
+    if [ "$configfile" = "/var/etc/mosdns.json" ]; then
+        uci -q get mosdns.config.log_file
     else
         [ ! -f /etc/mosdns/config_custom.yaml ] && exit 1
         awk '/^log:/{f=1;next}f==1{if($0~/file:/){print;exit}if($0~/^[^ ]/)exit}' /etc/mosdns/config_custom.yaml | grep -Eo "/[^'\"]+"
@@ -37,18 +37,18 @@ get_adlist() (
         for url in $ad_source;
         do
             if [ $(echo $url) = 'geosite.dat' ]; then
-                echo "        - \"/var/mosdns/geosite_category-ads-all.txt\""
+                echo "/var/mosdns/geosite_category-ads-all.txt"
             elif echo "$url" | grep -Eq "^file://" ; then
-                echo "        - \"$(echo "$url" | sed 's/file:\/\///')\""
+                echo "$url" | sed 's/file:\/\///'
             else
-                echo "        - \"/etc/mosdns/rule/adlist/$(basename $url)\""
+                echo "/etc/mosdns/rule/adlist/$(basename $url)"
                 [ ! -f "/etc/mosdns/rule/adlist/$(basename $url)" ] && touch /etc/mosdns/rule/adlist/$(basename $url)
             fi
         done
     else
         rm -rf /etc/mosdns/rule/adlist /etc/mosdns/rule/.ad_source
-        touch /var/disable-ads.txt
-        echo "        - \"/var/disable-ads.txt\""
+        touch /var/mosdns/disable-ads.txt
+        echo "/var/mosdns/disable-ads.txt"
     fi
 )
 
@@ -56,8 +56,6 @@ adlist_update() {
     [ "$(uci -q get mosdns.config.adblock)" != 1 ] && return 0
     lock_file=/var/lock/mosdns_ad_update.lock
     ad_source=$(uci -q get mosdns.config.ad_source)
-    AD_TMPDIR=$(mktemp -d) || exit 1
-    mirror=""
     : > /etc/mosdns/rule/.ad_source
     if [ -f "$lock_file" ]; then
         has_update=0
@@ -65,6 +63,7 @@ adlist_update() {
     else
         : > $lock_file
     fi
+    AD_TMPDIR=$(mktemp -d) || exit 1
     has_update=0
     for url in $ad_source;
     do
@@ -74,6 +73,8 @@ adlist_update() {
             filename=$(basename $url)
             if echo "$url" | grep -Eq "^https://raw.githubusercontent.com" ; then
                 [ -n "$(uci -q get mosdns.config.github_proxy)" ] && mirror="$(uci -q get mosdns.config.github_proxy)/"
+            else
+                mirror=""
             fi
             echo -e "\e[1;32mDownloading $mirror$url\e[0m"
             curl --connect-timeout 5 -m 90 --ipv4 -kfSLo "$AD_TMPDIR/$filename" "$mirror$url"
@@ -81,7 +82,7 @@ adlist_update() {
     done
     if [ $? -ne 0 ]; then
         echo -e "\e[1;31mRules download failed.\e[0m"
-        rm -rf "$AD_TMPDIR"
+        rm -rf "$AD_TMPDIR" "$lock_file"
         exit 1
     else
         [ $has_update -eq 1 ] && {
@@ -90,7 +91,7 @@ adlist_update() {
             \cp $AD_TMPDIR/* /etc/mosdns/rule/adlist
         }
     fi
-    rm -rf "$AD_TMPDIR" $lock_file
+    rm -rf "$AD_TMPDIR" "$lock_file"
 }
 
 geodat_update() (
@@ -142,13 +143,16 @@ v2dat_dump() {
     adblock=$(uci -q get mosdns.config.adblock)
     ad_source=$(uci -q get mosdns.config.ad_source)
     configfile=$(uci -q get mosdns.config.configfile)
+    streaming_media=$(uci -q get mosdns.config.custom_stream_media_dns)
     mkdir -p /var/mosdns
     rm -f /var/mosdns/geo*.txt
-    if [ "$configfile" = "/etc/mosdns/config.yaml" ]; then
+    if [ "$configfile" = "/var/etc/mosdns.json" ]; then
         # default config
         v2dat unpack geoip -o /var/mosdns -f cn $v2dat_dir/geoip.dat
         v2dat unpack geosite -o /var/mosdns -f cn -f apple -f 'geolocation-!cn' $v2dat_dir/geosite.dat
         [ "$adblock" -eq 1 ] && [ $(echo $ad_source | grep -c geosite.dat) -ge '1' ] && v2dat unpack geosite -o /var/mosdns -f category-ads-all $v2dat_dir/geosite.dat
+        [ "$streaming_media" -eq 1 ] && v2dat unpack geosite -o /var/mosdns -f netflix -f disney -f hulu $v2dat_dir/geosite.dat || \
+        touch /var/mosdns/geosite_disney.txt ; touch /var/mosdns/geosite_netflix.txt ; touch /var/mosdns/geosite_hulu.txt
     else
         # custom config
         v2dat unpack geoip -o /var/mosdns -f cn $v2dat_dir/geoip.dat
@@ -158,10 +162,6 @@ v2dat_dump() {
         [ -n "$geoip_tags" ] && v2dat unpack geoip -o /var/mosdns $(echo $geoip_tags | sed -r 's/\S+/-f &/g') $v2dat_dir/geoip.dat
         [ -n "$geosite_tags" ] && v2dat unpack geosite -o /var/mosdns $(echo $geosite_tags | sed -r 's/\S+/-f &/g') $v2dat_dir/geosite.dat
     fi
-}
-
-cloudflare_ip() {
-    uci -q get mosdns.config.cloudflare_ip
 }
 
 case $script_action in
@@ -185,9 +185,6 @@ case $script_action in
     ;;
     "v2dat_dump")
         v2dat_dump
-    ;;
-    "cloudflare")
-        cloudflare_ip
     ;;
     "version")
         mosdns version
