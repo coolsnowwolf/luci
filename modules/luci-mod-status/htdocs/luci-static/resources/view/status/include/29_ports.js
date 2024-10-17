@@ -212,7 +212,7 @@ function buildInterfaceMapping(zones, networks) {
 function formatSpeed(carrier, speed, duplex) {
 	if (speed && duplex) {
 		var d = (duplex == 'half') ? '\u202f(H)' : '',
-		    e = E('span', { 'title': _('Speed: %d Mbit/s, Duplex: %s').format(speed, duplex) });
+		    e = E('span', { 'title': _('Speed: %d Mibit/s, Duplex: %s').format(speed, duplex) });
 
 		switch (speed) {
 		case 10:    e.innerText = '10\u202fM' + d;  break;
@@ -301,6 +301,7 @@ return baseclass.extend({
 	load: function() {
 		return Promise.all([
 			L.resolveDefault(callGetBuiltinEthernetPorts(), []),
+			L.resolveDefault(fs.read('/etc/board.json'), '{}'),
 			firewall.getZones(),
 			network.getNetworks(),
 			uci.load('network')
@@ -311,27 +312,51 @@ return baseclass.extend({
 		if (L.hasSystemFeature('swconfig'))
 			return null;
 
-		var known_ports = [],
-		    port_map = buildInterfaceMapping(data[1], data[2]);
+		var board = JSON.parse(data[1]),
+		    known_ports = [],
+		    port_map = buildInterfaceMapping(data[2], data[3]);
 
-		if (Array.isArray(data[0]) && data[0].length > 0)
+		if (Array.isArray(data[0]) && data[0].length > 0) {
 			known_ports = data[0].map(port => ({
 				...port,
 				netdev: network.instantiateDevice(port.device)
 			}));
+		}
+		else {
+			if (L.isObject(board) && L.isObject(board.network)) {
+				for (var k = 'lan'; k != null; k = (k == 'lan') ? 'wan' : null) {
+					if (!L.isObject(board.network[k]))
+						continue;
+
+					if (Array.isArray(board.network[k].ports))
+						for (let i = 0; i < board.network[k].ports.length; i++)
+							known_ports.push({
+								role: k,
+								device: board.network[k].ports[i],
+								netdev: network.instantiateDevice(board.network[k].ports[i])
+							});
+					else if (typeof(board.network[k].device) == 'string')
+						known_ports.push({
+							role: k,
+							device: board.network[k].device,
+							netdev: network.instantiateDevice(board.network[k].device)
+						});
+				}
+			}
+		}
 
 		known_ports.sort(function(a, b) {
 			return L.naturalCompare(a.device, b.device);
 		});
 
-		return E('div', { 'style': 'display:grid;grid-template-columns:repeat(auto-fit, minmax(100px, 1fr));margin-bottom:1em;align-items:center;justify-items:center;text-align:center' }, known_ports.map(function(port) {
+		return E('div', { 'style': 'display:grid;grid-template-columns:repeat(auto-fit, minmax(70px, 1fr));margin-bottom:1em' }, known_ports.map(function(port) {
 			var speed = port.netdev.getSpeed(),
 			    duplex = port.netdev.getDuplex(),
 			    carrier = port.netdev.getCarrier(),
 			    pmap = port_map[port.netdev.getName()],
 			    pzones = (pmap && pmap.zones.length) ? pmap.zones.sort(function(a, b) { return L.naturalCompare(a.getName(), b.getName()) }) : [ null ];
 
-			return E('div', { 'class': 'ifacebox', 'style': 'margin:.25em;width:100px' }, [
+			return E('div', { 'class': 'ifacebox', 'style': 'margin:.25em;min-width:70px;max-width:100px' }, [
 				E('div', { 'class': 'ifacebox-head', 'style': 'font-weight:bold' }, [ port.netdev.getName() ]),
 				E('div', { 'class': 'ifacebox-body' }, [
 					E('img', { 'src': L.resource('icons/port_%s.png').format(carrier ? 'up' : 'down') }),
