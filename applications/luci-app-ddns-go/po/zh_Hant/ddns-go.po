@@ -1,0 +1,60 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Project-Id-Version: PACKAGE VERSION\n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: none\n"
+"Language: zh_Hant\n"
+"MIME-Version: 1.0\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: applications/luci-app-ddns-go/htdocs/luci-static/resources/view/ddns-go.js:55
+msgid "A simple and easy-to-use Dynamic DNS client with IPv6 support."
+msgstr "簡單好用的動態 DNS 用戶端，支持 IPv6"
+
+#: applications/luci-app-ddns-go/htdocs/luci-static/resources/view/ddns-go.js:68
+msgid "Collecting data..."
+msgstr "收集資料中..."
+
+#: applications/luci-app-ddns-go/htdocs/luci-static/resources/view/ddns-go.js:31
+#: applications/luci-app-ddns-go/htdocs/luci-static/resources/view/ddns-go.js:36
+#: applications/luci-app-ddns-go/htdocs/luci-static/resources/view/ddns-go.js:54
+#: applications/luci-app-ddns-go/root/usr/share/luci/menu.d/luci-app-ddns-go.json:3
+msgid "DDNS-Go"
+msgstr "DDNS-Go"
+
+#: applications/luci-app-ddns-go/htdocs/luci-static/resources/view/ddns-go.js:86
+msgid "Disable WebUI"
+msgstr "停用 WebUI"
+
+#: applications/luci-app-ddns-go/htdocs/luci-static/resources/view/ddns-go.js:74
+msgid "Enable"
+msgstr "啟用"
+
+#: applications/luci-app-ddns-go/root/usr/share/rpcd/acl.d/luci-app-ddns-go.json:3
+msgid "Grant UCI access for luci-app-ddns-go"
+msgstr "允許 UCI 訪問 luci-app-ddns-go 設定"
+
+#: applications/luci-app-ddns-go/htdocs/luci-static/resources/view/ddns-go.js:78
+msgid "Listen address"
+msgstr "監聽位址"
+
+#: applications/luci-app-ddns-go/htdocs/luci-static/resources/view/ddns-go.js:36
+msgid "NOT RUNNING"
+msgstr "尚未執行"
+
+#: applications/luci-app-ddns-go/htdocs/luci-static/resources/view/ddns-go.js:34
+msgid "Open Web Interface"
+msgstr "開啟 Web 介面"
+
+#: applications/luci-app-ddns-go/htdocs/luci-static/resources/view/ddns-go.js:31
+msgid "RUNNING"
+msgstr "正在執行"
+
+#: applications/luci-app-ddns-go/htdocs/luci-static/resources/view/ddns-go.js:89
+msgid "Skip certificate verification"
+msgstr "略過證書驗證"
+
+#: applications/luci-app-ddns-go/htdocs/luci-static/resources/view/ddns-go.js:83
+msgid "Update interval"
+msgstr "更新間隔"

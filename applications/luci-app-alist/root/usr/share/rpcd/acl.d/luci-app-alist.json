@@ -1,0 +1,17 @@
+{
+	"luci-app-alist": {
+		"description": "Grant access to AList configuration",
+		"read": {
+			"file": {
+				"/var/run/alist/log/alist.log": [ "read" ]
+			},
+			"ubus": {
+				"service": [ "list" ]
+			},
+			"uci": [ "alist" ]
+		},
+		"write": {
+			"uci": [ "alist" ]
+		}
+	}
+}

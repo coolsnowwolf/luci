@@ -1,0 +1,53 @@
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8"
+
+#: applications/luci-app-ddns-go/htdocs/luci-static/resources/view/ddns-go.js:55
+msgid "A simple and easy-to-use Dynamic DNS client with IPv6 support."
+msgstr ""
+
+#: applications/luci-app-ddns-go/htdocs/luci-static/resources/view/ddns-go.js:68
+msgid "Collecting data..."
+msgstr ""
+
+#: applications/luci-app-ddns-go/htdocs/luci-static/resources/view/ddns-go.js:31
+#: applications/luci-app-ddns-go/htdocs/luci-static/resources/view/ddns-go.js:36
+#: applications/luci-app-ddns-go/htdocs/luci-static/resources/view/ddns-go.js:54
+#: applications/luci-app-ddns-go/root/usr/share/luci/menu.d/luci-app-ddns-go.json:3
+msgid "DDNS-Go"
+msgstr ""
+
+#: applications/luci-app-ddns-go/htdocs/luci-static/resources/view/ddns-go.js:86
+msgid "Disable WebUI"
+msgstr ""
+
+#: applications/luci-app-ddns-go/htdocs/luci-static/resources/view/ddns-go.js:74
+msgid "Enable"
+msgstr ""
+
+#: applications/luci-app-ddns-go/root/usr/share/rpcd/acl.d/luci-app-ddns-go.json:3
+msgid "Grant UCI access for luci-app-ddns-go"
+msgstr ""
+
+#: applications/luci-app-ddns-go/htdocs/luci-static/resources/view/ddns-go.js:78
+msgid "Listen address"
+msgstr ""
+
+#: applications/luci-app-ddns-go/htdocs/luci-static/resources/view/ddns-go.js:36
+msgid "NOT RUNNING"
+msgstr ""
+
+#: applications/luci-app-ddns-go/htdocs/luci-static/resources/view/ddns-go.js:34
+msgid "Open Web Interface"
+msgstr ""
+
+#: applications/luci-app-ddns-go/htdocs/luci-static/resources/view/ddns-go.js:31
+msgid "RUNNING"
+msgstr ""
+
+#: applications/luci-app-ddns-go/htdocs/luci-static/resources/view/ddns-go.js:89
+msgid "Skip certificate verification"
+msgstr ""
+
+#: applications/luci-app-ddns-go/htdocs/luci-static/resources/view/ddns-go.js:83
+msgid "Update interval"
+msgstr ""
