@@ -1,0 +1,57 @@
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8"
+
+#: applications/luci-app-ua2f/htdocs/luci-static/resources/view/ua2f.js:70
+msgid "Auto setup firewall rules"
+msgstr ""
+
+#: applications/luci-app-ua2f/htdocs/luci-static/resources/view/ua2f.js:47
+msgid "Change User-Agent to F-words."
+msgstr ""
+
+#: applications/luci-app-ua2f/htdocs/luci-static/resources/view/ua2f.js:82
+msgid "Check User-Agent"
+msgstr ""
+
+#: applications/luci-app-ua2f/htdocs/luci-static/resources/view/ua2f.js:60
+msgid "Collecting data…"
+msgstr ""
+
+#: applications/luci-app-ua2f/htdocs/luci-static/resources/view/ua2f.js:80
+msgid "Custom User-Agent"
+msgstr ""
+
+#: applications/luci-app-ua2f/htdocs/luci-static/resources/view/ua2f.js:66
+msgid "Enable"
+msgstr ""
+
+#: applications/luci-app-ua2f/root/usr/share/rpcd/acl.d/luci-app-ua2f.json:3
+msgid "Grant access to UA2F configuration"
+msgstr ""
+
+#: applications/luci-app-ua2f/htdocs/luci-static/resources/view/ua2f.js:31
+msgid "NOT RUNNING"
+msgstr ""
+
+#: applications/luci-app-ua2f/htdocs/luci-static/resources/view/ua2f.js:83
+msgid "Open website"
+msgstr ""
+
+#: applications/luci-app-ua2f/htdocs/luci-static/resources/view/ua2f.js:72
+msgid "Process HTTP traffic from 443 port"
+msgstr ""
+
+#: applications/luci-app-ua2f/htdocs/luci-static/resources/view/ua2f.js:75
+msgid "Process HTTP traffic from Intranet"
+msgstr ""
+
+#: applications/luci-app-ua2f/htdocs/luci-static/resources/view/ua2f.js:29
+msgid "RUNNING"
+msgstr ""
+
+#: applications/luci-app-ua2f/htdocs/luci-static/resources/view/ua2f.js:29
+#: applications/luci-app-ua2f/htdocs/luci-static/resources/view/ua2f.js:31
+#: applications/luci-app-ua2f/htdocs/luci-static/resources/view/ua2f.js:47
+#: applications/luci-app-ua2f/root/usr/share/luci/menu.d/luci-app-ua2f.json:3
+msgid "UA2F"
+msgstr ""

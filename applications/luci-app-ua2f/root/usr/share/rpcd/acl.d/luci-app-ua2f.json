@@ -1,0 +1,14 @@
+{
+	"luci-app-ua2f": {
+		"description": "Grant access to UA2F configuration",
+		"read": {
+			"ubus": {
+				"service": [ "list" ]
+			},
+			"uci": [ "ua2f" ]
+		},
+		"write": {
+			"uci": [ "ua2f" ]
+		}
+	}
+}
