@@ -11834,3 +11834,31 @@ msgstr "{example_nx} 返回 {nxdomain}。"
 #: modules/luci-compat/luasrc/view/cbi/delegator.htm:20
 msgid "« Back"
 msgstr "« 后退"
+
+msgid "802.11n 2.4Ghz Only"
+msgstr "只适合 802.11n 2.4Ghz"
+
+msgid "DNS redirect"
+msgstr "DNS 重定向"
+
+msgid "Enable 256-QAM"
+msgstr "启用 256-QAM"
+
+msgid "Force redirect all local DNS queries to DNSMasq, a.k.a. DNS Hijacking."
+msgstr "强制将所有本地 DNS 查询重定向到 DNSMasq，即 DNS 劫持。"
+
+msgid "Max preferred lifetime"
+msgstr "前缀优先时间上限"
+
+msgid "Max valid lifetime"
+msgstr "前缀有效时间上限"
+
+msgid "Online Users"
+msgstr "在线用户数"
+
+msgid "Quectel Cellular"
+msgstr "移远蜂窝网络"
+
+msgid "Temperature"
+msgstr "温度"
+
