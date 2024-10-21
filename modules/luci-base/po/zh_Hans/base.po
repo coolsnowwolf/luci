@@ -11862,3 +11862,6 @@ msgstr "移远蜂窝网络"
 msgid "Temperature"
 msgstr "温度"
 
+msgid "Modem"
+msgstr "蜂窝网络"
+
