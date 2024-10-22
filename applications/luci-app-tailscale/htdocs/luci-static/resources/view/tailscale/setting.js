@@ -188,9 +188,9 @@ return view.extend({
 		o.rmempty = false;
 
 		o = s.taboption('basic', form.ListValue, 'fw_mode', _('Firewall Mode'));
-		o.value('nftables', 'nftables');
 		o.value('iptables', 'iptables');
-		o.default = 'nftables';
+		o.value('nftables', 'nftables');
+		o.default = 'iptables';
 		o.rmempty = false;
 
 		o = s.taboption('basic', form.Flag, 'log_stdout', _('StdOut Log'), _('Logging program activities.'));

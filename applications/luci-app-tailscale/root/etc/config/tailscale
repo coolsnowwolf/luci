@@ -1,2 +1,3 @@
 config tailscale 'settings'
 	option enabled '0'
+	option fw_mode 'iptables'
