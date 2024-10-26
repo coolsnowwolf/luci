@@ -83,11 +83,11 @@ msgstr "Flow offloading"
 
 #: applications/luci-app-turboacc/htdocs/luci-static/resources/view/turboacc.js:98
 msgid "Full Cone NAT"
-msgstr "全锥形 NAT"
+msgstr "全锥形 NAT1"
 
 #: applications/luci-app-turboacc/htdocs/luci-static/resources/view/turboacc.js:177
 msgid "Full cone NAT"
-msgstr "全锥形 NAT"
+msgstr "全锥形 NAT1"
 
 #: applications/luci-app-turboacc/htdocs/luci-static/resources/view/turboacc.js:178
 msgid "Full cone NAT (NAT1) can improve gaming performance effectively."
@@ -109,6 +109,9 @@ msgstr "IPv6 加速"
 msgid "MediaTek HNAT"
 msgstr "MediaTek HNAT"
 
+msgid "MTK WED WO offloading"
+msgstr "MTK 无线硬件加速"
+
 #: applications/luci-app-turboacc/htdocs/luci-static/resources/view/turboacc.js:140
 msgid "MediaTek's open source hardware offloading engine."
 msgstr "由联发科实现的开源硬件流量分载引擎。"
@@ -119,7 +122,10 @@ msgstr "开源流量分载引擎（快速转发或硬件 NAT）。"
 
 #: applications/luci-app-turboacc/htdocs/luci-static/resources/view/turboacc.js:146
 msgid "Requires hardware NAT support. Implemented at least for mt7621."
-msgstr "需要硬件 NAT 支持。目前 mt7621 已实现。"
+msgstr "需要硬件 NAT 支持。目前 mt762x/mt798x 已实现。"
+
+msgid "Requires hardware support, implemented at least for Filogic 8x0"
+msgstr "需要硬件支持，目前 Filogic 8x0 已实现"
 
 #: applications/luci-app-turboacc/htdocs/luci-static/resources/view/turboacc.js:126
 msgid "SFE connection manager"
@@ -149,12 +155,16 @@ msgstr "用于 路由/NAT 的分载引擎。"
 
 #: applications/luci-app-turboacc/root/usr/share/luci/menu.d/luci-app-turboacc.json:3
 msgid "TurboACC"
-msgstr "网络加速"
+msgstr "Turbo ACC 网络加速"
 
 #: applications/luci-app-turboacc/htdocs/luci-static/resources/view/turboacc.js:73
 msgid "TurboACC settings"
-msgstr "网络加速设置"
+msgstr "Turbo ACC 网络加速设置"
 
 #: applications/luci-app-turboacc/htdocs/luci-static/resources/view/turboacc.js:181
 msgid "xt_FULLCONENAT"
-msgstr "xt_FULLCONENAT"
+msgstr "兼容模式"
+
+#: applications/luci-app-turboacc/htdocs/luci-static/resources/view/turboacc.js:182
+msgid "Boardcom fullcone"
+msgstr "高性能模式"

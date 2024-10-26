@@ -1,6 +1,6 @@
 # SPDX-Identifier-License: GPL-3.0-only
 #
-# Copyright (C) 2018 Lean <coolsnowwolf@gmail.com>
+# Copyright (C) 2024 Lean <coolsnowwolf@gmail.com>
 # Copyright (C) 2019-2022 ImmortalWrt.org
 
 include $(TOPDIR)/rules.mk
