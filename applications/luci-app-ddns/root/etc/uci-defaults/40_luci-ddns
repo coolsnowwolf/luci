@@ -6,4 +6,5 @@ uci -q batch <<-EOF >/dev/null
 	commit ucitrack
 EOF
 
+rm -f /tmp/luci-indexcache
 return 0
