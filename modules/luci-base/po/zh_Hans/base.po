@@ -10559,6 +10559,10 @@ msgid ""
 "(encap2+3)"
 msgstr "使用硬件 MAC 地址和 IP 地址的 XOR，依靠 skb 流剖析 （encap2+3）"
 
+#: modules/luci-mod-system/htdocs/luci-static/resources/view/system/mounts.js:294
+msgid "Use as Docker data (/opt)"
+msgstr "作为 Docker 数据分区使用 (/opt)"
+
 #: modules/luci-mod-system/htdocs/luci-static/resources/view/system/mounts.js:295
 msgid "Use as external overlay (/overlay)"
 msgstr "作为外部 overlay 使用（/overlay）"
