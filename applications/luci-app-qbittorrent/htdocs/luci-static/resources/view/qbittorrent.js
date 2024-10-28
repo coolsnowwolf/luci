@@ -1,5 +1,3 @@
-// SPDX-License-Identifier: Apache-2.0
-
 'use strict';
 'require form';
 'require poll';
@@ -24,12 +22,12 @@ function getServiceStatus() {
 	});
 }
 
-function renderStatus(isRunning, port) {
-	var spanTemp = '<span style="color:%s"><strong>%s %s</strong></span>';
+function renderStatus(isRunning, webport) {
+	var spanTemp = '<em><span style="color:%s"><strong>%s %s</strong></span></em>';
 	var renderHTML;
 	if (isRunning) {
-		var button = String.format('&#160;<a class="btn cbi-button" href="http://%s:%s" target="_blank" rel="noreferrer noopener">%s</a>',
-			window.location.hostname, port, _('Open Web Interface'));
+		var button = String.format('<input class="cbi-button-reload" type="button" style="margin-left: 50px" value="%s" onclick="window.open(\'//%s:%s/\')">',
+			_('Open Web Interface'), window.location.hostname, webport);
 		renderHTML = spanTemp.format('green', _('qBittorrent'), _('RUNNING')) + button;
 	} else {
 		renderHTML = spanTemp.format('red', _('qBittorrent'), _('NOT RUNNING'));
@@ -47,11 +45,10 @@ return view.extend({
 
 	render: function(data) {
 		var m, s, o;
-		var webport = uci.get(data[0], 'config', 'http_port') || '8080';
+		var webport = uci.get(data[0], 'config', 'port') || '8080';
 
 		m = new form.Map('qbittorrent', _('qBittorrent'),
-			_('qBittorrent is a bittorrent client programmed in C++ / Qt.<br />' +
-				'Default login username is <code>admin</code> and password is <code>adminadmin</code>.'));
+			_('qBittorrent is a cross-platform free and open-source BitTorrent client. Default username & password: admin / adminadmin'));
 
 		s = m.section(form.TypedSection);
 		s.anonymous = true;
@@ -74,13 +71,13 @@ return view.extend({
 		o.default = o.disabled;
 		o.rmempty = false;
 
-		o = s.option(form.Value, 'http_port', _('Listen port'));
+		o = s.option(form.Value, 'port', _('WebUI Listen port'));
 		o.datatype = 'port';
 		o.default = '8080';
 		o.rmempty = false;
 
-		o = s.option(form.Value, 'download_dir', _('Download path'));
-		o.default = '/mnt/download';
+		o = s.option(form.Value, 'profile_dir', _('Configuration files Path'));
+		o.default = '/etc/qbittorrent';
 		o.rmempty = false;
 
 		return m.render();
