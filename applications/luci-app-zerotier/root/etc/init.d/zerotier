@@ -31,7 +31,8 @@ start_instance() {
 	config_get secret $cfg 'secret'
 
 	# Remove existing link or folder
-	config_path=/etc/zerotier
+	[ -d /etc/config/zero ] || mkdir -p /etc/config/zero
+	config_path=/etc/config/zero
 	rm -rf $CONFIG_PATH
 
 	# Create link from CONFIG_PATH to config_path
