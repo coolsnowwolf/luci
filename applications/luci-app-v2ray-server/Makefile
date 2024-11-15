@@ -6,7 +6,7 @@
 include $(TOPDIR)/rules.mk
 
 LUCI_TITLE:=LuCI support for V2ray Server
-LUCI_DEPENDS:=+unzip
+LUCI_DEPENDS:=+luci-compat +unzip
 LUCI_PKGARCH:=all
 
 PKG_NAME:=luci-app-v2ray-server
