@@ -1,14 +1,14 @@
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2023-06-20 13:52+0000\n"
-"Last-Translator: Quy <haonguyen93056@gmail.com>\n"
+"PO-Revision-Date: 2023-03-26 16:40+0000\n"
+"Last-Translator: Nguyễn văn tuyên <admin@tuyen.vn>\n"
 "Language-Team: Vietnamese <https://hosted.weblate.org/projects/openwrt/"
 "luciapplicationsudpxy/vi/>\n"
 "Language: vi\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 4.18.1\n"
+"X-Generator: Weblate 4.17-dev\n"
 
 #: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:30
 msgid "Bind IP/Interface"
@@ -16,51 +16,51 @@ msgstr "Liên kết IP/Giao diện"
 
 #: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:47
 msgid "Buffer messages"
-msgstr "Bộ đệm thông điệp (Buffer messages)"
+msgstr ""
 
 #: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:44
 msgid "Buffer size"
-msgstr "Kích thước bộ đệm (Buffer size)"
+msgstr ""
 
 #: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:50
 msgid "Buffer time"
-msgstr "Thời gian bộ đệm (Buffer time)"
+msgstr ""
 
 #: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:16
 msgid "Enabled"
-msgstr "Kích Hoạt"
+msgstr "Bật"
 
 #: applications/luci-app-udpxy/root/usr/share/rpcd/acl.d/luci-app-udpxy.json:3
 msgid "Grant UCI access for luci-app-udpxy"
-msgstr "Cấp quyền truy cập UCI cho luci-app-udpxy"
+msgstr ""
 
 #: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:42
 msgid "Log file"
-msgstr "Tệp nhật ký"
+msgstr ""
 
 #: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:39
 msgid "Max clients"
-msgstr "Số lượng tối đa máy khách"
+msgstr ""
 
 #: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:56
 msgid "Multicast subscription renew"
-msgstr "Gia hạn đăng ký Multicast"
+msgstr ""
 
 #: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:53
 msgid "Nice increment"
-msgstr "Bước tăng đẹp"
+msgstr ""
 
 #: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:33
 msgid "Port"
-msgstr "Cổng"
+msgstr ""
 
 #: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:22
 msgid "Respawn"
-msgstr "Respawn"
+msgstr ""
 
 #: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:36
 msgid "Source IP/Interface"
-msgstr "Nguồn IP/Giao thức"
+msgstr ""
 
 #: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:28
 msgid "Status"
@@ -68,17 +68,15 @@ msgstr "Trạng thái"
 
 #: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:25
 msgid "Verbose"
-msgstr "Chế độ chi tiết (Verbose)"
+msgstr ""
 
 #: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:9
 #: applications/luci-app-udpxy/root/usr/share/luci/menu.d/luci-app-udpxy.json:3
 msgid "udpxy"
-msgstr "udpxy"
+msgstr ""
 
 #: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:10
 msgid ""
 "udpxy is a UDP-to-HTTP multicast traffic relay daemon, here you can "
 "configure the settings."
 msgstr ""
-"udpxy là một tiến trình nền chuyển tiếp lưu lượng đa phát UDP thành HTTP, ở "
-"đây bạn có thể cấu hình các thiết lập."

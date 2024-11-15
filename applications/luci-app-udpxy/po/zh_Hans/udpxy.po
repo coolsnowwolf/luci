@@ -1,14 +1,14 @@
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2024-02-21 18:02+0000\n"
-"Last-Translator: try496 <pinghejk@gmail.com>\n"
+"PO-Revision-Date: 2023-03-11 13:39+0000\n"
+"Last-Translator: Eric <hamburger2048@users.noreply.hosted.weblate.org>\n"
 "Language-Team: Chinese (Simplified) <https://hosted.weblate.org/projects/"
 "openwrt/luciapplicationsudpxy/zh_Hans/>\n"
 "Language: zh_Hans\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.5-dev\n"
+"X-Generator: Weblate 4.16.2-dev\n"
 
 #: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:30
 msgid "Bind IP/Interface"
@@ -68,7 +68,7 @@ msgstr "状态"
 
 #: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:25
 msgid "Verbose"
-msgstr "详细"
+msgstr "记录详细日志"
 
 #: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:9
 #: applications/luci-app-udpxy/root/usr/share/luci/menu.d/luci-app-udpxy.json:3
