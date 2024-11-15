@@ -39,6 +39,8 @@ local methods = {
 				fptype = "Fast classifier"
 			elseif fs.stat("/sys/module/shortcut_fe_cm", "type") == "dir" then
 				fptype = "Shortcut-FE CM"
+			elseif fs.stat("/sys/module/ecm", "type") == "dir" then
+				fptype = "QCA NSS ECM"
 			elseif fs.stat("/sys/kernel/debug/hnat", "type") == "dir" then
 				local ethernet_hnat = (readfile("/sys/kernel/debug/hnat/hook_toggle") ~= "enabled") and
 					" / Ethernet HNAT Disabled" or ""
