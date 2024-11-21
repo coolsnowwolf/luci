@@ -1,14 +1,16 @@
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2023-11-30 14:34+0000\n"
-"Last-Translator: rygle <pittos@post.com>\n"
-"Language-Team: English <https://hosted.weblate.org/projects/openwrt/"
-"luciapplicationsmwan3/en/>\n"
-"Language: en\n"
+"Project-Id-Version: PACKAGE VERSION\n"
+"PO-Revision-Date: 2024-04-17 08:03+0000\n"
+"Last-Translator: Stephan <stephanrutten@users.noreply.hosted.weblate.org>\n"
+"Language-Team: Dutch <https://hosted.weblate.org/projects/openwrt/"
+"luciapplicationsmwan3/nl/>\n"
+"Language: nl\n"
+"MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.3-dev\n"
+"X-Generator: Weblate 5.5-dev\n"
 
 #: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:211
 #: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:227
@@ -164,7 +166,7 @@ msgstr ""
 #: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/status/overview.js:56
 #: applications/luci-app-mwan3/htdocs/luci-static/resources/view/status/include/90_mwan3.js:65
 msgid "Disabled"
-msgstr ""
+msgstr "Uitgeschakeld"
 
 #: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:267
 msgid ""
@@ -186,7 +188,7 @@ msgstr ""
 
 #: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:55
 msgid "Enabled"
-msgstr "Enabled"
+msgstr ""
 
 #: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/rule.js:118
 msgid ""
@@ -300,7 +302,7 @@ msgstr ""
 #: applications/luci-app-mwan3/htdocs/luci-static/resources/view/status/include/90_mwan3.js:100
 #: applications/luci-app-mwan3/root/usr/share/luci/menu.d/luci-app-mwan3.json:64
 msgid "Interface"
-msgstr "Interface"
+msgstr ""
 
 #: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:252
 msgid "Interface down"
@@ -527,7 +529,7 @@ msgstr ""
 
 #: applications/luci-app-mwan3/root/usr/share/luci/menu.d/luci-app-mwan3.json:13
 msgid "Overview"
-msgstr "Overview"
+msgstr ""
 
 #: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:103
 msgid "Ping count"
@@ -804,10 +806,3 @@ msgstr ""
 #: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/rule.js:127
 msgid "unreachable (reject)"
 msgstr ""
-
-#~ msgid ""
-#~ "WARNING: Rule %s have a port configured with no or improper protocol "
-#~ "specified!"
-#~ msgstr ""
-#~ "WARNING: Rule %s has a port configured with no or improper protocol "
-#~ "specified!"

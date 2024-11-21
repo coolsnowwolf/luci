@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2021-08-04 20:24+0000\n"
-"Last-Translator: Satoru Yoshida <ramat@ram.ne.jp>\n"
+"PO-Revision-Date: 2024-10-09 05:48+0000\n"
+"Last-Translator: Monarch <monarch.scrap-0p@icloud.com>\n"
 "Language-Team: Japanese <https://hosted.weblate.org/projects/openwrt/"
 "luciapplicationsmwan3/ja/>\n"
 "Language: ja\n"
@@ -11,59 +11,59 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 4.8-dev\n"
+"X-Generator: Weblate 5.8-dev\n"
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:187
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:203
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:225
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:211
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:227
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:249
 msgid "%d hour"
 msgstr "%d 時間"
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:182
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:198
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:220
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:206
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:222
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:244
 msgid "%d minute"
 msgstr "%d 分"
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:183
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:184
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:185
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:186
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:199
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:200
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:201
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:202
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:221
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:222
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:207
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:208
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:209
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:210
 #: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:223
 #: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:224
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:225
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:226
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:245
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:246
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:247
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:248
 msgid "%d minutes"
 msgstr "%d 分"
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:169
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:176
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:192
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:214
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:193
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:200
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:216
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:238
 #, fuzzy
 msgid "%d second"
 msgstr "%d 秒"
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:171
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:177
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:178
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:179
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:180
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:181
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:193
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:194
 #: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:195
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:196
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:197
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:215
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:216
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:201
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:202
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:203
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:204
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:205
 #: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:217
 #: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:218
 #: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:219
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:220
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:221
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:239
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:240
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:241
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:242
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:243
 msgid "%d seconds"
 msgstr "%d 秒"
 
@@ -99,11 +99,11 @@ msgstr ""
 msgid "-- Interface Selection --"
 msgstr ""
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/rule.js:85
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/rule.js:109
 msgid "-- Please choose --"
 msgstr "-- 選択してください --"
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:75
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:99
 msgid ""
 "Acceptable values: 1-100. This many Tracking IP addresses must respond for "
 "the link to be deemed up"
@@ -111,11 +111,11 @@ msgstr ""
 "利用可能な値: 1-100。上記のトラッキング IP の合計個数のうち、Up 状態と判定す"
 "るためにに必要な、レスポンスが返されたトラッキング IP アドレスの個数です。"
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/member.js:38
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/member.js:62
 msgid "Acceptable values: 1-1000. Defaults to 1 if not set"
 msgstr "利用可能な値: 1-1000。空欄の場合のデフォルトは1です。"
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/member.js:34
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/member.js:58
 msgid "Acceptable values: 1-256. Defaults to 1 if not set"
 msgstr "利用可能な値: 1-256。空欄の場合のデフォルトは1です。"
 
@@ -132,7 +132,7 @@ msgstr ""
 msgid "Check IP rules"
 msgstr "IP ルールのチェック"
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:116
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:140
 msgid "Check link quality"
 msgstr "リンク品質のチェック"
 
@@ -156,11 +156,11 @@ msgstr "重大"
 msgid "Debug"
 msgstr "デバッグ"
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/rule.js:61
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/rule.js:85
 msgid "Destination address"
 msgstr "宛先アドレス"
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/rule.js:65
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/rule.js:89
 msgid "Destination port"
 msgstr "宛先ポート"
 
@@ -173,7 +173,7 @@ msgstr "診断"
 msgid "Disabled"
 msgstr "無効"
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:243
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:267
 msgid ""
 "Downed interface will be deemed up after this many successful ping tests"
 msgstr ""
@@ -189,15 +189,15 @@ msgstr ""
 msgid "Emergency"
 msgstr "緊急"
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:68
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:92
 msgid "Enable ssl tracking"
 msgstr "SSL トラッキングを有効化"
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:31
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:55
 msgid "Enabled"
 msgstr "有効"
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/rule.js:94
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/rule.js:118
 msgid ""
 "Enables firewall rule logging (global mwan3 logging must also be enabled)"
 msgstr ""
@@ -208,7 +208,7 @@ msgstr ""
 msgid "Enables global firewall logging"
 msgstr "グローバルなファイアウォールのログ記録を有効にします。"
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:69
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:93
 msgid "Enables https tracking on ssl port 443"
 msgstr "SSL ポート 443 で https トラッキングを有効化"
 
@@ -224,19 +224,19 @@ msgstr "エラー"
 msgid "Execute"
 msgstr "実行"
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:35
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:59
 msgid "Expect interface state on up event"
 msgstr "Up イベント時に予想されるインターフェースの状態です。"
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:189
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:213
 msgid "Failure interval"
 msgstr "障害検出 インターバル"
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:121
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:145
 msgid "Failure latency [ms]"
 msgstr ""
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:134
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:158
 msgid "Failure packet loss [%]"
 msgstr ""
 
@@ -248,11 +248,11 @@ msgstr "ファイアウォール ログレベル"
 msgid "Firewall mask"
 msgstr "ファイアウォール マスク"
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:256
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:280
 msgid "Flush conntrack table"
 msgstr "conntrack テーブルのクリア"
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:257
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:281
 msgid "Flush global firewall conntrack table on interface events"
 msgstr ""
 "インターフェース イベント時にグローバル ファイアウォール conntrack テーブルを"
@@ -274,27 +274,27 @@ msgstr "ホットプラグ ifdown"
 msgid "Hotplug ifup"
 msgstr "ホットプラグ ifup"
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/rule.js:83
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/rule.js:107
 msgid "IPset"
 msgstr "IPset"
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:43
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:67
 msgid "IPv4"
 msgstr "IPv4"
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/rule.js:37
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/rule.js:61
 msgid "IPv4 and IPv6"
 msgstr "IPv4及びIPv6"
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/rule.js:38
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/rule.js:62
 msgid "IPv4 only"
 msgstr "IPv4のみ"
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:44
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:68
 msgid "IPv6"
 msgstr "IPv6"
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/rule.js:39
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/rule.js:63
 msgid "IPv6 only"
 msgstr "IPv6のみ"
 
@@ -302,11 +302,11 @@ msgstr "IPv6のみ"
 msgid "Info"
 msgstr "情報"
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:34
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:58
 msgid "Initial state"
 msgstr "初期状態"
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/member.js:26
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/member.js:50
 #: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/status/diagnostics.js:83
 #: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/status/overview.js:64
 #: applications/luci-app-mwan3/htdocs/luci-static/resources/view/status/include/90_mwan3.js:76
@@ -315,40 +315,41 @@ msgstr "初期状態"
 msgid "Interface"
 msgstr "インターフェース"
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:228
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:252
 msgid "Interface down"
 msgstr "インターフェース Down"
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:242
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:266
 msgid "Interface up"
 msgstr "インターフェース Up"
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:229
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:253
 msgid "Interface will be deemed down after this many failed ping tests"
 msgstr ""
 "インターフェースが Down 状態と判断されるまでに要する ping テストの失敗回数で"
 "す。"
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:24
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:25
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:46
 msgid ""
 "Interfaces may not share the same name as configured members, policies or "
 "rules."
 msgstr ""
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:41
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/rule.js:35
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:65
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/rule.js:59
 msgid "Internet Protocol"
 msgstr "インターネット プロトコル"
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:206
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:230
 msgid "Keep failure interval"
 msgstr ""
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:207
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:231
 msgid "Keep ping failure interval during failure state"
 msgstr ""
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/policy.js:37
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/policy.js:61
 msgid "Last resort"
 msgstr "最終手段"
 
@@ -356,14 +357,14 @@ msgstr "最終手段"
 msgid "Lines beginning with # are comments and are not executed."
 msgstr ""
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/policy.js:20
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/policy.js:21
 msgid ""
 "Load-balanced member interfaces distribute more traffic out those with "
 "higher weights."
 msgstr ""
 
 #: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/globals.js:19
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/rule.js:93
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/rule.js:117
 msgid "Logging"
 msgstr "ロギング"
 
@@ -371,12 +372,12 @@ msgstr "ロギング"
 msgid "Loglevel"
 msgstr "ログレベル"
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:103
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:127
 msgid "Max TTL"
 msgstr "最大 TTL"
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/rule.js:57
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/rule.js:66
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/rule.js:81
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/rule.js:90
 msgid ""
 "May be entered as a single or multiple port(s) (eg \"22\" or \"80,443\") or "
 "as a portrange (eg \"1024:2048\") without quotes"
@@ -388,31 +389,32 @@ msgstr ""
 msgid "Member"
 msgstr "メンバー"
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/policy.js:18
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/policy.js:19
 msgid "Member interfaces with lower metrics are used first."
 msgstr ""
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/policy.js:19
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/policy.js:20
 msgid "Member interfaces with the same metric will be load-balanced."
 msgstr ""
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/policy.js:30
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/policy.js:54
 msgid "Member used"
 msgstr "使用されるメンバー"
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/member.js:17
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/member.js:18
 msgid ""
 "Members are profiles attaching a metric and weight to an MWAN interface."
 msgstr ""
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/member.js:19
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/member.js:20
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/member.js:41
 msgid ""
 "Members may not share the same name as configured interfaces, policies or "
 "rules."
 msgstr ""
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:264
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/member.js:33
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:288
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/member.js:57
 msgid "Metric"
 msgstr "メトリック"
 
@@ -430,11 +432,11 @@ msgstr ""
 msgid "MultiWAN Manager - Globals"
 msgstr ""
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:20
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:21
 msgid "MultiWAN Manager - Interfaces"
 msgstr ""
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/member.js:16
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/member.js:17
 msgid "MultiWAN Manager - Members"
 msgstr ""
 
@@ -446,11 +448,11 @@ msgstr ""
 msgid "MultiWAN Manager - Overview"
 msgstr ""
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/policy.js:16
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/policy.js:17
 msgid "MultiWAN Manager - Policies"
 msgstr ""
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/rule.js:18
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/rule.js:19
 msgid "MultiWAN Manager - Rules"
 msgstr ""
 
@@ -462,13 +464,20 @@ msgstr ""
 msgid "MultiWAN Manager - Troubleshooting"
 msgstr ""
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:21
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:22
 msgid ""
 "Mwan3 requires that all interfaces have a unique metric configured in /etc/"
 "config/network."
 msgstr ""
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/rule.js:84
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:49
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/member.js:44
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/policy.js:48
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/rule.js:53
+msgid "Name length shall not exceed 15 characters"
+msgstr ""
+
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/rule.js:108
 msgid ""
 "Name of IPset rule. Requires IPset rule in /etc/dnsmasq.conf (eg \"ipset=/"
 "youtube.com/youtube\")"
@@ -476,25 +485,25 @@ msgstr ""
 "IPset ルールの名前です。このルールは、 /etc/dnsmasq.conf で必要です。（例: "
 "\"ipset=/youtube.com/youtube\")"
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:23
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:24
 msgid "Names may contain characters A-Z, a-z, 0-9, _ and no spaces-"
 msgstr ""
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/member.js:18
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/policy.js:21
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/rule.js:26
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/member.js:19
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/policy.js:22
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/rule.js:27
 msgid "Names may contain characters A-Z, a-z, 0-9, _ and no spaces."
 msgstr ""
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/policy.js:22
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/policy.js:23
 msgid "Names must be 15 characters or less."
 msgstr ""
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:22
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:23
 msgid "Names must match the interface name found in /etc/config/network."
 msgstr ""
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/rule.js:74
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/rule.js:98
 msgid "No"
 msgstr "いいえ"
 
@@ -507,7 +516,7 @@ msgstr "MWAN インターフェースが見つかりません"
 msgid "No Tracking"
 msgstr ""
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:272
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:296
 msgid "No interface metric set!"
 msgstr ""
 
@@ -523,13 +532,13 @@ msgstr "注意"
 msgid "Notify"
 msgstr ""
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:38
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:62
 #: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/status/overview.js:37
 #: applications/luci-app-mwan3/htdocs/luci-static/resources/view/status/include/90_mwan3.js:45
 msgid "Offline"
 msgstr "オフライン"
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:37
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:61
 #: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/status/overview.js:30
 #: applications/luci-app-mwan3/htdocs/luci-static/resources/view/status/include/90_mwan3.js:39
 msgid "Online"
@@ -539,7 +548,7 @@ msgstr "オンライン"
 msgid "Overview"
 msgstr "概要"
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:79
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:103
 msgid "Ping count"
 msgstr "Ping 回数"
 
@@ -547,23 +556,23 @@ msgstr "Ping 回数"
 msgid "Ping default gateway"
 msgstr "デフォルト ゲートウェイへのping"
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:174
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:198
 msgid "Ping interval"
 msgstr "Ping インターバル"
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:190
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:214
 msgid "Ping interval during failure detection"
 msgstr "障害検出中の Ping 実行間隔です。"
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:212
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:236
 msgid "Ping interval during failure recovering"
 msgstr "障害復旧中の Ping 実行間隔です。"
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:88
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:112
 msgid "Ping size"
 msgstr "Ping サイズ"
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:167
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:191
 msgid "Ping timeout"
 msgstr "Ping タイムアウト"
 
@@ -571,13 +580,14 @@ msgstr "Ping タイムアウト"
 msgid "Ping tracking IP"
 msgstr "トラッキング IP へのping"
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/policy.js:17
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/policy.js:18
 msgid ""
 "Policies are profiles grouping one or more members controlling how Mwan3 "
 "distributes traffic."
 msgstr ""
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/policy.js:23
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/policy.js:24
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/policy.js:45
 msgid ""
 "Policies may not share the same name as configured interfaces, members or "
 "rules"
@@ -587,11 +597,11 @@ msgstr ""
 msgid "Policy"
 msgstr "ポリシー"
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/rule.js:97
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/rule.js:121
 msgid "Policy assigned"
 msgstr "アサイン済みポリシー"
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/rule.js:42
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/rule.js:66
 msgid "Protocol"
 msgstr "プロトコル"
 
@@ -601,15 +611,15 @@ msgid ""
 "hotplug interface event on interfaces for which mwan3 is enabled."
 msgstr ""
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:211
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:235
 msgid "Recovery interval"
 msgstr "障害復旧 インターバル"
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:144
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:168
 msgid "Recovery latency [ms]"
 msgstr ""
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:157
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:181
 msgid "Recovery packet loss [%]"
 msgstr ""
 
@@ -625,37 +635,38 @@ msgstr "ルーティングテーブルの検索"
 msgid "Rule"
 msgstr "ルール"
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/rule.js:20
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/rule.js:21
 msgid "Rules are based on IP address, port or protocol."
 msgstr ""
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/rule.js:21
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/rule.js:22
 msgid "Rules are matched from top to bottom."
 msgstr ""
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/rule.js:22
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/rule.js:23
 msgid "Rules below a matching rule are ignored."
 msgstr ""
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/rule.js:27
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/rule.js:28
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/rule.js:50
 msgid ""
 "Rules may not share the same name as configured interfaces, members or "
 "policies."
 msgstr ""
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/rule.js:19
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/rule.js:20
 msgid "Rules specify which traffic will use a particular MWAN policy."
 msgstr ""
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/rule.js:78
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/rule.js:102
 msgid "Seconds. Acceptable values: 1-1000000. Defaults to 600 if not set"
 msgstr "秒。利用可能な値: 1-1000000。空欄の場合のデフォルト値は600です。"
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/rule.js:52
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/rule.js:76
 msgid "Source address"
 msgstr "送信元アドレス"
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/rule.js:56
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/rule.js:80
 msgid "Source port"
 msgstr "送信元ポート"
 
@@ -664,18 +675,18 @@ msgstr "送信元ポート"
 #: applications/luci-app-mwan3/htdocs/luci-static/resources/view/status/include/90_mwan3.js:106
 #: applications/luci-app-mwan3/root/usr/share/luci/menu.d/luci-app-mwan3.json:21
 msgid "Status"
-msgstr "ステータス"
+msgstr "状態"
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/rule.js:70
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/rule.js:94
 msgid "Sticky"
 msgstr "Sticky"
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/rule.js:77
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/rule.js:101
 msgid "Sticky timeout"
 msgstr "Sticky タイムアウト"
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/rule.js:53
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/rule.js:62
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/rule.js:77
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/rule.js:86
 msgid "Supports CIDR notation (eg \"192.168.100.0/24\") without quotes"
 msgstr "CIDR 表記のサポート（例: \"192.168.100.0/24\"）"
 
@@ -697,7 +708,7 @@ msgid ""
 "There are three main environment variables that are passed to this script."
 msgstr ""
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:265
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:289
 msgid ""
 "This displays the metric assigned to this interface in /etc/config/network"
 msgstr ""
@@ -707,7 +718,7 @@ msgstr ""
 msgid "This file is interpreted as a shell script."
 msgstr ""
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:48
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:72
 msgid ""
 "This hostname or IP address will be pinged to determine if the link is up or "
 "down. Leave blank to assume interface is always online"
@@ -720,25 +731,25 @@ msgstr ""
 msgid "This section allows you to modify the content of \"/etc/mwan3.user\"."
 msgstr ""
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:47
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:71
 msgid "Tracking hostname or IP address"
 msgstr "トラッキング ホスト名または IP アドレス"
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:52
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:76
 msgid "Tracking method"
 msgstr "トラッキング方式"
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:74
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:98
 msgid "Tracking reliability"
 msgstr "トラッキングの信頼性"
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/rule.js:24
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/rule.js:25
 msgid ""
 "Traffic destined for known (other than default) networks is handled by the "
 "main routing table."
 msgstr ""
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/rule.js:71
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/rule.js:95
 msgid ""
 "Traffic from the same source IP address that previously matched this rule "
 "within the sticky timeout period will use the same WAN interface"
@@ -747,13 +758,13 @@ msgstr ""
 "度 Sticky 制限時間内にマッチした場合には、同じ WAN インターフェースが使用され"
 "ます。"
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/rule.js:25
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/rule.js:26
 msgid ""
 "Traffic matching a rule, but all WAN interfaces for that policy are down "
 "will be blackholed."
 msgstr ""
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/rule.js:23
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/rule.js:24
 msgid "Traffic not matching any rule is routed using the main routing table."
 msgstr ""
 
@@ -772,7 +783,7 @@ msgstr "内容を保存できません: %s"
 msgid "Uptime"
 msgstr "稼働時間"
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/rule.js:43
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/rule.js:67
 msgid "View the content of /etc/protocols for protocol description"
 msgstr "プロトコルの説明については、 /etc/protocols の内容を確認してください"
 
@@ -780,44 +791,303 @@ msgstr "プロトコルの説明については、 /etc/protocols の内容を�
 msgid "Warning"
 msgstr "警告"
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/policy.js:38
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/policy.js:62
 msgid ""
 "When all policy members are offline use this behavior for matched traffic"
 msgstr ""
 "ポリシーの全メンバーがオフラインの場合、合致したトラフィックに対してこのふる"
 "まいが使用されます。"
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/rule.js:73
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/rule.js:97
 msgid "Yes"
 msgstr "はい"
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/policy.js:41
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/rule.js:104
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/policy.js:65
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/rule.js:128
 msgid "blackhole (drop)"
 msgstr "blackhole (drop)"
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:260
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:284
 msgid "connected (mwan3)"
 msgstr "接続時 (mwan3)"
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/policy.js:42
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/rule.js:105
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/policy.js:66
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/rule.js:129
 msgid "default (use main routing table)"
 msgstr "デフォルト（メインのルーティング テーブルを使用）"
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:261
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:285
 msgid "disconnected (mwan3)"
 msgstr "切断時 (mwan3)"
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:259
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:283
 msgid "ifdown (netifd)"
 msgstr "ifdown (netifd)"
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:258
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/interface.js:282
 msgid "ifup (netifd)"
 msgstr "ifup (netifd)"
 
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/policy.js:40
-#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/rule.js:103
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/policy.js:64
+#: applications/luci-app-mwan3/htdocs/luci-static/resources/view/mwan3/network/rule.js:127
 msgid "unreachable (reject)"
 msgstr "unreachable (reject)"
+
+#~ msgid "All required IP rules for interface %s found"
+#~ msgstr "インターフェース %s の全必須 IP ルールが見つかりました"
+
+#~ msgid "Collecting data..."
+#~ msgstr "データを収集中..."
+
+#~ msgid "Detail"
+#~ msgstr "詳細"
+
+#~ msgid "INFO: MWAN not running"
+#~ msgstr "情報: MWAN は実行されていません"
+
+#~ msgid "Interfaces"
+#~ msgstr "インターフェース"
+
+#~ msgid "Load Balancing"
+#~ msgstr "負荷分散"
+
+#~ msgid "Loading"
+#~ msgstr "読み込み中"
+
+#~ msgid "MWAN - Globals"
+#~ msgstr "MWAN - グローバル"
+
+#~ msgid "MWAN - Interfaces"
+#~ msgstr "MWAN - インターフェース"
+
+#~ msgid "MWAN - Members"
+#~ msgstr "MWAN - メンバー"
+
+#~ msgid "MWAN - Notification"
+#~ msgstr "MWAN - 通知"
+
+#~ msgid "MWAN - Policies"
+#~ msgstr "MWAN - ポリシー"
+
+#~ msgid "MWAN - Rules"
+#~ msgstr "MWAN - ルール"
+
+#~ msgid "MWAN Interface Configuration - %s"
+#~ msgstr "MWAN インターフェース設定 - %s"
+
+#~ msgid "MWAN Interfaces"
+#~ msgstr "MWAN インターフェース"
+
+#~ msgid "MWAN Member Configuration - %s"
+#~ msgstr "MWAN メンバー設定 - %s"
+
+#~ msgid "MWAN Policy Configuration - %s"
+#~ msgstr "MWAN ポリシー設定 - %s"
+
+#~ msgid "MWAN Rule Configuration - %s"
+#~ msgstr "MWAN ルール設定 - %s"
+
+#~ msgid "MWAN Status - Detail"
+#~ msgstr "MWAN ステータス - 詳細"
+
+#~ msgid "MWAN Status - Diagnostics"
+#~ msgstr "MWAN ステータス - 診断"
+
+#~ msgid "MWAN Status - Troubleshooting"
+#~ msgstr "MWAN ステータス - トラブルシューティング"
+
+#~ msgid "Members"
+#~ msgstr "メンバー"
+
+#~ msgid ""
+#~ "Members are profiles attaching a metric and weight to an MWAN "
+#~ "interface<br />Names may contain characters A-Z, a-z, 0-9, _ and no "
+#~ "spaces<br />Members may not share the same name as configured interfaces, "
+#~ "policies or rules"
+#~ msgstr ""
+#~ "メンバーは、MWAN インターフェースのメトリックおよびウエイトを関連付けたプ"
+#~ "ロファイルです。<br />名前は A-Z, a-z, 0-9, _ を含むことができますが、ス"
+#~ "ペースは使用できません。<br />メンバーには、設定済みのインターフェースやポ"
+#~ "リシー、ルールと同じ名前を使用することはできません。"
+
+#~ msgid "Members assigned"
+#~ msgstr "アサイン済みメンバー"
+
+#~ msgid "Missing both IP rules for interface %s"
+#~ msgstr "インターフェース %s にどちらの IP ルールもありません。"
+
+#~ msgid "No gateway for interface %s found."
+#~ msgstr "インターフェース %s にゲートウェイが見つかりません。"
+
+#~ msgid "No tracking Hosts for interface %s defined."
+#~ msgstr "インターフェース %s にトラッキングホストが指定されていません。"
+
+#~ msgid "Notification"
+#~ msgstr "通知"
+
+#~ msgid "Only one IP rules for interface %s found"
+#~ msgstr "インターフェース %s に IP ルールが一つのみ見つかりました。"
+
+#~ msgid "Policies"
+#~ msgstr "ポリシー"
+
+#~ msgid ""
+#~ "Policies are profiles grouping one or more members controlling how MWAN "
+#~ "distributes traffic<br />Member interfaces with lower metrics are used "
+#~ "first<br />Member interfaces with the same metric will be load-"
+#~ "balanced<br />Load-balanced member interfaces distribute more traffic out "
+#~ "those with higher weights<br />Names may contain characters A-Z, a-z, "
+#~ "0-9, _ and no spaces<br />Names must be 15 characters or less<br /"
+#~ ">Policies may not share the same name as configured interfaces, members "
+#~ "or rules"
+#~ msgstr ""
+#~ "ポリシーは、MWANがどのようにトラフィックの分配を行うかを制御する、1つ以上"
+#~ "のメンバーをグループ化するプロファイルです。<br />最小のメトリックを持つメ"
+#~ "ンバー インターフェースが最初に使用されます。<br />同じメトリックを持つ複"
+#~ "数のインターフェースでは、負荷分散を行います。<br />負荷分散に設定されたメ"
+#~ "ンバー インターフェースでは、ウェイトの値が大きい方により多くのトラフィッ"
+#~ "クを分配します。<br />名前は A-Z, a-z, 0-9, _ を含むことができますが、ス"
+#~ "ペースは使用できません。また、15文字以内でなければなりません。<br />ポリ"
+#~ "シーでは、設定済みのインターフェースやメンバー、ルールと同じ名前を使用する"
+#~ "ことはできません。"
+
+#~ msgid "Routing table %s for interface %s found"
+#~ msgstr "ルーティングテーブル %s が見つかりました（インターフェース %s）"
+
+#~ msgid "Routing table %s for interface %s not found"
+#~ msgstr "ルーティングテーブル %s が見つかりません（インターフェース %s）"
+
+#~ msgid "Rules"
+#~ msgstr "ルール"
+
+#~ msgid ""
+#~ "Rules specify which traffic will use a particular MWAN policy<br />Rules "
+#~ "are based on IP address, port or protocol<br />Rules are matched from top "
+#~ "to bottom<br />Rules below a matching rule are ignored<br />Traffic not "
+#~ "matching any rule is routed using the main routing table<br />Traffic "
+#~ "destined for known (other than default) networks is handled by the main "
+#~ "routing table<br />Traffic matching a rule, but all WAN interfaces for "
+#~ "that policy are down will be blackholed<br />Names may contain characters "
+#~ "A-Z, a-z, 0-9, _ and no spaces<br />Rules may not share the same name as "
+#~ "configured interfaces, members or policies"
+#~ msgstr ""
+#~ "ルールは、どのトラフィックが特定の MWAN ポリシーを使用するかを指定します"
+#~ "<br />ルールは IP アドレスやポート、プロトコルに基づいています<br />ルール"
+#~ "は上から下へマッチングが行われます<br />合致したルールより下のルールは無視"
+#~ "されます<br />いずれのルールにもマッチしないトラフィックは、メインのルー"
+#~ "ティングテーブルを使用してルーティングされます<br />既知（デフォルト以外）"
+#~ "のネットワークへのトラフィックは、メインのルーティングテーブルによって制御"
+#~ "されます<br />トラフィックがルールに合致しても、全 WAN インターフェースが "
+#~ "down の場合は blackhole 状態となります<br />名前は A-Z, a-z, 0-9, _ を含む"
+#~ "ことができますが、スペースは使用できません<br />ルールは、設定済みのイン"
+#~ "ターフェースやメンバー、ポリシーと同じ名前を使用することはできません。"
+
+#~ msgid "There are currently %d of %d supported interfaces configured"
+#~ msgstr "現在、%d 個中 %d 個のサポートされたインターフェースが設定済みです。"
+
+#~ msgid ""
+#~ "This section allows you to modify the content of \"/etc/mwan3.user\".<br /"
+#~ ">The file is also preserved during sysupgrade.<br /><br />Notes:<br /"
+#~ ">This file is interpreted as a shell script.<br />The first line of the "
+#~ "script must be &#34;#!/bin/sh&#34; without quotes.<br />Lines beginning "
+#~ "with # are comments and are not executed.<br />Put your custom mwan3 "
+#~ "action here, they will<br />be executed with each netifd hotplug "
+#~ "interface event<br />on interfaces for which mwan3 is enabled.<br /><br /"
+#~ ">There are three main environment variables that are passed to this "
+#~ "script.<br /><br />$ACTION <br />* \"ifup\" Is called by netifd and "
+#~ "mwan3track <br />* \"ifdown\" Is called by netifd and mwan3track <br />* "
+#~ "\"connected\" Is only called by mwan3track if tracking was successful "
+#~ "<br />* \"disconnected\" Is only called by mwan3track if tracking has "
+#~ "failed <br />$INTERFACE Name of the interface which went up or down (e.g. "
+#~ "\"wan\" or \"wwan\")<br />$DEVICE Physical device name which interface "
+#~ "went up or down (e.g. \"eth0\" or \"wwan0\")<br /><br />"
+#~ msgstr ""
+#~ "このセクションでは、 \"/etc/mwan3.user\" の内容を変更することができます。"
+#~ "<br />このファイルも sysupgrade の際に保持されます。<br /><br />注意: "
+#~ "<br />このファイルはシェルスクリプトとして解釈されます。<br />最初の行は "
+#~ "&#34;#!/bin/sh&#34; である必要があります（クォーテーション不要）。<br /># "
+#~ "で始まる行はコメントであり、実行されません。<br />mwan3 のカスタム動作をこ"
+#~ "こに入力してください。<br />これらは、mwan3 で有効なインターフェースの"
+#~ "<br /> netifd hotplug インターフェース イベント毎に実行されます。<br /"
+#~ "><br />このスクリプトに受け渡される主に３つの環境変数が利用できます。<br /"
+#~ "><br />$ACTION<br />* \"ifup\" は netifd と mwan3track により呼び出されま"
+#~ "す<br />* \"ifdown\" は netifd と mwan3track により呼び出されます<br />* "
+#~ "\"connected\" はトラッキングが成功した際に mwan3track にのみにより呼び出さ"
+#~ "れます<br />* \"disconnected\" は トラッキングが失敗した際に mwan3track の"
+#~ "みにより呼び出されます<br />$INTERFACE　up または down したインターフェー"
+#~ "ス名（例: \"wan\" や \"wwan\"）<br />$DEVICE　up または down したインター"
+#~ "フェースの物理デバイス名（例: \"eth0\" や \"wwan0\"）<br /><br />"
+
+#~ msgid "WARNING: %d interfaces are configured exceeding the maximum of %d!"
+#~ msgstr ""
+#~ "警告: %d 個のインターフェースが、最大個数の %d 個 を超えて設定されていま"
+#~ "す！"
+
+#~ msgid "WARNING: Interface %s are not found in /etc/config/network"
+#~ msgstr "警告: インターフェース %s が /etc/config/network に見つかりません"
+
+#~ msgid "WARNING: Interface %s has a duplicate metric %s configured"
+#~ msgstr ""
+#~ "警告: インターフェース %s に重複するメトリック %s が設定されています"
+
+#~ msgid ""
+#~ "WARNING: Interface %s has a higher reliability requirement than tracking "
+#~ "hosts (%d)"
+#~ msgstr ""
+#~ "警告: インターフェース %s はトラッキング ホスト数 (%d) よりも高いトラッキ"
+#~ "ング信頼性の値が設定されています"
+
+#~ msgid "WARNING: Interface %s has no default route in the main routing table"
+#~ msgstr ""
+#~ "警告: インターフェース %s はメインのルーティング テーブル内でデフォルト"
+#~ "ルートがありません"
+
+#~ msgid "WARNING: Policy %s has exceeding the maximum name of 15 characters"
+#~ msgstr "警告: ポリシー %s の名前は15文字の最大文字数を超えています"
+
+#~ msgid ""
+#~ "WARNING: Rule %s have a port configured with no or improper protocol "
+#~ "specified!"
+#~ msgstr ""
+#~ "警告: ルール %s はプロトコル指定が不適切、または無いポートが設定されていま"
+#~ "す！"
+
+#~ msgid "Waiting for command to complete..."
+#~ msgstr "コマンド実行中..."
+
+#~ msgid "Weight"
+#~ msgstr "ウエイト"
+
+#~ msgid "Max packet latency [ms]"
+#~ msgstr "最大パケットレイテンシ [ms]"
+
+#~ msgid "Max packet loss [%]"
+#~ msgstr "最大パケットロス [%]"
+
+#~ msgid "Min packet latency [ms]"
+#~ msgstr "最小パケットレイテンシ [ms]"
+
+#~ msgid "Min packet loss [%]"
+#~ msgstr "最小パケットロス [%]"
+
+#~ msgid "How often should rtmon update the interface routing table"
+#~ msgstr "rtmon がインターフェース ルーティングテーブルの更新を行う頻度です。"
+
+#~ msgid ""
+#~ "MWAN supports up to 252 physical and/or logical interfaces<br />MWAN "
+#~ "requires that all interfaces have a unique metric configured in /etc/"
+#~ "config/network<br />Names must match the interface name found in /etc/"
+#~ "config/network<br />Names may contain characters A-Z, a-z, 0-9, _ and no "
+#~ "spaces<br />Interfaces may not share the same name as configured members, "
+#~ "policies or rules"
+#~ msgstr ""
+#~ "MWAN は、252個までの物理または論理、あるいは両方のインターフェースをサポー"
+#~ "トします。<br />MWAN は、すべてのインターフェースが /etc/config/network で"
+#~ "設定されるユニークなメトリックを持つことを必要とします。<br />下記 \"イン"
+#~ "ターフェース\" の名前は、 /etc/config/network に存在するインターフェース名"
+#~ "と同じでなければなりません。<br />名前は A-Z, a-z, 0-9, _ を含むことができ"
+#~ "ますが、スペースは使用できません。<br />インターフェースには、設定済みのメ"
+#~ "ンバーやポリシー、ルールと同じ名前を使用することはできません。"
+
+#~ msgid "Update interval"
+#~ msgstr "更新間隔"
