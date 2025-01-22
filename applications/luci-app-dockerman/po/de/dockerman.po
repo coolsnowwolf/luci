@@ -1,14 +1,14 @@
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2024-03-02 21:56+0000\n"
-"Last-Translator: ssantos <ssantos@web.de>\n"
+"PO-Revision-Date: 2024-10-10 18:27+0000\n"
+"Last-Translator: Ettore Atalan <atalanttore@googlemail.com>\n"
 "Language-Team: German <https://hosted.weblate.org/projects/openwrt/"
 "luciapplicationsdockerman/de/>\n"
 "Language: de\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.5-dev\n"
+"X-Generator: Weblate 5.8-dev\n"
 
 #: applications/luci-app-dockerman/luasrc/model/cbi/dockerman/newcontainer.lua:604
 msgid "A list of kernel capabilities to add to the container"
@@ -542,7 +542,7 @@ msgstr "Last"
 
 #: applications/luci-app-dockerman/luasrc/model/cbi/dockerman/configuration.lua:54
 msgid "Log Level"
-msgstr "Protokollebene"
+msgstr "Protokollierungslevel"
 
 #: applications/luci-app-dockerman/luasrc/model/cbi/dockerman/newcontainer.lua:646
 msgid "Log driver options"
@@ -601,7 +601,7 @@ msgstr "Mount/Volume"
 #: applications/luci-app-dockerman/luasrc/model/cbi/dockerman/container.lua:411
 #: applications/luci-app-dockerman/luasrc/model/cbi/dockerman/volumes.lua:83
 msgid "Name"
-msgstr "Name"
+msgstr "Nome"
 
 #: applications/luci-app-dockerman/luasrc/model/cbi/dockerman/newnetwork.lua:29
 msgid "Name of the network that can be selected during container creation"
@@ -929,7 +929,7 @@ msgstr "UID"
 #: applications/luci-app-dockerman/luasrc/model/cbi/dockerman/container.lua:289
 #: applications/luci-app-dockerman/luasrc/model/cbi/dockerman/container.lua:328
 msgid "Update"
-msgstr "Aktualisieren"
+msgstr "Aktualisierung"
 
 #: applications/luci-app-dockerman/luasrc/model/cbi/dockerman/container.lua:254
 msgid "Upgrade"
@@ -954,11 +954,11 @@ msgstr "Upload/Download"
 
 #: applications/luci-app-dockerman/luasrc/model/cbi/dockerman/container.lua:331
 msgid "User"
-msgstr "Nutzer"
+msgstr "Benutzer"
 
 #: applications/luci-app-dockerman/luasrc/model/cbi/dockerman/newcontainer.lua:524
 msgid "User(-u)"
-msgstr "Nutzer(-u)"
+msgstr "Benutzer(-u)"
 
 #: applications/luci-app-dockerman/luasrc/model/cbi/dockerman/newnetwork.lua:53
 msgid "VEPA (Virtual Ethernet Port Aggregator)"
@@ -985,3 +985,15 @@ msgstr ""
 "Wenn Sie auf die Schaltfläche Importieren klicken, können Sie sowohl ein "
 "lokales Abbild auf das System laden als auch ein gültiges Abbild aus der "
 "Ferne herunterladen."
+
+#~ msgid "CPU Useage"
+#~ msgstr "CPU-Auslastung"
+
+#~ msgid "Memory Useage"
+#~ msgstr "Speicherverbrauch"
+
+#~ msgid "Access Control"
+#~ msgstr "Zugriffskontrolle"
+
+#~ msgid "Enable"
+#~ msgstr "Aktivieren"

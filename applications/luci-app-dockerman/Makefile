@@ -5,19 +5,16 @@ LUCI_DEPENDS:=@(aarch64||arm||x86_64) \
 	+luci-base \
 	+luci-compat \
 	+luci-lib-docker \
-	+luci-lib-ip \
 	+docker \
+	+ttyd \
 	+dockerd \
-	+docker-compose \
-	+ttyd
-
-LUCI_PKGARCH:=all
+	+docker-compose
 
 PKG_LICENSE:=AGPL-3.0
 PKG_MAINTAINER:=lisaac <lisaac.cn@gmail.com> \
 		Florian Eckert <fe@dev.tdt.de>
 
-PKG_VERSION:=v0.5.13-20240317
+PKG_VERSION:=0.5.13.20241008
 
 include ../../luci.mk
 

@@ -1,14 +1,14 @@
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2024-03-28 23:40+0000\n"
-"Last-Translator: Ioroi Kouhei <kouhei@ioroi.org>\n"
+"PO-Revision-Date: 2024-10-09 05:48+0000\n"
+"Last-Translator: Monarch <monarch.scrap-0p@icloud.com>\n"
 "Language-Team: Japanese <https://hosted.weblate.org/projects/openwrt/"
 "luciapplicationsdockerman/ja/>\n"
 "Language: ja\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.5-dev\n"
+"X-Generator: Weblate 5.8-dev\n"
 
 #: applications/luci-app-dockerman/luasrc/model/cbi/dockerman/newcontainer.lua:604
 msgid "A list of kernel capabilities to add to the container"
@@ -810,7 +810,7 @@ msgstr "統計"
 #: applications/luci-app-dockerman/luasrc/model/cbi/dockerman/container.lua:300
 #: applications/luci-app-dockerman/luasrc/model/cbi/dockerman/containers.lua:128
 msgid "Status"
-msgstr "ステータス"
+msgstr "状態"
 
 #: applications/luci-app-dockerman/luasrc/model/cbi/dockerman/container.lua:236
 #: applications/luci-app-dockerman/luasrc/model/cbi/dockerman/containers.lua:211
@@ -948,3 +948,55 @@ msgid ""
 "When pressing the Import button, both a local image can be loaded onto the "
 "system and a valid image tar can be downloaded from remote."
 msgstr ""
+
+#~ msgid "CPU Useage"
+#~ msgstr "CPU 使用率"
+
+#~ msgid "Memory Useage"
+#~ msgstr "メモリ使用量"
+
+#~ msgid "Setting"
+#~ msgstr "設定"
+
+#~ msgid "Docker Container"
+#~ msgstr "Docker コンテナ"
+
+#~ msgid "Docker Socket Path"
+#~ msgstr "Docker ソケット・パス"
+
+#~ msgid ""
+#~ "DockerMan is a Simple Docker manager client for LuCI, If you have any "
+#~ "issue please visit:"
+#~ msgstr ""
+#~ "DockerMan は LuCI 用のシンプルな Docker マネージャークライアントです。 問"
+#~ "題が発生した場合は、次の URL にアクセスしてください :"
+
+#~ msgid "Github"
+#~ msgstr "Github"
+
+#~ msgid "Import Images"
+#~ msgstr "イメージをインポート"
+
+#~ msgid "New Container"
+#~ msgstr "新規コンテナ"
+
+#~ msgid "New Network"
+#~ msgstr "新規ネットワーク"
+
+#~ msgid "Macvlan Mode"
+#~ msgstr "macvlan モード"
+
+#~ msgid "Access Control"
+#~ msgstr "アクセス制御"
+
+#~ msgid "Containers allowed to be accessed"
+#~ msgstr "アクセスが許可されているコンテナ"
+
+#~ msgid "Docker Daemon"
+#~ msgstr "Docker デーモン"
+
+#~ msgid "Enable"
+#~ msgstr "有効"
+
+#~ msgid "Server Host"
+#~ msgstr "サーバーホスト"
