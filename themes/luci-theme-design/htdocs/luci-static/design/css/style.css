@@ -846,11 +846,15 @@ span[data-indicator="uci-changes"] {
     content: "\e676";
 }
 
-.main>.main-left>.nav>li>a[data-title="Logout"] {
+.main>.main-left>.nav>li>a[data-title="Modem"]:before {
+    content: "\e7dd";
+}
+
+.main>.main-left>.nav>li>a[data-title="Log_out"] {
     padding: 0.675rem 0 0.675rem 2.5rem;
 }
 
-.main>.main-left>.nav>li>a[data-title="Logout"]:before {
+.main>.main-left>.nav>li>a[data-title="Log_out"]:before {
     content: "\e641";
 }
 
