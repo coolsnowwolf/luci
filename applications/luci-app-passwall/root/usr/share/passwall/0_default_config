@@ -2,15 +2,15 @@
 config global
 	option enabled '0'
 	option socks_enabled '0'
-	option tcp_node 'nil'
-	option udp_node 'nil'
 	option tcp_node_socks_port '1070'
 	option filter_proxy_ipv6 '1'
 	option dns_shunt 'chinadns-ng'
 	option dns_mode 'tcp'
 	option remote_dns '1.1.1.1'
+	list smartdns_remote_dns 'https://1.1.1.1/dns-query'
 	option use_default_dns 'direct'
 	option chinadns_ng_default_tag 'none'
+	option dns_redirect '1'
 	option use_direct_list '1'
 	option use_proxy_list '1'
 	option use_block_list '1'
@@ -21,16 +21,16 @@ config global
 	option localhost_proxy '1'
 	option client_proxy '1'
 	option acl_enable '0'
-	option log_tcp '1'
-	option log_udp '1'
+	option log_tcp '0'
+	option log_udp '0'
 	option loglevel 'error'
 	option trojan_loglevel '4'
+	option log_chinadns_ng '0'
 
 config global_haproxy
 	option balancing_enable '0'
 
 config global_delay
-	option auto_on '0'
 	option start_daemon '1'
 	option start_delay '60'
 
@@ -85,6 +85,8 @@ config global_app
 
 config global_subscribe
 	option filter_keyword_mode '1'
+	list filter_discard_list '距离下次重置剩余'
+	list filter_discard_list '套餐到期'
 	list filter_discard_list '过期时间'
 	list filter_discard_list '剩余流量'
 	list filter_discard_list 'QQ群'
@@ -100,7 +102,7 @@ config nodes 'myshunt'
 	option Streaming '_default'
 	option Proxy '_default'
 	option Direct '_direct'
-	option default_node 'nil'
+	option default_node '_direct'
 	option domainStrategy 'IPOnDemand'
 
 config shunt_rules 'DirectGame'
@@ -162,7 +164,8 @@ domain:store.steampowered.com'
 
 config shunt_rules 'AIGC'
 	option remarks 'AIGC'
-	option domain_list 'geosite:category-ai-chat-!cn'
+	option domain_list 'geosite:category-ai-chat-!cn
+domain:apple-relay.apple.com'
 
 config shunt_rules 'Streaming'
 	option remarks 'Streaming'

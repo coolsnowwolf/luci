@@ -4,8 +4,8 @@ local uci = api.uci
 
 local default_node_type = ""
 local shunt_rule_list = {}
-local node = api.uci_get_type("global", "node", "nil")
-if node ~= "nil" then
+local node = api.uci_get_type("global", "node")
+if node then
 	local node_type = api.uci_get_type_id(node, "type")
 	local node_protocol = api.uci_get_type_id(node, "protocol")
 	if node_type == "Xray" and node_protocol == "_shunt" then
@@ -43,11 +43,21 @@ table td, .table .td {
 }
 
 ._now_use {
-	background: #94e1ff !important;
+	color: red !important;
+}
+
+._now_use_bg {
+	background: #5e72e445 !important;
 }
 
 .ping a:hover{
 	text-decoration : underline;
+}
+
+@media (prefers-color-scheme: dark) {
+    ._now_use_bg {
+        background: #4a90e2 !important;
+    }
 }
 </style>
 
@@ -223,22 +233,18 @@ table td, .table .td {
 	function get_now_use_node() {
 		XHR.get('<%=api.url("get_now_use_node")%>', null,
 			function(x, result) {
-				var id = result["TCP"];
+				var id = result["global"];
 				if (id) {
 					var dom = document.getElementById("cbi-passwall2-" + id);
 					if (dom) {
-						dom.classList.add("_now_use");
-						dom.title = "当前TCP节点";
-						//var v = "<a style='color: red'>当前TCP节点：</a>" + document.getElementById("cbid.passwall2." + id + ".remarks").value;
+						dom.title = "当前使用的节点";
+						dom.classList.add("_now_use_bg");
+						//var v = "<a style='color: red'>当前节点：</a>" + document.getElementById("cbid.passwall2." + id + ".remarks").value;
 						//document.getElementById("cbi-passwall2-" + id + "-remarks").innerHTML = v;
-					}
-				}
-				id = result["UDP"];
-				if (id) {
-					var dom = document.getElementById("cbi-passwall2-" + id);
-					if (dom) {
-						dom.classList.add("_now_use");
-						dom.title = "当前UDP节点";
+						var dom_remarks = document.getElementById("cbi-passwall2-" + id + "-remarks");
+						if (dom_remarks) {
+							dom_remarks.classList.add("_now_use");
+						}
 					}
 				}
 			}
@@ -305,9 +311,7 @@ table td, .table .td {
 			);
 		}
 	}
-	
-	get_now_use_node();
-	
+
 	/* 自动Ping */
 	if (auto_detection_time == "icmp" || auto_detection_time == "tcping") {
 		var nodes = [];
@@ -427,7 +431,9 @@ table td, .table .td {
 			console.error(err);
 		}
 	}
-	
+
+	get_now_use_node();
+
 	if (true) {
 		var str = "";
 		for (var add_from in node_list) {

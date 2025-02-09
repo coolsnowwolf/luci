@@ -21,7 +21,6 @@ config global_haproxy
 	option balancing_enable '0'
 
 config global_delay
-	option auto_on '0'
 	option start_daemon '1'
 	option start_delay '60'
 
@@ -47,6 +46,7 @@ config global_rules
 	option geosite_update '1'
 	option geoip_update '1'
 	option v2ray_location_asset '/usr/share/v2ray/'
+	option enable_geoview '1'
 
 config global_app
 	option xray_file '/usr/bin/xray'
@@ -55,6 +55,8 @@ config global_app
 
 config global_subscribe
 	option filter_keyword_mode '1'
+	list filter_discard_list '距离下次重置剩余'
+	list filter_discard_list '套餐到期'
 	list filter_discard_list '过期时间'
 	list filter_discard_list '剩余流量'
 	list filter_discard_list 'QQ群'
@@ -75,13 +77,10 @@ config nodes 'myshunt'
 	option ProxyGame '_default'
 	option Direct '_direct'
 	option GooglePlay '_default'
-	option Netflix 'nil'
-	option OpenAI 'nil'
 	option Proxy '_default'
 	option China '_direct'
 	option QUIC '_blackhole'
-	option UDP 'nil'
-	option default_node 'nil'
+	option default_node '_direct'
 	option domainStrategy 'IPOnDemand'
 	option domainMatcher 'hybrid'
 

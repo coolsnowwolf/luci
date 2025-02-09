@@ -3,8 +3,6 @@
 ------------------------------------------------
 -- @author William Chan <root@williamchan.me>
 ------------------------------------------------
-require 'nixio'
-require 'luci.model.uci'
 require 'luci.util'
 require 'luci.jsonc'
 require 'luci.sys'
@@ -19,7 +17,8 @@ local ssub, slen, schar, sbyte, sformat, sgsub = string.sub, string.len, string.
 local split = api.split
 local jsonParse, jsonStringify = luci.jsonc.parse, luci.jsonc.stringify
 local base64Decode = api.base64Decode
-local uci = luci.model.uci.cursor()
+local uci = api.uci
+local fs = api.fs
 uci:revert(appname)
 
 local has_ss = api.is_finded("ss-redir")
@@ -86,14 +85,21 @@ local function is_filter_keyword(value)
 end
 
 local nodeResult = {} -- update result
-local debug = false
+local isDebug = false
 
 local log = function(...)
-	if debug == true then
+	if isDebug == true then
 		local result = os.date("%Y-%m-%d %H:%M:%S: ") .. table.concat({...}, " ")
 		print(result)
 	else
 		api.log(...)
+	end
+end
+
+local nodes_table = {}
+for k, e in ipairs(api.get_valid_nodes()) do
+	if e.node_type == "normal" then
+		nodes_table[#nodes_table + 1] = e
 	end
 end
 
@@ -124,20 +130,56 @@ do
 		local option = "node"
 		uci:foreach(appname, "socks", function(t)
 			i = i + 1
+			local id = t[".name"]
 			local node_id = t[option]
 			CONFIG[#CONFIG + 1] = {
 				log = true,
-				id = t[".name"],
+				id = id,
 				remarks = "Socks节点列表[" .. i .. "]",
 				currentNode = node_id and uci:get_all(appname, node_id) or nil,
 				set = function(o, server)
+					if not server or server == "" then
+						if #nodes_table > 0 then
+							server = nodes_table[1][".name"]
+						end
+					end
 					uci:set(appname, t[".name"], option, server)
 					o.newNodeId = server
-				end,
-				delete = function(o)
-					uci:delete(appname, t[".name"])
 				end
 			}
+			if t.autoswitch_backup_node and #t.autoswitch_backup_node > 0 then
+				local flag = "Socks节点列表[" .. i .. "]备用节点的列表"
+				local currentNodes = {}
+				local newNodes = {}
+				for k, node_id in ipairs(t.autoswitch_backup_node) do
+					if node_id then
+						local currentNode = uci:get_all(appname, node_id) or nil
+						if currentNode then
+							currentNodes[#currentNodes + 1] = {
+								log = true,
+								remarks = flag .. "[" .. k .. "]",
+								currentNode = currentNode,
+								set = function(o, server)
+									if server and server ~= "nil" then
+										table.insert(o.newNodes, server)
+									end
+								end
+							}
+						end
+					end
+				end
+				CONFIG[#CONFIG + 1] = {
+					remarks = flag,
+					currentNodes = currentNodes,
+					newNodes = newNodes,
+					set = function(o, newNodes)
+						if o then
+							if not newNodes then newNodes = o.newNodes end
+							uci:set_list(appname, id, "autoswitch_backup_node", newNodes or {})
+						end
+					end
+				}
+			end
 		end)
 	end
 
@@ -194,49 +236,6 @@ do
 		end)
 	end
 
-	uci:foreach(appname, "socks", function(o)
-		local id = o[".name"]
-		local node_table = uci:get(appname, id, "autoswitch_backup_node")
-		if node_table then
-			local nodes = {}
-			local new_nodes = {}
-			for k,node_id in ipairs(node_table) do
-				if node_id then
-					local currentNode = uci:get_all(appname, node_id) or nil
-					if currentNode then
-						if currentNode.protocol and (currentNode.protocol == "_balancing" or currentNode.protocol == "_shunt") then
-							currentNode = nil
-						end
-						nodes[#nodes + 1] = {
-							log = true,
-							remarks = "Socks[" .. id .. "]备用节点的列表[" .. k .. "]",
-							currentNode = currentNode,
-							set = function(o, server)
-								for kk, vv in pairs(CONFIG) do
-									if (vv.remarks == id .. "备用节点的列表") then
-										table.insert(vv.new_nodes, server)
-									end
-								end
-							end
-						}
-					end
-				end
-			end
-			CONFIG[#CONFIG + 1] = {
-				remarks = id .. "备用节点的列表",
-				nodes = nodes,
-				new_nodes = new_nodes,
-				set = function(o)
-					for kk, vv in pairs(CONFIG) do
-						if (vv.remarks == id .. "备用节点的列表") then
-							uci:set_list(appname, id, "autoswitch_backup_node", vv.new_nodes)
-						end
-					end
-				end
-			}
-		end
-	end)
-
 	uci:foreach(appname, "nodes", function(node)
 		local node_id = node[".name"]
 		if node.protocol and node.protocol == '_shunt' then
@@ -264,7 +263,7 @@ do
 						currentNode = _node_id and uci:get_all(appname, _node_id) or nil,
 						remarks = "分流" .. e.remarks .. "节点",
 						set = function(o, server)
-							if not server then server = "nil" end
+							if not server then server = "" end
 							uci:set(appname, node_id, e[".name"], server)
 							o.newNodeId = server
 						end
@@ -272,39 +271,32 @@ do
 				end
 			end
 		elseif node.protocol and node.protocol == '_balancing' then
-			local nodes = {}
-			local new_nodes = {}
+			local flag = "Xray负载均衡节点[" .. node_id .. "]列表"
+			local currentNodes = {}
+			local newNodes = {}
 			if node.balancing_node then
 				for k, node in pairs(node.balancing_node) do
-					nodes[#nodes + 1] = {
+					currentNodes[#currentNodes + 1] = {
 						log = false,
 						node = node,
 						currentNode = node and uci:get_all(appname, node) or nil,
 						remarks = node,
 						set = function(o, server)
-							for kk, vv in pairs(CONFIG) do
-								if (vv.remarks == "Xray负载均衡节点[" .. node_id .. "]列表") then
-									table.insert(vv.new_nodes, server)
-								end
+							if o and server and server ~= "nil" then
+								table.insert(o.newNodes, server)
 							end
 						end
 					}
 				end
 			end
 			CONFIG[#CONFIG + 1] = {
-				remarks = "Xray负载均衡节点[" .. node_id .. "]列表",
-				nodes = nodes,
-				new_nodes = new_nodes,
-				set = function(o)
-					for kk, vv in pairs(CONFIG) do
-						if (vv.remarks == "Xray负载均衡节点[" .. node_id .. "]列表") then
-							uci:foreach(appname, "nodes", function(node2)
-								if node2[".name"] == node[".name"] then
-									local section = uci:section(appname, "nodes", node_id)
-									uci:set_list(appname, section, "balancing_node", vv.new_nodes)
-								end
-							end)
-						end
+				remarks = flag,
+				currentNodes = currentNodes,
+				newNodes = newNodes,
+				set = function(o, newNodes)
+					if o then
+						if not newNodes then newNodes = o.newNodes end
+						uci:set_list(appname, node_id, "balancing_node", newNodes or {})
 					end
 				end
 			}
@@ -327,6 +319,23 @@ do
 				}
 			end
 		else
+			--前置代理节点
+			local currentNode = uci:get_all(appname, node_id) or nil
+			if currentNode and currentNode.preproxy_node then
+				CONFIG[#CONFIG + 1] = {
+					log = true,
+					id = node_id,
+					remarks = "节点[" .. node_id .. "]前置代理节点",
+					currentNode = uci:get_all(appname, currentNode.preproxy_node) or nil,
+					set = function(o, server)
+						uci:set(appname, node_id, "preproxy_node", server)
+						o.newNodeId = server
+					end,
+					delete = function(o)
+						uci:delete(appname, node_id, "preproxy_node")
+					end
+				}
+			end
 			--落地节点
 			local currentNode = uci:get_all(appname, node_id) or nil
 			if currentNode and currentNode.to_node then
@@ -348,10 +357,10 @@ do
 	end)
 
 	for k, v in pairs(CONFIG) do
-		if v.nodes and type(v.nodes) == "table" then
-			for kk, vv in pairs(v.nodes) do
+		if v.currentNodes and type(v.currentNodes) == "table" then
+			for kk, vv in pairs(v.currentNodes) do
 				if vv.currentNode == nil then
-					CONFIG[k].nodes[kk] = nil
+					CONFIG[k].currentNodes[kk] = nil
 				end
 			end
 		else
@@ -383,6 +392,24 @@ end
 local function trim(text)
 	if not text or text == "" then return "" end
 	return (sgsub(text, "^%s*(.-)%s*$", "%1"))
+end
+
+-- 取机场信息（剩余流量、到期时间）
+local subscribe_info = {}
+local function get_subscribe_info(cfgid, value)
+	if type(cfgid) ~= "string" or cfgid == "" or type(value) ~= "string" then
+		return
+	end
+	value = value:gsub("%s+", "")
+	local expired_date = value:match("套餐到期：(.+)")
+	local rem_traffic = value:match("剩余流量：(.+)")
+	subscribe_info[cfgid] = subscribe_info[cfgid] or {expired_date = "", rem_traffic = ""}
+	if expired_date then
+		subscribe_info[cfgid]["expired_date"] = expired_date
+	end
+	if rem_traffic then
+		subscribe_info[cfgid]["rem_traffic"] = rem_traffic
+	end
 end
 
 -- 处理数据
@@ -442,11 +469,20 @@ local function processData(szType, content, add_mode, add_from)
 		-- result.mux = 1
 		-- result.mux_concurrency = 8
 
-		if not info.net then
-			info.net = "tcp"
-		end
+		if not info.net then info.net = "tcp" end
 		info.net = string.lower(info.net)
-		result.transport = info.net
+		if result.type == "sing-box" and info.net == "raw" then 
+			info.net = "tcp"
+		elseif result.type == "Xray" and info.net == "tcp" then
+			info.net = "raw"
+		end
+		if info.net == "splithttp" then info.net = "xhttp" end
+		if info.net == 'h2' or info.net == 'http' then
+			info.net = "http"
+			result.transport = (result.type == "Xray") and "xhttp" or "http"
+		else
+			result.transport = info.net
+		end
 		if info.net == 'ws' then
 			result.ws_host = info.host
 			result.ws_path = info.path
@@ -466,11 +502,17 @@ local function processData(szType, content, add_mode, add_from)
 				end
 			end
 		end
-		if info.net == 'h2' then
-			result.h2_host = info.host
-			result.h2_path = info.path
+		if info.net == "http" then
+			if result.type == "Xray" then
+				result.xhttp_mode = "stream-one"
+				result.xhttp_host = info.host
+				result.xhttp_path = info.path
+			else
+				result.http_host = info.host
+				result.http_path = info.path
+			end
 		end
-		if info.net == 'tcp' then
+		if info.net == 'raw' or info.net == 'tcp' then
 			if info.type and info.type ~= "http" then
 				info.type = "none"
 			end
@@ -497,9 +539,9 @@ local function processData(szType, content, add_mode, add_from)
 		if info.net == 'grpc' then
 			result.grpc_serviceName = info.path
 		end
-		if info.net == 'splithttp' then
-			result.splithttp_host = info.host
-			result.splithttp_path = info.path
+		if info.net == 'xhttp' then
+			result.xhttp_host = info.host
+			result.xhttp_path = info.path
 		end
 		if info.net == 'httpupgrade' then
 			result.httpupgrade_host = info.host
@@ -514,7 +556,7 @@ local function processData(szType, content, add_mode, add_from)
 			result.tls = "0"
 		end
 
-		if result.type == "sing-box" and (result.transport == "mkcp" or result.transport == "splithttp") then
+		if result.type == "sing-box" and (result.transport == "mkcp" or result.transport == "xhttp" or result.transport == "splithttp") then
 			log("跳过节点:" .. result.remarks .."，因Sing-Box不支持" .. szType .. "协议的" .. result.transport .. "传输方式，需更换Xray。")
 			return nil
 		end
@@ -563,7 +605,7 @@ local function processData(szType, content, add_mode, add_from)
 			info = info:sub(1, find_index - 1)
 		end
 
-		local hostInfo = split(base64Decode(info), "@")
+		local hostInfo = split(base64Decode(UrlDecode(info)), "@")
 		if hostInfo and #hostInfo > 0 then
 			local host_port = hostInfo[#hostInfo]
 			-- [2001:4860:4860::8888]:443
@@ -602,19 +644,16 @@ local function processData(szType, content, add_mode, add_from)
 			if ss_type_default == "xray" and has_xray then
 				result.type = 'Xray'
 				result.protocol = 'shadowsocks'
-				result.transport = 'tcp'
+				result.transport = 'raw'
 			end
 			if ss_type_default == "sing-box" and has_singbox then
 				result.type = 'sing-box'
 				result.protocol = 'shadowsocks'
 			end
 
-			if result.type == "SS-Rust" and method:lower() == "chacha20-poly1305" then
-				result.method = "chacha20-ietf-poly1305"
-			end
-
-			if result.type == "Xray" and method:lower() == "chacha20-ietf-poly1305" then
-				result.method = "chacha20-poly1305"
+			if result.type ~= "Xray" then
+				result.method = (method:lower() == "chacha20-poly1305" and "chacha20-ietf-poly1305") or
+						(method:lower() == "xchacha20-poly1305" and "xchacha20-ietf-poly1305") or method
 			end
 
 			if result.plugin then
@@ -643,7 +682,17 @@ local function processData(szType, content, add_mode, add_from)
 
 			if params.type then
 				params.type = string.lower(params.type)
-				result.transport = params.type
+				if result.type == "sing-box" and params.type == "raw" then 
+					params.type = "tcp"
+				elseif result.type == "Xray" and params.type == "tcp" then
+					params.type = "raw"
+				end
+				if params.type == "h2" or params.type == "http" then
+					params.type = "http"
+					result.transport = (result.type == "Xray") and "xhttp" or "http"
+				else
+					result.transport = params.type
+				end
 				if result.type ~= "SS-Rust" and result.type ~= "SS" then
 					if params.type == 'ws' then
 						result.ws_host = params.host
@@ -664,18 +713,19 @@ local function processData(szType, content, add_mode, add_from)
 							end
 						end
 					end
-					if params.type == 'h2' or params.type == 'http' then
+					if params.type == "http" then
 						if result.type == "sing-box" then
 							result.transport = "http"
 							result.http_host = params.host
 							result.http_path = params.path
-						elseif result.type == "xray" then
-							result.transport = "h2"
-							result.h2_host = params.host
-							result.h2_path = params.path
+						elseif result.type == "Xray" then
+							result.transport = "xhttp"
+							result.xhttp_mode = "stream-one"
+							result.xhttp_host = params.host
+							result.xhttp_path = params.path
 						end
 					end
-					if params.type == 'tcp' then
+					if params.type == 'raw' or params.type == 'tcp' then
 						result.tcp_guise = params.headerType or "none"
 						result.tcp_guise_http_host = params.host
 						result.tcp_guise_http_path = params.path
@@ -699,7 +749,7 @@ local function processData(szType, content, add_mode, add_from)
 					if params.type == 'grpc' then
 						if params.path then result.grpc_serviceName = params.path end
 						if params.serviceName then result.grpc_serviceName = params.serviceName end
-						result.grpc_mode = params.mode
+						result.grpc_mode = params.mode or "gun"
 					end
 					result.tls = "0"
 					if params.security == "tls" or params.security == "reality" then
@@ -783,11 +833,19 @@ local function processData(szType, content, add_mode, add_from)
 				result.tls_allowInsecure = allowInsecure_default and "1" or "0"
 			end
 
-			if not params.type then
-				params.type = "tcp"
-			end
+			if not params.type then params.type = "tcp" end
 			params.type = string.lower(params.type)
-			result.transport = params.type
+			if result.type == "sing-box" and params.type == "raw" then 
+				params.type = "tcp"
+			elseif result.type == "Xray" and params.type == "tcp" then
+				params.type = "raw"
+			end
+			if params.type == "h2" or params.type == "http" then
+				params.type = "http"
+				result.transport = (result.type == "Xray") and "xhttp" or "http"
+			else
+				result.transport = params.type
+			end
 			if params.type == 'ws' then
 				result.ws_host = params.host
 				result.ws_path = params.path
@@ -807,18 +865,19 @@ local function processData(szType, content, add_mode, add_from)
 					end
 				end
 			end
-			if params.type == 'h2' or params.type == 'http' then
+			if params.type == "http" then
 				if result.type == "sing-box" then
 					result.transport = "http"
 					result.http_host = params.host
 					result.http_path = params.path
-				elseif result.type == "xray" then
-					result.transport = "h2"
-					result.h2_host = params.host
-					result.h2_path = params.path
+				elseif result.type == "Xray" then
+					result.transport = "xhttp"
+					result.xhttp_mode = "stream-one"
+					result.xhttp_host = params.host
+					result.xhttp_path = params.path
 				end
 			end
-			if params.type == 'tcp' then
+			if params.type == 'raw' or params.type == 'tcp' then
 				result.tcp_guise = params.headerType or "none"
 				result.tcp_guise_http_host = params.host
 				result.tcp_guise_http_path = params.path
@@ -842,11 +901,11 @@ local function processData(szType, content, add_mode, add_from)
 			if params.type == 'grpc' then
 				if params.path then result.grpc_serviceName = params.path end
 				if params.serviceName then result.grpc_serviceName = params.serviceName end
-				result.grpc_mode = params.mode
+				result.grpc_mode = params.mode or "gun"
 			end
-			if params.type == 'splithttp' then
-				result.splithttp_host = params.host
-				result.splithttp_path = params.path
+			if params.type == 'xhttp' or params.type == 'splithttp' then
+				result.xhttp_host = params.host
+				result.xhttp_path = params.path
 			end
 			if params.type == 'httpupgrade' then
 				result.httpupgrade_host = params.host
@@ -857,7 +916,7 @@ local function processData(szType, content, add_mode, add_from)
 
 			result.flow = params.flow or nil
 
-			if result.type == "sing-box" and (result.transport == "mkcp" or result.transport == "splithttp") then
+			if result.type == "sing-box" and (result.transport == "mkcp" or result.transport == "xhttp" or result.transport == "splithttp") then
 				log("跳过节点:" .. result.remarks .."，因Sing-Box不支持" .. szType .. "协议的" .. result.transport .. "传输方式，需更换Xray。")
 				return nil
 			end
@@ -920,11 +979,20 @@ local function processData(szType, content, add_mode, add_from)
 				result.address = host_port
 			end
 
-			if not params.type then
-				params.type = "tcp"
-			end
+			if not params.type then params.type = "tcp" end
 			params.type = string.lower(params.type)
-			result.transport = params.type
+			if result.type == "sing-box" and params.type == "raw" then 
+				params.type = "tcp"
+			elseif result.type == "Xray" and params.type == "tcp" then
+				params.type = "raw"
+			end
+			if params.type == "splithttp" then params.type = "xhttp" end
+			if params.type == "h2" or params.type == "http" then
+				params.type = "http"
+				result.transport = (result.type == "Xray") and "xhttp" or "http"
+			else
+				result.transport = params.type
+			end
 			if params.type == 'ws' then
 				result.ws_host = params.host
 				result.ws_path = params.path
@@ -944,18 +1012,19 @@ local function processData(szType, content, add_mode, add_from)
 					end
 				end
 			end
-			if params.type == 'h2' or params.type == 'http' then
+			if params.type == "http" then
 				if result.type == "sing-box" then
 					result.transport = "http"
 					result.http_host = params.host
 					result.http_path = params.path
-				elseif result.type == "xray" then
-					result.transport = "h2"
-					result.h2_host = params.host
-					result.h2_path = params.path
+				elseif result.type == "Xray" then
+					result.transport = "xhttp"
+					result.xhttp_mode = "stream-one"
+					result.xhttp_host = params.host
+					result.xhttp_path = params.path
 				end
 			end
-			if params.type == 'tcp' then
+			if params.type == 'raw' or params.type == 'tcp' then
 				result.tcp_guise = params.headerType or "none"
 				result.tcp_guise_http_host = params.host
 				result.tcp_guise_http_path = params.path
@@ -979,11 +1048,22 @@ local function processData(szType, content, add_mode, add_from)
 			if params.type == 'grpc' then
 				if params.path then result.grpc_serviceName = params.path end
 				if params.serviceName then result.grpc_serviceName = params.serviceName end
-				result.grpc_mode = params.mode
+				result.grpc_mode = params.mode or "gun"
 			end
-			if params.type == 'splithttp' then
-				result.splithttp_host = params.host
-				result.splithttp_path = params.path
+			if params.type == 'xhttp' then
+				result.xhttp_host = params.host
+				result.xhttp_path = params.path
+				result.xhttp_mode = params.mode or "auto"
+				result.use_xhttp_extra = (params.extra and params.extra ~= "") and "1" or nil
+				result.xhttp_extra = (params.extra and params.extra ~= "") and params.extra or nil
+				local success, Data = pcall(jsonParse, params.extra)
+				if success and Data then
+					local address = (Data.extra and Data.extra.downloadSettings and Data.extra.downloadSettings.address)
+							or (Data.downloadSettings and Data.downloadSettings.address)
+					result.download_address = address and address ~= "" and address or nil
+				else
+					result.download_address = nil
+				end
 			end
 			if params.type == 'httpupgrade' then
 				result.httpupgrade_host = params.host
@@ -1011,7 +1091,7 @@ local function processData(szType, content, add_mode, add_from)
 			result.port = port
 			result.tls_allowInsecure = allowInsecure_default and "1" or "0"
 
-			if result.type == "sing-box" and (result.transport == "mkcp" or result.transport == "splithttp") then
+			if result.type == "sing-box" and (result.transport == "mkcp" or result.transport == "xhttp" or result.transport == "splithttp") then
 				log("跳过节点:" .. result.remarks .."，因Sing-Box不支持" .. szType .. "协议的" .. result.transport .. "传输方式，需更换Xray。")
 				return nil
 			end
@@ -1192,55 +1272,70 @@ local function processData(szType, content, add_mode, add_from)
 	return result
 end
 
-local function curl(url, file, ua)
+local function curl(url, file, ua, mode)
 	local curl_args = api.clone(api.curl_args)
 	if ua and ua ~= "" and ua ~= "curl" then
 		table.insert(curl_args, '--user-agent "' .. ua .. '"')
 	end
-	local return_code, result = api.curl_logic(url, file, curl_args)
+	local return_code
+	if mode == "direct" then
+		return_code = api.curl_direct(url, file, curl_args)
+	elseif mode == "proxy" then
+		return_code = api.curl_proxy(url, file, curl_args)
+	else
+		return_code = api.curl_auto(url, file, curl_args)
+	end
 	return return_code
 end
 
 local function truncate_nodes(add_from)
 	for _, config in pairs(CONFIG) do
-		if config.nodes and type(config.nodes) == "table" then
-			for kk, vv in pairs(config.nodes) do
-				if vv.currentNode.add_mode == "2" then
-				else
-					vv.set(vv, vv.currentNode[".name"])
+		if config.currentNodes and #config.currentNodes > 0 then
+			local newNodes = {}
+			local removeNodesSet = {}
+			for k, v in pairs(config.currentNodes) do
+				if v.currentNode and v.currentNode.add_mode == "2" then
+					if (not add_from) or (add_from and add_from == v.currentNode.add_from) then
+						removeNodesSet[v.currentNode[".name"]] = true
+					end
 				end
 			end
-			config.set(config)
+			for _, value in ipairs(config.currentNodes) do
+				if not removeNodesSet[value.currentNode[".name"]] then
+					newNodes[#newNodes + 1] = value.currentNode[".name"]
+				end
+			end
+			if config.set then
+				config.set(config, newNodes)
+			end
 		else
 			if config.currentNode and config.currentNode.add_mode == "2" then
-				if add_from then
-					if config.currentNode.add_from and config.currentNode.add_from == add_from then
-						config.set(config, "nil")
+				if (not add_from) or (add_from and add_from == config.currentNode.add_from) then
+					if config.delete then
+						config.delete(config)
+					elseif config.set then
+						config.set(config, "")
 					end
-				else
-					config.set(config, "nil")
-				end
-				if config.id then
-					uci:delete(appname, config.id)
 				end
 			end
 		end
 	end
 	uci:foreach(appname, "nodes", function(node)
 		if node.add_mode == "2" then
-			if add_from then
-				if node.add_from and node.add_from == add_from then
-					uci:delete(appname, node['.name'])
-				end
-			else
+			if (not add_from) or (add_from and add_from == node.add_from) then
 				uci:delete(appname, node['.name'])
 			end
 		end
 	end)
-	uci:commit(appname)
+	uci:foreach(appname, "subscribe_list", function(o)
+		if (not add_from) or add_from == o.remark then
+			uci:delete(appname, o['.name'], "md5")
+		end
+	end)
+	api.uci_save(uci, appname, true)
 end
 
-local function select_node(nodes, config)
+local function select_node(nodes, config, parentConfig)
 	if config.currentNode then
 		local server
 		-- 特别优先级 cfgid
@@ -1333,32 +1428,34 @@ local function select_node(nodes, config)
 				end
 			end
 		end
-		-- 还不行 随便找一个
-		if not server then
-			local nodes_table = {}
-			for k, e in ipairs(api.get_valid_nodes()) do
-				if e.node_type == "normal" then
-					nodes_table[#nodes_table + 1] = e
+		if not parentConfig then
+			-- 还不行 随便找一个
+			if not server then
+				if #nodes_table > 0 then
+					if config.log == nil or config.log == true then
+						log('【' .. config.remarks .. '】' .. '无法找到最匹配的节点，当前已更换为：' .. nodes_table[1].remarks)
+					end
+					server = nodes_table[1][".name"]
 				end
-			end
-			if #nodes_table > 0 then
-				if config.log == nil or config.log == true then
-					log('【' .. config.remarks .. '】' .. '无法找到最匹配的节点，当前已更换为：' .. nodes_table[1].remarks)
-				end
-				server = nodes_table[1][".name"]
 			end
 		end
 		if server then
-			config.set(config, server)
+			if parentConfig then
+				config.set(parentConfig, server)
+			else
+				config.set(config, server)
+			end
 		end
 	else
-		config.set(config, "nil")
+		if not parentConfig then
+			config.set(config, "")
+		end
 	end
 end
 
 local function update_node(manual)
 	if next(nodeResult) == nil then
-		log("更新失败，没有可用的节点信息")
+		log("没有可用的节点信息更新。")
 		return
 	end
 
@@ -1389,7 +1486,17 @@ local function update_node(manual)
 			end
 		end
 	end
-	uci:commit(appname)
+	-- 更新机场信息
+	for cfgid, info in pairs(subscribe_info) do
+		for key, value in pairs(info) do
+			if value ~= "" then
+				uci:set(appname, cfgid, key, value)
+			else
+				uci:delete(appname, cfgid, key)
+			end
+		end
+	end
+	api.uci_save(uci, appname, true)
 
 	if next(CONFIG) then
 		local nodes = {}
@@ -1398,9 +1505,9 @@ local function update_node(manual)
 		end)
 
 		for _, config in pairs(CONFIG) do
-			if config.nodes and type(config.nodes) == "table" then
-				for kk, vv in pairs(config.nodes) do
-					select_node(nodes, vv)
+			if config.currentNodes and #config.currentNodes > 0 then
+				for kk, vv in pairs(config.currentNodes) do
+					select_node(nodes, vv, config)
 				end
 				config.set(config)
 			else
@@ -1408,27 +1515,11 @@ local function update_node(manual)
 			end
 		end
 
-		--[[
-		for k, v in pairs(CONFIG) do
-			if type(v.new_nodes) == "table" and #v.new_nodes > 0 then
-				local new_node_list = ""
-				for kk, vv in pairs(v.new_nodes) do
-					new_node_list = new_node_list .. vv .. " "
-				end
-				if new_node_list ~= "" then
-					print(v.remarks, new_node_list)
-				end
-			else
-				print(v.remarks, v.newNodeId)
-			end
-		end
-		]]--
-
-		uci:commit(appname)
+		api.uci_save(uci, appname, true)
 	end
 
 	if arg[3] == "cron" then
-		if not nixio.fs.access("/var/lock/" .. appname .. ".lock") then
+		if not fs.access("/var/lock/" .. appname .. ".lock") then
 			luci.sys.call("touch /tmp/lock/" .. appname .. "_cron.lock")
 		end
 	end
@@ -1436,7 +1527,7 @@ local function update_node(manual)
 	luci.sys.call("/etc/init.d/" .. appname .. " restart > /dev/null 2>&1 &")
 end
 
-local function parse_link(raw, add_mode, add_from)
+local function parse_link(raw, add_mode, add_from, cfgid)
 	if raw and #raw > 0 then
 		local nodes, szType
 		local node_list = {}
@@ -1497,6 +1588,9 @@ local function parse_link(raw, add_mode, add_from)
 							log('丢弃过滤节点: ' .. result.type .. ' 节点, ' .. result.remarks)
 						else
 							tinsert(node_list, result)
+						end
+						if add_mode == "2" then
+							get_subscribe_info(cfgid, result.remarks)
 						end
 					end
 				end, function (err)
@@ -1586,15 +1680,25 @@ local execute = function()
 				domain_strategy_node = domain_strategy_default
 			end
 			local ua = value.user_agent
-			log('正在订阅:【' .. remark .. '】' .. url)
-			local raw = curl(url, "/tmp/" .. cfgid, ua)
+			local access_mode = value.access_mode
+			local result = (not access_mode) and "自动" or (access_mode == "direct" and "直连访问" or (access_mode == "proxy" and "通过代理" or "自动"))
+			log('正在订阅:【' .. remark .. '】' .. url .. ' [' .. result .. ']')
+			local tmp_file = "/tmp/" .. cfgid
+			local raw = curl(url, tmp_file, ua, access_mode)
 			if raw == 0 then
-				local f = io.open("/tmp/" .. cfgid, "r")
+				local f = io.open(tmp_file, "r")
 				local stdout = f:read("*all")
 				f:close()
 				raw = trim(stdout)
-				os.remove("/tmp/" .. cfgid)
-				parse_link(raw, "2", remark)
+				local old_md5 = value.md5 or ""
+				local new_md5 = luci.sys.exec("[ -f " .. tmp_file .. " ] && md5sum " .. tmp_file .. " | awk '{print $1}' || echo 0")
+				os.remove(tmp_file)
+				if old_md5 == new_md5 then
+					log('订阅:【' .. remark .. '】没有变化，无需更新。')
+				else
+					parse_link(raw, "2", remark, cfgid)
+					uci:set(appname, cfgid, "md5", new_md5)
+				end
 			else
 				fail_list[#fail_list + 1] = value
 			end
@@ -1623,7 +1727,9 @@ if arg[1] then
 		log('开始订阅...')
 		xpcall(execute, function(e)
 			log(e)
-			log(debug.traceback())
+			if type(debug) == "table" and type(debug.traceback) == "function" then
+				log(debug.traceback())
+			end
 			log('发生错误, 正在恢复服务')
 		end)
 		log('订阅完毕...')

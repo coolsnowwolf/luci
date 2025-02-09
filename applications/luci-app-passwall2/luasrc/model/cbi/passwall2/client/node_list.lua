@@ -1,7 +1,7 @@
 local api = require "luci.passwall2.api"
 local appname = api.appname
-local sys = api.sys
 local datatypes = api.datatypes
+local sys = api.sys
 
 m = Map(appname)
 api.set_apply_on_parse(m)
@@ -54,13 +54,17 @@ function s.remove(e, t)
 		end
 	end)
 	TypedSection.remove(e, t)
-	local new_node = "nil"
+	local new_node
 	local node0 = m:get("@nodes[0]") or nil
 	if node0 then
 		new_node = node0[".name"]
 	end
-	if (m:get("@global[0]", "node") or "nil") == t then
-		m:set('@global[0]', "node", new_node)
+	if (m:get("@global[0]", "node") or "") == t then
+		if new_node then
+			m:set('@global[0]', "node", new_node)
+		else
+			m:del('@global[0]', "node")
+		end
 	end
 end
 

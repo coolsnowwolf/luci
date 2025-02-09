@@ -1,14 +1,18 @@
 local api = require "luci.passwall2.api"
 local appname = api.appname
-local uci = api.uci
+
+m = Map(appname)
+api.set_apply_on_parse(m)
+
+if not arg[1] or not m:get(arg[1]) then
+	luci.http.redirect(api.url("acl"))
+end
+
 local sys = api.sys
 
 local port_validate = function(self, value, t)
 	return value:gsub("-", ":")
 end
-
-m = Map(appname)
-api.set_apply_on_parse(m)
 
 local nodes_table = {}
 for k, e in ipairs(api.get_valid_nodes()) do
@@ -68,12 +72,12 @@ o.rmempty = false
 ---- Remarks
 o = s:option(Value, "remarks", translate("Remarks"))
 o.default = arg[1]
-o.rmempty = true
+o.rmempty = false
 
-use_if = s:option(Flag, "use_interface", translate("Use Interface With ACLs"))
-use_if.default = 0
-use_if.rmempty = false
-
+o = s:option(ListValue, "interface", translate("Source Interface"))
+o:value("", translate("All"))
+local wa = require "luci.tools.webadmin"
+wa.cbi_add_networks(o)
 
 local mac_t = {}
 sys.net.mac_hints(function(e, t)
@@ -95,17 +99,6 @@ table.sort(mac_t, function(a,b)
 	return false
 end)
 
-local device_list = {}
-device_list = sys.net.devices()
-table.sort(device_list)
-interface = s:option(ListValue, "interface", translate("Source Interface"))
-
-for k, name in ipairs(device_list) do
-	interface:value(name)
-end
-
-interface:depends({ use_interface = 1 })
-
 ---- Source
 sources = s:option(DynamicList, "sources", translate("Source"))
 sources.description = "<ul><li>" .. translate("Example:")
@@ -119,7 +112,6 @@ sources.cast = "string"
 for _, key in pairs(mac_t) do
 	sources:value(key.mac, "%s (%s)" % {key.mac, key.ip})
 end
-sources:depends({ use_interface = 0 })
 
 sources.cfgvalue = function(self, section)
 	local value
@@ -175,67 +167,87 @@ end
 sources.write = dynamicList_write
 
 ---- TCP No Redir Ports
-local TCP_NO_REDIR_PORTS = uci:get(appname, "@global_forwarding[0]", "tcp_no_redir_ports")
+local TCP_NO_REDIR_PORTS = m:get("@global_forwarding[0]", "tcp_no_redir_ports")
 o = s:option(Value, "tcp_no_redir_ports", translate("TCP No Redir Ports"))
-o.default = "default"
+o:value("", translate("Use global config") .. "(" .. TCP_NO_REDIR_PORTS .. ")")
 o:value("disable", translate("No patterns are used"))
-o:value("default", translate("Use global config") .. "(" .. TCP_NO_REDIR_PORTS .. ")")
 o:value("1:65535", translate("All"))
 o.validate = port_validate
 
 ---- UDP No Redir Ports
-local UDP_NO_REDIR_PORTS = uci:get(appname, "@global_forwarding[0]", "udp_no_redir_ports")
+local UDP_NO_REDIR_PORTS = m:get("@global_forwarding[0]", "udp_no_redir_ports")
 o = s:option(Value, "udp_no_redir_ports", translate("UDP No Redir Ports"),
 	"<font color='red'>" ..
 	translate("If you don't want to let the device in the list to go proxy, please choose all.") ..
 	"</font>")
-o.default = "default"
+o:value("", translate("Use global config") .. "(" .. UDP_NO_REDIR_PORTS .. ")")
 o:value("disable", translate("No patterns are used"))
-o:value("default", translate("Use global config") .. "(" .. UDP_NO_REDIR_PORTS .. ")")
 o:value("1:65535", translate("All"))
 o.validate = port_validate
 
-node = s:option(ListValue, "node", "<a style='color: red'>" .. translate("Node") .. "</a>")
-node.default = "default"
-node:value("default", translate("Use global config"))
-for k, v in pairs(nodes_table) do
-	node:value(v.id, v["remark"])
+o = s:option(DummyValue, "_hide_node_option", "")
+o.template = "passwall2/cbi/hidevalue"
+o.value = "1"
+o:depends({ tcp_no_redir_ports = "1:65535", udp_no_redir_ports = "1:65535" })
+if TCP_NO_REDIR_PORTS == "1:65535" and UDP_NO_REDIR_PORTS == "1:65535" then
+	o:depends({ tcp_no_redir_ports = "", udp_no_redir_ports = "" })
 end
 
+local GLOBAL_ENABLED = m:get("@global[0]", "enabled")
+local NODE = m:get("@global[0]", "node")
+o = s:option(ListValue, "node", "<a style='color: red'>" .. translate("Node") .. "</a>")
+if GLOBAL_ENABLED == "1" and NODE then
+	o:value("", translate("Use global config") .. "(" .. api.get_node_name(NODE) .. ")")
+end
+o:depends({ _hide_node_option = "1",  ['!reverse'] = true })
+
+o = s:option(DummyValue, "_hide_dns_option", "")
+o.template = "passwall2/cbi/hidevalue"
+o.value = "1"
+o:depends({ node = "" })
+if GLOBAL_ENABLED == "1" and NODE then
+	o:depends({ node = NODE })
+end
+
+o = s:option(DummyValue, "_xray_node", "")
+o.template = "passwall2/cbi/hidevalue"
+o.value = "1"
+o:depends({ __hide = true })
+
 ---- TCP Redir Ports
-local TCP_REDIR_PORTS = uci:get(appname, "@global_forwarding[0]", "tcp_redir_ports")
+local TCP_REDIR_PORTS = m:get("@global_forwarding[0]", "tcp_redir_ports")
 o = s:option(Value, "tcp_redir_ports", translate("TCP Redir Ports"))
-o.default = "default"
-o:value("default", translate("Use global config") .. "(" .. TCP_REDIR_PORTS .. ")")
+o:value("", translate("Use global config") .. "(" .. TCP_REDIR_PORTS .. ")")
 o:value("1:65535", translate("All"))
 o:value("22,25,53,143,465,587,853,993,995,80,443", translate("Common Use"))
 o:value("80,443", "80,443")
 o.validate = port_validate
+o:depends({ _hide_node_option = "1",  ['!reverse'] = true })
 
 ---- UDP Redir Ports
-local UDP_REDIR_PORTS = uci:get(appname, "@global_forwarding[0]", "udp_redir_ports")
+local UDP_REDIR_PORTS = m:get("@global_forwarding[0]", "udp_redir_ports")
 o = s:option(Value, "udp_redir_ports", translate("UDP Redir Ports"))
-o.default = "default"
-o:value("default", translate("Use global config") .. "(" .. UDP_REDIR_PORTS .. ")")
+o:value("", translate("Use global config") .. "(" .. UDP_REDIR_PORTS .. ")")
 o:value("1:65535", translate("All"))
 o.validate = port_validate
+o:depends({ _hide_node_option = "1",  ['!reverse'] = true })
 
 o = s:option(ListValue, "direct_dns_query_strategy", translate("Direct Query Strategy"))
 o.default = "UseIP"
 o:value("UseIP")
 o:value("UseIPv4")
 o:value("UseIPv6")
-o:depends({ node = "default",  ['!reverse'] = true })
+o:depends({ _hide_dns_option = "1",  ['!reverse'] = true })
 
 o = s:option(Flag, "write_ipset_direct", translate("Direct DNS result write to IPSet"), translate("Perform the matching direct domain name rules into IP to IPSet/NFTSet, and then connect directly (not entering the core). Maybe conflict with some special circumstances."))
 o.default = "1"
-o:depends({ node = "default",  ['!reverse'] = true })
+o:depends({ direct_dns_query_strategy = "",  ['!reverse'] = true })
 
 o = s:option(ListValue, "remote_dns_protocol", translate("Remote DNS Protocol"))
 o:value("tcp", "TCP")
 o:value("doh", "DoH")
 o:value("udp", "UDP")
-o:depends({ node = "default",  ['!reverse'] = true })
+o:depends({ _hide_dns_option = "1",  ['!reverse'] = true })
 
 ---- DNS Forward
 o = s:option(Value, "remote_dns", translate("Remote DNS"))
@@ -272,7 +284,9 @@ o = s:option(Value, "remote_dns_client_ip", translate("Remote DNS EDNS Client Su
 o.description = translate("Notify the DNS server when the DNS query is notified, the location of the client (cannot be a private IP address).") .. "<br />" ..
 				translate("This feature requires the DNS server to support the Edns Client Subnet (RFC7871).")
 o.datatype = "ipaddr"
-o:depends({ __hide = true })
+o:depends("remote_dns_protocol", "tcp")
+o:depends("remote_dns_protocol", "doh")
+o:depends("remote_dns_protocol", "udp")
 
 o = s:option(ListValue, "remote_dns_detour", translate("Remote DNS Outbound"))
 o.default = "remote"
@@ -303,8 +317,8 @@ o.rows = 5
 o.wrap = "off"
 o:depends({ __hide = true })
 o.remove = function(self, section)
-	local node_value = node:formvalue(arg[1])
-	if node_value ~= "nil" then
+	local node_value = s.fields["node"]:formvalue(arg[1])
+	if node_value then
 		local node_t = m:get(node_value) or {}
 		if node_t.type == "Xray" then
 			AbstractValue.remove(self, section)
@@ -313,11 +327,12 @@ o.remove = function(self, section)
 end
 
 for k, v in pairs(nodes_table) do
+	s.fields["node"]:value(v.id, v["remark"])
 	if v.type == "Xray" then
-		s.fields["remote_dns_client_ip"]:depends({ node = v.id, remote_dns_protocol = "tcp" })
-		s.fields["remote_dns_client_ip"]:depends({ node = v.id, remote_dns_protocol = "doh" })
-		s.fields["dns_hosts"]:depends({ node = v.id })
+		s.fields["_xray_node"]:depends({ node = v.id })
 	end
 end
+
+s.fields["dns_hosts"]:depends({ _xray_node = "1" })
 
 return m

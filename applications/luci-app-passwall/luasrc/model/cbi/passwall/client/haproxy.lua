@@ -1,8 +1,7 @@
 local api = require "luci.passwall.api"
 local appname = "passwall"
-local sys = api.sys
-local net = require "luci.model.network".init()
 local datatypes = api.datatypes
+local net = require "luci.model.network".init()
 
 local nodes_table = {}
 for k, e in ipairs(api.get_valid_nodes()) do
@@ -16,6 +15,7 @@ for k, e in ipairs(api.get_valid_nodes()) do
 end
 
 m = Map(appname)
+api.set_apply_on_parse(m)
 
 -- [[ Haproxy Settings ]]--
 s = m:section(TypedSection, "global_haproxy", translate("Basic Settings"))
@@ -28,16 +28,21 @@ o = s:option(Flag, "balancing_enable", translate("Enable Load Balancing"))
 o.rmempty = false
 o.default = false
 
+---- Console Login Auth
+o = s:option(Flag, "console_auth", translate("Console Login Auth"))
+o.default = false
+o:depends("balancing_enable", true)
+
 ---- Console Username
 o = s:option(Value, "console_user", translate("Console Username"))
 o.default = ""
-o:depends("balancing_enable", true)
+o:depends("console_auth", true)
 
 ---- Console Password
 o = s:option(Value, "console_password", translate("Console Password"))
 o.password = true
 o.default = ""
-o:depends("balancing_enable", true)
+o:depends("console_auth", true)
 
 ---- Console Port
 o = s:option(Value, "console_port", translate("Console Port"), translate(

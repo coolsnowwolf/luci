@@ -4,6 +4,8 @@ local has_xray = api.finded_com("xray")
 local has_singbox = api.finded_com("singbox")
 
 m = Map(appname)
+api.set_apply_on_parse(m)
+
 -- [[ Rule Settings ]]--
 s = m:section(TypedSection, "global_rules", translate("Rule status"))
 s.anonymous = true
@@ -87,6 +89,18 @@ if has_xray or has_singbox then
 	o = s:option(Value, "v2ray_location_asset", translate("Location of V2ray/Xray asset"), translate("This variable specifies a directory where geoip.dat and geosite.dat files are."))
 	o.default = "/usr/share/v2ray/"
 	o.rmempty = false
+
+	if api.is_finded("geoview") then
+		o = s:option(Flag, "enable_geoview", translate("Enable Geo Data Parsing"))
+		o.default = 0
+		o.rmempty = false
+		o.description = "<ul>"
+			.. "<li>" .. translate("Experimental feature.") .. "</li>"
+			.. "<li>" .. "1." .. translate("Analyzes and preloads GeoIP/Geosite data to enhance the shunt performance of Sing-box/Xray.") .. "</li>"
+			.. "<li>" .. "2." .. translate("Once enabled, the rule list can support GeoIP/Geosite rules.") .. "</li>"
+			.. "<li>" .. translate("Note: Increases resource usage; Geosite analysis is only supported in ChinaDNS-NG and SmartDNS modes.") .. "</li>"
+			.. "</ul>"
+	end
 
 	s = m:section(TypedSection, "shunt_rules", "Sing-Box/Xray " .. translate("Shunt Rule"), "<a style='color: red'>" .. translate("Please note attention to the priority, the higher the order, the higher the priority.") .. "</a>")
 	s.template = "cbi/tblsection"

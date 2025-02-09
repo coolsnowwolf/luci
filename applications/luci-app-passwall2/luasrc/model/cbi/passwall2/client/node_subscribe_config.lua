@@ -1,5 +1,14 @@
 local api = require "luci.passwall2.api"
 local appname = api.appname
+
+m = Map(appname)
+m.redirect = api.url("node_subscribe")
+api.set_apply_on_parse(m)
+
+if not arg[1] or not m:get(arg[1]) then
+	luci.http.redirect(m.redirect)
+end
+
 local has_ss = api.is_finded("ss-redir")
 local has_ss_rust = api.is_finded("sslocal")
 local has_singbox = api.finded_com("singbox")
@@ -38,13 +47,13 @@ if has_hysteria2 then
 	table.insert(hysteria2_type, s)
 end
 
-m = Map(appname)
-m.redirect = api.url("node_subscribe")
-api.set_apply_on_parse(m)
-
 s = m:section(NamedSection, arg[1])
 s.addremove = false
 s.dynamic = false
+
+function m.commit_handler(self)
+	self:del(arg[1], "md5")
+end
 
 o = s:option(Value, "remark", translate("Subscribe Remark"))
 o.rmempty = false
@@ -121,6 +130,15 @@ if #hysteria2_type > 0 then
 	end
 end
 
+o = s:option(ListValue, "domain_strategy", "Sing-box " .. translate("Domain Strategy"), translate("Set the default domain resolution strategy for the sing-box node."))
+o.default = "global"
+o:value("global", translate("Use global config"))
+o:value("", translate("Auto"))
+o:value("prefer_ipv4", translate("Prefer IPv4"))
+o:value("prefer_ipv6", translate("Prefer IPv6"))
+o:value("ipv4_only", translate("IPv4 Only"))
+o:value("ipv6_only", translate("IPv6 Only"))
+
 ---- Enable auto update subscribe
 o = s:option(Flag, "auto_update", translate("Enable auto update subscribe"))
 o.default = 0
@@ -162,12 +180,18 @@ o.default = 2
 o:depends("week_update", "8")
 o.rmempty = true
 
+o = s:option(ListValue, "access_mode", translate("Subscribe URL Access Method"))
+o.default = ""
+o:value("", translate("Auto"))
+o:value("direct", translate("Direct Connection"))
+o:value("proxy", translate("Proxy"))
+
 o = s:option(Value, "user_agent", translate("User-Agent"))
-o.default = "sing-box/9.9.9"
-o:value("curl", "Curl Default")
+o.default = "v2rayN/9.99"
+o:value("curl", "Curl")
 o:value("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36 Edg/122.0.0.0", "Edge for Linux")
 o:value("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36 Edg/122.0.0.0", "Edge for Windows")
 o:value("Passwall2/OpenWrt", "PassWall2")
-o:value("sing-box/9.9.9", "Xboard(V2board)")
+o:value("v2rayN/9.99", "v2rayN")
 
 return m

@@ -52,9 +52,6 @@ msgstr "规则列表"
 msgid "Access control"
 msgstr "访问控制"
 
-msgid "Watch Logs"
-msgstr "查看日志"
-
 msgid "Node Config"
 msgstr "节点配置"
 
@@ -111,6 +108,15 @@ msgstr "与 TCP 节点相同"
 
 msgid "Current node: %s"
 msgstr "当前节点：%s"
+
+msgid "DNS Shunt"
+msgstr "DNS分流"
+
+msgid "Domestic group name"
+msgstr "国内分组名"
+
+msgid "You only need to configure domestic DNS packets in SmartDNS and set it redirect or as Dnsmasq upstream, and fill in the domestic DNS group name here."
+msgstr "您只需要在SmartDNS配置好国内DNS分组，并设置重定向或作为Dnsmasq上游，此处填入国内DNS分组名。"
 
 msgid "Filter Mode"
 msgstr "过滤模式"
@@ -169,6 +175,9 @@ msgstr "此功能需要 DNS 服务器支持 EDNS Client Subnet（RFC7871）。"
 msgid "The effect is better, recommend."
 msgstr "效果更好，推荐使用。"
 
+msgid "ChinaDNS-NG (recommended)"
+msgstr "ChinaDNS-NG (推荐)"
+
 msgid "Default DNS"
 msgstr "默认 DNS"
 
@@ -211,8 +220,11 @@ msgstr "需要代理的分流规则域名使用 FakeDNS。"
 msgid "Redirect"
 msgstr "重定向"
 
-msgid "Force Router DNS server to all local devices."
-msgstr "强制所有本地设备使用路由器 DNS。"
+msgid "DNS Redirect"
+msgstr "DNS 重定向"
+
+msgid "Force special DNS server to need proxy devices."
+msgstr "强制需要代理的设备使用专用 DNS 服务器。"
 
 msgid "Clear IPSET"
 msgstr "清空 IPSET"
@@ -222,9 +234,6 @@ msgstr "清空 NFTSET"
 
 msgid "Try this feature if the rule modification does not take effect."
 msgstr "如果修改规则后没有生效，请尝试此功能。"
-
-msgid "Are you sure to reset?"
-msgstr "你确定要恢复吗？"
 
 msgid "Are you sure to hide?"
 msgstr "你确定要隐藏吗？"
@@ -249,9 +258,6 @@ msgstr "对于移动设备，可通过重新接入网络的方式清除。比如
 
 msgid "Please make sure your device's network settings point both the DNS server and default gateway to this router, to ensure DNS queries are properly routed."
 msgstr "请确认您设备的网络设置，客户端 DNS 服务器和默认网关应均指向本路由器，以确保 DNS 查询正确路由。"
-
-msgid "Restore to default configuration:"
-msgstr "恢复默认配置："
 
 msgid "Browser access:"
 msgstr "浏览器访问："
@@ -658,17 +664,32 @@ msgstr "单位：秒"
 msgid "Units:minutes"
 msgstr "单位：分钟"
 
-msgid "Open and close automatically"
-msgstr "定时自动开关"
+msgid "stop automatically mode"
+msgstr "定时关闭模式"
 
-msgid "Automatically turn off time"
-msgstr "自动关闭时间"
+msgid "stop Time(Every day)"
+msgstr "关闭时间(每天)"
 
-msgid "Automatically turn on time"
-msgstr "自动开启时间"
+msgid "stop Interval(Hour)"
+msgstr "关闭间隔(小时)"
 
-msgid "Automatically restart time"
-msgstr "自动重启时间"
+msgid "start automatically mode"
+msgstr "定时开启模式"
+
+msgid "start Time(Every day)"
+msgstr "开启时间(每天)"
+
+msgid "start Interval(Hour)"
+msgstr "开启间隔(小时)"
+
+msgid "restart automatically mode"
+msgstr "定时重启模式"
+
+msgid "restart Time(Every day)"
+msgstr "重启时间(每天)"
+
+msgid "restart Interval(Hour)"
+msgstr "重启间隔(小时)"
 
 msgid "Forwarding Settings"
 msgstr "转发配置"
@@ -777,6 +798,9 @@ msgstr "使用 127.0.0.1 和此端口配置节点"
 
 msgid "Enable Load Balancing"
 msgstr "开启负载均衡"
+
+msgid "Console Login Auth"
+msgstr "控制台登录认证"
 
 msgid "Console Username"
 msgstr "控制台账号"
@@ -910,11 +934,26 @@ msgstr "每周日"
 msgid "hour"
 msgstr "小时"
 
+msgid "Hour"
+msgstr "小时"
+
 msgid "Location of V2ray/Xray asset"
 msgstr "V2ray/Xray 资源文件目录"
 
 msgid "This variable specifies a directory where geoip.dat and geosite.dat files are."
 msgstr "此变量指定 geoip.dat 和 geosite.dat 文件所在的目录。"
+
+msgid "Enable Geo Data Parsing"
+msgstr "开启 Geo 数据解析"
+
+msgid "Analyzes and preloads GeoIP/Geosite data to enhance the shunt performance of Sing-box/Xray."
+msgstr "分析和预加载 GeoIP/Geosite 数据，以增强 Sing-box/Xray 的分流效果。"
+
+msgid "Once enabled, the rule list can support GeoIP/Geosite rules."
+msgstr "启用后，规则列表可以支持 GeoIP/Geosite 规则。"
+
+msgid "Note: Increases resource usage; Geosite analysis is only supported in ChinaDNS-NG and SmartDNS modes."
+msgstr "注：会增加一些系统资源的开销，仅在 ChinaDNS-NG 和 SmartDNS 模式下支持分析 Geosite 。"
 
 msgid "Shunt Rule"
 msgstr "分流规则"
@@ -985,8 +1024,14 @@ msgstr "节点订阅"
 msgid "Subscribe Remark"
 msgstr "订阅备注（机场）"
 
+msgid "Subscribe Info"
+msgstr "订阅信息"
+
 msgid "Subscribe URL"
 msgstr "订阅网址"
+
+msgid "Subscribe URL Access Method"
+msgstr "订阅网址访问方式"
 
 msgid "Please input the subscription url first, save and submit before manual subscription."
 msgstr "请输入订阅网址保存应用后再手动订阅。"
@@ -1471,6 +1516,9 @@ msgstr "要执行的 Shell 命令，用 %s 代替日志内容。"
 msgid "Not enabled log"
 msgstr "未启用日志"
 
+msgid "It is recommended to disable logging during regular use to reduce system overhead."
+msgstr "正常使用时建议关闭日志，以减少系统开销。"
+
 msgid "UDP Forward"
 msgstr "UDP 转发"
 
@@ -1518,6 +1566,12 @@ msgstr "客户端文件不适合当前设备。"
 
 msgid "Can't move new file to path: %s"
 msgstr "无法移动新文件到：%s"
+
+msgid "An XHttpObject in JSON format, used for sharing."
+msgstr "JSON 格式的 XHttpObject，用来实现分享。"
+
+msgid "Enable Mux.Cool"
+msgstr "启用 Mux.Cool"
 
 msgid "Mux concurrency"
 msgstr "最大并发连接数"
@@ -1582,6 +1636,9 @@ msgstr "端口跳跃时间 "
 msgid "Additional ports for hysteria hop"
 msgstr "端口跳跃额外端口"
 
+msgid "HeartbeatPeriod(second)"
+msgstr "心跳周期（单位：秒）"
+
 msgid "Custom geoip Path"
 msgstr "自定义 geoip 文件路径"
 
@@ -1609,8 +1666,11 @@ msgstr "握手服务器"
 msgid "Handshake Server Port"
 msgstr "握手服务器端口"
 
-msgid "Override the connection destination address with the sniffed domain."
-msgstr "用探测出的域名覆盖连接目标地址。"
+msgid "Override the connection destination address with the sniffed domain.<br />Otherwise use sniffed domain for routing only.<br />If using shunt nodes, configure the domain shunt rules correctly."
+msgstr "用探测出的域名覆盖连接目标地址。<br />否则仅将探测得到的域名用于路由。<br />如使用分流节点，请正确设置域名分流规则。"
+
+msgid "Override the connection destination address with the sniffed domain.<br />When enabled, traffic will match only by domain, ignoring IP rules.<br />If using shunt nodes, configure the domain shunt rules correctly."
+msgstr "用探测出的域名覆盖连接目标地址。<br />启用后仅使用域名进行流量匹配，将忽略IP规则。<br />如使用分流节点，请正确设置域名分流规则。"
 
 msgid "Protocol parameter. Will waste traffic randomly if enabled."
 msgstr "协议参数。如果启用会随机浪费流量。"
@@ -1678,7 +1738,10 @@ msgstr "延迟（ms）"
 msgid "If is domain name, The requested domain name will be resolved to IP before connect."
 msgstr "如果是域名，域名将在请求发出之前解析为 IP。"
 
-msgid "Landing node"
+msgid "Chain Proxy"
+msgstr "链式代理"
+
+msgid "Landing Node"
 msgstr "落地节点"
 
 msgid "Only support a layer of proxy."
@@ -1689,3 +1752,54 @@ msgstr "与使用 %s 节点时生效。"
 
 msgid "Set the default domain resolution strategy for the sing-box node."
 msgstr "为 sing-box 节点设置默认的域名解析策略。"
+
+msgid "Total Lines"
+msgstr "总行数："
+
+msgid "Read List"
+msgstr "读取列表"
+
+msgid "Log Maint"
+msgstr "日志维护"
+
+msgid "Backup and Restore"
+msgstr "备份还原"
+
+msgid "Backup or Restore Client and Server Configurations."
+msgstr "备份或还原客户端及服务端配置。"
+
+msgid "Note: Restoring configurations across different versions may cause compatibility issues."
+msgstr "注意：不同版本间的配置恢复可能会导致兼容性问题。"
+
+msgid "Create Backup File"
+msgstr "创建备份文件"
+
+msgid "Restore Backup File"
+msgstr "恢复备份文件"
+
+msgid "DL Backup"
+msgstr "下载备份"
+
+msgid "RST Backup"
+msgstr "恢复备份"
+
+msgid "UL Restore"
+msgstr "上传恢复"
+
+msgid "CLOSE WIN"
+msgstr "关闭窗口"
+
+msgid "Restore to default configuration"
+msgstr "恢复默认配置"
+
+msgid "Do Reset"
+msgstr "执行重置"
+
+msgid "Do you want to restore the client to default settings?"
+msgstr "是否要恢复客户端默认配置？"
+
+msgid "Are you sure you want to restore the client to default settings?"
+msgstr "是否真的要恢复客户端默认配置？"
+
+msgid "Settings have been successfully saved and applied!"
+msgstr "设置已成功保存并应用!"
