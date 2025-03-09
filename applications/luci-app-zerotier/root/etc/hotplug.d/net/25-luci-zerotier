@@ -1,0 +1,14 @@
+#!/bin/sh
+
+[ "$ACTION" = add ] || exit 0
+echo "$DEVICENAME" | grep -qE '^zt[0-9a-z]{8}$' || exit 0
+
+zero_enable="$(uci get zerotier.sample_config.enabled)"
+[ "${zero_enable}" -eq "1" ] || exit 0
+
+nat_enable="$(uci get zerotier.sample_config.nat)"
+[ "${nat_enable}" -eq "1" ] || exti 0
+
+logger -t luci-zerotier "zerotier start at $DEVICENAME"
+
+touch /var/run/zerotier/netchanged 2>/dev/null

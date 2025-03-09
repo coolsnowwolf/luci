@@ -1,0 +1,42 @@
+#!/bin/sh
+
+uci -q batch <<-EOF >/dev/null
+	delete ucitrack.@zerotier[-1]
+	add ucitrack zerotier
+	set ucitrack.@zerotier[-1].init=luci_zerotier
+	commit ucitrack
+	delete firewall.zerotier
+	set firewall.zerotier=include
+	set firewall.zerotier.type=script
+	set firewall.zerotier.path=/var/etc/zerotier.include
+	set firewall.zerotier.reload=1
+	commit firewall
+EOF
+
+zt_migrate_config(){
+	local join
+	local joins=$(uci get zerotier.sample_config.join)
+	[ -n "$joins" ] || return 0
+	for join in $joins; do
+		uci -q batch <<-EOF >/dev/null
+			add zerotier join
+			set zerotier.@join[-1].enabled=1
+			set zerotier.@join[-1].network=$join
+EOF
+	done
+	uci delete zerotier.sample_config.join
+	uci commit zerotier
+}
+
+zt_migrate_config
+
+/etc/init.d/zerotier disable
+sleep 1
+if /etc/init.d/zerotier running; then
+	echo "stop zerotier" >&2
+	/etc/init.d/zerotier stop
+	sleep 6
+fi
+
+rm -f /tmp/luci-indexcache
+exit 0

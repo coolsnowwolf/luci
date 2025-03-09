@@ -1,0 +1,45 @@
+#!/bin/sh
+
+NETWORKS_FILE=/var/run/zerotier/networks.json
+DNSMASQ_FILE=/var/run/zerotier/dnsmasq.conf.new
+
+/etc/init.d/dnsmasq enabled || exit 0
+
+parse_zt_dns() {
+    local status allow_dns domain servers server
+    json_select $2
+    json_get_var status status
+    json_get_var allow_dns allowDNS
+    if [[ "$status" == "OK" && $allow_dns == 1 ]] && json_is_a dns object; then
+        json_select dns
+        json_get_var domain domain
+        json_get_values servers servers
+        json_select ..
+        if [[ -n "$domain" && -n "$servers" ]]; then
+            for server in $servers; do
+                echo "server=/$domain/$server" >>$DNSMASQ_FILE
+            done
+        fi
+    fi
+    json_select ..
+}
+
+. /usr/share/libubox/jshn.sh
+
+while :; do
+    [[ -f /var/run/zerotier/dns.enabled ]] || exit 0
+    sleep 3
+    [[ -f /var/run/zerotier/dns.enabled ]] || exit 0
+    [[ -f $DNSMASQ_FILE ]] || cat /tmp/dnsmasq.d/zerotier/dns.conf >$DNSMASQ_FILE
+    md5sum $DNSMASQ_FILE >/var/run/zerotier/dnsmasq.conf.md5
+    >$DNSMASQ_FILE
+    echo '{"root":' >$NETWORKS_FILE
+    zerotier-cli -D/var/lib/zerotier-luci -j listnetworks >>$NETWORKS_FILE
+    echo '}' >>$NETWORKS_FILE
+    json_load_file $NETWORKS_FILE
+    json_for_each_item parse_zt_dns root
+    if ! md5sum -cs /var/run/zerotier/dnsmasq.conf.md5; then
+        cat $DNSMASQ_FILE >/tmp/dnsmasq.d/zerotier/dns.conf
+        /etc/init.d/dnsmasq restart
+    fi
+done
