@@ -1,0 +1,45 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: zh_Hans\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+msgid "Wake on LAN"
+msgstr "网络唤醒Plus"
+
+msgid "Wake on LAN +"
+msgstr "网络唤醒+"
+
+msgid "Host Clients"
+msgstr "主机列表"
+
+msgid "Network Interface"
+msgstr "网络接口"
+
+msgid "Wake Up Host"
+msgstr "唤醒主机"
+
+msgid "wolplus"
+msgstr "网络唤醒++"
+
+msgid "Wake up your LAN device"
+msgstr "唤醒你的局域网设备"
+
+msgid "macclient"
+msgstr "设备列表"
+
+msgid "name"
+msgstr "名称"
+
+msgid "macaddr"
+msgstr "客户端MAC"
+
+msgid "maceth"
+msgstr "网络接口"
+
+msgid "Awake"
+msgstr "唤醒"
+
+msgid "Please [Save & Apply] your changes first"
+msgstr "请先保存并应用您的设置"
