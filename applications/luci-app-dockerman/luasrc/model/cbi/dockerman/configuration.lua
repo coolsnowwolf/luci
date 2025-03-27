@@ -69,4 +69,39 @@ if nixio.fs.access("/usr/bin/dockerd") then
 	o:depends("remote_endpoint", 0)
 end
 
+if nixio.fs.access("/usr/bin/dockerd") and not m.uci:get_bool("dockerd", "dockerman", "remote_endpoint")  then
+	o = s:option(DynamicList, "ac_allowed_interface", translate("Allowed access interfaces"), translate("Which interface(s) can access containers under the bridge network, fill-in Interface Name"))
+	local interfaces = luci.sys and luci.sys.net and luci.sys.net.devices() or {}
+	for i, v in ipairs(interfaces) do
+		o:value(v, v)
+	end
+	o = s:option(DynamicList, "ac_allowed_ports", translate("Ports allowed to be accessed"), translate("Which Port(s) can be accessed, it's not restricted by the Allowed Access interfaces configuration. Use this configuration with caution!"))
+	o.placeholder = "8080/tcp"
+	local docker = require "luci.model.docker"
+	local containers, res, lost_state
+	local dk = docker.new()
+	if dk:_ping().code ~= 200 then
+		lost_state = true
+	else
+		lost_state = false
+		res = dk.containers:list()
+		if res and res.code and res.code < 300 then
+			containers = res.body
+		end
+	end
+
+	-- allowed_container.placeholder = "container name_or_id"
+	if containers then
+		for i, v in ipairs(containers) do
+			if	v.State == "running" and v.Ports then
+				for _, port in ipairs(v.Ports) do
+					if port.PublicPort and port.IP and not string.find(port.IP,":")  then
+						o:value(port.PublicPort.."/"..port.Type, v.Names[1]:sub(2) .. " | " .. port.PublicPort .. " | " .. port.Type)
+					end
+				end
+			end
+		end
+	end
+end
+
 return m
