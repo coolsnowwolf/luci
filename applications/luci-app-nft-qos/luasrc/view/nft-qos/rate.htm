@@ -1,145 +1,136 @@
-<%#
- Copyright 2018 Rosy Song <rosysong@rosinson.com>
- Licensed to the public under the Apache License 2.0.
--%>
-
 <%+header%>
 <script type="text/javascript" src="<%=resource%>/cbi.js"></script>
 <script type="text/javascript">//<![CDATA[
 
-	var RC = { };
-	var em = 0;
-	var ec = 1;
-
+	var RC = { download: {}, upload: {} }; // 存储上次的字节计数
 	var rate_table_dl;
 	var rate_table_ul;
 
-	function init_bytes(rl, ra) {
-		var bytes_pre;
-		var obj = { };
-		obj.chain = rl.chain;
-		obj.ipaddr = rl.expr[em].match.right;
-		obj.bytes = rl.expr[ec].counter.bytes;
-		obj.packets = rl.expr[ec].counter.packets;
-		obj.rate = 0;
-
-		if (RC[obj.chain] && RC[obj.chain][obj.ipaddr])
-				bytes_pre = RC[obj.chain][obj.ipaddr];
-		else
-				bytes_pre = 0;
-
-		obj.rate = (bytes_pre > 0) ? (obj.bytes - bytes_pre) / 3: 0;
-
-		if (!RC[obj.chain])
-				RC[obj.chain] = { };
-		RC[obj.chain][obj.ipaddr] = obj.bytes;
-
-		if (!ra[obj.chain])
-				ra[obj.chain] = [ ];
-		ra[obj.chain].push(obj);
-	} /* function init_bytes(rl, ra) */
-
-	function bytes_label(bytes) {
-		var uby = '<%:kB%>';
-		var kby = (bytes / 1024);
-
-		if (kby > 1024) {
-			uby = '<%:MB%>';
-			kby = (kby / 1024);
-		}
-
-		return String.format("%f %s", kby.toFixed(2), uby);
+	function formatBytes(bytes) {
+		if (bytes == 0) return '0 B';
+		var k = 1024;
+		var sizes = ['B', 'KB', 'MB', 'GB'];
+		var i = Math.min(Math.floor(Math.log(bytes) / Math.log(k)), sizes.length - 1);
+		return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 	}
 
-	function print_table(tbl, rs, ra) {
-		ra.sort(function(a, b) { return b.rate - a.rate });
-		for (var i = 0; i < ra.length; i++) {
-			rs.push([
-				ra[i].ipaddr,
-				bytes_label(ra[i].rate) + '/s',
-				bytes_label(ra[i].bytes),
-				'%s Pkts.'.format(ra[i].packets),
-			]);
-		}
+	function formatRate(bytes) {
+		if (bytes == 0) return '0 B/s';
+		var k = 1024;
+		var sizes = ['B/s', 'KB/s', 'MB/s', 'GB/s'];
+		var i = Math.min(Math.floor(Math.log(bytes) / Math.log(k)), sizes.length - 1);
+		return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+	}
 
-		/* BEGIN: Workaround as "cbi_update_table" isn't working */
-		rs.forEach((element, i) => {
-			var r = document.createElement("TR");
-			r.innerHTML = `
-				<tr>
-					<td style="text-align: center;">${element[0]}</th>
-					<td style="text-align: center;">${element[1]}</td>
-					<td style="text-align: center;">${element[2]}</td>
-					<td style="text-align: center;">${element[3]}</td>
-				</tr>
-					`;
-			if (i%2){
-				r.classList.add('tr', 'cbi-rowstyle-2');
-			} else {
-				r.classList.add('tr', 'cbi-rowstyle-1');
+	function processData(rules) {
+		var currentData = { download: {}, upload: {} };
+		
+		// 首先收集当前所有IP的数据
+		for (var i = 0; i < rules.length; i++) {
+			if (!rules[i].rule) continue;
+			if (rules[i].rule.table != 'nft-qos-monitor') continue;
+
+			var rl = rules[i].rule;
+			if (rl.chain !== 'download' && rl.chain !== 'upload') continue;
+			
+			var ipaddr = rl.expr[0].match.right;
+			var bytes = rl.expr[1].counter.bytes;
+			var packets = rl.expr[1].counter.packets;
+			
+			currentData[rl.chain][ipaddr] = {
+				ipaddr: ipaddr,
+				bytes: bytes,
+				packets: packets,
+				rate: 0
+			};
+		}
+		
+		// 计算速率
+		var result = { download: [], upload: [] };
+		
+		['download', 'upload'].forEach(function(chain) {
+			for (var ip in currentData[chain]) {
+				var data = currentData[chain][ip];
+				
+				if (RC[chain][ip]) {
+					// 计算速率 (字节/秒)
+					data.rate = (data.bytes - RC[chain][ip]) / 2; // 2秒间隔
+				} else {
+					data.rate = 0;
+				}
+				
+				// 更新RC为当前值
+				RC[chain][ip] = data.bytes;
+				
+				result[chain].push(data);
 			}
 			
-			tbl.appendChild(r)
-			/* END: Workaround as "cbi_update_table" isn't working */
+			// 按速率排序
+			result[chain].sort(function(a, b) {
+				return b.rate - a.rate;
+			});
 		});
+		
+		return result;
+	}
+	
+	function updateTable(table, data) {
+		// 清除旧数据（保留表头）
+		var tbody = table.tBodies[0];
+		while (tbody.rows.length > 0) {
+			tbody.deleteRow(0);
+		}
+		
+		// 添加新数据
+		data.forEach(function(item, index) {
+			var row = tbody.insertRow();
+			row.className = (index % 2) ? 'cbi-rowstyle-2' : 'cbi-rowstyle-1';
+			
+			var cell1 = row.insertCell(0);
+			var cell2 = row.insertCell(1);
+			var cell3 = row.insertCell(2);
+			var cell4 = row.insertCell(3);
+			
+			cell1.textContent = item.ipaddr;
+			cell2.textContent = formatRate(item.rate);
+			cell3.textContent = formatBytes(item.bytes);
+			cell4.textContent = item.packets + ' Pkts.';
+			
+        cell1.style.setProperty('text-align', 'center', 'important');
+        cell2.style.setProperty('text-align', 'center', 'important');
+        cell3.style.setProperty('text-align', 'center', 'important');
+        cell4.style.setProperty('text-align', 'center', 'important');
+		});
+		
+		// 如果没有数据，显示提示
+		if (data.length === 0) {
+			var row = tbody.insertRow();
+			row.className = 'tr placeholder';
+			var cell = row.insertCell(0);
+			cell.colSpan = 4;
+			cell.style.textAlign = 'center';
+			cell.innerHTML = '<em><%:No data available%></em>';
+		}
+	}
 
-	} /* function print_table(tbl, ra) */
+	window.setTimeout(function() {
+		rate_table_dl = document.getElementById('rate_table_dl');
+		rate_table_ul = document.getElementById('rate_table_ul');
 
-	/* wait for SVG */
-	window.setTimeout(
-		function() {
-			if (!RC)
-			{
-				window.setTimeout(arguments.callee, 1000);
+		XHR.poll(2, '<%=build_url("admin/status/realtime/rate_status")%>', null,
+			function(x, json) {
+				try {
+					var processedData = processData(json.nftables);
+					updateTable(rate_table_dl, processedData.download);
+					updateTable(rate_table_ul, processedData.upload);
+				} catch (e) {
+					console.error('Error processing data:', e);
+				}
 			}
-			else
-			{
-				rate_table_dl     = document.getElementById('rate_table_dl');
-				rate_table_ul     = document.getElementById('rate_table_ul');
+		);
 
-				/* render datasets, start update interval */
-				XHR.poll(3, '<%=build_url("admin/status/realtime/rate_status")%>', null,
-					function(x, json)
-					{
-						var RA = {};
-						var rows_dl = [];
-						var rows_ul = [];
-
-						var rules = json.nftables;
-						for (var i = 0; i < rules.length; i++)
-						{
-							if (!rules[i].rule)
-								continue;
-							if (rules[i].rule.table != 'nft-qos-monitor')
-								continue;
-
-							var rl = rules[i].rule;
-							switch (rl.chain)
-							{
-								case 'download':
-								case 'upload': init_bytes(rl, RA); break;
-							}
-						} /* for (var i = 0; i < rules.length; i++) */
-
-						/* display the result */
-						if (RA.download) {
-							while (rate_table_dl.firstElementChild !== rate_table_dl.lastElementChild)
-								rate_table_dl.removeChild(rate_table_dl.lastElementChild);
-							print_table(rate_table_dl, rows_dl, RA.download);
-						}
-						if (RA.upload) {
-							while (rate_table_ul.firstElementChild !== rate_table_ul.lastElementChild)
-								rate_table_ul.removeChild(rate_table_ul.lastElementChild);
-							print_table(rate_table_ul, rows_ul, RA.upload);
-						}
-
-					} /* function(x, json) */
-				); /* XHR.poll() */
-
-				XHR.run();
-			}
-		}, 1000
-	);
+		XHR.run();
+	}, 1000);
 //]]></script>
 
 <h2 name="content"><%:Realtime Rate%></h2>
@@ -149,38 +140,46 @@
 <fieldset class="cbi-section" id="cbi-table-table">
 	<legend><%:Realtime Download Rate%></legend>
 	<div class="cbi-section-node">
-		<div class="table" id="rate_table_dl">
-			<div class="tr table-titles">
-				<div class="th col-2 hide-xs"><%:IP Address%></div>
-				<div class="th col-2"><%:Download Rate%></div>
-				<div class="th col-7"><%:Bytes Total%></div>
-				<div class="th col-7"><%:Packets Total%></div>
-			</div>
-			<div class="tr placeholder">
-				<div class="td">
-					<em><%:Collecting data...%></em>
-				</div>
-			</div>
-		</div>
+		<table class="table" id="rate_table_dl" style="width:100%">
+			<thead>
+				<tr class="tr table-titles">
+					<th class="th" style="text-align:center"><%:IP Address%></th>
+					<th class="th" style="text-align:center"><%:Download Rate%></th>
+					<th class="th" style="text-align:center"><%:Bytes Total%></th>
+					<th class="th" style="text-align:center"><%:Packets Total%></th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr class="tr placeholder">
+					<td class="td" colspan="4" style="text-align:center !important;">
+						<em><%:Collecting data...%></em>
+					</td>
+				</tr>
+			</tbody>
+		</table>
 	</div>
 </fieldset>
 
 <fieldset class="cbi-section" id="cbi-table-table">
 	<legend><%:Realtime Upload Rate%></legend>
 	<div class="cbi-section-node">
-		<div class="table" id="rate_table_ul">
-			<div class="tr table-titles">
-				<div class="th col-2 hide-xs"><%:IP Address%></div>
-				<div class="th col-2"><%:Upload Rate%></div>
-				<div class="th col-7"><%:Bytes Total%></div>
-				<div class="th col-7"><%:Packets Total%></div>
-			</div>
-			<div class="tr placeholder">
-				<div class="td">
-					<em><%:Collecting data...%></em>
-				</div>
-			</div>
-		</div>
+		<table class="table" id="rate_table_ul" style="width:100%">
+			<thead>
+				<tr class="tr table-titles">
+					<th class="th" style="text-align:center"><%:IP Address%></th>
+					<th class="th" style="text-align:center"><%:Upload Rate%></th>
+					<th class="th" style="text-align:center"><%:Bytes Total%></th>
+					<th class="th" style="text-align:center"><%:Packets Total%></th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr class="tr placeholder">
+					<td class="td" colspan="4" style="text-align:center !important;">
+						<em><%:Collecting data...%></em>
+					</td>
+				</tr>
+			</tbody>
+		</table>
 	</div>
 </fieldset>
 
