@@ -28,3 +28,6 @@
 [submodule "applications/luci-app-homebridge"]
 	path = applications/luci-app-homebridge
 	url = https://github.com/shanglanxin/luci-app-homebridge
+[submodule "applications/luci-app-store"]
+	path = applications/luci-app-store
+	url = https://github.com/linkease/istore
