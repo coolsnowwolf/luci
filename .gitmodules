@@ -25,3 +25,6 @@
 [submodule "applications/luci-app-shortcutmenu"]
 	path = applications/luci-app-shortcutmenu
 	url = https://github.com/doushang/luci-app-shortcutmenu
+[submodule "applications/luci-app-ssr-plus"]
+	path = applications/luci-app-ssr-plus
+	url = https://github.com/fw876/helloworld
