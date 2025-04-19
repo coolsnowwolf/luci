@@ -22,3 +22,6 @@
 [submodule "applications/luci-app-ssr-plus"]
 	path = applications/luci-app-ssr-plus
 	url = https://github.com/fw876/helloworld
+[submodule "applications/luci-app-homeproxy"]
+	path = applications/luci-app-homeproxy
+	url = https://github.com/douglarek/luci-app-homeproxy
