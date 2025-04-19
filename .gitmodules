@@ -10,3 +10,6 @@
 [submodule "applications/luci-app-argon-config"]
 	path = applications/luci-app-argon-config
 	url = https://github.com/jerrykuku/luci-app-argon-config
+[submodule "applications/luci-app-chatgpt-web"]
+	path = applications/luci-app-chatgpt-web
+	url = https://github.com/sirpdboy/luci-app-chatgpt-web
