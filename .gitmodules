@@ -7,3 +7,6 @@
 [submodule "applications/luci-app-advanced"]
 	path = applications/luci-app-advanced
 	url = https://github.com/sirpdboy/luci-app-advanced
+[submodule "applications/luci-app-argon-config"]
+	path = applications/luci-app-argon-config
+	url = https://github.com/jerrykuku/luci-app-argon-config
