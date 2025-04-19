@@ -1,0 +1,3 @@
+[submodule "themes/luci-theme-edge"]
+	path = themes/luci-theme-edge
+	url = https://github.com/kiddin9/luci-theme-edge
