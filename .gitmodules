@@ -4,3 +4,6 @@
 [submodule "applications/luci-app-wizard"]
 	path = applications/luci-app-wizard
 	url = https://github.com/kiddin9/luci-app-wizard
+[submodule "applications/luci-app-advanced"]
+	path = applications/luci-app-advanced
+	url = https://github.com/sirpdboy/luci-app-advanced
