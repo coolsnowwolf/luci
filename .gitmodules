@@ -22,3 +22,6 @@
 [submodule "applications/luci-app-nikki"]
 	path = applications/luci-app-nikki
 	url = https://github.com/nikkinikki-org/OpenWrt-nikki
+[submodule "applications/luci-app-shortcutmenu"]
+	path = applications/luci-app-shortcutmenu
+	url = https://github.com/doushang/luci-app-shortcutmenu
