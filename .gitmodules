@@ -16,3 +16,6 @@
 [submodule "applications/luci-homebridge"]
 	path = applications/luci-homebridge
 	url = https://github.com/shanglanxin/luci-app-homebridge
+[submodule "applications/luci-homeproxy"]
+	path = applications/luci-homeproxy
+	url = https://github.com/douglarek/luci-app-homeproxy
