@@ -19,3 +19,6 @@
 [submodule "applications/luci-homeproxy"]
 	path = applications/luci-homeproxy
 	url = https://github.com/douglarek/luci-app-homeproxy
+[submodule "applications/luci-app-nikki"]
+	path = applications/luci-app-nikki
+	url = https://github.com/nikkinikki-org/OpenWrt-nikki
