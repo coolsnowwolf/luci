@@ -31,3 +31,6 @@
 [submodule "applications/luci-app-store"]
 	path = applications/luci-app-store
 	url = https://github.com/linkease/istore
+[submodule "applications/luci-app-netwizard"]
+	path = applications/luci-app-netwizard
+	url = https://github.com/sirpdboy/luci-app-netwizard
