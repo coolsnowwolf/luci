@@ -34,3 +34,6 @@
 [submodule "applications/luci-app-netwizard"]
 	path = applications/luci-app-netwizard
 	url = https://github.com/sirpdboy/luci-app-netwizard
+[submodule "applications/luci-app-nezha-agent-v1"]
+	path = applications/luci-app-nezha-agent-v1
+	url = https://github.com/SFGZS888/OpenWRT_NeZha_V1
