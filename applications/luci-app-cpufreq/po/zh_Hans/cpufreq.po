@@ -14,7 +14,7 @@ msgstr "<h4>应用于 CPU %s。</h4>"
 
 #: applications/luci-app-cpufreq/root/usr/share/luci/menu.d/luci-app-cpufreq.json:3
 msgid "CPU Freq"
-msgstr "CPU 性能优化调节"
+msgstr "性能优化"
 
 #: applications/luci-app-cpufreq/htdocs/luci-static/resources/view/cpufreq.js:23
 msgid "CPU Freq Settings"
