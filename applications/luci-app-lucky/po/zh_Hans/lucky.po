@@ -5,7 +5,7 @@ msgid "Config dir path"
 msgstr "配置文件夹位置"
 
 msgid "Lucky"
-msgstr "Lucky大吉"
+msgstr "大吉服务"
 
 msgid "Lucky Control panel"
 msgstr "Lucky操作台"
