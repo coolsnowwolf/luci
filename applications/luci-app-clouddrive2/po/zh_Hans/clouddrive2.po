@@ -1,6 +1,9 @@
 msgid ""
 msgstr "Content-Type: text/plain; charset=UTF-8\n"
 
+msgid "CloudDrive2"
+msgstr "云端网盘"
+
 msgid "Configure and manage CloudDrive2"
 msgstr "配置和管理CloudDrive2"
 
