@@ -89,6 +89,14 @@ msgstr "全锥形 NAT1"
 msgid "Full cone NAT"
 msgstr "全锥形 NAT1"
 
+#: applications/luci-app-turboacc/htdocs/luci-static/resources/view/turboacc.js:177
+msgid "FULLCONENAT"
+msgstr "兼容模式全锥形 NAT1"
+
+#: applications/luci-app-turboacc/htdocs/luci-static/resources/view/turboacc.js:177
+msgid "Boardcom Fullcone NAT1"
+msgstr "高性能 Boardcom 全锥形 NAT1"
+
 #: applications/luci-app-turboacc/htdocs/luci-static/resources/view/turboacc.js:178
 msgid "Full cone NAT (NAT1) can improve gaming performance effectively."
 msgstr "Full cone NAT（NAT1）可以有效提升游戏体验。"

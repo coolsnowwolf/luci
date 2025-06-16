@@ -19,11 +19,12 @@ local methods = {
 			local boardinfo = util.ubus("system", "board") or {}
 			local features  = {
 				hasIPV6           = fs.access("/proc/net/ipv6_route"),
-				hasFLOWOFFLOADING = fs.access("/lib/modules/" .. boardinfo.kernel .. "/xt_FLOWOFFLOAD.ko"),
+				hasFLOWOFFLOADING = fs.access("/lib/modules/" .. boardinfo.kernel .. "/xt_FLOWOFFLOAD.ko") or fs.access("/lib/modules/" .. boardinfo.kernel .. "/xt_FLOWOFFLOAD.ko"),
 				hasFASTCLASSIFIER = fs.access("/lib/modules/" .. boardinfo.kernel .. "/fast-classifier.ko"),
 				hasSHORTCUTFECM   = fs.access("/lib/modules/" .. boardinfo.kernel .. "/shortcut-fe-cm.ko"),
 				hasMEDIATEKHNAT   = fs.access("/lib/modules/" .. boardinfo.kernel .. "/mtkhnat.ko"),
 				hasXTFULLCONENAT  = fs.access("/lib/modules/" .. boardinfo.kernel .. "/xt_FULLCONENAT.ko"),
+				hasNFTFULLCONENAT  = fs.access("/lib/modules/" .. boardinfo.kernel .. "/nft_fullcone.ko"),
 				hasTCPCCA         = readfile("/proc/sys/net/ipv4/tcp_available_congestion_control")
 			}
 			print(json.stringify(features))
@@ -34,7 +35,10 @@ local methods = {
 			local fptype
 			if fs.access("/sys/module/xt_FLOWOFFLOAD/refcnt") and
 			(readfile("/sys/module/xt_FLOWOFFLOAD/refcnt") or "0") ~= "0" then
-				fptype = "Flow offloading"
+				fptype = "Flow offloading (FW3)"
+			elseif fs.access("/sys/module/nft_flow_offload/refcnt") and
+			(readfile("/sys/module/nft_flow_offload/refcnt") or "0") ~= "0" then
+				fptype = "Flow offloading (FW4)"
 			elseif fs.stat("/sys/module/fast_classifier", "type") == "dir" then
 				fptype = "Fast classifier"
 			elseif fs.stat("/sys/module/shortcut_fe_cm", "type") == "dir" then
@@ -59,6 +63,9 @@ local methods = {
 			if fs.access("/sys/module/xt_FULLCONENAT/refcnt") and
 			(readfile("/sys/module/xt_FULLCONENAT/refcnt") or "0") ~= "0" then
 				fctype = "xt_FULLCONENAT"
+			elseif fs.access("/sys/module/nft_fullcone/refcnt") and
+			(readfile("/sys/module/nft_fullcone/refcnt") or "0") ~= "0" then
+				fctype = "nft_FULLCONENAT"
 			elseif sys.call("iptables -t nat -L zone_wan_postrouting | grep -q fullcone") == 0 then
 				fctype = "Boardcom Fullcone"
 			end
