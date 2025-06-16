@@ -17,7 +17,7 @@ PKG_CONFIG_DEPENDS:= \
 PKG_LICENSE:=GPL-3.0-only
 PKG_MAINTAINER:=Tianling Shen <cnsztl@immortalwrt.org>
 
-LUCI_TITLE:=LuCI support for FastPath
+LUCI_TITLE:=LuCI support for FastPath (FW3 or FW4)
 LUCI_DEPENDS:= \
 	+PACKAGE_TURBOACC_INCLUDE_FLOW_OFFLOADING:kmod-ipt-offload \
 	+PACKAGE_TURBOACC_INCLUDE_FAST_CLASSIFIER:kmod-fast-classifier \
