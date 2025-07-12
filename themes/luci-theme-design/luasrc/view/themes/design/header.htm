@@ -120,6 +120,9 @@
 	local mode = 'normal'
 	local navbar = 'display'
 	local navbar_proxy = 'shadowsocksr'
+	if not fs.access('/etc/config/google_fu_mode') then
+		navbar_proxy = 'none'
+	end
 	if fs.access('/etc/config/design') then
 		mode = uci:get_first('design', 'global', 'mode')
 		navbar = uci:get_first('design', 'global', 'navbar')
@@ -199,11 +202,13 @@
 <div class="navbar" style="display: none;">
 <% end -%>
   <a href="/cgi-bin/luci/admin/status/overview"><img src="<%=media%>/images/home.png" /></a>
-  <% if navbar_proxy == 'openclash' then %>
-  <a href="/cgi-bin/luci/admin/services/<%=navbar_proxy%>"><img src="<%=media%>/images/<%=navbar_proxy%>.png" /></a>
-  <% else  %>
-  <a href="/cgi-bin/luci/admin/services/<%=navbar_proxy%>"><img src="<%=media%>/images/ssr.png" /></a>
-  <% end -%>	
+  <% if navbar_proxy ~= 'none' then %>
+    <% if navbar_proxy == 'openclash' then %>
+    <a href="/cgi-bin/luci/admin/services/<%=navbar_proxy%>"><img src="<%=media%>/images/<%=navbar_proxy%>.png" /></a>
+    <% else  %>
+    <a href="/cgi-bin/luci/admin/services/<%=navbar_proxy%>"><img src="<%=media%>/images/ssr.png" /></a>
+    <% end -%>	
+  <% end -%>
   <a href="/cgi-bin/luci/admin/network/network"><img src="<%=media%>/images/link.png" /></a>
   <a href="/cgi-bin/luci/admin/status/realtime"><img src="<%=media%>/images/rank.png" /></a>
   <a href="/cgi-bin/luci/admin/system/admin"><img src="<%=media%>/images/user.png" /></a>
