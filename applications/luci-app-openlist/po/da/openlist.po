@@ -1,156 +1,160 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"PO-Revision-Date: 2025-07-03 07:20+0000\n"
-"Last-Translator: 大王叫我来巡山 "
-"<hamburger2048@users.noreply.hosted.weblate.org>\n"
-"Language-Team: Chinese (Simplified Han script) <https://hosted.weblate.org/"
-"projects/openwrt/luciapplicationsopenlist/zh_Hans/>\n"
-"Language: zh_Hans\n"
+"PO-Revision-Date: 2024-01-25 02:53+0000\n"
+"Last-Translator: drax red <drax@outlook.dk>\n"
+"Language-Team: Danish <https://hosted.weblate.org/projects/openwrt/"
+"luciapplicationsalist/da/>\n"
+"Language: da\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.13-dev\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 5.4-dev\n"
 
 #: applications/luci-app-openlist/htdocs/luci-static/resources/view/openlist/config.js:67
 msgid ""
 "A file list/WebDAV program that supports multiple storages, powered by Gin "
 "and Solidjs."
-msgstr "一个支持多存储的 文件列表/WebDAV 程序，使用 Gin 和 Solidjs。"
+msgstr ""
+"En filliste/WebDAV program, der understøtter flere opbevaringer, drevet af "
+"Gin og Solidjs."
 
 #: applications/luci-app-openlist/htdocs/luci-static/resources/view/openlist/config.js:119
 msgid ""
 "Allow connection even if the remote TLS certificate is invalid (<strong>not "
 "recommended</strong>)."
-msgstr "即使远程 TLS 证书无效，也允许连接（<strong>不推荐</strong>）。"
+msgstr ""
+"Tillad tilslutning, selvom fjern TLS-certifikatet er ugyldig (<strong> ikke "
+"anbefales</strong>)."
 
 #: applications/luci-app-openlist/htdocs/luci-static/resources/view/openlist/config.js:118
 msgid "Allow insecure connection"
-msgstr "允许不安全连接"
+msgstr "Tillad usikker forbindelse"
 
 #: applications/luci-app-openlist/htdocs/luci-static/resources/view/openlist/config.js:81
 #: applications/luci-app-openlist/htdocs/luci-static/resources/view/openlist/log.js:32
 msgid "Collecting data..."
-msgstr "正在收集数据中..."
+msgstr "Indsamler data..."
 
 #: applications/luci-app-openlist/htdocs/luci-static/resources/view/openlist/config.js:68
 msgid "Default webUI/WebDAV login username is %s and password is %s."
-msgstr "默认 webUI/WebDAV 登录用户名 %s 密码 %s。"
+msgstr "Standard WebUI/WebDAV login brugernavn er %s og adgangskode er %s."
 
 #: applications/luci-app-openlist/htdocs/luci-static/resources/view/openlist/config.js:87
 msgid "Enable"
-msgstr "启用"
+msgstr "Aktiver"
 
 #: applications/luci-app-openlist/htdocs/luci-static/resources/view/openlist/config.js:121
 msgid "Enable logging"
-msgstr "启用日志"
+msgstr "Aktiver logning"
 
 #: applications/luci-app-openlist/htdocs/luci-static/resources/view/openlist/config.js:99
 msgid "Expecting: %s"
-msgstr "请输入：%s"
+msgstr "Forventer: %s"
 
 #: applications/luci-app-openlist/root/usr/share/rpcd/acl.d/luci-app-openlist.json:3
 msgid "Grant UCI access for luci-app-openlist"
-msgstr "授予 luci-app-openlist 访问 UCI 配置的权限"
+msgstr "Grant UCI adgang til luci-app-openlist"
 
 #: applications/luci-app-openlist/htdocs/luci-static/resources/view/openlist/config.js:91
 msgid "Listen address"
-msgstr "监听地址"
+msgstr "Lytteadresse"
 
 #: applications/luci-app-openlist/htdocs/luci-static/resources/view/openlist/config.js:104
 msgid "Listen port"
-msgstr "监听端口"
+msgstr "Lytteport"
 
 #: applications/luci-app-openlist/htdocs/luci-static/resources/view/openlist/log.js:30
 msgid "Loading..."
-msgstr "加载中..."
+msgstr "Indlæser..."
 
 #: applications/luci-app-openlist/root/usr/share/luci/menu.d/luci-app-openlist.json:21
 msgid "Log"
-msgstr "日志"
+msgstr "Log"
 
 #: applications/luci-app-openlist/htdocs/luci-static/resources/view/openlist/log.js:48
 msgid "Log file does not exist."
-msgstr "日志文件不存在。"
+msgstr "Log-filen findes ikke."
 
 #: applications/luci-app-openlist/htdocs/luci-static/resources/view/openlist/log.js:39
 msgid "Log is empty."
-msgstr "日志为空。"
+msgstr "Log er tomt."
 
 #: applications/luci-app-openlist/htdocs/luci-static/resources/view/openlist/config.js:108
 msgid "Login expiration time"
-msgstr "登录过期时间"
+msgstr "Log ind udløbsdato"
 
 #: applications/luci-app-openlist/htdocs/luci-static/resources/view/openlist/config.js:113
 msgid "Max connections"
-msgstr "最大连接数"
+msgstr "Maks. forbindelser"
 
 #: applications/luci-app-openlist/htdocs/luci-static/resources/view/openlist/config.js:136
 msgid "Max log age"
-msgstr "日志最长保留时间"
+msgstr "Maks. log alder"
 
 #: applications/luci-app-openlist/htdocs/luci-static/resources/view/openlist/config.js:130
 msgid "Max log backups"
-msgstr "日志最大备份数"
+msgstr "Maks. log backups"
 
 #: applications/luci-app-openlist/htdocs/luci-static/resources/view/openlist/config.js:124
 msgid "Max log size"
-msgstr "日志最大大小"
+msgstr "Maks. logstørrelse"
 
 #: applications/luci-app-openlist/htdocs/luci-static/resources/view/openlist/config.js:36
 msgid "NOT RUNNING"
-msgstr "未在运行"
+msgstr "KØRE IKKE"
 
 #: applications/luci-app-openlist/htdocs/luci-static/resources/view/openlist/config.js:33
 msgid "Open Web Interface"
-msgstr "打开 Web 界面"
+msgstr "Åbn webinterface"
 
 #: applications/luci-app-openlist/htdocs/luci-static/resources/view/openlist/config.js:34
 #: applications/luci-app-openlist/htdocs/luci-static/resources/view/openlist/config.js:36
 #: applications/luci-app-openlist/htdocs/luci-static/resources/view/openlist/config.js:66
 #: applications/luci-app-openlist/root/usr/share/luci/menu.d/luci-app-openlist.json:3
 msgid "OpenList"
-msgstr "OpenList"
+msgstr ""
 
 #: applications/luci-app-openlist/htdocs/luci-static/resources/view/openlist/config.js:34
 msgid "RUNNING"
-msgstr "运行中"
+msgstr "KØRE"
 
 #: applications/luci-app-openlist/htdocs/luci-static/resources/view/openlist/log.js:65
 msgid "Refresh every %s seconds."
-msgstr "每 %s 秒刷新。"
+msgstr "Opdater hver %s sekundt."
 
 #: applications/luci-app-openlist/root/usr/share/luci/menu.d/luci-app-openlist.json:13
 msgid "Settings"
-msgstr "设置"
+msgstr "Indstillinger"
 
 #: applications/luci-app-openlist/htdocs/luci-static/resources/view/openlist/config.js:137
 msgid "The maximum days of the log file to retain."
-msgstr "日志文件的最长保存天数。"
+msgstr "De maksimale dage af logfilen til at bevare."
 
 #: applications/luci-app-openlist/htdocs/luci-static/resources/view/openlist/config.js:114
 msgid ""
 "The maximum number of concurrent connections at the same time (0 = "
 "unlimited)."
-msgstr "允许的最大并发连接数（0 = 不限制）。"
+msgstr "Det maksimale antal samtidige forbindelser (0 = ubegrænset)."
 
 #: applications/luci-app-openlist/htdocs/luci-static/resources/view/openlist/config.js:131
 msgid "The maximum number of old log files to retain."
-msgstr "要保留的最大旧日志文件数量。"
+msgstr "Det maksimale antal gamle logfiler til at bevare."
 
 #: applications/luci-app-openlist/htdocs/luci-static/resources/view/openlist/config.js:125
 msgid "The maximum size in megabytes of the log file before it gets rotated."
-msgstr "轮换前的最大日志大小（单位：MB）。"
+msgstr ""
+"Den maksimale størrelse i megabytes af logfilen, før den bliver roteret."
 
 #: applications/luci-app-openlist/htdocs/luci-static/resources/view/openlist/log.js:52
 msgid "Unknown error: %s"
-msgstr "未知错误：%s"
+msgstr "Ukendt fejl: %s"
 
 #: applications/luci-app-openlist/htdocs/luci-static/resources/view/openlist/config.js:109
 msgid "User login expiration time (in hours)."
-msgstr "用户登录过期时间（单位：小时）。"
+msgstr "Brugerlogin udløbsdato (i timevis)."
 
 #: applications/luci-app-openlist/htdocs/luci-static/resources/view/openlist/config.js:99
 msgid "valid IP address"
-msgstr "有效 IP 地址"
+msgstr "gyldig IP-adresse"
