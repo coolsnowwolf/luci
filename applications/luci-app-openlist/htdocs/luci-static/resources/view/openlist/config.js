@@ -8,7 +8,7 @@
 'require validation';
 'require view';
 
-var callServiceList = rpc.declare({
+const callServiceList = rpc.declare({
 	object: 'service',
 	method: 'list',
 	params: ['name'],
@@ -60,12 +60,12 @@ return view.extend({
 	},
 
 	render: function(data) {
-		var m, s, o;
+		let m, s, o;
 		var webport = uci.get(data[0], 'config', 'listen_http_port') || '5244';
 
 		m = new form.Map('openlist', _('OpenList'),
-			_('A file list/WebDAV program that supports multiple storages, powered by Gin and Solidjs.<br />' +
-				'Default login username is <code>admin</code> and password is <code>password</code>.'));
+			_('A file list/WebDAV program that supports multiple storages, powered by Gin and Solidjs.') + '<br />' +
+			_('Default webUI/WebDAV login username is %s and password is %s.').format('<code>admin</code>', '<code>password</code>'));
 
 		s = m.section(form.TypedSection);
 		s.anonymous = true;
@@ -89,41 +89,34 @@ return view.extend({
 		o.rmempty = false;
 
 		o = s.option(form.Value, 'listen_addr', _('Listen address'));
-		o.default = '0.0.0.0';
-		o.rmempty = false;
+		o.placeholder = '0.0.0.0';
 		o.validate = function(section_id, value) {
-			if (!value)
-				return _('Expecting: %s').format(_('non-empty value'));
+			if (section_id && value) {
+				var m4 = value.match(/^([^\[\]:]+)$/),
+				    m6 = value.match(/^\[(.+)\]$/ );
 
-			var m4 = value.match(/^([^\[\]:]+)$/),
-			    m6 = value.match(/^\[(.+)\]$/ );
-
-			if ((!m4 && !m6) || !stubValidator.apply('ipaddr', m4 ? m4[1] : m6[1]))
-				return _('Expecting: %s').format(_('valid IP address'));
-
+				if ((!m4 && !m6) || !stubValidator.apply('ipaddr', m4 ? m4[1] : m6[1]))
+					return _('Expecting: %s').format(_('valid IP address'));
+			}
 			return true;
 		}
 
 		o = s.option(form.Value, 'listen_http_port', _('Listen port'));
 		o.datatype = 'port';
-		o.default = '5244';
-		o.rmempty = false;
+		o.placeholder = '5244';
 
 		o = s.option(form.Value, 'site_login_expire', _('Login expiration time'),
 			_('User login expiration time (in hours).'));
 		o.datatype = 'uinteger';
-		o.default = '48';
-		o.rmempty = false;
+		o.placeholder = '48';
 
 		o = s.option(form.Value, 'site_max_connections', _('Max connections'),
 			_('The maximum number of concurrent connections at the same time (0 = unlimited).'));
 		o.datatype = 'uinteger';
-		o.default = '0';
-		o.rmempty = false;
+		o.placeholder = '0';
 
 		o = s.option(form.Flag, 'site_tls_insecure', _('Allow insecure connection'),
 			_('Allow connection even if the remote TLS certificate is invalid (<strong>not recommended</strong>).'));
-		o.default = o.disabled;
 
 		o = s.option(form.Flag, 'log_enable', _('Enable logging'));
 		o.default = o.enabled;
@@ -131,19 +124,19 @@ return view.extend({
 		o = s.option(form.Value, 'log_max_size', _('Max log size'),
 			_('The maximum size in megabytes of the log file before it gets rotated.'));
 		o.datatype = 'uinteger';
-		o.default = '5';
+		o.placeholder = '5';
 		o.depends('log_enable', '1');
 
 		o = s.option(form.Value, 'log_max_backups', _('Max log backups'),
 			_('The maximum number of old log files to retain.'));
 		o.datatype = 'uinteger';
-		o.default = '1';
+		o.placeholder = '1';
 		o.depends('log_enable', '1');
 
 		o = s.option(form.Value, 'log_max_age', _('Max log age'),
 			_('The maximum days of the log file to retain.'));
 		o.datatype = 'uinteger';
-		o.default = '15';
+		o.placeholder = '15';
 		o.depends('log_enable', '1');
 
 		return m.render();

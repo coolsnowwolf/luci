@@ -1,7 +1,6 @@
 {
 	"admin/services/openlist": {
 		"title": "OpenList",
-		"order": 10,
 		"action": {
 			"type": "firstchild"
 		},

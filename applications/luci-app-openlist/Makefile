@@ -4,9 +4,12 @@
 
 include $(TOPDIR)/rules.mk
 
+PKG_LICENSE:=Apache-2.0
+
 LUCI_TITLE:=LuCI app for OpenList
 LUCI_DEPENDS:=+openlist
-LUCI_PKGARCH:=all
+
+PKG_MAINTAINER:=Tianling Shen <cnsztl@immortalwrt.org>
 
 include ../../luci.mk
 
