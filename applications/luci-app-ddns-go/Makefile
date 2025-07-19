@@ -10,6 +10,11 @@ LUCI_PKGARCH:=all
 
 PKG_MAINTAINER:=Tianling Shen <cnsztl@immortalwrt.org>
 
+define Package/ddns-go/conffiles
+/etc/config/ddns-go
+/etc/init.d/ddns-go
+endef
+
 include ../../luci.mk
 
 # call BuildPackage - OpenWrt buildroot signature
