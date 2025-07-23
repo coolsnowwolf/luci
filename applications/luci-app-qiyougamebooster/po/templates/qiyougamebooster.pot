@@ -1,0 +1,52 @@
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8"
+
+#: applications/luci-app-qiyougamebooster/htdocs/luci-static/resources/view/qiyougamebooster.js:26
+#: applications/luci-app-qiyougamebooster/htdocs/luci-static/resources/view/qiyougamebooster.js:28
+#: applications/luci-app-qiyougamebooster/htdocs/luci-static/resources/view/qiyougamebooster.js:53
+msgid "QiYou Game Booster"
+msgstr ""
+
+#: applications/luci-app-qiyougamebooster/htdocs/luci-static/resources/view/qiyougamebooster.js:54
+msgid "Play console games online with less lag and more stability."
+msgstr ""
+
+#: applications/luci-app-qiyougamebooster/htdocs/luci-static/resources/view/qiyougamebooster.js:55
+msgid "— now supporting PS, Switch, Xbox, PC, and mobile."
+msgstr ""
+
+#: applications/luci-app-qiyougamebooster/htdocs/luci-static/resources/view/qiyougamebooster.js:70
+msgid "Collecting data..."
+msgstr ""
+
+#: applications/luci-app-qiyougamebooster/htdocs/luci-static/resources/view/qiyougamebooster.js:76
+msgid "Enable"
+msgstr ""
+
+#: applications/luci-app-qiyougamebooster/htdocs/luci-static/resources/view/qiyougamebooster.js:38
+msgid "Status"
+msgstr ""
+
+msgid "NOT ENABLED"
+msgstr ""
+
+msgid "CLOSED"
+msgstr ""
+
+msgid "BOOSTING"
+msgstr ""
+
+msgid "RUNNING"
+msgstr ""
+
+msgid "NOT SUPPORTED"
+msgstr ""
+
+msgid "DOWNLOADING"
+msgstr ""
+
+msgid "INSTALLING"
+msgstr ""
+
+msgid "NOT RUNNING"
+msgstr ""
