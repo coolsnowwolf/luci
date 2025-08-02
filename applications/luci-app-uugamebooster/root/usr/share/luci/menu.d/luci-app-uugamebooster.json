@@ -1,0 +1,13 @@
+{
+	"admin/services/uugamebooster": {
+		"title": "UU GameAcc",
+		"action": {
+			"type": "view",
+			"path": "uugamebooster"
+		},
+		"depends": {
+			"acl": [ "luci-app-uugamebooster" ],
+			"uci": { "uugamebooster": true }
+		}
+	}
+}
