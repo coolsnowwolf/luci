@@ -87,7 +87,6 @@ body {
   padding: 0px;
   height: 100%;
   font-size: 16px;
-  font-family: var(--font-family-sans-serif);
 }
 
 html {
@@ -985,6 +984,8 @@ div[style="width:100%;height:300px;border:1px solid #000;background:#fff"] {
   text-decoration: none;
   cursor: default;
   font-size: 1rem;
+  font-weight: 700;
+  color: #5ea69b;
   transition: all .2s;
   position: relative
 }
@@ -3941,11 +3942,11 @@ pre.command-output {
   }
 
   .main-left {
-    width: calc(0% + 13rem);
+    width: calc(0% + 16rem);
   }
 
   .main-right {
-    width: calc(100% - 13rem);
+    width: calc(100% - 16rem);
   }
 
   .btn:not(button),
