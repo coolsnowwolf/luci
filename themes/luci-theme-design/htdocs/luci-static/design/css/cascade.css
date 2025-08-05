@@ -1536,7 +1536,7 @@ tr>th,
 .tr>.th,
 .cbi-section-table-row::before,
 #cbi-wireless>#wifi_assoclist_table>.tr:nth-child(2) {
-  border-top: thin solid #ddd;
+  border-top: thin solid #eee;
   padding: 1.1em 1.5rem;
 }
 
@@ -2552,11 +2552,11 @@ td>table>tbody>tr>td,
   height: 22px;
   margin: 6px 0;
   /* border: thin solid #999; */
-  background: #eee;
+  background: #ccc;
   border-radius: 12px;
   overflow: hidden;
-  color: #2e2b60;
-  color: var(--progressbar-font-color);
+  color: #ffffff;
+  /* color: var(--progressbar-font-color);  */
 }
 
 .cbi-progressbar>div {
