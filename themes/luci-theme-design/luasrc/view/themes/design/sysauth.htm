@@ -129,8 +129,8 @@
 	<div class="login-container">
 		<div class="login-form">
 			<!-- Logo Start -->
-			<a class="brand" href="/"><img src="<%=media%>/img/design.svg" class="icon">
-				<span class="brand-text"><%=striptags( (boardinfo.hostname or "?") ) %></span>
+				<div class="brand"><%:Authorization Required%></div>
+				<div class="brand-text"><%:Please enter your username and password.%></div>
 			</a>
 			<!-- Logo End -->
 			<!-- Login Form Start -->
@@ -184,4 +184,4 @@
 				}
 			//]]></script>
 			<% end %>
-<%+themes/design/footer_login%>
+

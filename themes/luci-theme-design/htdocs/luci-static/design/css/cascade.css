@@ -476,9 +476,8 @@ h5 {
 
 .login-page .login-container {
   height: 100%;
-  margin-left: 4.5rem;
-  position: absolute;
-  top: 0px;
+  position: relative;
+  top: 150px;
   display: flex;
   flex-direction: column;
   -webkit-box-pack: center;
@@ -488,7 +487,7 @@ h5 {
   z-index: 2;
   width: 420px;
   box-shadow: rgba(0, 0, 0, 0.75) 0 0 35px -5px;
-  margin-left: 5%;
+  margin-left: 35%;
   background: transparent
 }
 
@@ -513,10 +512,11 @@ h5 {
   display: flex;
   -webkit-box-align: center;
   align-items: center;
-  margin: 50px auto 100px 50px;
-  color: #525461;
-  color: var(--default);
-  justify-content: center
+  margin: 50px 50px 20px 50px;
+  color: #5ea69b;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 1.25rem;
 }
 
 .login-page .login-container .login-form .brand .icon {
