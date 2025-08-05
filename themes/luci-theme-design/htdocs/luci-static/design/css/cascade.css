@@ -733,7 +733,6 @@ small {
   font-size: 1.8rem;
   color: #5e72e4;
   color: var(--primary);
-  font-family: "Sniglet-Regular";
   font-weight: bold;
   text-decoration: none;
   text-align: center;
