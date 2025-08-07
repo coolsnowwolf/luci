@@ -8,12 +8,8 @@ LUCI_TITLE:=LuCI for Tailscale
 LUCI_DEPENDS:=+tailscale
 LUCI_PKGARCH:=all
 
-PKG_VERSION:=1.2.2
+PKG_VERSION:=1.2.6
 
-define Package/luci-app-tailscale/conffiles
-/etc/config/tailscale
-endef
-
-include ../../luci.mk
+include $(TOPDIR)/feeds/luci/luci.mk
 
 # call BuildPackage - OpenWrt buildroot signature
