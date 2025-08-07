@@ -54,3 +54,9 @@ msgstr "无线网络设置错误"
 
 msgid "At least one MBSSID needs to be reserved"
 msgstr "至少需要保留1个MBSSID"
+
+msgid "Low"
+msgstr "低"
+
+msgid "Very Low"
+msgstr "非常低"

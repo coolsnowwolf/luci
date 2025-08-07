@@ -1043,9 +1043,12 @@ return view.extend({
 					o.value('1', _('Enable'));
 					o.value('2', _('Force'));
 
-					o = ss.taboption('advanced', form.Value, 'txpower', _('Maximum transmit power'));
-					o.datatype = 'range(1,100)';
-					o.placeholder = 100;
+					o = ss.taboption('general', form.ListValue, 'txpower', _('Maximum transmit power'));
+					o.value('1', _('Very Low'));
+					o.value('20', _('Low'));
+					o.value('50', _('Normal'));
+					o.value('100', _('High'));
+					o.default = 100;
 				}
 
 				o = s.option(form.SectionValue, '_device', form.NamedSection, radioNet.getName(), 'wifi-iface', _('Interface Configuration'));
