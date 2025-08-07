@@ -2493,8 +2493,7 @@ return view.extend({
 					E('th', { 'class': 'th hide-xs' }, _('MAC address')),
 					E('th', { 'class': 'th' }, _('Host')),
 					E('th', { 'class': 'th' }, _('Signal / Noise')),
-					E('th', { 'class': 'th' }, _('RX Rate / TX Rate')),
-					E('th', { 'class': 'th' }, _('Uptime'))
+					E('th', { 'class': 'th' }, _('RX Rate / TX Rate'))
 				])
 			]);
 
