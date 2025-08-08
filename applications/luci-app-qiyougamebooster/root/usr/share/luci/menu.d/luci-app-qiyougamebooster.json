@@ -1,0 +1,16 @@
+{
+	"admin/services/qiyougamebooster": {
+		"title": "QiYou Game Booster",
+		"action": {
+			"type": "view",
+			"path": "qiyougamebooster"
+		},
+		"depends": {
+			"acl": [ "luci-app-qiyougamebooster" ],
+			"fs": {
+				"/usr/bin/qiyougamebooster.sh": "executable"
+			},
+			"uci": { "qiyougamebooster": true }
+		}
+	}
+}
