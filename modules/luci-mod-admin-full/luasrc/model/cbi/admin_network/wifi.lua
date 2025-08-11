@@ -372,6 +372,14 @@ if hwtype == "mt_dbdc" then
 			tp:value(p.driver_dbm, "%i dBm (%i mW)"
 				%{ p.display_dbm, p.display_mw })
 		end
+	else
+		tp = s:taboption("general", ListValue,
+			"txpower", translate("Transmit Power"))
+		tp:value('1', translate('Very Low'))
+		tp:value('20', translate('Low'))
+		tp:value('50', translate('Normal'))
+		tp:value('100', translate('High'))
+		tp.default = 100;
 	end
 	wmm = s:taboption("general", Flag, "wmm", translate("WMM Mode"))
 	wmm.default = wmm.enabled

@@ -4150,3 +4150,12 @@ msgstr "指定为主接口"
 
 msgid "Set this interface as master for RA and DHCPv6 relaying as well as NDP proxying."
 msgstr "将此接口设为 RA 和 DHCPv6 中继以及 NDP 代理的主接口。"
+
+msgid "High"
+msgstr "高"
+
+msgid "Low"
+msgstr "低"
+
+msgid "Very Low"
+msgstr "非常低"
