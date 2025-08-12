@@ -8,9 +8,5 @@ then
 		add_list uhttpd.main.index_page='cgi-bin/luci'
 		commit uhttpd
 	EOF
-fi	
-uci -q batch <<-EOF >/dev/null
-	set luci.main.lang=zh_cn
-	commit luci
-EOF
+fi
 exit 0
