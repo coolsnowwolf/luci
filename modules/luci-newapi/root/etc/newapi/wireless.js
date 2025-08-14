@@ -323,7 +323,7 @@ var CBIWifiFrequencyValue = form.Value.extend({
 	load: function(section_id) {
 		return Promise.all([
 			network.getWifiDevice(section_id),
-			this.callFrequencyList(section_id)
+			this.callFrequencyList('${section_id}0')
 		]).then(L.bind(function(data) {
 			this.channels = {
 				'2g': [ 'auto', 'auto', true ],
