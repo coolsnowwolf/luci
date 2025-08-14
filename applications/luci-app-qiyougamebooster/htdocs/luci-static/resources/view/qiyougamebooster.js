@@ -34,9 +34,11 @@ function getVersion() {
 function renderStatus(status, version) {
 	var spanTemp = '<span style="color:%s"><strong>%s: %s %s</strong></span>';
 	var renderHTML;
-
-	renderHTML = spanTemp.format('green', _('Status'), _(version), _(status));
- 
+	if (status == 'NOT ENABLED' || status == 'NOT RUNNING' || status == 'NOT SUPPORTED') {
+		renderHTML = spanTemp.format('red', _('Status'), _(version), _(status));
+	} else {
+		renderHTML = spanTemp.format('green', _('Status'), _(version), _(status));
+	}
 	return renderHTML;
 }
 
@@ -82,7 +84,7 @@ return view.extend({
 		s.render = function () {
 			return E('div', {class: 'cbi-section'}, [
 				E('p', [
-					E('img', {src: '/qiyougamebooster/Tutorial.png', height: '300'})
+					E('img', {src: '/qiyougamebooster/Tutorial.png', height: '350'})
 				])
 			])
 		}

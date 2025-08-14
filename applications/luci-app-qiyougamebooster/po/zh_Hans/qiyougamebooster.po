@@ -49,4 +49,4 @@ msgid "INSTALLING"
 msgstr "安装中"
 
 msgid "NOT RUNNING"
-msgstr "未运行
+msgstr "未运行"
