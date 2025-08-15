@@ -641,17 +641,19 @@ if hwtype == "mt_dbdc" then
 	disassoc_low_ack.default = disassoc_low_ack.disabled
 	disassoc_low_ack:depends({mode="ap"})
 	
-	rssikick= s:taboption("general", Value, "rssikick", translate("Kick low RSSI station threshold"), translate("dBm"));
-	rssikick.optional    = true
-	rssikick.placeholder = 75
-	rssikick.datatype = "range(-100,0)"
-	rssikick:depends("disassoc_low_ack", "1")
+	kicklow= s:taboption("general", Value, "kicklow", translate("Kick low RSSI station threshold"), translate("dBm"));
+	kicklow.optional    = true
+	kicklow.placeholder = -75
+	kicklow.datatype = "range(-100,0)"
+	kicklow:depends("disassoc_low_ack", "1")
+	kicklow.description = translate("-100 - 0 dBm")
 
-	rssiassoc= s:taboption("general", Value, "rssiassoc", translate("Station associate threshold"), translate("dBm"));
-	rssiassoc.optional    = true
-	rssiassoc.placeholder = 60
-	rssiassoc.datatype    = "range(-100,0)"
-	rssiassoc:depends("disassoc_low_ack", "1")
+	assocthres= s:taboption("general", Value, "assocthres", translate("Station associate threshold"), translate("dBm"));
+	assocthres.optional    = true
+	assocthres.placeholder = -60
+	assocthres.datatype    = "range(-100,0)"
+	assocthres:depends("disassoc_low_ack", "1")
+	assocthres.description = translate("-100 - 0 dBm")
 end
 
 ------------------- WiFI-Encryption -------------------
