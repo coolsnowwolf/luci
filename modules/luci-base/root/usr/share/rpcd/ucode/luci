@@ -660,8 +660,8 @@ const methods = {
 
 	getCPUUsage: {
 		call: function() {
-			const fd = popen('top -n1 | awk \'/^CPU/ {printf("%d%", 100 - $8)}\'');
-			if (fd) {
+			if (access('/sbin/usage')) {
+        const fd = popen('/sbin/usage');
 				let cpuusage = fd.read('all');
 				if (!cpuusage)
 					cpuusage = '?';
@@ -669,7 +669,13 @@ const methods = {
 
 				return { cpuusage: cpuusage };
 			} else {
-				return { cpuusage: error() };
+        const fd = popen('top -n1 | awk \'/^CPU/ {printf("%d%", 100 - $8)}\'');
+				let cpuusage = fd.read('all');
+				if (!cpuusage)
+					cpuusage = '?';
+				fd.close();
+
+				return { cpuusage: cpuusage };
 			}
 		}
 	},
