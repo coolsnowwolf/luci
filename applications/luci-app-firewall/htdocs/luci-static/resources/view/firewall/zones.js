@@ -58,7 +58,11 @@ return view.extend({
 
 		o = s.option(form.Flag, 'drop_invalid', _('Drop invalid packets'));
 		if (L.hasSystemFeature('fullcone')) {
-			o = s.option(form.Flag, 'fullcone', _('Enable FullCone NAT'));
+			o = s.option(form.ListValue, 'fullcone', _('Enable FullCone NAT'));
+			o.value("0", _("Disable"))
+			o.value("1", _("Compatible Mode"))
+			if (!fw4)
+				o.value("2", _("High Performing Mode"));
 			if (fw4)
 				o = s.option(form.Flag, 'fullcone6', _('Enable FullCone NAT6'));
 		}

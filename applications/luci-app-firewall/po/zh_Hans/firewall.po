@@ -1538,3 +1538,15 @@ msgstr "最多 65536 个条目。"
 #: applications/luci-app-firewall/htdocs/luci-static/resources/tools/firewall.js:339
 msgid "valid firewall mark"
 msgstr "有效的防火墙标记"
+
+msgid "Enable FullCone NAT"
+msgstr "启用 FullCone NAT"
+
+msgid "Enable FullCone NAT6"
+msgstr "启用 FullCone NAT6"
+
+msgid "Compatible Mode"
+msgstr "兼容模式"
+
+msgid "High Performing Mode"
+msgstr "高性能模式"
