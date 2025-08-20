@@ -1,0 +1,15 @@
+#!/bin/sh
+
+if [ -d /www/luci-static/resources/view/network ]; then
+mv -f /etc/newapi/wireless.js /www/luci-static/resources/view/network/wireless.js
+fi
+
+luci_network_js="/www/luci-static/resources/network.js"
+
+if [ -f $luci_network_js ]; then
+	if ! grep -sq 'ra\[xiyez\]' $luci_network_js ; then
+		sed -i 's#/^wlan\\d+/,#/^wlan\\d+/,/^ra[xiyez]?\\d+/,/^apcli[xiyez]?\\d+/,#' $luci_network_js
+	fi
+fi
+
+exit 0
