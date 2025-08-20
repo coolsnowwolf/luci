@@ -13,6 +13,11 @@ s:tab("template", translate("Edit Template"))
 s:taboption("general", Value, "name", translate("Hostname"))
 s:taboption("general", Value, "description", translate("Description"))
 s:taboption("general", Value, "workgroup", translate("Workgroup"))
+
+e = s:taboption("general", Flag, "enabled", translate("Enabled"))
+e.rmempty = false
+e.default = "1"
+
 h = s:taboption("general", Flag, "homes", translate("Share home-directories"),
         translate("Allow system users to reach their home directories via " ..
                 "network shares"))

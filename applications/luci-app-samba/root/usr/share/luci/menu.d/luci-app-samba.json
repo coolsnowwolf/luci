@@ -1,0 +1,13 @@
+{
+	"admin/nas/samba": {
+		"title": "Network Shares",
+		"action": {
+			"type": "view",
+			"path": "samba"
+		},
+		"depends": {
+			"acl": [ "luci-app-samba" ],
+			"uci": { "samba": true }
+		}
+	}
+}
