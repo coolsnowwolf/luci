@@ -32,12 +32,12 @@ return baseclass.extend({
 		    swap = L.isObject(systeminfo.swap) ? systeminfo.swap : {};
 
 		var fields = [
-			_('Total Available'), (mem.available) ? mem.available : (mem.total && mem.free && mem.buffered) ? mem.free + mem.buffered : null, mem.total,
-			_('Used'),            (mem.total && mem.free) ? (mem.total - mem.free) : null, mem.total,
+			_('Total Available'), (mem.available) ? mem.available+mem.cached : (mem.total && mem.free && mem.buffered) ? mem.free + mem.buffered : null, mem.total,
+			// _('Used'),            (mem.total && mem.free) ? (mem.total - mem.free) : null, mem.total,
 		];
 
-		if (mem.buffered)
-			fields.push(_('Buffered'), mem.buffered, mem.total);
+		//if (mem.buffered)
+		//	fields.push(_('Buffered'), mem.buffered, mem.total);
 
 		if (mem.cached)
 			fields.push(_('Cached'), mem.cached, mem.total);
