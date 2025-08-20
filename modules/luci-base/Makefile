@@ -8,7 +8,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=luci-base
 
-LUCI_TYPE:=mod
+LUCI_TYPE:=mod 
 LUCI_BASENAME:=base
 
 LUCI_TITLE:=LuCI core libraries
