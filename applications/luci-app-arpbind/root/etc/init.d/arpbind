@@ -5,51 +5,44 @@
 START=80
 STOP=20
 
-#清除单接口ARP
-#参数：$1:接口名称
-if_clean_arp()
-{
-	[ -z "$1" ] && return
-	ip link set arp off dev $1
-	ip link set arp on dev $1
+USE_PROCD=1
+
+setup_arp() {
+	local cfg="$1"
+	local enabled ipaddr macaddr ifname
+
+	config_get_bool enabled "$cfg" "enabled" "1"
+	[ "$enabled" -eq "1" ] || return 1
+
+	config_get ipaddr "$cfg" "ipaddr"
+	config_get macaddr "$cfg" "macaddr"
+	config_get ifname "$cfg" "ifname"
+
+	if [ -z "$ipaddr" ] || [ -z "$macaddr" ] || [ -z "$ifname" ]; then
+		return 1
+	fi
+
+	ip neigh add "$ipaddr" lladdr "$macaddr" nud permanent dev "$ifname" || \
+		ip neigh change "$ipaddr" lladdr "$macaddr" nud permanent dev "$ifname"
 }
 
-#清除系统所有ARP
-#参数：无
-clean_arp()
-{
-	for i in $(ls /sys/class/net)
-	do
-		if_clean_arp $i
+start_service() {
+	config_load "arpbind"
+	config_foreach setup_arp "arpbind"
+}
+
+stop_service() {
+	ls "/sys/class/net" | while IFS= read -r ifname; do
+		ip link set arp off dev "$ifname"
+		ip link set arp on dev "$ifname"
 	done
 }
 
-#添加静态ARP绑定
-#参数：$1:IP地址 $2:MAC地址 $3:接口名称
-add_arp()
-{
-	[ -z "$1" ] || [ -z "$2" ] || [ -z "$3" ] && return
-	echo "Adding ARP:IP Addr:$1  MAC Addr:$2  Interface:$3"
-	ip neigh add $1 lladdr $2 nud permanent dev $3 || \
-	ip neigh change $1 lladdr $2 nud permanent dev $3
+reload_service() {
+	stop
+	start
 }
 
-arpconf_foreach()
-{
-	config_get ipaddr "$1" 'ipaddr'
-	config_get macaddr "$1" 'macaddr'
-	config_get ifname "$1" 'ifname'
-	[ -z "$ifname" ] && return
-	add_arp $ipaddr $macaddr $ifname
-}
-
-start()
-{
-	config_load 'arpbind'
-	config_foreach arpconf_foreach 'arpbind'
-}
-
-stop()
-{
-	clean_arp
+service_triggers() {
+	procd_add_reload_trigger "arpbind"
 }

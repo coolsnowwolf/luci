@@ -1,14 +1,14 @@
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2024-01-05 04:02+0000\n"
-"Last-Translator: Yuan Law <traverslombard@outlook.com>\n"
-"Language-Team: Chinese (Traditional) <https://hosted.weblate.org/projects/"
-"openwrt/luciapplicationsfrps/zh_Hant/>\n"
+"PO-Revision-Date: 2025-06-19 08:24+0000\n"
+"Last-Translator: ZW <roc_fe@users.noreply.hosted.weblate.org>\n"
+"Language-Team: Chinese (Traditional Han script) <https://hosted.weblate.org/"
+"projects/openwrt/luciapplicationsfrps/zh_Hant/>\n"
 "Language: zh_Hant\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.4-dev\n"
+"X-Generator: Weblate 5.12.1\n"
 
 #: applications/luci-app-frps/htdocs/luci-static/resources/view/frps.js:15
 msgid "Additional configs"
@@ -16,7 +16,7 @@ msgstr "額外設定"
 
 #: applications/luci-app-frps/htdocs/luci-static/resources/view/frps.js:43
 msgid "Additional settings"
-msgstr "附加設定"
+msgstr "進階設定"
 
 #: applications/luci-app-frps/htdocs/luci-static/resources/view/frps.js:40
 msgid "Allow ports"
@@ -41,8 +41,8 @@ msgid ""
 "resources from. If this value is \"\", assets will be loaded from the "
 "bundled executable using statik.<br />By default, this value is \"\"."
 msgstr ""
-"AssetsDir指定本地目錄讓儀表板從其加載資源. 如果此值為“”, 則將使用statik從捆綁"
-"的可執行文件中加載資產. <br />默認情況下, 此值為“”."
+"AssetsDir指定本地目錄讓儀表板從其載入資源。如果此值為“”，則將使用statik從捆綁"
+"的執行檔中載入資產。<br />預設情況下,，此值為“”."
 
 #: applications/luci-app-frps/htdocs/luci-static/resources/view/frps.js:19
 msgid "Bind address"
@@ -50,7 +50,7 @@ msgstr "綁定位址"
 
 #: applications/luci-app-frps/htdocs/luci-static/resources/view/frps.js:20
 msgid "Bind port"
-msgstr "綁定埠號"
+msgstr "繫結連接埠"
 
 #: applications/luci-app-frps/htdocs/luci-static/resources/view/frps.js:19
 msgid ""
@@ -64,7 +64,7 @@ msgid ""
 "is 0, the server will not listen for KCP connections.<br />By default, this "
 "value is 0."
 msgstr ""
-"indKcpPort指定服務器監聽的KCP埠號. 如果此值為0, 則伺服器將不會監聽KCP連線。"
+"indKcpPort指定伺服器監聽的KCP埠號. 如果此值為0, 則伺服器將不會監聽KCP連線。"
 "<br />預設情況下, 此值為0."
 
 #: applications/luci-app-frps/htdocs/luci-static/resources/view/frps.js:20
@@ -79,16 +79,16 @@ msgid ""
 "is 0, the server will not listen for UDP connections.<br />By default, this "
 "value is 0"
 msgstr ""
-"BindUdpPort指定伺服器監聽的UDP端口. 如果此值為0, 則伺服器將不監聽UDP連接. "
-"<br />預設情況下, 此值為0"
+"BindUdpPort指定伺服器監聽的UDP連接埠。如果此值為0，伺服器將不會監聽UDP連線。 "
+"<br />預設值為0"
 
 #: applications/luci-app-frps/htdocs/luci-static/resources/view/frps.js:143
 msgid "Collecting data ..."
-msgstr "資料採集中..."
+msgstr "收集資料中..."
 
 #: applications/luci-app-frps/htdocs/luci-static/resources/view/frps.js:151
 msgid "Common settings"
-msgstr "通用設定值"
+msgstr "通用設定"
 
 #: applications/luci-app-frps/htdocs/luci-static/resources/view/frps.js:15
 msgid "Config files include in temporary config file"
@@ -96,7 +96,7 @@ msgstr "設定檔包含在臨時設定檔案中"
 
 #: applications/luci-app-frps/htdocs/luci-static/resources/view/frps.js:39
 msgid "Custom 404 page"
-msgstr "自定義404頁面"
+msgstr "自訂404頁面"
 
 #: applications/luci-app-frps/htdocs/luci-static/resources/view/frps.js:39
 msgid ""
@@ -104,7 +104,7 @@ msgid ""
 "value is \"\", a default page will be displayed.<br />By default, this value "
 "is \"\"."
 msgstr ""
-"Custom404Page指定要顯示的自定義404頁面的路徑. 如果此值為“”, 將顯示默認頁面. "
+"Custom404Page指定要顯示的自訂404頁面的路徑. 如果此值為“”, 將顯示預設頁面. "
 "<br />預設情況下, 此值為“”."
 
 #: applications/luci-app-frps/htdocs/luci-static/resources/view/frps.js:27
@@ -144,14 +144,14 @@ msgid ""
 "DashboardPwd specifies the password that the dashboard will use for login."
 "<br />By default, this value is \"admin\"."
 msgstr ""
-"DashboardPwd指定儀表板將用於登錄的密碼. <br />預設情況下, 此值為\"admin\"."
+"DashboardPwd指定儀表板將用於登入的密碼. <br />預設情況下, 此值為\"admin\"."
 
 #: applications/luci-app-frps/htdocs/luci-static/resources/view/frps.js:29
 msgid ""
 "DashboardUser specifies the username that the dashboard will use for login."
 "<br />By default, this value is \"admin\"."
 msgstr ""
-"DashboardUser指定儀表板用於登錄的用戶名稱 <br />預設情況下, 此值為\"admin\"."
+"DashboardUser指定儀表板用於登入的用戶名稱 <br />預設情況下, 此值為\"admin\"."
 
 #: applications/luci-app-frps/htdocs/luci-static/resources/view/frps.js:35
 msgid "Disable log color"
@@ -162,8 +162,8 @@ msgid ""
 "DisableLogColor disables log colors when LogWay == \"console\" when set to "
 "true.<br />By default, this value is false."
 msgstr ""
-"當LogWay ==“ console”設置為true時, DisableLogColor禁用日誌顏色. <br />預設默"
-"認情況下, 此值為false."
+"當LogWay == 「console」設定為true時，DisableLogColor會停用日誌顏色。 <br />此"
+"值預設為false。"
 
 #: applications/luci-app-frps/htdocs/luci-static/resources/view/frps.js:14
 msgid "Environment variable"
@@ -171,7 +171,7 @@ msgstr "環境變數"
 
 #: applications/luci-app-frps/root/usr/share/rpcd/acl.d/luci-app-frps.json:3
 msgid "Grant access to LuCI app frps"
-msgstr "授予 luci-app-frps 擁有存取的權限"
+msgstr "授予存取luci-app-frps的權限"
 
 #: applications/luci-app-frps/htdocs/luci-static/resources/view/frps.js:42
 msgid ""
@@ -196,7 +196,7 @@ msgstr "日誌檔案"
 
 #: applications/luci-app-frps/htdocs/luci-static/resources/view/frps.js:33
 msgid "Log level"
-msgstr "日誌級別"
+msgstr "日誌等級"
 
 #: applications/luci-app-frps/htdocs/luci-static/resources/view/frps.js:34
 msgid "Log max days"
@@ -259,7 +259,7 @@ msgid ""
 "OS environments pass to frp for config file template, see <a href=\"https://"
 "github.com/fatedier/frp#configuration-file-template\">frp README</a>"
 msgstr ""
-"傳遞到 frp 組態檔模板的作業系統環境變數，請參閱 <a href=\"https://github.com/"
+"傳遞至frp設定檔範本的作業系統環境變數，請參閱 <a href=\"https://github.com/"
 "fatedier/frp#configuration-file-template\">frp README</a>"
 
 #: applications/luci-app-frps/htdocs/luci-static/resources/view/frps.js:23
@@ -304,8 +304,8 @@ msgid ""
 "this value is \"\"."
 msgstr ""
 "SubDomainHost指定當使用Vhost代理時將附加到客戶端請求網域的子網域. 例如, 如果"
-"將此值設置為“frps.com”, 並且客戶端請求了子域“test”, 則結果URL將為“ test.frps."
-"com”. <br />預設情況下，此值為“”."
+"將此值設定為“frps.com”, 並且客戶端請求了子域“test”, 則結果URL將為“ "
+"test.frps.com”. <br />預設情況下，此值為“”."
 
 #: applications/luci-app-frps/htdocs/luci-static/resources/view/frps.js:37
 msgid "Subdomain host"
@@ -327,7 +327,7 @@ msgstr ""
 msgid ""
 "This list can be used to specify some additional parameters which have not "
 "been included in this LuCI."
-msgstr "此列表可用於指定此LuCI中未包括的某些其他額外參數."
+msgstr "此列表用於指定此LuCI中未包括的某些其他額外參數。"
 
 #: applications/luci-app-frps/htdocs/luci-static/resources/view/frps.js:36
 msgid "Token"
@@ -372,7 +372,7 @@ msgid ""
 "VhostHttpTimeout specifies the response header timeout for the Vhost HTTP "
 "server, in seconds.<br />By default, this value is 60."
 msgstr ""
-"VhostHttpTimeout指定虛擬主機HTTP伺服器的響應標頭逾時, 以秒為單位. <br />預設"
+"VhostHttpTimeout指定虛擬主機HTTP伺服器的回應標頭逾時, 以秒為單位. <br />預設"
 "情況下, 此值為60."
 
 #: applications/luci-app-frps/htdocs/luci-static/resources/view/frps.js:25

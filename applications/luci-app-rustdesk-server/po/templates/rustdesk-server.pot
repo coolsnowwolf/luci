@@ -1,0 +1,115 @@
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8"
+
+#: applications/luci-app-rustdesk-server/htdocs/luci-static/resources/view/rustdesk-server.js:75
+msgid "Allow connection from Internet"
+msgstr ""
+
+#: applications/luci-app-rustdesk-server/htdocs/luci-static/resources/view/rustdesk-server.js:81
+msgid "Always use relay"
+msgstr ""
+
+#: applications/luci-app-rustdesk-server/htdocs/luci-static/resources/view/rustdesk-server.js:61
+#: applications/luci-app-rustdesk-server/htdocs/luci-static/resources/view/rustdesk-server.js:62
+msgid "Collecting data…"
+msgstr ""
+
+#: applications/luci-app-rustdesk-server/htdocs/luci-static/resources/view/rustdesk-server.js:91
+msgid "Delay before downgrade check (in seconds)."
+msgstr ""
+
+#: applications/luci-app-rustdesk-server/htdocs/luci-static/resources/view/rustdesk-server.js:82
+msgid "Disallows direct peer connection if enabled."
+msgstr ""
+
+#: applications/luci-app-rustdesk-server/htdocs/luci-static/resources/view/rustdesk-server.js:90
+msgid "Downgrade check delay"
+msgstr ""
+
+#: applications/luci-app-rustdesk-server/htdocs/luci-static/resources/view/rustdesk-server.js:94
+msgid "Downgrade check threshold"
+msgstr ""
+
+#: applications/luci-app-rustdesk-server/htdocs/luci-static/resources/view/rustdesk-server.js:88
+msgid "Enable RustDesk Relay"
+msgstr ""
+
+#: applications/luci-app-rustdesk-server/htdocs/luci-static/resources/view/rustdesk-server.js:79
+msgid "Enable RustDesk Server"
+msgstr ""
+
+#: applications/luci-app-rustdesk-server/htdocs/luci-static/resources/view/rustdesk-server.js:73
+msgid ""
+"Force the use of a specific key if set. Force the use of any key if set to "
+"\"_\"."
+msgstr ""
+
+#: applications/luci-app-rustdesk-server/htdocs/luci-static/resources/view/rustdesk-server.js:66
+msgid "Global settings"
+msgstr ""
+
+#: applications/luci-app-rustdesk-server/root/usr/share/rpcd/acl.d/luci-app-rustdesk-server.json:3
+msgid "Grant UCI access for luci-app-rustdesk-server"
+msgstr ""
+
+#: applications/luci-app-rustdesk-server/htdocs/luci-static/resources/view/rustdesk-server.js:72
+msgid "Key"
+msgstr ""
+
+#: applications/luci-app-rustdesk-server/htdocs/luci-static/resources/view/rustdesk-server.js:68
+msgid "Listen port"
+msgstr ""
+
+#: applications/luci-app-rustdesk-server/htdocs/luci-static/resources/view/rustdesk-server.js:107
+msgid "Max bandwidth for a single connection (in Mb/s)."
+msgstr ""
+
+#: applications/luci-app-rustdesk-server/htdocs/luci-static/resources/view/rustdesk-server.js:103
+msgid "Max total bandwidth (in Mb/s)."
+msgstr ""
+
+#: applications/luci-app-rustdesk-server/htdocs/luci-static/resources/view/rustdesk-server.js:33
+msgid "NOT RUNNING"
+msgstr ""
+
+#: applications/luci-app-rustdesk-server/htdocs/luci-static/resources/view/rustdesk-server.js:33
+msgid "RUNNING"
+msgstr ""
+
+#: applications/luci-app-rustdesk-server/htdocs/luci-static/resources/view/rustdesk-server.js:86
+msgid "Relay settings"
+msgstr ""
+
+#: applications/luci-app-rustdesk-server/htdocs/luci-static/resources/view/rustdesk-server.js:32
+msgid "RustDesk Relay"
+msgstr ""
+
+#: applications/luci-app-rustdesk-server/htdocs/luci-static/resources/view/rustdesk-server.js:32
+#: applications/luci-app-rustdesk-server/htdocs/luci-static/resources/view/rustdesk-server.js:44
+#: applications/luci-app-rustdesk-server/root/usr/share/luci/menu.d/luci-app-rustdesk-server.json:3
+msgid "RustDesk Server"
+msgstr ""
+
+#: applications/luci-app-rustdesk-server/htdocs/luci-static/resources/view/rustdesk-server.js:77
+msgid "Server settings"
+msgstr ""
+
+#: applications/luci-app-rustdesk-server/htdocs/luci-static/resources/view/rustdesk-server.js:106
+msgid "Single bandwidth"
+msgstr ""
+
+#: applications/luci-app-rustdesk-server/htdocs/luci-static/resources/view/rustdesk-server.js:98
+msgid "Speed limit"
+msgstr ""
+
+#: applications/luci-app-rustdesk-server/htdocs/luci-static/resources/view/rustdesk-server.js:99
+msgid "Speed limit (in Mb/s)."
+msgstr ""
+
+#: applications/luci-app-rustdesk-server/htdocs/luci-static/resources/view/rustdesk-server.js:95
+msgid "Threshold of downgrade check (bit/ms)."
+msgstr ""
+
+#: applications/luci-app-rustdesk-server/htdocs/luci-static/resources/view/rustdesk-server.js:102
+msgid "Total bandwidth"
+msgstr ""

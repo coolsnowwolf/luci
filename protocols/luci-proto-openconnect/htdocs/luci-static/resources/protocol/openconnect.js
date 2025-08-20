@@ -4,14 +4,14 @@
 'require network';
 'require validation';
 
-var callGetCertificateFiles = rpc.declare({
+const callGetCertificateFiles = rpc.declare({
 	object: 'luci.openconnect',
 	method: 'getCertificates',
 	params: [ 'interface' ],
 	expect: { '': {} }
 });
 
-var callSetCertificateFiles = rpc.declare({
+const callSetCertificateFiles = rpc.declare({
 	object: 'luci.openconnect',
 	method: 'setCertificates',
 	params: [ 'interface', 'user_certificate', 'user_privatekey', 'ca_certificate' ],
@@ -22,14 +22,14 @@ network.registerPatternVirtual(/^vpn-.+$/);
 
 function sanitizeCert(s) {
 	if (typeof(s) != 'string')
-		return null;
+		return '';
 
 	s = s.trim();
 
 	if (s == '')
-		return null;
+		return s;
 
-	s = s.replace(/\r\n?/g, '\n');
+	s = s.replace(/\r?\n/g, '\n');
 
 	if (!s.match(/\n$/))
 		s += '\n';
@@ -38,38 +38,36 @@ function sanitizeCert(s) {
 }
 
 function validateCert(priv, section_id, value) {
-	var beg = priv ? /^-----BEGIN (RSA )?PRIVATE KEY-----$/ : /^-----BEGIN CERTIFICATE-----$/,
-	    end = priv ? /^-----END (RSA )?PRIVATE KEY-----$/ : /^-----END CERTIFICATE-----$/,
-	    lines = value.trim().split(/[\r\n]/),
-	    start = false,
-	    i;
-
-	if (value === null || value === '')
+	if (!value?.trim())
 		return true;
 
-	for (i = 0; i < lines.length; i++) {
-		if (lines[i].match(beg))
-			start = true;
-		else if (start && !lines[i].match(/^(?:[A-Za-z0-9+\/]{4})*(?:[A-Za-z0-9+\/]{2}==|[A-Za-z0-9+\/]{3}=)?$/))
-			break;
-	}
+	const beg = priv ? /^-----BEGIN (RSA )?PRIVATE KEY-----$/ : /^-----BEGIN CERTIFICATE-----$/;
+	const end = priv ? /^-----END (RSA )?PRIVATE KEY-----$/ : /^-----END CERTIFICATE-----$/;
+	const lines = value.trim().split(/[\r?\n]/);
+	const base64 = /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/;
+	const errmsg = _('This does not look like a valid PEM file');
 
-	if (!start || i < lines.length - 1 || !lines[i].match(end))
-		return _('This does not look like a valid PEM file');
+
+	if (!lines?.[0].match(beg) || !lines.at(-1).match(end))
+		return errmsg;
+
+	for (let i = 1; i < lines.length - 1; i++)
+		if (!base64.test(lines[i]))
+			return errmsg;
 
 	return true;
 }
 
 return network.registerProtocol('openconnect', {
 	getI18n: function() {
-		return _('OpenConnect (CISCO AnyConnect)');
+		return _('OpenConnect');
 	},
 
 	getIfname: function() {
 		return this._ubus('l3_device') || 'vpn-%s'.format(this.sid);
 	},
 
-	getOpkgPackage: function() {
+	getPackageName: function() {
 		return 'openconnect';
 	},
 
@@ -90,25 +88,29 @@ return network.registerProtocol('openconnect', {
 	},
 
 	renderFormOptions: function(s) {
-		var dev = this.getDevice().getName(),
-		    certLoadPromise = null,
-		    o;
+		const dev = this.getDevice().getName();
+		let certLoadPromise = null;
+		let o;
 
 		o = s.taboption('general', form.ListValue, 'vpn_protocol', _('VPN Protocol'));
-		o.value('anyconnect', 'Cisco AnyConnect SSL VPN');
+		o.value('anyconnect', 'OpenConnect or Cisco AnyConnect SSL VPN');
 		o.value('nc', 'Juniper Network Connect');
-		o.value('gp', 'GlobalProtect SSL VPN');
+		o.value('gp', 'Palo Alto Networks GlobalProtect');
 		o.value('pulse', 'Pulse Connect Secure SSL VPN');
+		o.value('f5', 'F5 BIG-IP SSL VPN');
+		o.value('fortinet', 'Fortinet SSL VPN');
+		o.value('array', 'Array Networks SSL VPN');
 
-		o = s.taboption('general', form.Value, 'server', _('VPN Server'));
+		o = s.taboption('general', form.Value, 'uri', _('VPN Server'));
+		o.placeholder = 'https://example.com:443/usergroup';
 		o.validate = function(section_id, value) {
-			var m = String(value).match(/^(?:(\w+):\/\/|)(?:\[([0-9a-f:.]{2,45})\]|([^\/:]+))(?::([0-9]{1,5}))?(?:\/.*)?$/i);
+			const m = String(value).match(/^(?:(\w+):\/\/|)(?:\[([0-9a-f:.]{2,45})\]|([^\/:]+))(?::([0-9]{1,5}))?(?:\/.*)?$/i);
 
 			if (!m)
 				return _('Invalid server URL');
 
 			if (m[1] != null) {
-				if (!m[1].match(/^(?:http|https|socks|socks4|socks5)$/i))
+				if (!m[1].match(/^(?:https|socks|socks4|socks5)$/i))
 					return _('Unsupported protocol');
 			}
 
@@ -137,13 +139,8 @@ return network.registerProtocol('openconnect', {
 			return true;
 		};
 
-		o = s.taboption('general', form.Value, 'port', _('VPN Server port'));
-		o.placeholder = '443';
-		o.datatype    = 'port';
-
 		s.taboption('general', form.Value, 'serverhash', _("VPN Server's certificate SHA1 hash"));
 		s.taboption('general', form.Value, 'authgroup', _('Auth Group'));
-		s.taboption('general', form.Value, 'usergroup', _('User Group'));
 		s.taboption("general", form.Value, "username", _("Username"));
 
 		o = s.taboption('general', form.Value, 'password', _('Password'));
@@ -164,7 +161,7 @@ return network.registerProtocol('openconnect', {
 			return certLoadPromise.then(function(certs) { return certs.user_certificate });
 		};
 		o.write = function(section_id, value) {
-			return callSetCertificateFiles(section_id, sanitizeCert(value), null, null);
+			return callSetCertificateFiles(section_id, sanitizeCert(value), '', '');
 		};
 
 		o = s.taboption('general', form.TextValue, 'userkey', _('User key (PEM encoded)'));
@@ -176,7 +173,7 @@ return network.registerProtocol('openconnect', {
 			return certLoadPromise.then(function(certs) { return certs.user_privatekey });
 		};
 		o.write = function(section_id, value) {
-			return callSetCertificateFiles(section_id, null, sanitizeCert(value), null);
+			return callSetCertificateFiles(section_id, '', sanitizeCert(value), '');
 		};
 
 		o = s.taboption('general', form.TextValue, 'ca', _('CA certificate; if empty it will be saved after the first connection.'));
@@ -188,7 +185,7 @@ return network.registerProtocol('openconnect', {
 			return certLoadPromise.then(function(certs) { return certs.ca_certificate });
 		};
 		o.write = function(section_id, value) {
-			return callSetCertificateFiles(section_id, null, null, sanitizeCert(value));
+			return callSetCertificateFiles(section_id, '', '', sanitizeCert(value));
 		};
 
 		o = s.taboption('advanced', form.Value, 'mtu', _('Override MTU'));

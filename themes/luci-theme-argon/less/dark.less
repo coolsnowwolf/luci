@@ -3,7 +3,7 @@
  *  Argon is a clean HTML5 theme for LuCI. It is based on luci-theme-material and Argon Template
  *
  *  luci-theme-argon
- *      Copyright 2023 Jerryk <jerrykuku@gmail.com>
+ *      Copyright 2025 Jerryk <jerrykuku@gmail.com>
  *
  *  Have a bug? Please create an issue here on GitHub!
  *      https://github.com/jerrykuku/luci-theme-argon/issues
@@ -502,6 +502,11 @@ textarea {
     background-color: #1e1e1e;
 }
 
+.cbi-section[id] .cbi-section-remove:nth-of-type(4n+3),
+.cbi-section[id] .cbi-section-node:nth-of-type(4n+4) {
+    background-color: #1e1e1e;
+}
+
 .node-system-packages > .main table tr td:nth-last-child(1) {
     color: #ccc;
 
@@ -807,7 +812,9 @@ div[style="width:100%;height:300px;border:1px solid #000;background:#fff"] {
 [data-page="admin-system-flash"] {
     .modal {
         label > input[type="checkbox"] {
-            top: -0.35rem;
+            vertical-align: text-top;
+            top: auto;
+            border-color: #fff !important;
         }
 
         .btn {
@@ -985,6 +992,7 @@ input,
 
 }
 
+[data-page=""],
 [data-page="admin-dashboard"] {
     .main-right > #maincontent {
         .Dashboard {
@@ -1001,19 +1009,17 @@ input,
             .dashboard-bg {
                 background-color: #333333;
             }
-        }
 
-        .router-status-info .title img,
-        .lan-info .title img,
-        .wifi-info .title img {
-            filter: invert(90%);
-        }
+            img.svgmonochrome {
+                filter: invert(90%);
+            }
 
-        tr {
-            border-top: thin solid #4d4d4d;
+            tr {
+                border-top: thin solid #4d4d4d;
 
-            &:last-child {
-                border-bottom: thin solid #4d4d4d;
+                &:last-child {
+                    border-bottom: thin solid #4d4d4d;
+                }
             }
         }
     }
@@ -1027,9 +1033,34 @@ input,
     .fb-container td[class$="-icon"]::before {
         filter: invert(0.7);
     }
+
+    div#list-content {
+        table.cbi-section-table {
+            tbody {
+                tr:nth-child(1) {
+                    td.parent-icon {
+                        background: #1e1e1e !important;
+                    }
+                }
+            }
+        }
+    }
 }
 
 [data-page^="admin-services-openclash"] {
+    .oc {
+        --bg-light: #1e1e1e !important;
+        --bg-gray: #1e1e1e !important;
+
+        .developer-container {
+            background: transparent !important;
+        }
+    }
+
+    .config-upload-content{
+        background: #1e1e1e !important;
+    }
+
     .cbi-tabmenu::-webkit-scrollbar-thumb {
         background-color: #5b5b5b;
     }
@@ -1086,6 +1117,20 @@ input,
 
     .ifacebox-head[style*="--zone-color-rgb: 238, 238, 238;"] {
         background-color: #666 !important;
+    }
+
+    #modal_overlay > .modal.cbi-modal > div > p > textarea {
+        border: 1px solid #3c3c3c !important;
+        background-color: transparent !important;
+    }
+
+    #modal_overlay div[data-tab="peers"] div[data-name="_peers"] .ifacebadge code {
+        color: #fff !important;
+        background-color: transparent !important;
+    }
+
+    #modal_overlay > .modal.cbi-modal > div > p > textarea {
+        color: #ccc!important;
     }
 }
 

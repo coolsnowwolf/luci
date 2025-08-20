@@ -8,21 +8,15 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=luci-app-privoxy
 
-# Version == major.minor.patch
-# increase "minor" on new functionality and "patch" on patches/optimization
 PKG_VERSION:=1.0.6
 
-# Release == build
-# increase on changes of translation files
 PKG_RELEASE:=2
 
 PKG_LICENSE:=Apache-2.0
-PKG_MAINTAINER:=
+PKG_MAINTAINER:=Christian Schoenebeck <christian.schoenebeck@gmail.com>
 
-# LuCI specific settings
 LUCI_TITLE:=LuCI Support for Privoxy WEB proxy
-LUCI_DEPENDS:=+luci-compat +luci-lib-ipkg +luci-mod-admin-full +privoxy
-LUCI_PKGARCH:=all
+LUCI_DEPENDS:=+luci-compat +luci-lib-ipkg +luci-base +privoxy
 
 define Package/$(PKG_NAME)/config
 # shown in make menuconfig <Help>

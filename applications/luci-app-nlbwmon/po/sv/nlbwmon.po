@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2022-12-06 15:41+0000\n"
+"PO-Revision-Date: 2025-03-05 20:26+0000\n"
 "Last-Translator: Kristoffer Grundström <swedishsailfishosuser@tutanota.com>\n"
 "Language-Team: Swedish <https://hosted.weblate.org/projects/openwrt/"
 "luciapplicationsnlbwmon/sv/>\n"
@@ -8,7 +8,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 4.15-dev\n"
+"X-Generator: Weblate 5.10.3-dev\n"
 
 #: applications/luci-app-nlbwmon/htdocs/luci-static/resources/view/nlbw/display.js:563
 msgid "%d IPv4-only hosts"
@@ -42,27 +42,27 @@ msgstr "-7 - Starta om en vecka i slutet av månaden"
 msgid "1 - Restart every 1st of month"
 msgstr "1 - Starta om 1:a dagen i månaden"
 
-#: applications/luci-app-nlbwmon/htdocs/luci-static/resources/view/nlbw/config.js:161
+#: applications/luci-app-nlbwmon/htdocs/luci-static/resources/view/nlbw/config.js:162
 msgid "10m - frequent commits at the expense of flash wear"
 msgstr ""
 
-#: applications/luci-app-nlbwmon/htdocs/luci-static/resources/view/nlbw/config.js:160
+#: applications/luci-app-nlbwmon/htdocs/luci-static/resources/view/nlbw/config.js:161
 msgid "12h - compromise between risk of data loss and flash wear"
 msgstr ""
 
-#: applications/luci-app-nlbwmon/htdocs/luci-static/resources/view/nlbw/config.js:159
+#: applications/luci-app-nlbwmon/htdocs/luci-static/resources/view/nlbw/config.js:160
 msgid "24h - least flash wear at the expense of data loss risk"
 msgstr ""
 
-#: applications/luci-app-nlbwmon/htdocs/luci-static/resources/view/nlbw/config.js:166
+#: applications/luci-app-nlbwmon/htdocs/luci-static/resources/view/nlbw/config.js:167
 msgid "30s - refresh twice per minute for reasonably current stats"
 msgstr "30s - uppdatera 2 gånger per minut för någorlunda aktuell statistik"
 
-#: applications/luci-app-nlbwmon/htdocs/luci-static/resources/view/nlbw/config.js:167
+#: applications/luci-app-nlbwmon/htdocs/luci-static/resources/view/nlbw/config.js:168
 msgid "5m - rarely refresh to avoid frequently clearing conntrack counters"
 msgstr ""
 
-#: applications/luci-app-nlbwmon/htdocs/luci-static/resources/view/nlbw/config.js:162
+#: applications/luci-app-nlbwmon/htdocs/luci-static/resources/view/nlbw/config.js:163
 msgid "60s - commit minutely, useful for non-flash storage"
 msgstr ""
 
@@ -136,7 +136,7 @@ msgstr "Säkerhetskopiera"
 
 #: applications/luci-app-nlbwmon/root/usr/share/luci/menu.d/luci-app-nlbwmon.json:3
 msgid "Bandwidth Monitor"
-msgstr ""
+msgstr "Bandbreddsövervakare"
 
 #: applications/luci-app-nlbwmon/htdocs/luci-static/resources/view/nlbw/config.js:76
 msgid ""
@@ -157,7 +157,7 @@ msgstr ""
 msgid "Collecting data..."
 msgstr "Samlar in data..."
 
-#: applications/luci-app-nlbwmon/htdocs/luci-static/resources/view/nlbw/config.js:157
+#: applications/luci-app-nlbwmon/htdocs/luci-static/resources/view/nlbw/config.js:158
 msgid "Commit interval"
 msgstr ""
 
@@ -171,7 +171,7 @@ msgstr "Konfiguration"
 
 #: applications/luci-app-nlbwmon/htdocs/luci-static/resources/view/nlbw/display.js:628
 msgid "Conn."
-msgstr ""
+msgstr "Anslut."
 
 #: applications/luci-app-nlbwmon/htdocs/luci-static/resources/view/nlbw/display.js:861
 #: applications/luci-app-nlbwmon/htdocs/luci-static/resources/view/nlbw/display.js:907
@@ -182,11 +182,11 @@ msgstr "Anslutningar"
 msgid "Connections / Host"
 msgstr ""
 
-#: applications/luci-app-nlbwmon/htdocs/luci-static/resources/view/nlbw/config.js:169
-msgid "Database directory"
-msgstr ""
-
 #: applications/luci-app-nlbwmon/htdocs/luci-static/resources/view/nlbw/config.js:170
+msgid "Database directory"
+msgstr "Databasens katalog"
+
+#: applications/luci-app-nlbwmon/htdocs/luci-static/resources/view/nlbw/config.js:171
 msgid ""
 "Database storage directory. One file per accounting period will be placed "
 "into this directory."
@@ -213,11 +213,11 @@ msgstr "Visa"
 
 #: applications/luci-app-nlbwmon/htdocs/luci-static/resources/view/nlbw/display.js:629
 msgid "Down. (Bytes)"
-msgstr ""
+msgstr "Hämt. (Bytes)"
 
 #: applications/luci-app-nlbwmon/htdocs/luci-static/resources/view/nlbw/display.js:630
 msgid "Down. (Pkts.)"
-msgstr ""
+msgstr "Hämt. (Pkt.)"
 
 #: applications/luci-app-nlbwmon/htdocs/luci-static/resources/view/nlbw/display.js:611
 msgctxt "Traffic counter"
@@ -228,13 +228,13 @@ msgstr "Nedladdning"
 #: applications/luci-app-nlbwmon/htdocs/luci-static/resources/view/nlbw/display.js:908
 #: applications/luci-app-nlbwmon/htdocs/luci-static/resources/view/nlbw/display.js:955
 msgid "Download (Bytes)"
-msgstr ""
+msgstr "Hämta (Bytes)"
 
 #: applications/luci-app-nlbwmon/htdocs/luci-static/resources/view/nlbw/display.js:863
 #: applications/luci-app-nlbwmon/htdocs/luci-static/resources/view/nlbw/display.js:909
 #: applications/luci-app-nlbwmon/htdocs/luci-static/resources/view/nlbw/display.js:956
 msgid "Download (Packets)"
-msgstr ""
+msgstr "Hämta (Paket)"
 
 #: applications/luci-app-nlbwmon/htdocs/luci-static/resources/view/nlbw/display.js:885
 msgid "Download / Application"
@@ -262,7 +262,7 @@ msgstr ""
 #: applications/luci-app-nlbwmon/htdocs/luci-static/resources/view/nlbw/display.js:1001
 #: applications/luci-app-nlbwmon/htdocs/luci-static/resources/view/nlbw/display.js:1010
 msgid "Export"
-msgstr ""
+msgstr "Exportera"
 
 #: applications/luci-app-nlbwmon/htdocs/luci-static/resources/view/nlbw/display.js:804
 msgid "Failed to commit database: %s"
@@ -282,7 +282,7 @@ msgstr ""
 
 #: applications/luci-app-nlbwmon/htdocs/luci-static/resources/view/nlbw/display.js:954
 msgid "Family"
-msgstr ""
+msgstr "Familj"
 
 #: applications/luci-app-nlbwmon/htdocs/luci-static/resources/view/nlbw/config.js:73
 msgid "Fixed interval"
@@ -342,15 +342,15 @@ msgstr "IPv6"
 
 #: applications/luci-app-nlbwmon/htdocs/luci-static/resources/view/nlbw/config.js:111
 msgid "Interval"
-msgstr ""
+msgstr "Intervall"
 
-#: applications/luci-app-nlbwmon/htdocs/luci-static/resources/view/nlbw/config.js:158
+#: applications/luci-app-nlbwmon/htdocs/luci-static/resources/view/nlbw/config.js:159
 msgid ""
 "Interval at which the temporary in-memory database is committed to the "
 "persistent database directory."
 msgstr ""
 
-#: applications/luci-app-nlbwmon/htdocs/luci-static/resources/view/nlbw/config.js:165
+#: applications/luci-app-nlbwmon/htdocs/luci-static/resources/view/nlbw/config.js:166
 msgid ""
 "Interval at which traffic counters of still established connections are "
 "refreshed from netlink information."
@@ -381,7 +381,7 @@ msgstr ""
 msgid "Maximum entries"
 msgstr ""
 
-#: applications/luci-app-nlbwmon/htdocs/luci-static/resources/view/nlbw/config.js:155
+#: applications/luci-app-nlbwmon/htdocs/luci-static/resources/view/nlbw/config.js:156
 msgid ""
 "Maximum number of accounting periods to keep, use zero to keep databases "
 "forever."
@@ -432,7 +432,7 @@ msgid ""
 "number and the third column is the name of the mapped protocol."
 msgstr ""
 
-#: applications/luci-app-nlbwmon/htdocs/luci-static/resources/view/nlbw/config.js:164
+#: applications/luci-app-nlbwmon/htdocs/luci-static/resources/view/nlbw/config.js:165
 msgid "Refresh interval"
 msgstr ""
 
@@ -468,7 +468,7 @@ msgstr ""
 msgid "Start date of the first accounting period, e.g. begin of ISP contract."
 msgstr ""
 
-#: applications/luci-app-nlbwmon/htdocs/luci-static/resources/view/nlbw/config.js:154
+#: applications/luci-app-nlbwmon/htdocs/luci-static/resources/view/nlbw/config.js:155
 msgid "Stored periods"
 msgstr ""
 
@@ -511,7 +511,7 @@ msgstr ""
 #: applications/luci-app-nlbwmon/htdocs/luci-static/resources/view/nlbw/display.js:615
 msgctxt "Traffic counter"
 msgid "Upload"
-msgstr ""
+msgstr "Ladda upp"
 
 #: applications/luci-app-nlbwmon/htdocs/luci-static/resources/view/nlbw/display.js:864
 #: applications/luci-app-nlbwmon/htdocs/luci-static/resources/view/nlbw/display.js:910
@@ -563,4 +563,4 @@ msgstr ""
 #: applications/luci-app-nlbwmon/htdocs/luci-static/resources/view/nlbw/display.js:653
 #: applications/luci-app-nlbwmon/htdocs/luci-static/resources/view/nlbw/display.js:658
 msgid "other"
-msgstr ""
+msgstr "andra"

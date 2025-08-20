@@ -1,0 +1,12 @@
+
+config instance 'example'
+	option enabled '0'
+	option listen_addr '::'
+	option listen_port '25'
+	option dest_addr 'mail.my.provider'
+	option dest_port '25'
+	option protocol 'tcp'
+	option ip_prefer ''
+	option logging '0'
+	option firewall '0'
+

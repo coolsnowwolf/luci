@@ -1,14 +1,14 @@
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2024-03-02 21:56+0000\n"
-"Last-Translator: ssantos <ssantos@web.de>\n"
+"PO-Revision-Date: 2025-05-04 20:13+0000\n"
+"Last-Translator: Bob Idle <102661087+bobidle@users.noreply.github.com>\n"
 "Language-Team: German <https://hosted.weblate.org/projects/openwrt/"
 "luciapplicationsaria2/de/>\n"
 "Language: de\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.5-dev\n"
+"X-Generator: Weblate 5.12-dev\n"
 
 #: applications/luci-app-aria2/htdocs/luci-static/resources/view/aria2/config.js:433
 msgid "<abbr title=\"Local Peer Discovery\">LPD</abbr> enabled"
@@ -79,14 +79,14 @@ msgid ""
 "Close connection if download speed is lower than or equal to this value "
 "(bytes per sec). 0 means has no lowest speed limit."
 msgstr ""
-"Schließe die Verbindung wenn die Download-Geschwinidigkeit niedriger oder "
+"Schließe die Verbindung wenn die Download-Geschwindigkeit niedriger oder "
 "gleich dieses Wertes (Bytes pro Sekunde) ist. 0 heißt es gibt keine "
 "niedrigste Geschwindigkeitsgrenze."
 
 #: applications/luci-app-aria2/htdocs/luci-static/resources/view/aria2/config.js:29
 #: applications/luci-app-aria2/htdocs/luci-static/resources/view/aria2/log.js:51
 msgid "Collecting data..."
-msgstr "Sammle Daten..."
+msgstr "Daten werden gesammelt..."
 
 #: applications/luci-app-aria2/htdocs/luci-static/resources/view/aria2/config.js:216
 msgid "Config file directory"
@@ -145,8 +145,7 @@ msgstr "Download-Verzeichnis"
 #: applications/luci-app-aria2/htdocs/luci-static/resources/view/aria2/config.js:417
 msgid "Enable IPv4 DHT functionality. It also enables UDP tracker support."
 msgstr ""
-"Aktiviere IPv4 DHT Funktionalität. Aktiviviert auch UDP-Tracker-"
-"Unterstützung."
+"Aktiviere IPv4 DHT Funktionalität. Aktiviert auch UDP-Tracker-Unterstützung."
 
 #: applications/luci-app-aria2/htdocs/luci-static/resources/view/aria2/config.js:427
 msgid "Enable IPv6 DHT functionality."
@@ -300,8 +299,8 @@ msgstr "Liste von Announce-URIs zusätzlicher BitTorrent-Tracker."
 
 #: applications/luci-app-aria2/htdocs/luci-static/resources/view/aria2/config.js:625
 msgid ""
-"List of extra settings. Format: option=value, eg. <code>netrc-path=/tmp/."
-"netrc</code>."
+"List of extra settings. Format: option=value, eg. <code>netrc-path=/"
+"tmp/.netrc</code>."
 msgstr ""
 "Liste der zusätzlichen Einstellungen. Format: Option=Wert, z.B. <code>netrc-"
 "path=/tmp/.netrc</code>."
@@ -324,7 +323,7 @@ msgstr "Protokolldatei"
 
 #: applications/luci-app-aria2/htdocs/luci-static/resources/view/aria2/config.js:228
 msgid "Log level"
-msgstr "Protokollierungsstufe"
+msgstr "Protokollierungslevel"
 
 #: applications/luci-app-aria2/htdocs/luci-static/resources/view/aria2/config.js:377
 msgid "Lowest speed limit"
@@ -389,7 +388,7 @@ msgstr "Keine"
 
 #: applications/luci-app-aria2/htdocs/luci-static/resources/view/aria2/config.js:232
 msgid "Notice"
-msgstr "Notiz"
+msgstr "Hinweis"
 
 #: applications/luci-app-aria2/htdocs/luci-static/resources/view/aria2/config.js:242
 msgid "Pause"
@@ -875,7 +874,7 @@ msgstr ""
 
 #: applications/luci-app-aria2/htdocs/luci-static/resources/view/aria2/config.js:233
 msgid "Warn"
-msgstr "Achtung"
+msgstr "Warn"
 
 #: applications/luci-app-aria2/htdocs/luci-static/resources/view/aria2/config.js:381
 #: applications/luci-app-aria2/htdocs/luci-static/resources/view/aria2/config.js:493

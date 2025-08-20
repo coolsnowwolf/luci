@@ -7,8 +7,9 @@
 include $(TOPDIR)/rules.mk
 
 LUCI_TITLE:=LuCI Support for PageKite
-LUCI_DEPENDS:=+pagekitec
+LUCI_DEPENDS:=+luci-base +pagekitec
 
+PKG_LICENSE:=Apache-2.0
 PKG_MAINTAINER:=Karl Palsson <karlp@tweak.net.au>
 
 include ../../luci.mk

@@ -23,33 +23,41 @@
 			"path": "adblock/overview"
 		}
 	},
+	"admin/services/adblock/allowlist": {
+		"title": "Edit Allowlist",
+		"order": 20,
+		"action": {
+			"type": "view",
+			"path": "adblock/allowlist"
+		}
+	},
+	"admin/services/adblock/blocklist": {
+		"title": "Edit Blocklist",
+		"order": 30,
+		"action": {
+			"type": "view",
+			"path": "adblock/blocklist"
+		}
+	},
+	"admin/services/adblock/feeds": {
+		"title": "Custom Feed Editor",
+		"order": 40,
+		"action": {
+			"type": "view",
+			"path": "adblock/feeds"
+		}
+	},
 	"admin/services/adblock/dnsreport": {
 		"title": "DNS Report",
-		"order": 20,
+		"order": 50,
 		"action": {
 			"type": "view",
 			"path": "adblock/dnsreport"
 		}
 	},
-	"admin/services/adblock/blacklist": {
-		"title": "Edit Blacklist",
-		"order": 30,
-		"action": {
-			"type": "view",
-			"path": "adblock/blacklist"
-		}
-	},
-	"admin/services/adblock/whitelist": {
-		"title": "Edit Whitelist",
-		"order": 40,
-		"action": {
-			"type": "view",
-			"path": "adblock/whitelist"
-		}
-	},
 	"admin/services/adblock/logread": {
 		"title": "Log View",
-		"order": 50,
+		"order": 60,
 		"action": {
 			"type": "view",
 			"path": "adblock/logread"

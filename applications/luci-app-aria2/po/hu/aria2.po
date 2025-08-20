@@ -1,14 +1,14 @@
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2022-12-14 00:53+0000\n"
-"Last-Translator: Gajdos Tamás <gajdipajti@gmail.com>\n"
+"PO-Revision-Date: 2025-05-08 13:02+0000\n"
+"Last-Translator: hmzs <hmzs@1szer1.hu>\n"
 "Language-Team: Hungarian <https://hosted.weblate.org/projects/openwrt/"
 "luciapplicationsaria2/hu/>\n"
 "Language: hu\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 4.15-dev\n"
+"X-Generator: Weblate 5.12-dev\n"
 
 #: applications/luci-app-aria2/htdocs/luci-static/resources/view/aria2/config.js:433
 msgid "<abbr title=\"Local Peer Discovery\">LPD</abbr> enabled"
@@ -24,7 +24,7 @@ msgstr "Speciális beállítások"
 
 #: applications/luci-app-aria2/htdocs/luci-static/resources/view/aria2/config.js:309
 msgid "All proxy"
-msgstr "Összes proxy"
+msgstr "Minden proxy"
 
 #: applications/luci-app-aria2/htdocs/luci-static/resources/view/aria2/config.js:365
 msgid "Append HEADERs to HTTP request header."
@@ -219,7 +219,7 @@ msgstr "Előállítás véletlenszerűen"
 
 #: applications/luci-app-aria2/root/usr/share/rpcd/acl.d/luci-app-aria2.json:3
 msgid "Grant UCI access for luci-app-aria2"
-msgstr "UCI hozzáférés megadása a luci-app-aria2 alkalmazásnak"
+msgstr "UCI hozzáférés engedélyezése a <em>luci-app-aria2</em> alkalmazásnak"
 
 #: applications/luci-app-aria2/htdocs/luci-static/resources/view/aria2/config.js:347
 msgid "HTTP accept gzip"
@@ -268,7 +268,7 @@ msgstr ""
 
 #: applications/luci-app-aria2/htdocs/luci-static/resources/view/aria2/config.js:231
 msgid "Info"
-msgstr "Információ"
+msgstr "Infó"
 
 #: applications/luci-app-aria2/htdocs/luci-static/resources/view/aria2/config.js:41
 msgid "Installed web interface:"
@@ -300,8 +300,8 @@ msgstr "További BitTorrent követő bejelentési URI-jának listája."
 
 #: applications/luci-app-aria2/htdocs/luci-static/resources/view/aria2/config.js:625
 msgid ""
-"List of extra settings. Format: option=value, eg. <code>netrc-path=/tmp/."
-"netrc</code>."
+"List of extra settings. Format: option=value, eg. <code>netrc-path=/"
+"tmp/.netrc</code>."
 msgstr ""
 "További beállítások listája. Formátum: beállítás=érték, például <code>netrc-"
 "path=/tmp/.netrc</code>."
@@ -324,7 +324,7 @@ msgstr "Naplófájl"
 
 #: applications/luci-app-aria2/htdocs/luci-static/resources/view/aria2/config.js:228
 msgid "Log level"
-msgstr "Naplózási szint"
+msgstr "Naplózás szintje"
 
 #: applications/luci-app-aria2/htdocs/luci-static/resources/view/aria2/config.js:377
 msgid "Lowest speed limit"
@@ -389,7 +389,7 @@ msgstr "Nincs"
 
 #: applications/luci-app-aria2/htdocs/luci-static/resources/view/aria2/config.js:232
 msgid "Notice"
-msgstr "Figyelmeztetés"
+msgstr "Értesítés"
 
 #: applications/luci-app-aria2/htdocs/luci-static/resources/view/aria2/config.js:242
 msgid "Pause"
@@ -791,7 +791,7 @@ msgstr ""
 
 #: applications/luci-app-aria2/htdocs/luci-static/resources/view/aria2/config.js:373
 msgid "Timeout"
-msgstr "Időkorlát"
+msgstr "Időtúllépés"
 
 #: applications/luci-app-aria2/htdocs/luci-static/resources/view/aria2/config.js:260
 msgid "Token"
@@ -837,8 +837,8 @@ msgid ""
 "PKCS12 files with a blank import password can be opened!<br/>When using PEM, "
 "you have to specify the \"Private key\" as well."
 msgstr ""
-"A FÁJLBAN lévő ügyféltanúsítvány használata. A tanúsítványnak vagy PKCS12 (."
-"p12, .pfx), vagy PEM formátumban kell lennie.<br/>A PKCS12 fájloknak "
+"A FÁJLBAN lévő ügyféltanúsítvány használata. A tanúsítványnak vagy PKCS12 "
+"(.p12, .pfx), vagy PEM formátumban kell lennie.<br/>A PKCS12 fájloknak "
 "tartalmazniuk kell a tanúsítványt, egy kulcsot és esetlegesen a további "
 "tanúsítványok láncát. Csak az üres importálási jelszóval rendelkező PKCS12 "
 "fájlok nyithatók meg!<br/>PEM használatakor meg kell adnia a „Személyes "

@@ -1,0 +1,14 @@
+{
+	"admin/status/release_ram": {
+		"title": "Release RAM",
+		"order": 999,
+		"action": {
+			"type": "function",
+			"module": "luci.controller.ramfree",
+			"function": "action_release_ram"
+		},
+		"depends": {
+			"acl": [ "luci-app-ramfree" ]
+		}
+	}
+}

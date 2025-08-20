@@ -1,0 +1,10 @@
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8"
+
+#: applications/luci-app-ramfree/root/usr/share/rpcd/acl.d/luci-app-ramfree.json:3
+msgid "Free Your Boom"
+msgstr ""
+
+#: applications/luci-app-ramfree/root/usr/share/luci/menu.d/luci-app-ramfree.json:3
+msgid "Release RAM"
+msgstr ""

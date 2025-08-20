@@ -1,0 +1,90 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"PO-Revision-Date: 2025-05-11 19:01+0000\n"
+"Last-Translator: Pavel Borecki <pavel.borecki@gmail.com>\n"
+"Language-Team: Czech <https://hosted.weblate.org/projects/openwrt/"
+"luciapplicationssnmpd/cs/>\n"
+"Language: cs\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=((n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2);\n"
+"X-Generator: Weblate 5.12-dev\n"
+
+#: applications/luci-app-snmpd/htdocs/luci-static/resources/view/snmpd/snmpd.js:22
+msgid "Agent settings"
+msgstr "Nastavení agenta"
+
+#: applications/luci-app-snmpd/htdocs/luci-static/resources/view/snmpd/snmpd.js:27
+msgid "AgentX settings"
+msgstr "Nastavení pro AgentX"
+
+#: applications/luci-app-snmpd/htdocs/luci-static/resources/view/snmpd/snmpd.js:28
+msgid "Delete this section to disable AgentX"
+msgstr "AgentX vypnete smazáním této sekce"
+
+#: applications/luci-app-snmpd/htdocs/luci-static/resources/view/snmpd/snmpd.js:25
+msgid "Eg: UDP:161, or UDP:10.5.4.3:161 to only listen on a given interface"
+msgstr ""
+"Např.: UDP:161, nebo UDP:10.5.4.3:161 pokud má být spojení očekáváno pouze "
+"na daném rozhraní"
+
+#: applications/luci-app-snmpd/root/usr/share/rpcd/acl.d/luci-app-snmpd.json:3
+msgid "Grant UCI access for luci-app-snmpd"
+msgstr "Udělit luci-app-snmpd přístup do UCI nastavování"
+
+#: applications/luci-app-snmpd/htdocs/luci-static/resources/view/snmpd/snmpd.js:40
+msgid "Groups help define access methods"
+msgstr "Skupiny pomáhají definovat přístupové metody"
+
+#: applications/luci-app-snmpd/root/usr/share/luci/menu.d/luci-app-snmpd.json:3
+msgid "SNMPD"
+msgstr "SNMPD"
+
+#: applications/luci-app-snmpd/htdocs/luci-static/resources/view/snmpd/snmpd.js:8
+msgid ""
+"SNMPD is a master daemon/agent for SNMP, from the <a href='http://www.net-"
+"snmp.org'>net-snmp project</a>. Note, OpenWrt has mostly complete UCI "
+"support for snmpd, but this LuCI applet only covers a few of those options. "
+"In particular, there is very little/no validation or help. See /etc/config/"
+"snmpd for manual configuration."
+msgstr ""
+"SNMPD je hlavní proces služby / agent pro SNMP, z <a href='http://www.net-"
+"snmp.org'>projektu net-snmp</a>. Mějte na paměti, že OpenWrt má v UCI "
+"nastavování téměř úplnou podporu pro snmpd, ale LuCI applet pokrývá pouze "
+"několik z těchto voleb. Konkrétně, je zde velmi málo / žádná ověřování "
+"správnosti či nápověda. Ohledně ručního nastavování se podívejte do /etc/"
+"config/snmpd."
+
+#: applications/luci-app-snmpd/htdocs/luci-static/resources/view/snmpd/snmpd.js:56
+msgid "System"
+msgstr "Systém"
+
+#: applications/luci-app-snmpd/htdocs/luci-static/resources/view/snmpd/snmpd.js:30
+msgid "The address the agent should allow AgentX connections to"
+msgstr "Adresa agenta, ke které by agent měl umožňovat AgentX spojení"
+
+#: applications/luci-app-snmpd/htdocs/luci-static/resources/view/snmpd/snmpd.js:24
+msgid "The address the agent should listen on"
+msgstr "Adresa na které má agent očekávat spojení"
+
+#: applications/luci-app-snmpd/htdocs/luci-static/resources/view/snmpd/snmpd.js:31
+msgid ""
+"This is only necessary if you have subagents using the agentX socket "
+"protocol. Eg: /var/run/agentx.sock"
+msgstr ""
+"Toto je nezbytné pouze pokud máte dílčí agenty, používající agentX soketový "
+"protokol. Např.: /var/run/agentx.sock"
+
+#: applications/luci-app-snmpd/htdocs/luci-static/resources/view/snmpd/snmpd.js:56
+msgid "Values used in the MIB2 System tree"
+msgstr "Hodnoty použité v MIB2 systémovém stromu"
+
+#: applications/luci-app-snmpd/htdocs/luci-static/resources/view/snmpd/snmpd.js:35
+msgid "com2sec security"
+msgstr "zabezpečení com2sec"
+
+#: applications/luci-app-snmpd/htdocs/luci-static/resources/view/snmpd/snmpd.js:20
+msgid "net-snmp's SNMPD"
+msgstr "SNMPD od net-snmp"

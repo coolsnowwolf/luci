@@ -29,8 +29,6 @@ o = s:option(ListValue, "rule_sources", translate("Choose Template For Create Co
 o.description = translate("Use Other Rules To Create Config")
 o:depends("create_config", 1)
 o:value("lhie1", translate("lhie1 Rules"))
-o:value("ConnersHua", translate("ConnersHua(Provider-type) Rules"))
-o:value("ConnersHua_return", translate("ConnersHua Return Rules"))
 
 o = s:option(Flag, "mix_proxies", translate("Mix Proxies"))
 o.description = font_red .. bold_on .. translate("Mix This Page's Proxies") .. bold_off .. font_off
@@ -255,10 +253,9 @@ o = a:option(Button,"Load_Config", " ")
 o.inputtitle = translate("Read Config")
 o.inputstyle = "apply"
 o.write = function()
-  m.uci:set("openclash", "config", "enable", 0)
-  m.uci:commit("openclash")
-  luci.sys.call("/usr/share/openclash/yml_groups_get.sh 2>/dev/null &")
-  luci.http.redirect(luci.dispatcher.build_url("admin", "services", "openclash"))
+	m.uci:commit("openclash")
+	luci.sys.call("/usr/share/openclash/yml_groups_get.sh 2>/dev/null &")
+	luci.http.redirect(luci.dispatcher.build_url("admin", "services", "openclash"))
 end
 
 o = a:option(Button, "Commit", " ") 
@@ -266,19 +263,17 @@ o.inputtitle = translate("Commit Settings")
 o.inputstyle = "apply"
 o.write = function()
 	fs.unlink("/tmp/Proxy_Group")
-  m.uci:set("openclash", "config", "enable", 0)
-  m.uci:commit("openclash")
+	m.uci:commit("openclash")
 end
 
 o = a:option(Button, "Apply", " ")
 o.inputtitle = translate("Apply Settings")
 o.inputstyle = "apply"
 o.write = function()
+	m.uci:commit("openclash")
 	fs.unlink("/tmp/Proxy_Group")
-  m.uci:set("openclash", "config", "enable", 0)
-  m.uci:commit("openclash")
-  luci.sys.call("/usr/share/openclash/yml_groups_set.sh >/dev/null 2>&1 &")
-  luci.http.redirect(luci.dispatcher.build_url("admin", "services", "openclash"))
+	luci.sys.call("/usr/share/openclash/yml_groups_set.sh >/dev/null 2>&1 &")
+	luci.http.redirect(luci.dispatcher.build_url("admin", "services", "openclash"))
 end
 
 m:append(Template("openclash/toolbar_show"))

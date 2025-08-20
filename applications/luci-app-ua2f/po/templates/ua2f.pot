@@ -9,7 +9,7 @@ msgstr ""
 msgid "Change User-Agent to F-words."
 msgstr ""
 
-#: applications/luci-app-ua2f/htdocs/luci-static/resources/view/ua2f.js:82
+#: applications/luci-app-ua2f/htdocs/luci-static/resources/view/ua2f.js:85
 msgid "Check User-Agent"
 msgstr ""
 
@@ -19,6 +19,10 @@ msgstr ""
 
 #: applications/luci-app-ua2f/htdocs/luci-static/resources/view/ua2f.js:80
 msgid "Custom User-Agent"
+msgstr ""
+
+#: applications/luci-app-ua2f/htdocs/luci-static/resources/view/ua2f.js:82
+msgid "Disable conntrack mark"
 msgstr ""
 
 #: applications/luci-app-ua2f/htdocs/luci-static/resources/view/ua2f.js:66
@@ -33,7 +37,7 @@ msgstr ""
 msgid "NOT RUNNING"
 msgstr ""
 
-#: applications/luci-app-ua2f/htdocs/luci-static/resources/view/ua2f.js:83
+#: applications/luci-app-ua2f/htdocs/luci-static/resources/view/ua2f.js:86
 msgid "Open website"
 msgstr ""
 
@@ -47,6 +51,12 @@ msgstr ""
 
 #: applications/luci-app-ua2f/htdocs/luci-static/resources/view/ua2f.js:29
 msgid "RUNNING"
+msgstr ""
+
+#: applications/luci-app-ua2f/htdocs/luci-static/resources/view/ua2f.js:83
+msgid ""
+"This will increase compatibility with other programs that modify conntrack "
+"marks but will decrease performance."
 msgstr ""
 
 #: applications/luci-app-ua2f/htdocs/luci-static/resources/view/ua2f.js:29

@@ -1,41 +1,44 @@
 #!/bin/sh /etc/rc.common
+
 START=50
+USE_PROCD=1
 
-run_reboot()
-{
-	local enable
-	config_get_bool enable $1 enable
+CONF="autoreboot"
+CRON_FILE="/tmp/autoreboot.cron"
 
-	if [ $enable = 1 ]; then
-		local minute
-		local hour
-		config_get week $1 week
-		config_get minute $1 minute
-		config_get hour $1 hour
-    if [ $minute = 0 ] ; then
-        minute="00"
-		fi
-    if [ $week = 7 ] ; then
-        week="*"
-		fi
-		sed -i '/reboot/d' /etc/crontabs/root >/dev/null 2>&1
-		/etc/init.d/cron restart
-		echo "$minute $hour * * $week sleep 5 && touch /etc/banner && reboot" >> /etc/crontabs/root
-		echo "Auto REBOOT has started."
-	else
-		sed -i '/reboot/d' /etc/crontabs/root >/dev/null 2>&1
-		/etc/init.d/cron restart
-		echo "Auto REBOOT has started."
-	fi
+setup_cron() {
+	local cfg="$1"
+
+	local enabled
+	config_get_bool enabled "$cfg" "enabled" "0"
+
+	[ "$enabled" -eq "1" ] || return 1
+
+	local minute hour day month week
+	config_get minute "$cfg" "minute"
+	config_get hour "$cfg" "hour"
+	config_get day "$cfg" "day"
+	config_get month "$cfg" "month"
+	config_get week "$cfg" "week"
+
+	echo "$minute $hour $day $month $week sleep 5 && touch /etc/banner && reboot #${CONF}_$cfg" >> "$CRON_FILE"
 }
 
-start()
-{
-	config_load autoreboot
-	config_foreach run_reboot login
+start_service() {
+	crontab -l | sed "/#${CONF}_/d" > "$CRON_FILE"
+
+	config_load "$CONF"
+	config_foreach setup_cron schedule
+
+	crontab "$CRON_FILE"
+	rm -f "$CRON_FILE"
 }
 
-stop()
-{
-	echo "Auto REBOOT has stoped."
+stop_service() {
+	sed -i "/#${CONF}_/d" "/etc/crontabs/root"
+	/etc/init.d/cron restart
+}
+
+service_triggers() {
+	procd_add_reload_trigger "$CONF"
 }

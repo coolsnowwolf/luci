@@ -17,23 +17,11 @@ bold_off = [[</strong>]]
 
 local op_mode = string.sub(luci.sys.exec('uci get openclash.config.operation_mode 2>/dev/null'),0,-2)
 if not op_mode then op_mode = "redir-host" end
-local lan_int_name = uci:get("openclash", "config", "lan_interface_name") or "0"
-
-local lan_ip
-if lan_int_name == "0" then
-	lan_ip = SYS.exec("uci -q get network.lan.ipaddr |awk -F '/' '{print $1}' 2>/dev/null |tr -d '\n'")
-else
-	lan_ip = SYS.exec(string.format("ip address show %s | grep -w 'inet' 2>/dev/null |grep -Eo 'inet [0-9\.]+' | awk '{print $2}' | tr -d '\n'", lan_int_name))
-end
-if not lan_ip or lan_ip == "" then
-	lan_ip = luci.sys.exec("ip address show $(uci -q -p /tmp/state get network.lan.ifname || uci -q -p /tmp/state get network.lan.device) | grep -w 'inet'  2>/dev/null |grep -Eo 'inet [0-9\.]+' | awk '{print $2}' | tr -d '\n'")
-end
-if not lan_ip or lan_ip == "" then
-	lan_ip = luci.sys.exec("ip addr show 2>/dev/null | grep -w 'inet' | grep 'global' | grep 'brd' | grep -Eo 'inet [0-9\.]+' | awk '{print $2}' | head -n 1 | tr -d '\n'")
-end
+local lan_ip = fs.lanip()
 m = Map("openclash", translate("Overwrite Settings"))
 m.pageaction = false
-m.description = translate("Note: To restore the default configuration, try accessing:").." <a href='javascript:void(0)' onclick='javascript:restore_config(this)'>http://"..lan_ip.."/cgi-bin/luci/admin/services/openclash/restore</a>"
+m.description = translate("Note: To restore the default configuration, try accessing:").." <a href='javascript:void(0)' onclick='javascript:restore_config(this)'>http://"..lan_ip.."/cgi-bin/luci/admin/services/openclash/restore</a>"..
+"<br/>"..font_green..translate("For More Useful Meta Core Functions Go Wiki")..": "..font_off.."<a href='javascript:void(0)' onclick='javascript:return winOpen(\"https://wiki.metacubex.one/\")'>"..translate("https://wiki.metacubex.one/").."</a>"
 
 s = m:section(TypedSection, "openclash")
 s.anonymous = true
@@ -81,11 +69,10 @@ o:value("http://captive.apple.com/generate_204")
 o.default = "0"
 
 o = s:taboption("settings", Value, "github_address_mod", translate("Github Address Modify"))
-o.description = translate("Modify The Github Address In The Config And OpenClash With Proxy(CDN) To Prevent File Download Faild. Format Reference:").." ".."<a href='javascript:void(0)' onclick='javascript:return winOpen(\"https://mirror.ghproxy.com/\")'>https://mirror.ghproxy.com/</a>"
+o.description = translate("Modify The Github Address In The Config And OpenClash With Proxy(CDN) To Prevent File Download Faild. Format Reference:").." ".."<a href='javascript:void(0)' onclick='javascript:return winOpen(\"https://ghp.ci/\")'>https://ghp.ci/</a>"
 o:value("0", translate("Disable"))
 o:value("https://fastly.jsdelivr.net/")
 o:value("https://testingcf.jsdelivr.net/")
-o:value("https://raw.fastgit.org/")
 o:value("https://cdn.jsdelivr.net/")
 o.default = "0"
 
@@ -147,26 +134,9 @@ o = s:taboption("dns", Flag, "enable_custom_dns", font_red..bold_on..translate("
 o.description = font_red..bold_on..translate("Set OpenClash Upstream DNS Resolve Server")..bold_off..font_off
 o.default = 0
 
----- Fallback DNS Proxy Group
-o = s:taboption("dns", Value, "proxy_dns_group", font_red..bold_on..translate("Fallback DNS Proxy Group (Support Regex)")..bold_off..font_off)
-o.description = translate("Group Use For Proxy The Fallback DNS, Preventing DNS Lookup Failures")..translate("(Only Meta Core)")
-local groupnames,filename
-filename = m.uci:get("openclash", "config", "config_path")
-if filename then
-	groupnames = SYS.exec(string.format('ruby -ryaml -rYAML -I "/usr/share/openclash" -E UTF-8 -e "YAML.load_file(\'%s\')[\'proxy-groups\'].each do |i| puts i[\'name\']+\'##\' end" 2>/dev/null',filename))
-	if groupnames then
-		for groupname in string.gmatch(groupnames, "([^'##\n']+)##") do
-			if groupname ~= nil and groupname ~= "" then
-				o:value(groupname)
-			end
-		end
-	end
-end
-
-o:value("DIRECT")
-o:value("Disable", translate("Disable"))
-o.default = "Disable"
-o.rempty = false
+o = s:taboption("dns", Flag, "enable_respect_rules", font_red..bold_on..translate("Respect Rules").."(respect-rules)"..bold_off..font_off)
+o.description = font_red..bold_on..translate("Whether or not The Connection to the DNS Server Follow the Rules in Config")..bold_off..font_off
+o.default = 0
 
 o = s:taboption("dns", Flag, "append_wan_dns", translate("Append Upstream DNS"))
 o.description = translate("Append The Upstream Assigned DNS And Gateway IP To The Nameserver")
@@ -225,6 +195,13 @@ end
 if op_mode == "fake-ip" then
 o = s:taboption("dns", Flag, "custom_fakeip_filter", translate("Fake-IP-Filter"))
 o.default = 0
+
+o = s:taboption("dns", ListValue, "custom_fakeip_filter_mode", translate("Fake-IP-Filter-Mode"))
+o.description = translate("Fake-IP is not returned if the matching succeeds when blacklist mode or Fake-IP is returned if the matching succeeds when whitelist mode")
+o.default = "blacklist"
+o:value("blacklist", translate("Blacklist Mode"))
+o:value("whitelist", translate("Whitelist Mode"))
+o:depends("custom_fakeip_filter", "1")
 
 custom_fake_black = s:taboption("dns", Value, "custom_fake_filter")
 custom_fake_black.template = "cbi/tvalue"
@@ -302,16 +279,8 @@ o = s:taboption("meta", Flag, "enable_unified_delay", font_red..bold_on..transla
 o.description = font_red..bold_on..translate("Change The Delay Calculation Method To Remove Extra Delays Such as Handshaking")..bold_off..font_off
 o.default = "0"
 
-o = s:taboption("meta", ListValue, "keep_alive_interval", font_red..bold_on..translate("TCP Keep-alive Interval(s)")..bold_off..font_off)
-o.description = font_red..bold_on..translate("Change The TCP Keep-alive Interval, Selecting a Larger Value Avoids Abnormal Resource Consumption")..bold_off..font_off
-o:value("0", translate("Disable"))
-o:value("15")
-o:value("1800")
-o:value("3600")
-o.default = "0"
-
 o = s:taboption("meta", ListValue, "find_process_mode", translate("Enable Process Rule"))
-o.description = translate("Whether to Enable Process Rules, If You Are Not Sure, Please Choose off Which Useful in Router Environment")
+o.description = translate("Whether to Enable Process Rules, Only Works on Routerself, If You Are Not Sure, Please Choose off Which Useful in Router Environment, Depend on kmod-inet-diag")
 o:value("0", translate("Disable"))
 o:value("off", translate("OFF　"))
 o:value("always", translate("Always　"))
@@ -357,62 +326,21 @@ o.description = translate("Custom The Force and Skip Sniffing Doamin Lists")
 o.default = 0
 o:depends("enable_meta_sniffer", "1")
 
-sniffing_domain_force = s:taboption("meta", Value, "sniffing_domain_force")
-sniffing_domain_force:depends("enable_meta_sniffer_custom", "1")
-sniffing_domain_force.template = "cbi/tvalue"
-sniffing_domain_force.description = translate("Will Override Dns Queries If Domains in The List")
-sniffing_domain_force.rows = 20
-sniffing_domain_force.wrap = "off"
+sniffer_custom = s:taboption("meta", Value, "sniffer_custom")
+sniffer_custom:depends("enable_meta_sniffer_custom", "1")
+sniffer_custom.template = "cbi/tvalue"
+sniffer_custom.rows = 20
+sniffer_custom.wrap = "off"
 
-function sniffing_domain_force.cfgvalue(self, section)
-	return NXFS.readfile("/etc/openclash/custom/openclash_force_sniffing_domain.yaml") or ""
+function sniffer_custom.cfgvalue(self, section)
+	return NXFS.readfile("/etc/openclash/custom/openclash_custom_sniffer.yaml") or ""
 end
-function sniffing_domain_force.write(self, section, value)
+function sniffer_custom.write(self, section, value)
 	if value then
 		value = value:gsub("\r\n?", "\n")
-		local old_value = NXFS.readfile("/etc/openclash/custom/openclash_force_sniffing_domain.yaml")
+		local old_value = NXFS.readfile("/etc/openclash/custom/openclash_custom_sniffer.yaml")
 	  if value ~= old_value then
-			NXFS.writefile("/etc/openclash/custom/openclash_force_sniffing_domain.yaml", value)
-		end
-	end
-end
-
-sniffing_port_filter = s:taboption("meta", Value, "sniffing_port_filter")
-sniffing_port_filter:depends("enable_meta_sniffer_custom", "1")
-sniffing_port_filter.template = "cbi/tvalue"
-sniffing_port_filter.description = translate("Will Only Sniffing If Ports in The List")
-sniffing_port_filter.rows = 20
-sniffing_port_filter.wrap = "off"
-
-function sniffing_port_filter.cfgvalue(self, section)
-	return NXFS.readfile("/etc/openclash/custom/openclash_sniffing_ports_filter.yaml") or ""
-end
-function sniffing_port_filter.write(self, section, value)
-	if value then
-		value = value:gsub("\r\n?", "\n")
-		local old_value = NXFS.readfile("/etc/openclash/custom/openclash_sniffing_ports_filter.yaml")
-	  if value ~= old_value then
-			NXFS.writefile("/etc/openclash/custom/openclash_sniffing_ports_filter.yaml", value)
-		end
-	end
-end
-
-sniffing_domain_filter = s:taboption("meta", Value, "sniffing_domain_filter")
-sniffing_domain_filter:depends("enable_meta_sniffer_custom", "1")
-sniffing_domain_filter.template = "cbi/tvalue"
-sniffing_domain_filter.description = translate("Will Disable Sniffing If Domains(sni) in The List")
-sniffing_domain_filter.rows = 20
-sniffing_domain_filter.wrap = "off"
-
-function sniffing_domain_filter.cfgvalue(self, section)
-	return NXFS.readfile("/etc/openclash/custom/openclash_sniffing_domain_filter.yaml") or ""
-end
-function sniffing_domain_filter.write(self, section, value)
-	if value then
-		value = value:gsub("\r\n?", "\n")
-		local old_value = NXFS.readfile("/etc/openclash/custom/openclash_sniffing_domain_filter.yaml")
-	  if value ~= old_value then
-			NXFS.writefile("/etc/openclash/custom/openclash_sniffing_domain_filter.yaml", value)
+			NXFS.writefile("/etc/openclash/custom/openclash_custom_sniffer.yaml", value)
 		end
 	end
 end
@@ -433,7 +361,7 @@ o.default = 0
 custom_rules = s:taboption("rules", Value, "custom_rules")
 custom_rules:depends("enable_custom_clash_rules", 1)
 custom_rules.template = "cbi/tvalue"
-custom_rules.description = font_green..bold_on..translate("(Priority)")..bold_off..font_off.." "..translate("Custom Rules Here, For More Go:").." ".."<a href='javascript:void(0)' onclick='javascript:return winOpen(\"https://lancellc.gitbook.io/clash/clash-config-file/rules\")'>https://lancellc.gitbook.io/clash/clash-config-file/rules</a>".." ,"..translate("IP To CIDR:").." ".."<a href='javascript:void(0)' onclick='javascript:return winOpen(\"http://ip2cidr.com\")'>http://ip2cidr.com</a>"
+custom_rules.description = font_green..bold_on..translate("(Priority)")..bold_off..font_off.." "..translate("Custom Rules Here, For More Go:").." ".."<a href='javascript:void(0)' onclick='javascript:return winOpen(\"https://wiki.metacubex.one/config/rules/\")'>https://wiki.metacubex.one/config/rules/</a>".." ,"..translate("IP To CIDR:").." ".."<a href='javascript:void(0)' onclick='javascript:return winOpen(\"http://ip2cidr.com\")'>http://ip2cidr.com</a>"
 custom_rules.rows = 20
 custom_rules.wrap = "off"
 
@@ -453,7 +381,7 @@ end
 custom_rules_2 = s:taboption("rules", Value, "custom_rules_2")
 custom_rules_2:depends("enable_custom_clash_rules", 1)
 custom_rules_2.template = "cbi/tvalue"
-custom_rules_2.description = font_green..bold_on..translate("(Extended)")..bold_off..font_off.." "..translate("Custom Rules Here, For More Go:").." ".."<a href='javascript:void(0)' onclick='javascript:return winOpen(\"https://lancellc.gitbook.io/clash/clash-config-file/rules\")'>https://lancellc.gitbook.io/clash/clash-config-file/rules</a>".." ,"..translate("IP To CIDR:").." ".."<a href='javascript:void(0)' onclick='javascript:return winOpen(\"http://ip2cidr.com\")'>http://ip2cidr.com</a>"
+custom_rules_2.description = font_green..bold_on..translate("(Extended)")..bold_off..font_off.." "..translate("Custom Rules Here, For More Go:").." ".."<a href='javascript:void(0)' onclick='javascript:return winOpen(\"https://wiki.metacubex.one/config/rules/\")'>https://wiki.metacubex.one/config/rules/</a>".." ,"..translate("IP To CIDR:").." ".."<a href='javascript:void(0)' onclick='javascript:return winOpen(\"http://ip2cidr.com\")'>http://ip2cidr.com</a>"
 custom_rules_2.rows = 20
 custom_rules_2.wrap = "off"
 
@@ -538,9 +466,14 @@ o:value("udp", translate("UDP"))
 o:value("tcp", translate("TCP"))
 o:value("tls", translate("TLS"))
 o:value("https", translate("HTTPS"))
-o:value("quic", translate("QUIC ")..translate("(Only Meta Core)"))
+o:value("quic", translate("QUIC"))
 o.default     = "udp"
 o.rempty      = false
+
+---- Disable-IPv6
+o = ds:option(Flag, "disable_ipv6", translate("Disable-IPv6"))
+o.rmempty     = false
+o.default     = o.disbled
 
 -- [[ Other Rules Manage ]]--
 ss = m:section(TypedSection, "other_rules", translate("Other Rules Edit")..translate("(Take Effect After Choose Above)"))

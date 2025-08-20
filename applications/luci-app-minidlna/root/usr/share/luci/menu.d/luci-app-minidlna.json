@@ -1,5 +1,5 @@
 {
-	"admin/services/minidlna": {
+	"admin/nas/minidlna": {
 		"title": "miniDLNA",
 		"action": {
 			"type": "view",

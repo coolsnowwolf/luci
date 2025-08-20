@@ -9,8 +9,26 @@ local dns_host = "www.instagram.com"
 %>
 
 <style>
+:root[data-darkmode="true"] .diag-style {
+    background-color: #404040;
+}
+
+:root[data-darkmode="true"] #diag-rc-output > pre {
+	background-color: #404040;
+	color: #ffffff;
+}
+
+:root[data-darkmode="true"] #dns-rc-output > pre {
+	background-color: #404040;
+	color: #ffffff;
+}
+
+.diag-style {
+	background-color: #f5f5f5;
+}
+
 #diag-rc-output > pre {
-    background-color: #f5f5f5;
+    background-color: #ffffff;
     display: block;
     padding: 8.5px;
     margin: 0 0 18px;
@@ -23,7 +41,7 @@ local dns_host = "www.instagram.com"
 }
 
 #dns-rc-output > pre {
-    background-color: #f5f5f5;
+    background-color: #ffffff;
     display: block;
     padding: 8.5px;
     margin: 0 0 18px;
@@ -39,6 +57,36 @@ local dns_host = "www.instagram.com"
 
 
 <script type="text/javascript">//<![CDATA[
+
+	function isDarkBackground(element) {
+		var style = window.getComputedStyle(element);
+		var bgColor = style.backgroundColor;
+		let r, g, b;
+		if (/rgb\(/.test(bgColor)) {
+			var rgb = bgColor.match(/\d+/g);
+			r = parseInt(rgb);
+			g = parseInt(rgb);
+			b = parseInt(rgb);
+		} else if (/#/.test(bgColor)) {
+			if (bgColor.length === 4) {
+			r = parseInt(bgColor + bgColor, 16);
+			g = parseInt(bgColor + bgColor, 16);
+			b = parseInt(bgColor + bgColor, 16);
+			} else {
+			r = parseInt(bgColor.slice(1, 3), 16);
+			g = parseInt(bgColor.slice(3, 5), 16);
+			b = parseInt(bgColor.slice(5, 7), 16);
+			}
+		} else {
+			return false;
+		}
+		var luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+		return luminance < 128;
+	};
+
+	if (isDarkBackground(document.body)) {
+		document.documentElement.setAttribute('data-darkmode', 'true');
+	};
 
 	function show_diag_info(addr)
 	{
@@ -77,7 +125,7 @@ local dns_host = "www.instagram.com"
 		if (legend && output)
 		{
 			output.innerHTML =
-				'<img src="<%=resource%>/icons/loading.gif" alt="<%:Loading%>" style="vertical-align:middle" /> ' +
+				'<img src="<%=resource%>/icons/loading.svg" onerror="this.onerror=null;this.src=\'<%=resource%>/icons/loading.gif\'" alt="<%:Loading%>" style="vertical-align:middle" /> ' +
 				'<%:Waiting for command to complete...%>';
 
 			legend.parentNode.style.display = 'block';
@@ -120,7 +168,7 @@ local dns_host = "www.instagram.com"
 		if (legend && output)
 		{
 			output.innerHTML =
-				'<img src="<%=resource%>/icons/loading.gif" alt="<%:Loading%>" style="vertical-align:middle" /> ' +
+				'<img src="<%=resource%>/icons/loading.svg" onerror="this.onerror=null;this.src=\'<%=resource%>/icons/loading.gif\'" alt="<%:Loading%>" style="vertical-align:middle" /> ' +
 				'<%:Waiting for command to complete...%>';
 
 			legend.parentNode.style.display = 'block';
@@ -157,7 +205,7 @@ local dns_host = "www.instagram.com"
 		if (legend && output)
 		{
 			output.innerHTML =
-				'<img src="<%=resource%>/icons/loading.gif" alt="<%:Loading%>" style="vertical-align:middle" /> ' +
+				'<img src="<%=resource%>/icons/loading.svg" onerror="this.onerror=null;this.src=\'<%=resource%>/icons/loading.gif\'" alt="<%:Loading%>" style="vertical-align:middle" /> ' +
 				'<%:Waiting for command to complete...%>';
 
 			legend.parentNode.style.display = 'block';
@@ -181,7 +229,7 @@ local dns_host = "www.instagram.com"
 //]]></script>
 
 <form>
-	<fieldset>
+	<fieldset class="diag-style">
 		<div style="width:33%; float: left; text-align: center;">
 			<%:Connection Test (Current Browser)%>&nbsp;&nbsp;&nbsp;&nbsp;
 			<input type="text" value="<%=diag_host%>" name="diag" />
@@ -198,19 +246,19 @@ local dns_host = "www.instagram.com"
 		</div>
 	</fieldset>
 
-	<fieldset style="display:none">
+	<fieldset class="diag-style" style="display:none">
 		<legend id="diag-rc-legend"><%:Collecting data...%></legend>
 		<br />
 		<span id="diag-rc-output"></span>
 	</fieldset>
 
-	<fieldset style="display:none">
+	<fieldset class="diag-style" style="display:none">
 		<legend id="dns-rc-legend"><%:Collecting data...%></legend>
 		<br />
 		<span id="dns-rc-output"></span>
 	</fieldset>
 	
-	<fieldset style="display:none">
+	<fieldset class="diag-style" style="display:none">
 		<legend id="debug-rc-legend"><%:Collecting data...%></legend>
 		<br />
 		<span id="debug-rc-output"></span>

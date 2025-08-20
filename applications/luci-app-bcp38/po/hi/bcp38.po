@@ -1,22 +1,28 @@
 msgid ""
 msgstr ""
+"PO-Revision-Date: 2025-06-22 09:37+0000\n"
+"Last-Translator: Aaryadev <devmgbhat@gmail.com>\n"
+"Language-Team: Hindi <https://hosted.weblate.org/projects/openwrt/"
+"luciapplicationsbcp38/hi/>\n"
 "Language: hi\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n > 1;\n"
+"X-Generator: Weblate 5.13-dev\n"
 
 #: applications/luci-app-bcp38/htdocs/luci-static/resources/view/bcp38/form.js:41
 msgid "Allowed IP ranges"
+msgstr "स्वीकृत IP श्रेणियाँ"
+
+#: applications/luci-app-bcp38/htdocs/luci-static/resources/view/bcp38/form.js:25
+msgid "Auto-detect upstream IP"
 msgstr ""
 
 #: applications/luci-app-bcp38/htdocs/luci-static/resources/view/bcp38/form.js:26
 msgid ""
-"Attempt to automatically detect if the upstream IP will be blocked by the "
-"configuration, and add an exception if it will. If this does not work "
+"Automatically attempt to detect whether the upstream IP will be blocked by "
+"the configuration, adding an exception if so. If this does not work "
 "correctly, you can add exceptions manually below."
-msgstr ""
-
-#: applications/luci-app-bcp38/htdocs/luci-static/resources/view/bcp38/form.js:25
-msgid "Auto-detect upstream IP"
 msgstr ""
 
 #: applications/luci-app-bcp38/htdocs/luci-static/resources/view/bcp38/form.js:10

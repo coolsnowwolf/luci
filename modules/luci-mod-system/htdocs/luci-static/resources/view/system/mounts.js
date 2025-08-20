@@ -291,7 +291,6 @@ return view.extend({
 		}
 
 		o = s.taboption('general', form.Value, 'target', _('Mount point'), _('Specifies the directory the device is attached to'));
-		o.value('/opt', _('Use as Docker data (/opt)'));
 		o.value('/', _('Use as root filesystem (/)'));
 		o.value('/overlay', _('Use as external overlay (/overlay)'));
 		o.rmempty = false;

@@ -1,5 +1,5 @@
 {
-	"admin/services/samba4": {
+	"admin/nas/samba4": {
 		"title": "Network Shares",
 		"action": {
 			"type": "view",

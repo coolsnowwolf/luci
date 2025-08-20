@@ -1,0 +1,113 @@
+#!/bin/sh /etc/rc.common
+# Copyright (C) 2025 ImmortalWrt.org
+
+START=99
+USE_PROCD=1
+
+NAME="3cat"
+PROG="/usr/bin/3proxy"
+CONF="/var/run/3cat.cfg"
+
+fw_ports=""
+
+validate_3cat_section() {
+	uci_load_validate "$NAME" "instance" "$1" "$2" \
+		'enabled:bool:0' \
+		'listen_addr:or(ipaddr,hostname)' \
+		'listen_port:port' \
+		'dest_addr:or(ipaddr,hostname)' \
+		'dest_port:port' \
+		'protocol:string' \
+		'ip_prefer:uinteger' \
+		'logging:bool:0' \
+		'firewall:bool:0'
+}
+
+start_instance() {
+	local section="$1"
+	local seconds="0"
+
+	[ "$2" -eq "0" ] || { logger -p daemon.err -t "$NAME" "$section Validation failed."; return 1; }
+	[ "$enabled" -eq "1" ] || return 1
+
+	if [ -x "$PROG" ]; then
+		if [ "$logging" -eq "1" ]; then
+			logging="-l"
+		else
+			logging=""
+		fi
+		[ "$firewall" -eq "1" ] && fw_ports="$fw_ports $listen_port@$protocol"
+		echo "${protocol}pm $logging ${ip_prefer:+-$ip_prefer} ${listen_addr:+-i$listen_addr} $listen_port $dest_addr $dest_port" >> "$CONF"
+	else
+		procd_open_instance "$section"
+		procd_set_param command "/usr/libexec/3proxy/${protocol}pm"
+		[ "$logging" -eq "1" ] && procd_append_param command "-l@$section"
+		[ -n "$ip_prefer" ] && procd_append_param command "-$ip_prefer"
+		[ -n "$listen_addr" ] && procd_append_param command "-i$listen_addr"
+		procd_append_param command "$listen_port"
+		procd_append_param command "$dest_addr"
+		procd_append_param command "$dest_port"
+
+		procd_set_param limits core="unlimited"
+		procd_set_param limits nofile="1000000 1000000"
+		procd_set_param respawn
+
+		if [ "$firewall" -eq "1" ]; then
+			procd_open_data
+			json_add_array firewall
+				json_add_object ""
+				json_add_string type rule
+				json_add_string src "*"
+				json_add_string dest_port "$listen_port"
+				json_add_string proto "$protocol"
+				json_add_string target ACCEPT
+				json_close_object
+			json_close_array
+			procd_close_data
+		fi
+
+		procd_close_instance
+	fi
+}
+
+start_service() {
+	rm -f "$CONF"
+
+	config_load "$NAME"
+	config_foreach validate_3cat_section "instance" start_instance
+
+	if [ -x "$PROG" ] && [ -s "$CONF" ]; then
+		procd_open_instance
+		procd_set_param command "$PROG" "$CONF"
+		procd_set_param limits core="unlimited"
+		procd_set_param limits nofile="1000000 1000000"
+		procd_set_param respawn
+		procd_set_param stdout 1
+
+		if [ -n "$fw_ports" ]; then
+			procd_open_data
+			json_add_array firewall
+				for fw_port in $fw_ports; do
+					json_add_object ""
+					json_add_string type rule
+					json_add_string src "*"
+					json_add_string dest_port "${fw_port%@*}"
+					json_add_string proto "${fw_port#*@}"
+					json_add_string target ACCEPT
+					json_close_object
+				done
+			json_close_array
+			procd_close_data
+		fi
+
+		procd_close_instance
+	fi
+}
+
+stop_service() {
+	rm -f "$CONF"
+}
+
+service_triggers() {
+	procd_add_reload_trigger "$NAME"
+}

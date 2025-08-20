@@ -1,20 +1,162 @@
-msgid "Scheduled Reboot"
-msgstr "定时重启"
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Project-Id-Version: PACKAGE VERSION\n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: none\n"
+"Language: zh-Hans\n"
+"MIME-Version: 1.0\n"
+"Content-Transfer-Encoding: 8bit\n"
 
-msgid "Scheduled reboot Setting"
-msgstr "定时重启设置"
+#: applications/luci-app-autoreboot/htdocs/luci-static/resources/view/autoreboot.js:22
+msgid "Add schedule"
+msgstr "添加计划"
 
-msgid "Week Day"
-msgstr "星期"
+#: applications/luci-app-autoreboot/htdocs/luci-static/resources/view/autoreboot.js:73
+msgid "April"
+msgstr "四月"
 
-msgid "Everyday"
+#: applications/luci-app-autoreboot/htdocs/luci-static/resources/view/autoreboot.js:77
+msgid "August"
+msgstr "八月"
+
+#: applications/luci-app-autoreboot/htdocs/luci-static/resources/view/autoreboot.js:15
+msgid "Configure the scheduled restart of this device."
+msgstr "配置此设备的定时重启。"
+
+#: applications/luci-app-autoreboot/htdocs/luci-static/resources/view/autoreboot.js:92
+msgid "Day of month"
+msgstr "日（day of month）"
+
+#: applications/luci-app-autoreboot/htdocs/luci-static/resources/view/autoreboot.js:81
+msgid "December"
+msgstr "十二月"
+
+#: applications/luci-app-autoreboot/htdocs/luci-static/resources/view/autoreboot.js:24
+msgid "Enable"
+msgstr "启用"
+
+#: applications/luci-app-autoreboot/htdocs/luci-static/resources/view/autoreboot.js:30
+msgid "Every day"
 msgstr "每天"
 
-msgid "Day"
-msgstr "天"
+#: applications/luci-app-autoreboot/htdocs/luci-static/resources/view/autoreboot.js:69
+msgid "Every month"
+msgstr "每月"
 
+#: applications/luci-app-autoreboot/htdocs/luci-static/resources/view/autoreboot.js:40
+#: applications/luci-app-autoreboot/htdocs/luci-static/resources/view/autoreboot.js:51
+#: applications/luci-app-autoreboot/htdocs/luci-static/resources/view/autoreboot.js:61
+#: applications/luci-app-autoreboot/htdocs/luci-static/resources/view/autoreboot.js:84
+#: applications/luci-app-autoreboot/htdocs/luci-static/resources/view/autoreboot.js:95
+msgid "Expecting: %s"
+msgstr "请输入：%s"
+
+#: applications/luci-app-autoreboot/htdocs/luci-static/resources/view/autoreboot.js:71
+msgid "February"
+msgstr "二月"
+
+#: applications/luci-app-autoreboot/htdocs/luci-static/resources/view/autoreboot.js:35
+msgid "Friday"
+msgstr "星期五"
+
+#: applications/luci-app-autoreboot/root/usr/share/rpcd/acl.d/luci-app-autoreboot.json:3
+msgid "Grant UCI access for luci-app-autoreboot"
+msgstr "授予 luci-app-autoreboot 访问 UCI 配置的权限"
+
+#: applications/luci-app-autoreboot/htdocs/luci-static/resources/view/autoreboot.js:48
 msgid "Hour"
 msgstr "小时"
 
+#: applications/luci-app-autoreboot/htdocs/luci-static/resources/view/autoreboot.js:70
+msgid "January"
+msgstr "一月"
+
+#: applications/luci-app-autoreboot/htdocs/luci-static/resources/view/autoreboot.js:76
+msgid "July"
+msgstr "七月"
+
+#: applications/luci-app-autoreboot/htdocs/luci-static/resources/view/autoreboot.js:75
+msgid "June"
+msgstr "六月"
+
+#: applications/luci-app-autoreboot/htdocs/luci-static/resources/view/autoreboot.js:72
+msgid "March"
+msgstr "三月"
+
+#: applications/luci-app-autoreboot/htdocs/luci-static/resources/view/autoreboot.js:74
+msgid "May"
+msgstr "五月"
+
+#: applications/luci-app-autoreboot/htdocs/luci-static/resources/view/autoreboot.js:58
 msgid "Minute"
 msgstr "分钟"
+
+#: applications/luci-app-autoreboot/htdocs/luci-static/resources/view/autoreboot.js:31
+msgid "Monday"
+msgstr "星期一"
+
+#: applications/luci-app-autoreboot/htdocs/luci-static/resources/view/autoreboot.js:68
+msgid "Month"
+msgstr "月份"
+
+#: applications/luci-app-autoreboot/htdocs/luci-static/resources/view/autoreboot.js:80
+msgid "November"
+msgstr "十一月"
+
+#: applications/luci-app-autoreboot/htdocs/luci-static/resources/view/autoreboot.js:79
+msgid "October"
+msgstr "十月"
+
+#: applications/luci-app-autoreboot/htdocs/luci-static/resources/view/autoreboot.js:36
+msgid "Saturday"
+msgstr "星期六"
+
+#: applications/luci-app-autoreboot/htdocs/luci-static/resources/view/autoreboot.js:14
+#: applications/luci-app-autoreboot/root/usr/share/luci/menu.d/luci-app-autoreboot.json:3
+msgid "Scheduled Reboot"
+msgstr "定时重启"
+
+#: applications/luci-app-autoreboot/htdocs/luci-static/resources/view/autoreboot.js:78
+msgid "September"
+msgstr "九月"
+
+#: applications/luci-app-autoreboot/htdocs/luci-static/resources/view/autoreboot.js:37
+msgid "Sunday"
+msgstr "星期日"
+
+#: applications/luci-app-autoreboot/htdocs/luci-static/resources/view/autoreboot.js:34
+msgid "Thursday"
+msgstr "星期四"
+
+#: applications/luci-app-autoreboot/htdocs/luci-static/resources/view/autoreboot.js:32
+msgid "Tuesday"
+msgstr "星期二"
+
+#: applications/luci-app-autoreboot/htdocs/luci-static/resources/view/autoreboot.js:33
+msgid "Wednesday"
+msgstr "星期三"
+
+#: applications/luci-app-autoreboot/htdocs/luci-static/resources/view/autoreboot.js:29
+msgid "Week"
+msgstr "星期"
+
+#: applications/luci-app-autoreboot/htdocs/luci-static/resources/view/autoreboot.js:95
+msgid "valid day value"
+msgstr "有效的天数"
+
+#: applications/luci-app-autoreboot/htdocs/luci-static/resources/view/autoreboot.js:51
+msgid "valid hour value"
+msgstr "有效的小时"
+
+#: applications/luci-app-autoreboot/htdocs/luci-static/resources/view/autoreboot.js:61
+msgid "valid minute value"
+msgstr "有效的分钟"
+
+#: applications/luci-app-autoreboot/htdocs/luci-static/resources/view/autoreboot.js:84
+msgid "valid month value"
+msgstr "有效的月份"
+
+#: applications/luci-app-autoreboot/htdocs/luci-static/resources/view/autoreboot.js:40
+msgid "valid week value"
+msgstr "有效的星期"

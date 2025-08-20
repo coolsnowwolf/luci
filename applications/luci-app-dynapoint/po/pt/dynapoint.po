@@ -1,14 +1,14 @@
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2020-05-02 10:21+0000\n"
-"Last-Translator: ssantos <ssantos@web.de>\n"
+"PO-Revision-Date: 2025-03-03 00:12+0000\n"
+"Last-Translator: Tiago Gaspar <tiagogaspar8@gmail.com>\n"
 "Language-Team: Portuguese <https://hosted.weblate.org/projects/openwrt/"
 "luciapplicationsdynapoint/pt/>\n"
 "Language: pt\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Generator: Weblate 4.1-dev\n"
+"X-Generator: Weblate 5.10.3-dev\n"
 
 #: applications/luci-app-dynapoint/luasrc/model/cbi/dynapoint.lua:90
 msgid "Activate this wVIF if status is:"
@@ -21,7 +21,7 @@ msgstr "Acrescentar o nome de host ao ssid"
 #: applications/luci-app-dynapoint/luasrc/model/cbi/dynapoint.lua:31
 msgid "Append the router's hostname to the SSID when connectivity check fails"
 msgstr ""
-"Acrescentar o nome de host do roteador ao SSID quando a verificação de "
+"Acrescentar o nome de host do router ao SSID quando a verificação de "
 "conectividade falhar"
 
 #: applications/luci-app-dynapoint/luasrc/model/cbi/dynapoint.lua:18
@@ -69,7 +69,7 @@ msgstr ""
 
 #: applications/luci-app-dynapoint/root/usr/share/rpcd/acl.d/luci-app-dynapoint.json:3
 msgid "Grant UCI access for luci-app-dynapoint"
-msgstr "Conceder acesso UCI ao luci-app-dynapoint"
+msgstr "Conceder UCI acesso ao luci-app-dynapoint"
 
 #: applications/luci-app-dynapoint/luasrc/model/cbi/dynapoint.lua:56
 msgid "List of Wireless Virtual Interfaces (wVIF)"

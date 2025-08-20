@@ -52,7 +52,7 @@
 	));
 %}
 
-<script type="text/javascript">//<![CDATA[
+<script>
 	var input = document.getElementsByName('luci_password')[0];
 
 	if (input)
@@ -64,11 +64,11 @@
 			var img = new Image();
 
 			img.onload = function() { window.location = url };
-			img.src = 'https://' + window.location.hostname + ':' + port + '{{ resource }}/icons/loading.gif?' + Math.random();
+			img.src = 'https://' + window.location.hostname + ':' + port + '{{ resource }}/icons/loading.svg?' + Math.random();
 
 			setTimeout(function() { img.src = '' }, 5000);
 		});
 	}
-//]]></script>
+</script>
 
 {% include('footer') %}

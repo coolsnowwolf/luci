@@ -1,0 +1,124 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Project-Id-Version: PACKAGE VERSION\n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: none\n"
+"Language: zh_Hans\n"
+"MIME-Version: 1.0\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: applications/luci-app-rustdesk-server/htdocs/luci-static/resources/view/rustdesk-server.js:75
+msgid "Allow connection from Internet"
+msgstr "允许从互联网连接"
+
+#: applications/luci-app-rustdesk-server/htdocs/luci-static/resources/view/rustdesk-server.js:81
+msgid "Always use relay"
+msgstr "始终使用中继器"
+
+#: applications/luci-app-rustdesk-server/htdocs/luci-static/resources/view/rustdesk-server.js:61
+#: applications/luci-app-rustdesk-server/htdocs/luci-static/resources/view/rustdesk-server.js:62
+msgid "Collecting data…"
+msgstr "正在收集数据中…"
+
+#: applications/luci-app-rustdesk-server/htdocs/luci-static/resources/view/rustdesk-server.js:91
+msgid "Delay before downgrade check (in seconds)."
+msgstr "降级检查延迟（单位：秒）"
+
+#: applications/luci-app-rustdesk-server/htdocs/luci-static/resources/view/rustdesk-server.js:82
+msgid "Disallows direct peer connection if enabled."
+msgstr "如果启用，则不允许直接连接对端。"
+
+#: applications/luci-app-rustdesk-server/htdocs/luci-static/resources/view/rustdesk-server.js:90
+msgid "Downgrade check delay"
+msgstr "降级检查延迟"
+
+#: applications/luci-app-rustdesk-server/htdocs/luci-static/resources/view/rustdesk-server.js:94
+msgid "Downgrade check threshold"
+msgstr "降级检查阈值"
+
+#: applications/luci-app-rustdesk-server/htdocs/luci-static/resources/view/rustdesk-server.js:88
+msgid "Enable RustDesk Relay"
+msgstr "启用 RustDesk 中继器"
+
+#: applications/luci-app-rustdesk-server/htdocs/luci-static/resources/view/rustdesk-server.js:79
+msgid "Enable RustDesk Server"
+msgstr "启用 RustDesk 服务器"
+
+#: applications/luci-app-rustdesk-server/htdocs/luci-static/resources/view/rustdesk-server.js:73
+msgid ""
+"Force the use of a specific key if set. Force the use of any key if set to "
+"\"_\"."
+msgstr ""
+"如果设置了特定的密钥，则强制使用该密钥。如果设置为“_”，则允许使用任何密钥连"
+"接。"
+
+#: applications/luci-app-rustdesk-server/htdocs/luci-static/resources/view/rustdesk-server.js:66
+msgid "Global settings"
+msgstr "全局设置"
+
+#: applications/luci-app-rustdesk-server/root/usr/share/rpcd/acl.d/luci-app-rustdesk-server.json:3
+msgid "Grant UCI access for luci-app-rustdesk-server"
+msgstr "授予 luci-app-rustdesk-server 访问 UCI 配置的权限"
+
+#: applications/luci-app-rustdesk-server/htdocs/luci-static/resources/view/rustdesk-server.js:72
+msgid "Key"
+msgstr "密钥"
+
+#: applications/luci-app-rustdesk-server/htdocs/luci-static/resources/view/rustdesk-server.js:68
+msgid "Listen port"
+msgstr "监听端口"
+
+#: applications/luci-app-rustdesk-server/htdocs/luci-static/resources/view/rustdesk-server.js:107
+msgid "Max bandwidth for a single connection (in Mb/s)."
+msgstr "单个连接的最大带宽（单位：Mb/s）"
+
+#: applications/luci-app-rustdesk-server/htdocs/luci-static/resources/view/rustdesk-server.js:103
+msgid "Max total bandwidth (in Mb/s)."
+msgstr "最大总带宽（单位：Mb/s）"
+
+#: applications/luci-app-rustdesk-server/htdocs/luci-static/resources/view/rustdesk-server.js:33
+msgid "NOT RUNNING"
+msgstr "未运行"
+
+#: applications/luci-app-rustdesk-server/htdocs/luci-static/resources/view/rustdesk-server.js:33
+msgid "RUNNING"
+msgstr "运行中"
+
+#: applications/luci-app-rustdesk-server/htdocs/luci-static/resources/view/rustdesk-server.js:86
+msgid "Relay settings"
+msgstr "中继器设置"
+
+#: applications/luci-app-rustdesk-server/htdocs/luci-static/resources/view/rustdesk-server.js:32
+msgid "RustDesk Relay"
+msgstr "RustDesk 中继器"
+
+#: applications/luci-app-rustdesk-server/htdocs/luci-static/resources/view/rustdesk-server.js:32
+#: applications/luci-app-rustdesk-server/htdocs/luci-static/resources/view/rustdesk-server.js:44
+#: applications/luci-app-rustdesk-server/root/usr/share/luci/menu.d/luci-app-rustdesk-server.json:3
+msgid "RustDesk Server"
+msgstr "RustDesk 服务器"
+
+#: applications/luci-app-rustdesk-server/htdocs/luci-static/resources/view/rustdesk-server.js:77
+msgid "Server settings"
+msgstr "服务器设置"
+
+#: applications/luci-app-rustdesk-server/htdocs/luci-static/resources/view/rustdesk-server.js:106
+msgid "Single bandwidth"
+msgstr "单个带宽"
+
+#: applications/luci-app-rustdesk-server/htdocs/luci-static/resources/view/rustdesk-server.js:98
+msgid "Speed limit"
+msgstr "速度限制"
+
+#: applications/luci-app-rustdesk-server/htdocs/luci-static/resources/view/rustdesk-server.js:99
+msgid "Speed limit (in Mb/s)."
+msgstr "速度限制（单位：Mb/s）"
+
+#: applications/luci-app-rustdesk-server/htdocs/luci-static/resources/view/rustdesk-server.js:95
+msgid "Threshold of downgrade check (bit/ms)."
+msgstr "降级检查阈值（单位：bit/ms）"
+
+#: applications/luci-app-rustdesk-server/htdocs/luci-static/resources/view/rustdesk-server.js:102
+msgid "Total bandwidth"
+msgstr "总带宽"

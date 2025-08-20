@@ -1,20 +1,15 @@
 #
 # Copyright (C) 2015 OpenWrt.org
 #
-# This is free software, licensed under the GNU General Public License v2.
-# See /LICENSE for more information.
-#
+# This is free software, licensed under the Apache License, Version 2.0 .
 
 include $(TOPDIR)/rules.mk
 
 LUCI_TITLE:=uHTTPd Webserver Configuration
-LUCI_DEPENDS:=+luci-compat +uhttpd
-LUCI_PKGARCH:=all
+LUCI_DEPENDS:=+luci-base +uhttpd
 
 PKG_LICENSE:=Apache-2.0
-PKG_MAINTAINER:=Daniel Dickinson <openwrt@daniel.thecshore.com>
-
-LUA_TARGET:=source
+PKG_MAINTAINER:=Daniel F. Dickinson <dfdpublic@wildtechgarden.ca>
 
 include ../../luci.mk
 

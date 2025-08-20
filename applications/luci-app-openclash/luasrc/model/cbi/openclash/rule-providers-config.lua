@@ -57,21 +57,25 @@ o.default = "Rule-provider - "..sid
 o = s:option(ListValue, "type", translate("Rule Providers Type"))
 o.rmempty = true
 o.description = translate("Choose The Rule Providers Type")
-o:value("http", translate("http"))
-o:value("file", translate("file"))
+o:value("http")
+o:value("file")
+o:value("inline")
+
+o = s:option(ListValue, "format", translate("Rule Format"))
+o.rmempty = true
+o.description = translate("Choose The Rule File Format, For More Info:").." ".."<a href='javascript:void(0)' onclick='javascript:return winOpen(\"https://wiki.metacubex.one/config/rule-providers/content/\")'>https://wiki.metacubex.one/config/rule-providers/content/</a>"
+o:value("yaml")
+o:value("text")
+o:value("mrs")
+o:depends("type", "file")
+o:depends("type", "http")
 
 o = s:option(ListValue, "behavior", translate("Rule Behavior"))
 o.rmempty = true
 o.description = translate("Choose The Rule Behavior")
 o:value("domain")
 o:value("ipcidr")
-o:value("classical")
-
-o = s:option(ListValue, "format", translate("Rule Format")..translate("(TUN&Meta Core)"))
-o.rmempty = true
-o.description = translate("Choose The Rule File Format, For More Info:").." ".."<a href='javascript:void(0)' onclick='javascript:return winOpen(\"https://github.com/Dreamacro/clash/wiki/Premium%3A-Rule-Providers\")'>https://github.com/Dreamacro/clash/wiki/</a>"
-o:value("yaml")
-o:value("text")
+o:value("classical", translate("classical").." "..translate("(Not Support mrs Format)"))
 
 o = s:option(ListValue, "path", translate("Rule Providers Path"))
 o.description = translate("Update Your Rule Providers File From Config Luci Page")
@@ -110,16 +114,19 @@ o:value("0", translate("Priority Match"))
 o:value("1", translate("Extended Match"))
 
 o = s:option(ListValue, "group", translate("Set Proxy Group"))
-o.description = font_red..bold_on..translate("The Added Proxy Groups Must Exist Except 'DIRECT' & 'REJECT'")..bold_off..font_off
+o.description = font_red..bold_on..translate("The Added Proxy Groups Must Exist Except 'DIRECT' & 'REJECT' & 'REJECT-DROP' & 'PASS' & 'GLOBAL'")..bold_off..font_off
 o.rmempty = true
-local groupnames,filename
+
+local groupnames, filename
+local group_list = {}
+
 filename = m.uci:get(openclash, "config", "config_path")
 if filename then
    groupnames = sys.exec(string.format('ruby -ryaml -rYAML -I "/usr/share/openclash" -E UTF-8 -e "YAML.load_file(\'%s\')[\'proxy-groups\'].each do |i| puts i[\'name\']+\'##\' end" 2>/dev/null',filename))
    if groupnames then
       for groupname in string.gmatch(groupnames, "([^'##\n']+)##") do
          if groupname ~= nil and groupname ~= "" then
-            o:value(groupname)
+            table.insert(group_list, groupname)
          end
       end
    end
@@ -128,12 +135,51 @@ end
 m.uci:foreach("openclash", "groups",
    function(s)
       if s.name ~= "" and s.name ~= nil then
-         o:value(s.name)
+         table.insert(group_list, s.name)
       end
    end)
 
+table.sort(group_list)
+
+for _, groupname in ipairs(group_list) do
+   o:value(groupname)
+end
+
 o:value("DIRECT")
 o:value("REJECT")
+o:value("REJECT-DROP")
+o:value("PASS")
+o:value("GLOBAL")
+
+-- [[ other-setting ]]--
+o = s:option(Value, "other_parameters", translate("Other Parameters"))
+o.template = "cbi/tvalue"
+o.rows = 20
+o.wrap = "off"
+o.description = font_red..bold_on..translate("Edit Your Other Parameters Here")..bold_off..font_off
+o.rmempty = true
+function o.cfgvalue(self, section)
+	if self.map:get(section, "other_parameters") == nil then
+		return "# Example:\n"..
+		"# Only support YAML, four spaces need to be reserved at the beginning of each line to maintain formatting alignment\n"..
+		"# 示例：\n"..
+		"# 仅支持 YAML, 每行行首需要多保留四个空格以使脚本处理后能够与上方配置保持格式对齐\n"..
+		"# inline Example:\n"..
+		"#    payload:\n"..
+		"#      - '.blogger.com'\n"..
+		"#      - '*.*.microsoft.com'\n"..
+		"#      - 'books.itunes.apple.com'\n"
+	else
+		return Value.cfgvalue(self, section)
+	end
+end
+function o.validate(self, value)
+	if value then
+		value = value:gsub("\r\n?", "\n")
+		value = value:gsub("%c*$", "")
+	end
+	return value
+end
 
 local t = {
     {Commit, Back}
@@ -158,4 +204,5 @@ o.write = function()
 end
 
 m:append(Template("openclash/toolbar_show"))
+m:append(Template("openclash/config_editor"))
 return m

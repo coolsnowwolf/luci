@@ -7,10 +7,10 @@
 include $(TOPDIR)/rules.mk
 
 LUCI_TITLE:=Luci for Music Remote Center
-LUCI_DEPENDS:=+alsa-utils +forked-daapd
+LUCI_DEPENDS:=+alsa-utils +owntone
 LUCI_PKGARCH:=all
 PKG_VERSION:=1
-PKG_RELEASE:=6
+PKG_RELEASE:=7
 
 include ../../luci.mk
 

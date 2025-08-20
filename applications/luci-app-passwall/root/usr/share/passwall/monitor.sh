@@ -40,7 +40,7 @@ while [ "$ENABLED" -eq 1 ]; do
 			eval $(echo "nohup ${cmd} 2>&1 &") >/dev/null 2>&1 &
 		fi
 	done
-	
+
 	rm -f $LOCK_FILE
 	sleep 58s
 done

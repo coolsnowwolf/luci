@@ -11,7 +11,7 @@ msgstr ""
 #: applications/luci-app-dae/htdocs/luci-static/resources/view/dae/log.js:30
 #: applications/luci-app-dae/htdocs/luci-static/resources/view/dae/settings.js:63
 msgid "Collecting data…"
-msgstr "收集数据中…"
+msgstr "正在收集数据中…"
 
 #: applications/luci-app-dae/htdocs/luci-static/resources/view/dae/settings.js:71
 msgid "Configration file"

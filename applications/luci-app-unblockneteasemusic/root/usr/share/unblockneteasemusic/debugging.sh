@@ -1,5 +1,5 @@
 #!/bin/sh
-# Copyright (C) 2021-2023 Tianling Shen <cnsztl@immortalwrt.org>
+# Copyright (C) 2021-2022 Tianling Shen <cnsztl@immortalwrt.org>
 
 . /lib/functions.sh
 
@@ -72,15 +72,25 @@ echo -e "\n"
 
 [ -n "$is_stopped" ] || {
 	echo -e "Firewall info:"
-	iptables -t "nat" -L "netease_cloud_music" 2>"/dev/null" || echo -e 'Chain "netease_cloud_music" not found.'
+	nft list set inet fw4 "acl_neteasemusic_http" 2>&1
 	echo -e ""
-	ipset list "neteasemusic" 2>"/dev/null" || echo -e 'Table "neteasemusic" not found.'
+	nft list set inet fw4 "acl_neteasemusic_https" 2>&1
 	echo -e ""
-	ipset list "acl_neteasemusic_http" 2>"/dev/null" || echo -e 'Table "acl_neteasemusic_http" not found.'
+	nft list set inet fw4 "neteasemusic" 2>&1
 	echo -e ""
-	ipset list "acl_neteasemusic_https" 2>"/dev/null" || echo -e 'Table "acl_neteasemusic_https" not found.'
+	nft list set inet fw4 "neteasemusic6" 2>&1
 	echo -e ""
-	cat "/tmp/dnsmasq.d/dnsmasq-$NAME.conf"
+	nft list chain inet fw4 "netease_cloud_music" 2>&1
+	echo -e ""
+	nft list chain inet fw4 "netease_cloud_music_redir" 2>&1
+	echo -e ""
+	dnsmasq_uci_config="$(uci -q show "dhcp.@dnsmasq[0]" | awk 'NR==1 {split($0, conf, /[.=]/); print conf[2]}')"
+	if [ -f "/tmp/etc/dnsmasq.conf.$dnsmasq_uci_config" ]; then
+		dnsmasq_dir="$(awk -F '=' '/^conf-dir=/ {print $2}' "/tmp/etc/dnsmasq.conf.$dnsmasq_uci_config")"
+	else
+		dnsmasq_dir="/tmp/dnsmasq.d"
+	fi
+	cat "$dnsmasq_dir/dnsmasq-$NAME.conf"
 	echo -e "\n"
 
 	echo -e "Testing source replacing..."

@@ -1,5 +1,5 @@
 {
-	"admin/services/p910nd": {
+	"admin/nas/p910nd": {
 		"title": "p910nd - Printer server",
 		"order": 60,
 		"action": {

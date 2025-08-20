@@ -58,10 +58,7 @@ return view.extend({
 
 		o = s.option(form.Flag, 'drop_invalid', _('Drop invalid packets'));
 		if (L.hasSystemFeature('fullcone')) {
-			o = s.option(form.ListValue, 'fullcone', _('Enable FullCone NAT'));
-			o.value("0", _("Disable"))
-			o.value("1", _("Compatible Mode"))
-			o.value("2", _("High Performing Mode"))
+			o = s.option(form.Flag, 'fullcone', _('Enable FullCone NAT'));
 			if (fw4)
 				o = s.option(form.Flag, 'fullcone6', _('Enable FullCone NAT6'));
 		}
@@ -82,21 +79,27 @@ return view.extend({
 
 		if (L.hasSystemFeature('offloading')) {
 			s = m.section(form.TypedSection, 'defaults', _('Routing/NAT Offloading'),
-				_('Experimental feature. Not fully compatible with QoS/SQM.'));
+				_('Not fully compatible with QoS/SQM.'));
 
 			s.anonymous = true;
 			s.addremove = false;
 
-			o = s.option(form.Flag, 'flow_offloading',
-				_('Software flow offloading'),
-				_('Software based offloading for routing/NAT'));
-			o.optional = true;
-
-			o = s.option(form.Flag, 'flow_offloading_hw',
-				_('Hardware flow offloading'),
-				_('Requires hardware NAT support.'));
-			o.optional = true;
-			o.depends('flow_offloading', '1');
+			o = s.option(form.RichListValue, "offloading_type", _("Flow offloading type"));
+			o.value('0', _("None"));
+			o.value('1', _("Software flow offloading"), _('Software based offloading for routing/NAT.'));
+			o.value('2', _("Hardware flow offloading"), _('Hardware based offloading for routing with/without NAT.') + ' ' + _(' Requires hardware NAT support.'));
+			o.optional = false;
+			o.load = function (section_id) {
+				var flow_offloading = uci.get('firewall', section_id, 'flow_offloading');
+				var flow_offloading_hw = uci.get('firewall', section_id, 'flow_offloading_hw');
+				return (flow_offloading === '1')
+					? (flow_offloading_hw === '1' ? '2' : '1')
+					: '0';
+			};
+			o.write = function(section_id, value) {
+				uci.set('firewall', section_id, 'flow_offloading', value === '0' ? null : '1');
+				uci.set('firewall', section_id, 'flow_offloading_hw', value === '2' ? '1' : null);
+			};
 		}
 
 
@@ -132,7 +135,7 @@ return view.extend({
 		o.placeholder = _('Unnamed zone');
 		o.modalonly = true;
 		o.rmempty = false;
-		o.datatype = 'and(uciname,maxlength(11))';
+		o.datatype = L.hasSystemFeature('firewall4') ? 'uciname' : 'and(uciname,maxlength(11))';
 		o.write = function(section_id, formvalue) {
 			var cfgvalue = this.cfgvalue(section_id);
 
@@ -142,7 +145,7 @@ return view.extend({
 				return firewall.renameZone(cfgvalue, formvalue);
 		};
 
-		o = s.option(widgets.ZoneForwards, '_info', _('Zone ⇒ Forwardings'));
+		o = s.option(widgets.ZoneForwards, '_info', _('Zone ⇒ Forwards'));
 		o.editable = true;
 		o.modalonly = false;
 		o.cfgvalue = function(section_id) {
@@ -152,7 +155,7 @@ return view.extend({
 		var p = [
 			s.taboption('general', form.ListValue, 'input', _('Input')),
 			s.taboption('general', form.ListValue, 'output', _('Output')),
-			s.taboption('general', form.ListValue, 'forward', _('Forward'))
+			s.taboption('general', form.ListValue, 'forward', _('Intra zone forward'))
 		];
 
 		for (var i = 0; i < p.length; i++) {

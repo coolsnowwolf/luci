@@ -1,0 +1,12 @@
+#!/bin/sh
+
+if uci -q get "autoreboot.@login[0]" > "/dev/null"; then
+	uci rename "autoreboot.@login[0].enable"="enabled"
+	uci set "autoreboot.@login[0].day"="*"
+	uci set "autoreboot.@login[0].month"="*"
+	[ "$(uci get "autoreboot.@login[0]".week)" = "7" ] && uci set "autoreboot.@login[0].week"="*"
+	uci commit "autoreboot"
+	sed -i "s,config login,config schedule,g" "/etc/config/autoreboot"
+fi
+
+exit 0

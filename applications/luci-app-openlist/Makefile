@@ -10,6 +10,7 @@ LUCI_TITLE:=LuCI app for OpenList
 LUCI_DEPENDS:=+openlist
 
 PKG_MAINTAINER:=Tianling Shen <cnsztl@immortalwrt.org>
+PKG_PROVIDES:=luci-app-alist
 
 include ../../luci.mk
 

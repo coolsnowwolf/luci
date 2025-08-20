@@ -6,7 +6,6 @@ openvpn_port="$(uci -q get openvpn.myvpn.port)"
 uci -q batch <<-EOF >/dev/null
 	delete network.vpn0
 	set network.vpn0=interface
-	set network.vpn0.device='tun0'
 	set network.vpn0.ifname='tun0'
 	set network.vpn0.proto='none'
 

@@ -1,14 +1,14 @@
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2023-08-30 11:51+0000\n"
-"Last-Translator: Charles03010 <charles03010@gmail.com>\n"
+"PO-Revision-Date: 2025-02-05 09:04+0000\n"
+"Last-Translator: william wijaya <wijayawilliam333@gmail.com>\n"
 "Language-Team: Indonesian <https://hosted.weblate.org/projects/openwrt/"
 "luciapplicationsdockerman/id/>\n"
 "Language: id\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.0.1-dev\n"
+"X-Generator: Weblate 5.10-dev\n"
 
 #: applications/luci-app-dockerman/luasrc/model/cbi/dockerman/newcontainer.lua:604
 msgid "A list of kernel capabilities to add to the container"
@@ -693,8 +693,9 @@ msgstr "Mohon masukkan <docker create/run> baris perintah:"
 
 #: applications/luci-app-dockerman/luasrc/model/cbi/dockerman/container.lua:347
 #: applications/luci-app-dockerman/luasrc/model/cbi/dockerman/containers.lua:135
+#, fuzzy
 msgid "Ports"
-msgstr "Port"
+msgstr "Porta (banyak)"
 
 #: applications/luci-app-dockerman/luasrc/model/cbi/dockerman/newnetwork.lua:52
 msgid "Private (Prevent communication between MAC VLANs)"
@@ -877,8 +878,8 @@ msgstr "Konfigurasi catatan untuk kontainer ini"
 
 #: applications/luci-app-dockerman/luasrc/model/cbi/dockerman/newcontainer.lua:525
 msgid ""
-"The user that commands are run as inside the container.(format: name|uid[:"
-"group|gid])"
+"The user that commands are run as inside the container.(format: name|"
+"uid[:group|gid])"
 msgstr ""
 "Pengguna yang menjalankan perintah sebagai di dalam kontainer.(format: name|"
 "uid[:group|gid])"
@@ -973,31 +974,3 @@ msgid ""
 msgstr ""
 "Saat menekan tombol Impor, gambar lokal dapat dimuat ke sistem dan tar "
 "gambar yang valid dapat diunduh dari jarak jauh."
-
-#~ msgid "CPU Useage"
-#~ msgstr "Lama Penggunaan CPU"
-
-#~ msgid "Memory Useage"
-#~ msgstr "Pengunaan Memori"
-
-#~ msgid "Docker Container"
-#~ msgstr "Kontainer docker"
-
-#~ msgid "Docker Socket Path"
-#~ msgstr "Letak Soket Docker"
-
-#~ msgid ""
-#~ "DockerMan is a Simple Docker manager client for LuCI, If you have any "
-#~ "issue please visit:"
-#~ msgstr ""
-#~ "DockerMan adalah klien manajer Docker Sederhana untuk LuCI, Jika Anda "
-#~ "memiliki masalah, silakan kunjungi:"
-
-#~ msgid "Github"
-#~ msgstr "Github"
-
-#~ msgid "Access Control"
-#~ msgstr "Kontrol Akses"
-
-#~ msgid "Allowed access interfaces"
-#~ msgstr "Akses antarmuka yang diperbolehkan"

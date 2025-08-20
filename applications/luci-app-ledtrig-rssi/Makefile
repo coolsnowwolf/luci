@@ -8,8 +8,10 @@
 include $(TOPDIR)/rules.mk
 
 LUCI_TITLE:= LuCI Support for ledtrigger rssi
-LUCI_DEPENDS:=+rssileds
-LUCI_PKGARCH:=all
+LUCI_DEPENDS:=+luci-base +rssileds
+
+PKG_LICENSE:=Apache-2.0
+PKG_MAINTAINER:=Jo-Philipp Wich <jo@mein.io>
 
 include ../../luci.mk
 

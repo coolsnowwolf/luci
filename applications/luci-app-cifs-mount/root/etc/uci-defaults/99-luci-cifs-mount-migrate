@@ -1,0 +1,49 @@
+#!/bin/sh
+
+. /lib/functions.sh
+
+migrate_cifs() {
+	local cfg="$1"
+	local ncfg="$(uci -q add "cifs-mount" "mount")"
+
+	local server name natpath users pwd sec agm iocharset smbver
+	config_get server "$cfg" "server"
+	config_get name "$cfg" "name"
+	config_get natpath "$cfg" "natpath"
+	config_get users "$cfg" "users"
+	config_get pwd "$cfg" "pwd"
+	config_get sec "$cfg" "sec"
+	config_get agm "$cfg" "agm"
+	config_get iocharset "$cfg" "iocharset" "utf8"
+	config_get smbver "$cfg" "smbver"
+
+	if [ -z "$server" ] || [ -z "$name" ] || [ -z "$natpath" ]; then
+		return 1
+	fi
+
+	uci -q set "cifs-mount.$ncfg.enabled"="$enabled"
+	uci -q set "cifs-mount.$ncfg.server"="$server"
+	uci -q set "cifs-mount.$ncfg.local_path"="$name"
+	uci -q set "cifs-mount.$ncfg.remote_path"="/$natpath"
+	uci -q set "cifs-mount.$ncfg.username"="$users"
+	uci -q set "cifs-mount.$ncfg.password"="$pwd"
+	[ -z "$sec" ] || uci -q add_list "cifs-mount.$ncfg.options"="sec=$sec"
+	[ -z "$agm" ] || uci -q add_list "cifs-mount.$ncfg.options"="$agm"
+	uci -q set "cifs-mount.$ncfg.iocharset"="$iocharset"
+	uci -q set "cifs-mount.$ncfg.smb_version"="$smbver"
+	uci -q set "cifs-mount.$ncfg.workgroup"="$workgroup"
+}
+
+grep -q "natshare" "/etc/config/cifs" 2>"/dev/null" || exit 0
+
+enabled="$(uci -q get "cifs.@cifs[0].enabled")"
+[ "$enabled" -eq "1" ] || enabled="0"
+workgroup="$(uci -q get "cifs.@cifs[0].workgroup")"
+
+config_load "cifs"
+config_foreach migrate_cifs "natshare"
+uci -q commit "cifs-mount"
+
+rm -f "/etc/config/cifs"
+
+exit 0

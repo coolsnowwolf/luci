@@ -1,15 +1,16 @@
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2024-01-23 10:05+0000\n"
-"Last-Translator: st7105 <st7105@gmail.com>\n"
+"PO-Revision-Date: 2025-08-06 17:02+0000\n"
+"Last-Translator: SnIPeRSnIPeR "
+"<snipersniper@users.noreply.hosted.weblate.org>\n"
 "Language-Team: Russian <https://hosted.weblate.org/projects/openwrt/"
 "luciapplicationsocserv/ru/>\n"
 "Language: ru\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
-"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Generator: Weblate 5.4-dev\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"X-Generator: Weblate 5.13-dev\n"
 
 #: applications/luci-app-ocserv/luasrc/model/cbi/ocserv/main.lua:124
 #: applications/luci-app-ocserv/luasrc/model/cbi/ocserv/user-config.lua:80
@@ -158,7 +159,7 @@ msgstr "Максимальное количество одинаковых кл�
 
 #: applications/luci-app-ocserv/luasrc/model/cbi/ocserv/users.lua:22
 msgid "Name"
-msgstr "Название"
+msgstr "Имя"
 
 #: applications/luci-app-ocserv/luasrc/model/cbi/ocserv/main.lua:151
 #: applications/luci-app-ocserv/luasrc/model/cbi/ocserv/user-config.lua:131
@@ -351,8 +352,8 @@ msgstr "IP Адрес VPN"
 #: applications/luci-app-ocserv/luasrc/model/cbi/ocserv/main.lua:95
 #: applications/luci-app-ocserv/luasrc/model/cbi/ocserv/user-config.lua:100
 msgid ""
-"View the CA certificate used by this server. You will need to save it as 'ca."
-"pem' and import it into the clients."
+"View the CA certificate used by this server. You will need to save it as "
+"'ca.pem' and import it into the clients."
 msgstr ""
-"Просмотр CA сертификата, используемого этим сервером. Сохраните его как «ca."
-"pem» для импорта клиентам."
+"Просмотр CA-сертификата, используемого этим сервером. Сохраните его как "
+"«ca.pem» для импорта клиентам."

@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"PO-Revision-Date: 2023-04-23 07:03+0000\n"
-"Last-Translator: olimpiumarius <oliver_magnum44@yahoo.com>\n"
+"PO-Revision-Date: 2025-08-04 09:32+0000\n"
+"Last-Translator: CRISTIAN ANDREI <cristianvdr@gmail.com>\n"
 "Language-Team: Romanian <https://hosted.weblate.org/projects/openwrt/"
 "luciapplicationsminidlna/ro/>\n"
 "Language: ro\n"
@@ -11,15 +11,15 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n==1 ? 0 : (n==0 || (n%100 > 0 && n%100 < "
 "20)) ? 1 : 2;\n"
-"X-Generator: Weblate 4.18-dev\n"
+"X-Generator: Weblate 5.13-dev\n"
 
 #: applications/luci-app-minidlna/htdocs/luci-static/resources/view/minidlna.js:51
 msgid "Advanced Settings"
-msgstr "Setări avansate"
+msgstr "Setări Avansate"
 
 #: applications/luci-app-minidlna/htdocs/luci-static/resources/view/minidlna.js:80
 msgid "Album art names"
-msgstr "Nume de artă de album"
+msgstr "Nume de coperte de albume"
 
 #: applications/luci-app-minidlna/htdocs/luci-static/resources/view/minidlna.js:94
 msgid "Allow wide links"
@@ -47,7 +47,7 @@ msgstr "Directorul bazei de date"
 
 #: applications/luci-app-minidlna/htdocs/luci-static/resources/view/minidlna.js:53
 msgid "Enable"
-msgstr "Activează"
+msgstr "Permite"
 
 #: applications/luci-app-minidlna/htdocs/luci-static/resources/view/minidlna.js:92
 msgid "Enable TIVO"
@@ -161,7 +161,7 @@ msgstr ""
 
 #: applications/luci-app-minidlna/htdocs/luci-static/resources/view/minidlna.js:90
 msgid ""
-"Set this to enable inotify monitoring to automatically discover new files."
+"Set this to enable inotify monitoring to discover new files automatically."
 msgstr ""
 "Setați această opțiune pentru a activa monitorizarea inotify pentru a "
 "descoperi automat fișiere noi."
@@ -171,8 +171,8 @@ msgid ""
 "Set this to enable support for streaming .jpg and .mp3 files to a TiVo "
 "supporting HMO."
 msgstr ""
-"Setați acest lucru pentru a activa suportul pentru streamingul de fișiere ."
-"jpg și .mp3 către un TiVo care acceptă HMO."
+"Setați acest lucru pentru a activa suportul pentru streamingul de "
+"fișiere .jpg și .mp3 către un TiVo care acceptă HMO."
 
 #: applications/luci-app-minidlna/htdocs/luci-static/resources/view/minidlna.js:96
 msgid ""

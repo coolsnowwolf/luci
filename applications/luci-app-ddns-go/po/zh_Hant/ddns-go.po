@@ -16,6 +16,10 @@ msgstr "簡單好用的動態 DNS 用戶端，支持 IPv6"
 msgid "Collecting data..."
 msgstr "收集資料中..."
 
+#: applications/luci-app-ddns-go/htdocs/luci-static/resources/view/ddns-go.js:87
+msgid "Custom DNS server"
+msgstr "自訂 DNS 伺服器"
+
 #: applications/luci-app-ddns-go/htdocs/luci-static/resources/view/ddns-go.js:31
 #: applications/luci-app-ddns-go/htdocs/luci-static/resources/view/ddns-go.js:36
 #: applications/luci-app-ddns-go/htdocs/luci-static/resources/view/ddns-go.js:54
@@ -23,7 +27,7 @@ msgstr "收集資料中..."
 msgid "DDNS-Go"
 msgstr "DDNS-Go"
 
-#: applications/luci-app-ddns-go/htdocs/luci-static/resources/view/ddns-go.js:86
+#: applications/luci-app-ddns-go/htdocs/luci-static/resources/view/ddns-go.js:90
 msgid "Disable WebUI"
 msgstr "停用 WebUI"
 
@@ -51,7 +55,7 @@ msgstr "開啟 Web 介面"
 msgid "RUNNING"
 msgstr "正在執行"
 
-#: applications/luci-app-ddns-go/htdocs/luci-static/resources/view/ddns-go.js:89
+#: applications/luci-app-ddns-go/htdocs/luci-static/resources/view/ddns-go.js:93
 msgid "Skip certificate verification"
 msgstr "略過證書驗證"
 

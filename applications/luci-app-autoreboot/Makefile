@@ -1,15 +1,14 @@
-# Copyright (C) 2016 Openwrt.org
+# SPDX-License-Identifier: Apache-2.0
 #
-# This is free software, licensed under the Apache License, Version 2.0 .
-#
+# Copyright (C) 2025 ImmortalWrt.org
 
 include $(TOPDIR)/rules.mk
 
 LUCI_TITLE:=LuCI support for Scheduled Reboot
-LUCI_DEPENDS:=+luci-compat
-LUCI_PKGARCH:=all
-PKG_VERSION:=1.0
-PKG_RELEASE:=8
+
+define Package/luci-app-autoreboot/conffiles
+/etc/config/autoreboot
+endef
 
 include ../../luci.mk
 

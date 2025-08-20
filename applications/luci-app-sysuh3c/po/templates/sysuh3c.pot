@@ -1,0 +1,60 @@
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8"
+
+#: applications/luci-app-sysuh3c/htdocs/luci-static/resources/view/sysuh3c.js:61
+msgid "Collecting data…"
+msgstr ""
+
+#: applications/luci-app-sysuh3c/htdocs/luci-static/resources/view/sysuh3c.js:48
+msgid "Configure SYSU H3C 802.1x client."
+msgstr ""
+
+#: applications/luci-app-sysuh3c/htdocs/luci-static/resources/view/sysuh3c.js:75
+msgid "EAP Method"
+msgstr ""
+
+#: applications/luci-app-sysuh3c/htdocs/luci-static/resources/view/sysuh3c.js:67
+msgid "Enable"
+msgstr ""
+
+#: applications/luci-app-sysuh3c/root/usr/share/rpcd/acl.d/luci-app-sysuh3c.json:3
+msgid "Grant UCI access for luci-app-sysuh3c"
+msgstr ""
+
+#: applications/luci-app-sysuh3c/htdocs/luci-static/resources/view/sysuh3c.js:81
+msgid "Interface"
+msgstr ""
+
+#: applications/luci-app-sysuh3c/htdocs/luci-static/resources/view/sysuh3c.js:76
+msgid "MD5"
+msgstr ""
+
+#: applications/luci-app-sysuh3c/htdocs/luci-static/resources/view/sysuh3c.js:38
+msgid "NOT RUNNING"
+msgstr ""
+
+#: applications/luci-app-sysuh3c/htdocs/luci-static/resources/view/sysuh3c.js:72
+msgid "Password"
+msgstr ""
+
+#: applications/luci-app-sysuh3c/htdocs/luci-static/resources/view/sysuh3c.js:36
+msgid "RUNNING"
+msgstr ""
+
+#: applications/luci-app-sysuh3c/htdocs/luci-static/resources/view/sysuh3c.js:47
+#: applications/luci-app-sysuh3c/root/usr/share/luci/menu.d/luci-app-sysuh3c.json:3
+msgid "SYSU H3C Client"
+msgstr ""
+
+#: applications/luci-app-sysuh3c/htdocs/luci-static/resources/view/sysuh3c.js:69
+msgid "Username"
+msgstr ""
+
+#: applications/luci-app-sysuh3c/htdocs/luci-static/resources/view/sysuh3c.js:77
+msgid "XOR"
+msgstr ""
+
+#: applications/luci-app-sysuh3c/htdocs/luci-static/resources/view/sysuh3c.js:36
+#: applications/luci-app-sysuh3c/htdocs/luci-static/resources/view/sysuh3c.js:38
+msgid "sysuh3c"
+msgstr ""

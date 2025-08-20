@@ -1,14 +1,14 @@
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2023-11-26 17:59+0000\n"
-"Last-Translator: Pegah_fars <ashkanull@gmail.com>\n"
+"PO-Revision-Date: 2025-03-28 21:27+0000\n"
+"Last-Translator: KING APPS <kiperking1@gmail.com>\n"
 "Language-Team: Persian <https://hosted.weblate.org/projects/openwrt/"
 "luciapplicationsdynapoint/fa/>\n"
 "Language: fa\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Generator: Weblate 5.2.1-rc\n"
+"X-Generator: Weblate 5.11-dev\n"
 
 #: applications/luci-app-dynapoint/luasrc/model/cbi/dynapoint.lua:90
 msgid "Activate this wVIF if status is:"

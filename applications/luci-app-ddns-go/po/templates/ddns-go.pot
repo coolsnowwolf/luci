@@ -9,6 +9,10 @@ msgstr ""
 msgid "Collecting data..."
 msgstr ""
 
+#: applications/luci-app-ddns-go/htdocs/luci-static/resources/view/ddns-go.js:87
+msgid "Custom DNS server"
+msgstr ""
+
 #: applications/luci-app-ddns-go/htdocs/luci-static/resources/view/ddns-go.js:31
 #: applications/luci-app-ddns-go/htdocs/luci-static/resources/view/ddns-go.js:36
 #: applications/luci-app-ddns-go/htdocs/luci-static/resources/view/ddns-go.js:54
@@ -16,7 +20,7 @@ msgstr ""
 msgid "DDNS-Go"
 msgstr ""
 
-#: applications/luci-app-ddns-go/htdocs/luci-static/resources/view/ddns-go.js:86
+#: applications/luci-app-ddns-go/htdocs/luci-static/resources/view/ddns-go.js:90
 msgid "Disable WebUI"
 msgstr ""
 
@@ -44,7 +48,7 @@ msgstr ""
 msgid "RUNNING"
 msgstr ""
 
-#: applications/luci-app-ddns-go/htdocs/luci-static/resources/view/ddns-go.js:89
+#: applications/luci-app-ddns-go/htdocs/luci-static/resources/view/ddns-go.js:93
 msgid "Skip certificate verification"
 msgstr ""
 

@@ -6,6 +6,7 @@
 			"path": "omcproxy"
 		},
 		"depends": {
+			"acl": [ "luci-app-omcproxy" ],
 			"fs": { "/etc/config/omcproxy": "file" }
 		}
 	}

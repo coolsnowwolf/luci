@@ -1,84 +1,132 @@
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2021-06-18 19:32+0000\n"
-"Last-Translator: Demian Wright <wright.demian+weblate@gmail.com>\n"
+"PO-Revision-Date: 2025-05-04 15:03+0000\n"
+"Last-Translator: Ricky Tigg <ricky.tigg@gmail.com>\n"
 "Language-Team: Finnish <https://hosted.weblate.org/projects/openwrt/"
 "luciapplicationsudpxy/fi/>\n"
 "Language: fi\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 4.7\n"
+"X-Generator: Weblate 5.12-dev\n"
 
-#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:30
-msgid "Bind IP/Interface"
-msgstr "Sido IP/sovitin"
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:207
+msgid "-1 is all."
+msgstr "-1 on kaikki."
 
-#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:47
-msgid "Buffer messages"
-msgstr "Puskurin viestit"
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:211
+msgid "-1 is unlimited."
+msgstr "-1 on rajoittamaton."
 
-#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:44
-msgid "Buffer size"
-msgstr "Puskurin koko"
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:117
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:121
+msgid "Absent Interface"
+msgstr "Poissa oleva liitäntä"
 
-#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:50
-msgid "Buffer time"
-msgstr "Puskurin aika"
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:207
+msgid "Buffer message amount"
+msgstr "Puskuriviestien määrä"
 
-#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:16
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:211
+msgid "Buffer time limit"
+msgstr "Puskurin aikaraja"
+
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:198
+msgid "Client amount upper limit"
+msgstr "Asiakkaiden määrän yläraja"
+
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:175
+msgid "Client statistics"
+msgstr "Asiakastilastot"
+
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:144
+msgid "Custom Value"
+msgstr "Mukautettu arvo"
+
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:181
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:193
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:201
+msgid "Default"
+msgstr "Oletus"
+
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:163
 msgid "Enabled"
-msgstr "Käytössä"
+msgstr "Otettu käyttöön"
 
 #: applications/luci-app-udpxy/root/usr/share/rpcd/acl.d/luci-app-udpxy.json:3
 msgid "Grant UCI access for luci-app-udpxy"
 msgstr "Myönnä UCI:n käyttöoikeus luci-app-udpxy:lle"
 
-#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:42
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:177
+msgid "HTTP Listen interface"
+msgstr "HTTP-kuunteluliitäntä"
+
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:204
+msgid "Ingress buffer size"
+msgstr "Ingress-puskurin koko"
+
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:201
 msgid "Log file"
 msgstr "Lokitiedosto"
 
-#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:39
-msgid "Max clients"
-msgstr "Asiakkaita enintään"
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:186
+msgid "Multicast subscribe Source Network"
+msgstr "Monilähetystilaus lähdeverkko"
 
-#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:56
-msgid "Multicast subscription renew"
-msgstr "Monilähetystilauksen uusiminen"
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:192
+msgid "Multicast subscribe source interface"
+msgstr "Monilähetystilauslähdeliitäntä"
 
-#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:53
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:215
 msgid "Nice increment"
 msgstr "Mukava lisäys"
 
-#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:33
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:181
 msgid "Port"
 msgstr "Portti"
 
-#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:22
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:219
+msgid "Renew multicast subscription periodicity"
+msgstr "Uusi monilähetystilauksen jaksotus"
+
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:169
 msgid "Respawn"
-msgstr "Respawn"
+msgstr "Käynnistä uudelleen"
 
-#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:36
-msgid "Source IP/Interface"
-msgstr "Lähde IP/sovitin"
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:204
+msgid "Unit: bytes, Kb, Mb; Max 2097152 bytes"
+msgstr "Yksiköt: tavu, kt, Mt; enintään 2097152 tavua"
 
-#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:28
-msgid "Status"
-msgstr "Tila"
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:219
+msgid "Unit: seconds; 0 is skip."
+msgstr "Yksikkö: sekunnit; \"0\" tarkoittaa ohitusta."
 
-#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:25
-msgid "Verbose"
-msgstr "Monisanainen"
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:172
+msgid "Verbose logging"
+msgstr "Monisanainen lokikirjaaminen"
 
-#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:9
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:187
+msgid "When the network is reloaded, the udpxy is reloaded"
+msgstr "Kun verkko latautuu uudelleen, niin tekee myös udpxy"
+
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:136
+msgid "custom"
+msgstr "mukautettu"
+
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:156
 #: applications/luci-app-udpxy/root/usr/share/luci/menu.d/luci-app-udpxy.json:3
 msgid "udpxy"
 msgstr "udpxy"
 
-#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:10
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:157
 msgid ""
-"udpxy is a UDP-to-HTTP multicast traffic relay daemon, here you can "
-"configure the settings."
+"udpxy is an IPTV stream relay, a UDP-to-HTTP multicast traffic relay daemon "
+"which forwards multicast UDP streams to HTTP clients."
 msgstr ""
-"udpxy on UDP:stä HTTP:hen monilähetysliikenteen välityspalvelin, täällä voit "
-"määrittää asetuksia."
+"udpxy on IPTV-virranvälitys, UDP-HTTP-monilähetysliikenteen välitysdemoni, "
+"joka välittää UDP-monilähetysvirrat HTTP-asiakkaille."
+
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:39
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:135
+msgid "unspecified"
+msgstr "määrittelemätön"

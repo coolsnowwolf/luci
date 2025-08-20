@@ -9,7 +9,7 @@ if not arg[1] or not m:get(arg[1]) then
 	luci.http.redirect(m.redirect)
 end
 
-local has_singbox = api.finded_com("singbox")
+local has_singbox = api.finded_com("sing-box")
 local has_xray = api.finded_com("xray")
 
 local nodes_table = {}
@@ -90,7 +90,7 @@ o = s:option(Value, "autoswitch_retry_num", translate("Timeout retry num"))
 o.datatype = "min(1)"
 o.default = 1
 o:depends("enable_autoswitch", true)
-	
+
 autoswitch_backup_node = s:option(DynamicList, "autoswitch_backup_node", translate("List of backup nodes"))
 autoswitch_backup_node:depends("enable_autoswitch", true)
 function o.write(self, section, value)

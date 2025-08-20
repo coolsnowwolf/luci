@@ -1,15 +1,16 @@
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2023-02-16 13:38+0000\n"
-"Last-Translator: Дмитрий Михирев <bizdelnick@gmail.com>\n"
+"PO-Revision-Date: 2025-08-03 11:02+0000\n"
+"Last-Translator: SnIPeRSnIPeR "
+"<snipersniper@users.noreply.hosted.weblate.org>\n"
 "Language-Team: Russian <https://hosted.weblate.org/projects/openwrt/"
 "luciapplicationsttyd/ru/>\n"
 "Language: ru\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
-"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Generator: Weblate 4.16-dev\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"X-Generator: Weblate 5.13-dev\n"
 
 #: applications/luci-app-ttyd/htdocs/luci-static/resources/view/ttyd/config.js:65
 msgid "Accept only one client and exit on disconnection"
@@ -33,7 +34,7 @@ msgstr ""
 
 #: applications/luci-app-ttyd/htdocs/luci-static/resources/view/ttyd/config.js:20
 msgid "Bind to UNIX domain socket instead of IP port"
-msgstr ""
+msgstr "Привязка к сокету домена UNIX вместо IP-порта"
 
 #: applications/luci-app-ttyd/htdocs/luci-static/resources/view/ttyd/config.js:59
 msgid "Check origin"
@@ -53,11 +54,11 @@ msgstr "Конфигурация"
 
 #: applications/luci-app-ttyd/htdocs/luci-static/resources/view/ttyd/config.js:37
 msgid "Credential"
-msgstr "Учетные данные"
+msgstr "Учётные данные"
 
 #: applications/luci-app-ttyd/htdocs/luci-static/resources/view/ttyd/config.js:37
 msgid "Credential for Basic Authentication"
-msgstr "Учетные данные для базовой аутентификации"
+msgstr "Учётные данные для базовой аутентификации"
 
 #: applications/luci-app-ttyd/htdocs/luci-static/resources/view/ttyd/config.js:67
 msgid "Custom index.html path"
@@ -121,11 +122,11 @@ msgstr "Интерфейс"
 
 #: applications/luci-app-ttyd/htdocs/luci-static/resources/view/ttyd/config.js:94
 msgid "Make sure to set up another authorization method."
-msgstr ""
+msgstr "Обязательно настройте альтернативный метод авторизации."
 
 #: applications/luci-app-ttyd/htdocs/luci-static/resources/view/ttyd/config.js:61
 msgid "Max clients"
-msgstr "Макс. кол-во обслуживаемых клиентов"
+msgstr "Максимум клиентов"
 
 #: applications/luci-app-ttyd/htdocs/luci-static/resources/view/ttyd/config.js:61
 msgid "Maximum clients to support (default: 0, no limit)"
@@ -135,11 +136,13 @@ msgstr ""
 
 #: applications/luci-app-ttyd/htdocs/luci-static/resources/view/ttyd/config.js:27
 msgid "Network interface to bind (eg: eth0)"
-msgstr ""
+msgstr "Сетевой интерфейс для привязки (например, eth0)"
 
 #: applications/luci-app-ttyd/htdocs/luci-static/resources/view/ttyd/config.js:93
 msgid "Note that reverse proxied pages is NOT protected by password like LuCI."
 msgstr ""
+"Обратите внимание, что страницы, обслуживаемые через обратный прокси, НЕ "
+"защищены паролем, как LuCI."
 
 #: applications/luci-app-ttyd/htdocs/luci-static/resources/view/ttyd/config.js:85
 msgid "Notice"
@@ -152,6 +155,7 @@ msgstr "Однократно"
 #: applications/luci-app-ttyd/htdocs/luci-static/resources/view/ttyd/config.js:92
 msgid "Override URL in Terminal tab. For use with reverse proxy."
 msgstr ""
+"Переопределить URL во вкладке 'Терминал'. Для работы через обратный прокси."
 
 #: applications/luci-app-ttyd/htdocs/luci-static/resources/view/ttyd/config.js:22
 msgid "Port"
@@ -217,7 +221,8 @@ msgstr "Сигнал"
 
 #: applications/luci-app-ttyd/htdocs/luci-static/resources/view/ttyd/config.js:46
 msgid "Signal to send to the command when exit it (default: 1, SIGHUP)"
-msgstr "Сигнал, посылаемый команде при выходе из нее (по умолчанию: 1, SIGHUP)"
+msgstr ""
+"Сигнал, отправляемый команде при завершении работы (по умолчанию: 1, SIGHUP)"
 
 #: applications/luci-app-ttyd/root/usr/share/luci/menu.d/luci-app-ttyd.json:3
 #: applications/luci-app-ttyd/root/usr/share/luci/menu.d/luci-app-ttyd.json:14
@@ -230,23 +235,23 @@ msgstr "Тип терминала"
 
 #: applications/luci-app-ttyd/htdocs/luci-static/resources/view/ttyd/config.js:56
 msgid "Terminal type to report (default: xterm-256color)"
-msgstr "Тип терминала для отчета (по умолчанию: xterm-256color)"
+msgstr "Тип терминала для отчёта (по умолчанию: xterm-256color)"
 
 #: applications/luci-app-ttyd/htdocs/luci-static/resources/view/ttyd/config.js:32
 msgid "UNIX domain socket path (eg: /var/run/ttyd.sock)"
-msgstr ""
+msgstr "Путь к сокету домена UNIX (например: /var/run/ttyd.sock)"
 
 #: applications/luci-app-ttyd/htdocs/luci-static/resources/view/ttyd/config.js:20
 msgid "UNIX socket"
-msgstr ""
+msgstr "Сокет UNIX"
 
 #: applications/luci-app-ttyd/htdocs/luci-static/resources/view/ttyd/config.js:32
 msgid "UNIX socket path"
-msgstr ""
+msgstr "Путь к сокету UNIX"
 
 #: applications/luci-app-ttyd/htdocs/luci-static/resources/view/ttyd/config.js:91
 msgid "URL override"
-msgstr ""
+msgstr "Переопределение URL"
 
 #: applications/luci-app-ttyd/htdocs/luci-static/resources/view/ttyd/config.js:40
 msgid "User ID"
@@ -258,7 +263,7 @@ msgstr "Идентификатор пользователя для запуск�
 
 #: applications/luci-app-ttyd/htdocs/luci-static/resources/view/ttyd/config.js:84
 msgid "Warning"
-msgstr "Внимание"
+msgstr "Предупреждение"
 
 #: applications/luci-app-ttyd/htdocs/luci-static/resources/view/ttyd/config.js:12
 msgid "ttyd Instance"

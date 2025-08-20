@@ -1,7 +1,7 @@
 local api = require "luci.passwall.api"
 local appname = "passwall"
 local fs = api.fs
-local has_singbox = api.finded_com("singbox")
+local has_singbox = api.finded_com("sing-box")
 local has_xray = api.finded_com("xray")
 local has_fw3 = api.is_finded("fw3")
 local has_fw4 = api.is_finded("fw4")
@@ -106,6 +106,13 @@ o.default = "1:65535"
 o:value("1:65535", translate("All"))
 o:value("53", "DNS")
 o.validate = port_validate
+
+o = s:option(DummyValue, "tips", "　")
+o.rawhtml = true
+o.cfgvalue = function(t, n)
+	return string.format('<font color="red">%s</font>',
+	translate("The port settings support single ports and ranges.<br>Separate multiple ports with commas (,).<br>Example: 21,80,443,1000:2000."))
+end
 
 ---- Use nftables
 o = s:option(ListValue, "use_nft", translate("Firewall tools"))
@@ -234,6 +241,9 @@ if has_xray then
 end
 
 if has_singbox then
+	local version = api.get_app_version("sing-box"):match("[^v]+")
+	local version_ge_1_12_0 = api.compare_versions(version, ">=", "1.12.0")
+
 	s = m:section(TypedSection, "global_singbox", "Sing-Box " .. translate("Settings"))
 	s.anonymous = true
 	s.addremove = false
@@ -243,40 +253,14 @@ if has_singbox then
 	o.rmempty = false
 	o.description = translate("Override the connection destination address with the sniffed domain.<br />When enabled, traffic will match only by domain, ignoring IP rules.<br />If using shunt nodes, configure the domain shunt rules correctly.")
 
-	o = s:option(Value, "geoip_path", translate("Custom geoip Path"))
-	o.default = "/usr/share/singbox/geoip.db"
-	o.rmempty = false
+	if version_ge_1_12_0 then
+		o = s:option(Flag, "record_fragment", "TLS Record " .. translate("Fragment"),
+			translate("Split handshake data into multiple TLS records for better censorship evasion. Low overhead. Recommended to enable first."))
+		o.default = 0
 
-	o = s:option(Value, "geoip_url", translate("Custom geoip URL"))
-	o.default = "https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geoip.db"
-	o:value("https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geoip.db")
-	o:value("https://github.com/1715173329/sing-geoip/releases/latest/download/geoip.db")
-	o:value("https://github.com/lyc8503/sing-box-rules/releases/latest/download/geoip.db")
-	o.rmempty = false
-
-	o = s:option(Value, "geosite_path", translate("Custom geosite Path"))
-	o.default = "/usr/share/singbox/geosite.db"
-	o.rmempty = false
-
-	o = s:option(Value, "geosite_url", translate("Custom geosite URL"))
-	o.default = "https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geosite.db"
-	o:value("https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geosite.db")
-	o:value("https://github.com/1715173329/sing-geosite/releases/latest/download/geosite.db")
-	o:value("https://github.com/lyc8503/sing-box-rules/releases/latest/download/geosite.db")
-	o.rmempty = false
-
-	o = s:option(Button, "_remove_resource", translate("Remove resource files"))
-	o.description = translate("Sing-Box will automatically download resource files when starting, you can use this feature achieve upgrade resource files.")
-	o.inputstyle = "remove"
-	function o.write(self, section, value)
-		local geoip_path = s.fields["geoip_path"] and s.fields["geoip_path"]:formvalue(section) or nil
-		if geoip_path then
-			os.remove(geoip_path)
-		end
-		local geosite_path = s.fields["geosite_path"] and s.fields["geosite_path"]:formvalue(section) or nil
-		if geosite_path then
-			os.remove(geosite_path)
-		end
+		o = s:option(Flag, "fragment", "TLS TCP " .. translate("Fragment"),
+			translate("Split handshake into multiple TCP segments. Enhances obfuscation. May increase delay. Use only if needed."))
+		o.default = 0
 	end
 end
 

@@ -16,17 +16,21 @@ msgstr "自动设置防火墙规则"
 msgid "Change User-Agent to F-words."
 msgstr "更改 User-Agent 为 F 字符。"
 
-#: applications/luci-app-ua2f/htdocs/luci-static/resources/view/ua2f.js:82
+#: applications/luci-app-ua2f/htdocs/luci-static/resources/view/ua2f.js:85
 msgid "Check User-Agent"
 msgstr "检查 User-Agent"
 
 #: applications/luci-app-ua2f/htdocs/luci-static/resources/view/ua2f.js:60
 msgid "Collecting data…"
-msgstr "收集数据中…"
+msgstr "正在收集数据中…"
 
 #: applications/luci-app-ua2f/htdocs/luci-static/resources/view/ua2f.js:80
 msgid "Custom User-Agent"
 msgstr "自定义 User-Agent"
+
+#: applications/luci-app-ua2f/htdocs/luci-static/resources/view/ua2f.js:82
+msgid "Disable conntrack mark"
+msgstr "禁用 conntrack 标记"
 
 #: applications/luci-app-ua2f/htdocs/luci-static/resources/view/ua2f.js:66
 msgid "Enable"
@@ -40,7 +44,7 @@ msgstr "授予访问 UA2F 配置的权限"
 msgid "NOT RUNNING"
 msgstr "未运行"
 
-#: applications/luci-app-ua2f/htdocs/luci-static/resources/view/ua2f.js:83
+#: applications/luci-app-ua2f/htdocs/luci-static/resources/view/ua2f.js:86
 msgid "Open website"
 msgstr "打开网站"
 
@@ -55,6 +59,12 @@ msgstr "处理来自内网的 HTTP 流量"
 #: applications/luci-app-ua2f/htdocs/luci-static/resources/view/ua2f.js:29
 msgid "RUNNING"
 msgstr "运行中"
+
+#: applications/luci-app-ua2f/htdocs/luci-static/resources/view/ua2f.js:83
+msgid ""
+"This will increase compatibility with other programs that modify conntrack "
+"marks but will decrease performance."
+msgstr "这将增加与其他修改 conntrack 标记的程序的兼容性，但会降低性能。"
 
 #: applications/luci-app-ua2f/htdocs/luci-static/resources/view/ua2f.js:29
 #: applications/luci-app-ua2f/htdocs/luci-static/resources/view/ua2f.js:31

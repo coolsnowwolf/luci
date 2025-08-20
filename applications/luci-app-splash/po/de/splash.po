@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2021-02-08 04:46+0000\n"
-"Last-Translator: Zocker1012 <julian.schoemer.1997@gmail.com>\n"
+"PO-Revision-Date: 2025-05-07 12:01+0000\n"
+"Last-Translator: Bob Idle <102661087+bobidle@users.noreply.github.com>\n"
 "Language-Team: German <https://hosted.weblate.org/projects/openwrt/"
 "luciapplicationssplash/de/>\n"
 "Language: de\n"
@@ -11,7 +11,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 4.5-dev\n"
+"X-Generator: Weblate 5.12-dev\n"
 
 #: applications/luci-app-splash/luasrc/view/splash/splash.htm:53
 msgid "%s with the operator of this access point."
@@ -20,7 +20,7 @@ msgstr "%s mit dem Betreiber dieses Accesspoints."
 #: applications/luci-app-splash/luasrc/view/splash/splash.htm:65
 #: applications/luci-app-splash/luasrc/view/splash_splash/splash.htm:13
 msgid "Accept"
-msgstr "Akzeptieren"
+msgstr "Annehmen"
 
 #: applications/luci-app-splash/luasrc/view/splash/splash.htm:79
 msgid ""
@@ -161,7 +161,7 @@ msgstr ""
 #: applications/luci-app-splash/luasrc/view/splash/splash.htm:97
 msgid "Donate some money to help us keep this project alive."
 msgstr ""
-"Hilf durch eine Spende dieses Projekt aufrechzuerhalten oder weiter "
+"Hilf durch eine Spende dieses Projekt aufrechtzuerhalten oder weiter "
 "auszubauen."
 
 #: applications/luci-app-splash/luasrc/model/cbi/splash/splash.lua:15

@@ -1,19 +1,19 @@
 msgid ""
 msgstr "Content-Type: text/plain; charset=UTF-8"
 
-#: applications/luci-app-ipsec-vpnd/htdocs/luci-static/resources/view/ipsec-vpnd/ipsec-vpnd.js:86
+#: applications/luci-app-ipsec-vpnd/htdocs/luci-static/resources/view/ipsec-vpnd.js:79
 msgid "Account"
 msgstr ""
 
-#: applications/luci-app-ipsec-vpnd/htdocs/luci-static/resources/view/ipsec-vpnd/ipsec-vpnd.js:66
+#: applications/luci-app-ipsec-vpnd/htdocs/luci-static/resources/view/ipsec-vpnd.js:59
 msgid "Collecting data..."
 msgstr ""
 
-#: applications/luci-app-ipsec-vpnd/htdocs/luci-static/resources/view/ipsec-vpnd/ipsec-vpnd.js:82
+#: applications/luci-app-ipsec-vpnd/htdocs/luci-static/resources/view/ipsec-vpnd.js:75
 msgid "DNS using in VPN tunnel.Set to the router's LAN IP is recommended"
 msgstr ""
 
-#: applications/luci-app-ipsec-vpnd/htdocs/luci-static/resources/view/ipsec-vpnd/ipsec-vpnd.js:72
+#: applications/luci-app-ipsec-vpnd/htdocs/luci-static/resources/view/ipsec-vpnd.js:65
 msgid "Enable"
 msgstr ""
 
@@ -21,46 +21,46 @@ msgstr ""
 msgid "Grant access to ipsec configuration"
 msgstr ""
 
-#: applications/luci-app-ipsec-vpnd/htdocs/luci-static/resources/view/ipsec-vpnd/ipsec-vpnd.js:34
-#: applications/luci-app-ipsec-vpnd/htdocs/luci-static/resources/view/ipsec-vpnd/ipsec-vpnd.js:36
+#: applications/luci-app-ipsec-vpnd/htdocs/luci-static/resources/view/ipsec-vpnd.js:34
+#: applications/luci-app-ipsec-vpnd/htdocs/luci-static/resources/view/ipsec-vpnd.js:36
 msgid "IPSec VPN"
 msgstr ""
 
-#: applications/luci-app-ipsec-vpnd/htdocs/luci-static/resources/view/ipsec-vpnd/ipsec-vpnd.js:52
+#: applications/luci-app-ipsec-vpnd/htdocs/luci-static/resources/view/ipsec-vpnd.js:45
 #: applications/luci-app-ipsec-vpnd/root/usr/share/luci/menu.d/luci-app-ipsec-vpnd.json:3
 msgid "IPSec VPN Server"
 msgstr ""
 
-#: applications/luci-app-ipsec-vpnd/htdocs/luci-static/resources/view/ipsec-vpnd/ipsec-vpnd.js:53
+#: applications/luci-app-ipsec-vpnd/htdocs/luci-static/resources/view/ipsec-vpnd.js:46
 msgid ""
 "IPSec VPN connectivity using the native built-in VPN Client on iOS or "
 "Andriod (IKEv1 with PSK and Xauth)"
 msgstr ""
 
-#: applications/luci-app-ipsec-vpnd/htdocs/luci-static/resources/view/ipsec-vpnd/ipsec-vpnd.js:77
+#: applications/luci-app-ipsec-vpnd/htdocs/luci-static/resources/view/ipsec-vpnd.js:70
 msgid "LAN DHCP reserved started IP addresses with the same subnet mask"
 msgstr ""
 
-#: applications/luci-app-ipsec-vpnd/htdocs/luci-static/resources/view/ipsec-vpnd/ipsec-vpnd.js:36
+#: applications/luci-app-ipsec-vpnd/htdocs/luci-static/resources/view/ipsec-vpnd.js:36
 msgid "NOT RUNNING"
 msgstr ""
 
-#: applications/luci-app-ipsec-vpnd/htdocs/luci-static/resources/view/ipsec-vpnd/ipsec-vpnd.js:89
+#: applications/luci-app-ipsec-vpnd/htdocs/luci-static/resources/view/ipsec-vpnd.js:82
 msgid "Password"
 msgstr ""
 
-#: applications/luci-app-ipsec-vpnd/htdocs/luci-static/resources/view/ipsec-vpnd/ipsec-vpnd.js:34
+#: applications/luci-app-ipsec-vpnd/htdocs/luci-static/resources/view/ipsec-vpnd.js:34
 msgid "RUNNING"
 msgstr ""
 
-#: applications/luci-app-ipsec-vpnd/htdocs/luci-static/resources/view/ipsec-vpnd/ipsec-vpnd.js:93
+#: applications/luci-app-ipsec-vpnd/htdocs/luci-static/resources/view/ipsec-vpnd.js:86
 msgid "Secret Pre-Shared Key"
 msgstr ""
 
-#: applications/luci-app-ipsec-vpnd/htdocs/luci-static/resources/view/ipsec-vpnd/ipsec-vpnd.js:81
+#: applications/luci-app-ipsec-vpnd/htdocs/luci-static/resources/view/ipsec-vpnd.js:74
 msgid "VPN Client DNS"
 msgstr ""
 
-#: applications/luci-app-ipsec-vpnd/htdocs/luci-static/resources/view/ipsec-vpnd/ipsec-vpnd.js:76
+#: applications/luci-app-ipsec-vpnd/htdocs/luci-static/resources/view/ipsec-vpnd.js:69
 msgid "VPN Client IP"
 msgstr ""

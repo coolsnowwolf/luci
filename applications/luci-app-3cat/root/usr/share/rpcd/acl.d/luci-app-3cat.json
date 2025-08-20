@@ -1,0 +1,11 @@
+{
+	"luci-app-3cat": {
+		"description": "Grant UCI access for luci-app-3cat",
+		"read": {
+			"uci": [ "3cat" ]
+		},
+		"write": {
+			"uci": [ "3cat" ]
+		}
+	}
+}

@@ -1,0 +1,506 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Project-Id-Version: luci-app-3ginfo-lite\n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: none\n"
+"Language: zh_Hans\n"
+"MIME-Version: 1.0\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:1067
+msgid "(Received Signal Strength Indicator)"
+msgstr "（接收信号强度指示）"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:1079
+msgid "(Reference Signal Receive Power)"
+msgstr "（参考信号接收功率）"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:1103
+msgid "(Reference Signal Received Quality)"
+msgstr "（参考信号接收质量）"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:1055
+msgid "(Signal Strength)"
+msgstr "（信号强度）"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:1091
+msgid "(Signal to Interference plus Noise Ratio)"
+msgstr "（信噪比）"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:536
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:936
+msgid "3ginfo-lite"
+msgstr "3ginfo-lite"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdebug.js:93
+msgid "<code>cat /sys/kernel/debug/usb/devices</code>."
+msgstr "<code>cat /sys/kernel/debug/usb/devices</code>。"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdebug.js:110
+msgid "<code>ls /dev</code>."
+msgstr "<code>ls /dev</code>。"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdebug.js:127
+msgid "<code>sh -x /usr/share/3ginfo-lite/3ginfo.sh</code>."
+msgstr "<code>sh -x /usr/share/3ginfo-lite/3ginfo.sh</code>。"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:1141
+msgid "BTS Search"
+msgstr "基站搜索"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gconfig.js:64
+msgid "BTS search settings"
+msgstr "基站搜索设置"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:1117
+msgid "CA band (SCC1)"
+msgstr "载波聚合频段（SCC1）"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:1121
+msgid "CA band (SCC2)"
+msgstr "载波聚合频段（SCC2）"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:1125
+msgid "CA band (SCC3)"
+msgstr "载波聚合频段（SCC3）"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:1129
+msgid "CA band (SCC4)"
+msgstr "载波聚合频段（SCC4）"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:188
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:196
+msgid "CLICK ME TO SEE NEW MENU"
+msgstr "点此查看新菜单"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:1054
+msgid "CSQ"
+msgstr "载波信号质量"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:314
+msgid "Cancel"
+msgstr "取消"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:1033
+msgid "Cell / Signal Information"
+msgstr "基站 / 信号信息"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:1040
+msgid "Cell ID"
+msgstr "基站 ID"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:139
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:171
+msgid "Cell edge"
+msgstr "边缘基站"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdebug.js:106
+msgid "Check availability of ttyX ports."
+msgstr "检查 ttyX 端口的可用性。"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdebug.js:123
+msgid "Check data read by the 3ginfo scripts."
+msgstr "检查 3ginfo 脚本读取的数据。"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:1029
+msgid "Chip Temperature"
+msgstr "芯片温度"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdebug.js:164
+msgid "Clear"
+msgstr "清空"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:433
+msgid "Close"
+msgstr "关闭"
+
+#: applications/luci-app-3ginfo-lite/root/usr/share/luci/menu.d/luci-app-3ginfo-lite.json:43
+msgid "Configuration"
+msgstr "配置"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gconfig.js:26
+msgid "Configuration 3ginfo-lite"
+msgstr "3ginfo-lite 配置"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gconfig.js:26
+msgid "Configuration panel for the 3ginfo-lite application."
+msgstr "3ginfo-lite 配置面板。"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:1002
+msgid "Connection statistics"
+msgstr "连接统计"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdebug.js:134
+msgid "Debug"
+msgstr "调试"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:471
+msgid "Defined modems"
+msgstr "已定义的模块"
+
+#: applications/luci-app-3ginfo-lite/root/usr/share/luci/menu.d/luci-app-3ginfo-lite.json:25
+msgid "Details"
+msgstr "详细信息"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdebug.js:144
+#: applications/luci-app-3ginfo-lite/root/usr/share/luci/menu.d/luci-app-3ginfo-lite.json:34
+msgid "Diagnostics"
+msgstr "诊断"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdebug.js:171
+msgid "Download"
+msgstr "下载"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdebug.js:74
+msgid "Download error"
+msgstr "下载错误"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:931
+msgid "Error:"
+msgstr "错误："
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:124
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:156
+msgid "Excellent"
+msgstr "优秀"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdebug.js:145
+msgid ""
+"Execution of various commands to check the availability of the modem and "
+"eliminate errors in the data collected by the scripts."
+msgstr "执行各种命令以检查模块的可用性，并消除脚本收集的数据中的错误。"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:958
+msgid "General Information"
+msgstr "常规信息"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:33
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:65
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:98
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:129
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:161
+msgid "Good"
+msgstr "良好"
+
+#: applications/luci-app-3ginfo-lite/root/usr/share/rpcd/acl.d/luci-app-3ginfo-lite.json:3
+msgid "Grant access to LuCI app 3ginfo-lite"
+msgstr "授予访问 LuCI 应用 3ginfo-lite 的权限"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:188
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:196
+msgid "Hint"
+msgstr "提示"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gconfig.js:70
+msgid ""
+"Hint: To set up a BTS search engine, all you have to do is select the "
+"dedicated website for your location."
+msgstr "提示：要设置基站搜索引擎，您只需选择适合您所在位置的专用网站即可。"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:1021
+msgid "IP adress / Communication Port"
+msgstr "IP 地址 / 通信端口"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gconfig.js:49
+msgid "IP adress / Port for communication with the modem"
+msgstr "用于与模块通信的 IP 地址 / 端口"
+
+#: applications/luci-app-3ginfo-lite/root/usr/share/luci/menu.d/luci-app-3ginfo-lite.json:12
+msgid "Information about 3G/4G/5G connection"
+msgstr "3G/4G/5G 连接信息"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:477
+msgid "Information read from the SIM card and device."
+msgstr "从 SIM 卡和设备读取的信息。"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gconfig.js:40
+msgid "Interface"
+msgstr "接口"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:472
+msgid "Interface for selecting user defined modems."
+msgstr "用于选择用户定义的模块的接口。"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:1048
+msgid "LAC"
+msgstr "位置区域码"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:357
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:445
+msgid "Loading"
+msgstr "加载中"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:1036
+msgid "MCC MNC"
+msgstr "MCC MNC"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:134
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:166
+msgid "Mid cell"
+msgstr "中间基站"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:292
+#: applications/luci-app-3ginfo-lite/root/usr/share/luci/menu.d/luci-app-3ginfo-lite.json:3
+msgid "Modem"
+msgstr "模块"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:187
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:195
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:416
+msgid "Modem IMEI"
+msgstr "模块 IMEI"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:1010
+msgid "Modem Information"
+msgstr "调制解调器信息"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:950
+msgid "Modem selection menu"
+msgstr "模块选择菜单"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:1013
+msgid "Modem type"
+msgstr "模块类型"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdebug.js:141
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:935
+msgid "More information about the 3ginfo on the %seko.one.pl forum%s."
+msgstr "有关 3ginfo 的更多信息，请访问 %seko.one.pl 论坛%s。"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gconfig.js:41
+msgid "Network interface for Internet access."
+msgstr "用于访问互联网的网络接口。"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:617
+msgid "Not registered"
+msgstr "未注册"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:965
+msgid "Operator"
+msgstr "运营商"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gconfig.js:57
+msgid "Please select a port"
+msgstr "请选择一个端口"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:1113
+msgid "Primary band (PCC) | PCI & EARFCN"
+msgstr "主要频段（PCC） | PCI & EARFCN"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:489
+msgid "Problem with registering to the network, check the SIM card."
+msgstr "注册到网络时出现问题，请检查 SIM 卡。"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:1025
+msgid "Protocol"
+msgstr "协议"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:1078
+msgid "RSRP"
+msgstr "RSRP"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:1102
+msgid "RSRQ"
+msgstr "RSRQ"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:1066
+msgid "RSSI"
+msgstr "RSSI"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:620
+msgid "Registered"
+msgstr "已注册"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:629
+msgid "Registered (roaming)"
+msgstr "已注册（漫游）"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:635
+msgid "Registered (roaming), only SMS"
+msgstr "已注册（漫游），仅短信"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:632
+msgid "Registered, only SMS"
+msgstr "已注册，仅短信"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:626
+msgid "Registering denied"
+msgstr "注册被拒绝"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:1017
+msgid "Revision / Firmware"
+msgstr "版本 / 固件"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:186
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:194
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:408
+msgid "SIM ICCID"
+msgstr "SIM ICCID"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:185
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:193
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:400
+msgid "SIM IMSI"
+msgstr "SIM IMSI"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:492
+msgid "SIM PIN required"
+msgstr "需要 SIM PIN"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:507
+msgid "SIM PIN2 required"
+msgstr "需要 SIM PIN2"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:495
+msgid "SIM PUK required"
+msgstr "需要 SIM PUK"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:510
+msgid "SIM PUK2 required"
+msgstr "需要 SIM PUK2"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:184
+msgid "SIM Slot"
+msgstr "SIM 卡槽"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:501
+msgid "SIM busy"
+msgstr "SIM 卡忙"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:476
+msgid "SIM card menu"
+msgstr "SIM 卡菜单"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:498
+msgid "SIM failure"
+msgstr "SIM 卡故障"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:974
+msgid "SIM status"
+msgstr "SIM 卡状态"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:504
+msgid "SIM wrong"
+msgstr "SIM 卡错误"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:1090
+msgid "SINR"
+msgstr "SINR"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:321
+msgid "Save"
+msgstr "保存"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:1146
+msgid "Search"
+msgstr "搜索"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:1145
+msgid "Search BTS using Cell ID"
+msgstr "使用基站 ID 搜索"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:623
+msgid "Searching.."
+msgstr "搜索中..."
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gconfig.js:74
+msgid "Select a website for searching."
+msgstr "选择一个用于搜索的网站。"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gconfig.js:50
+msgid ""
+"Select the appropriate settings. <br /> <br />Traditional modem. <br /> "
+"Select one of the available ttyUSBX ports.<br /> <br />HiLink modem. <br /> "
+"Enter the IP address 192.168.X.X under which the modem is available."
+msgstr ""
+"选择适当的设置。 <br /> <br />传统模块。 <br /> 选择一个可用的 ttyUSBX 端口。"
+"<br /> <br />HiLink 模块。 <br /> 输入模块可用的 IP 地址 192.168.X.X。"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdebug.js:100
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdebug.js:117
+msgid "Show devices"
+msgstr "显示设备"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:961
+msgid "Signal strength"
+msgstr "信号强度"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:1044
+msgid "TAC"
+msgstr "跟踪区域码"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:1006
+msgid "Technology"
+msgstr "技术"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:520
+msgid ""
+"There is a problem reading connection data. <br /><br /><b>Please check:</b> "
+"<ul><li>1. Connection of the modem to the internet, the correctness of the "
+"entered APN. Some modems need to force the APN on the modem using at "
+"commands to connect to internet.</li><li> 2. Check that the correct "
+"interface assigned to the modem is selected. The default name of the "
+"interface in the package is wan.</li><li><ul>"
+msgstr ""
+"读取连接数据时出现问题。 <br /><br /><b>请检查：</b> <ul><li>1. 模块是否已经"
+"连接到互联网，输入的 APN 是否正确。某些模块需要使用 AT 命令强制在模块上设置 "
+"APN 才能连接到互联网。</li><li>2. 检查是否选择了正确的接口。默认接口名称为 "
+"wan。</li><li><ul>"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:513
+msgid ""
+"There is a problem reading data from the modem. <br /><br /><b>Please check:"
+"</b> <ul><li>1. Modem availability in the system.</li><li>2. The correct "
+"installation of the SIM card in the modem.</li><li> 3. Port for "
+"communication with the modem.</li><li><ul>"
+msgstr ""
+"读取模块数据时出现问题。 <br /><br /><b>请检查：</b> <ul><li>1. 系统中模块是"
+"否可用。</li><li>2. 模块中 SIM 卡是否正确安装。</li><li>3. 与模块通信的端口。"
+"</li><li><ul>"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdebug.js:89
+msgid "USB debug information"
+msgstr "USB 调试信息"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:28
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:60
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:93
+msgid "Very good"
+msgstr "非常好"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:43
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:75
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:108
+msgid "Very weak"
+msgstr "非常弱"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:579
+msgid "Waiting for connection data..."
+msgstr "等待连接数据..."
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:537
+msgid "Waiting to read data from the modem..."
+msgstr "等待从模块读取数据..."
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:38
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:70
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:103
+msgid "Weak"
+msgstr "弱"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gconfig.js:73
+msgid "Website to search for BTS"
+msgstr "用于搜索基站的网站"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gconfig.js:76
+msgid "btsearch.pl"
+msgstr "btsearch.pl"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gconfig.js:77
+msgid "lteitaly.it"
+msgstr "lteitaly.it"
+
+#: applications/luci-app-3ginfo-lite/htdocs/luci-static/resources/view/modem/3gdetail.js:955
+msgid "☰"
+msgstr "☰"

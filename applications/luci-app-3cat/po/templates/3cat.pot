@@ -1,0 +1,97 @@
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8"
+
+#: applications/luci-app-3cat/htdocs/luci-static/resources/view/3cat.js:23
+#: applications/luci-app-3cat/root/usr/share/luci/menu.d/luci-app-3cat.json:3
+msgid "3cat"
+msgstr ""
+
+#: applications/luci-app-3cat/htdocs/luci-static/resources/view/3cat.js:24
+msgid "A simple TCP/UDP port forwarder via 3proxy."
+msgstr ""
+
+#: applications/luci-app-3cat/htdocs/luci-static/resources/view/3cat.js:31
+msgid "Add instance"
+msgstr ""
+
+#: applications/luci-app-3cat/htdocs/luci-static/resources/view/3cat.js:75
+msgid "Allow access from the Internet."
+msgstr ""
+
+#: applications/luci-app-3cat/htdocs/luci-static/resources/view/3cat.js:64
+msgid "Default"
+msgstr ""
+
+#: applications/luci-app-3cat/htdocs/luci-static/resources/view/3cat.js:46
+msgid "Destination address"
+msgstr ""
+
+#: applications/luci-app-3cat/htdocs/luci-static/resources/view/3cat.js:53
+msgid "Destination port"
+msgstr ""
+
+#: applications/luci-app-3cat/htdocs/luci-static/resources/view/3cat.js:33
+msgid "Enable"
+msgstr ""
+
+#: applications/luci-app-3cat/htdocs/luci-static/resources/view/3cat.js:74
+msgid "Firewall"
+msgstr ""
+
+#: applications/luci-app-3cat/root/usr/share/rpcd/acl.d/luci-app-3cat.json:3
+msgid "Grant UCI access for luci-app-3cat"
+msgstr ""
+
+#: applications/luci-app-3cat/htdocs/luci-static/resources/view/3cat.js:62
+msgid "IP version"
+msgstr ""
+
+#: applications/luci-app-3cat/htdocs/luci-static/resources/view/3cat.js:67
+msgid "IPv4 only"
+msgstr ""
+
+#: applications/luci-app-3cat/htdocs/luci-static/resources/view/3cat.js:68
+msgid "IPv6 only"
+msgstr ""
+
+#: applications/luci-app-3cat/htdocs/luci-static/resources/view/3cat.js:63
+msgid ""
+"If the destination address is a hostname, this option controls which IP "
+"version to use."
+msgstr ""
+
+#: applications/luci-app-3cat/htdocs/luci-static/resources/view/3cat.js:36
+msgid "Listen address"
+msgstr ""
+
+#: applications/luci-app-3cat/htdocs/luci-static/resources/view/3cat.js:42
+msgid "Listen port"
+msgstr ""
+
+#: applications/luci-app-3cat/htdocs/luci-static/resources/view/3cat.js:71
+msgid "Log this instance to the system log."
+msgstr ""
+
+#: applications/luci-app-3cat/htdocs/luci-static/resources/view/3cat.js:70
+msgid "Logging"
+msgstr ""
+
+#: applications/luci-app-3cat/htdocs/luci-static/resources/view/3cat.js:65
+msgid "Prefer IPv4"
+msgstr ""
+
+#: applications/luci-app-3cat/htdocs/luci-static/resources/view/3cat.js:66
+msgid "Prefer IPv6"
+msgstr ""
+
+#: applications/luci-app-3cat/htdocs/luci-static/resources/view/3cat.js:57
+msgid "Protocol"
+msgstr ""
+
+#: applications/luci-app-3cat/htdocs/luci-static/resources/view/3cat.js:58
+msgid "TCP"
+msgstr ""
+
+#: applications/luci-app-3cat/htdocs/luci-static/resources/view/3cat.js:59
+msgid "UDP"
+msgstr ""

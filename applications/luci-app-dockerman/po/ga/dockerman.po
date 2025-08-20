@@ -1,15 +1,15 @@
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2024-10-17 17:11+0000\n"
+"PO-Revision-Date: 2025-07-24 15:20+0000\n"
 "Last-Translator: Aindriú Mac Giolla Eoin <aindriu80@gmail.com>\n"
 "Language-Team: Irish <https://hosted.weblate.org/projects/openwrt/"
 "luciapplicationsdockerman/ga/>\n"
 "Language: ga\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=5; plural=n==1 ? 0 : n==2 ? 1 : (n>2 && n<7) ? 2 :("
-"n>6 && n<11) ? 3 : 4;\n"
-"X-Generator: Weblate 5.8-rc\n"
+"Plural-Forms: nplurals=5; plural=n==1 ? 0 : n==2 ? 1 : (n>2 && n<7) ? 2 :"
+"(n>6 && n<11) ? 3 : 4;\n"
+"X-Generator: Weblate 5.13-dev\n"
 
 #: applications/luci-app-dockerman/luasrc/model/cbi/dockerman/newcontainer.lua:604
 msgid "A list of kernel capabilities to add to the container"
@@ -570,8 +570,8 @@ msgid ""
 "can be one of b, k, m, or g. Minimum is 4M"
 msgstr ""
 "Teorainn chuimhne (formáid: <uimhir>[<aonad>]). Is slánuimhir dhearfach í an "
-"uimhir. Is féidir aonad a bheith mar cheann de b, k, m, nó g. Is é 4M an "
-"t-íosmhéid"
+"uimhir. Is féidir aonad a bheith mar cheann de b, k, m, nó g. Is é 4M an t-"
+"íosmhéid"
 
 #: applications/luci-app-dockerman/luasrc/model/cbi/dockerman/container.lua:582
 msgid ""
@@ -579,8 +579,8 @@ msgid ""
 "can be one of b, k, m, or g. Minimum is 4M."
 msgstr ""
 "Teorainn chuimhne (formáid: <uimhir>[<aonad>]). Is slánuimhir dhearfach í an "
-"uimhir. Is féidir aonad a bheith mar cheann de b, k, m, nó g. Is é 4M an "
-"t-íosmhéid."
+"uimhir. Is féidir aonad a bheith mar cheann de b, k, m, nó g. Is é 4M an t-"
+"íosmhéid."
 
 #: applications/luci-app-dockerman/luasrc/model/cbi/dockerman/newnetwork.lua:47
 msgid "Mode"
@@ -705,7 +705,7 @@ msgstr "Cuir isteach líne na n-orduithe <docker create/run> le do thoil:"
 #: applications/luci-app-dockerman/luasrc/model/cbi/dockerman/container.lua:347
 #: applications/luci-app-dockerman/luasrc/model/cbi/dockerman/containers.lua:135
 msgid "Ports"
-msgstr "Calafoirt"
+msgstr "Poirt"
 
 #: applications/luci-app-dockerman/luasrc/model/cbi/dockerman/newnetwork.lua:52
 msgid "Private (Prevent communication between MAC VLANs)"
@@ -852,7 +852,7 @@ msgstr "Cuir isteach"
 #: applications/luci-app-dockerman/luasrc/model/cbi/dockerman/networks.lua:83
 #: applications/luci-app-dockerman/luasrc/model/cbi/dockerman/newnetwork.lua:91
 msgid "Subnet"
-msgstr "Foghlíon"
+msgstr "Folíon"
 
 #: applications/luci-app-dockerman/luasrc/model/cbi/dockerman/container.lua:367
 msgid "Sysctl"
@@ -888,11 +888,11 @@ msgstr "An chumraíocht logála don choimeádán seo"
 
 #: applications/luci-app-dockerman/luasrc/model/cbi/dockerman/newcontainer.lua:525
 msgid ""
-"The user that commands are run as inside the container.(format: name|uid[:"
-"group|gid])"
+"The user that commands are run as inside the container.(format: name|"
+"uid[:group|gid])"
 msgstr ""
-"An t-úsáideoir a reáchtáiltear orduithe mar laistigh den choimeádán (formáid:"
-" ainm|uid [:group|gid])"
+"An t-úsáideoir a reáchtáiltear orduithe mar laistigh den choimeádán "
+"(formáid: ainm|uid [:group|gid])"
 
 #: applications/luci-app-dockerman/luasrc/model/cbi/dockerman/containers.lua:95
 msgid ""

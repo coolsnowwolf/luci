@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: luci-app-v 2raya\n"
-"PO-Revision-Date: 2024-02-15 00:29+0000\n"
+"PO-Revision-Date: 2025-08-02 07:12+0000\n"
 "Last-Translator: ssantos <ssantos@web.de>\n"
 "Language-Team: Portuguese <https://hosted.weblate.org/projects/openwrt/"
 "luciapplicationsv2raya/pt/>\n"
@@ -10,17 +10,17 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.4-dev\n"
+"X-Generator: Weblate 5.13-dev\n"
 
 #: applications/luci-app-v2raya/htdocs/luci-static/resources/view/v2raya/config.js:79
 #: applications/luci-app-v2raya/htdocs/luci-static/resources/view/v2raya/config.js:86
 msgid "Auto"
-msgstr ""
+msgstr "Auto"
 
 #: applications/luci-app-v2raya/htdocs/luci-static/resources/view/v2raya/config.js:64
 #: applications/luci-app-v2raya/htdocs/luci-static/resources/view/v2raya/log.js:30
 msgid "Collecting data…"
-msgstr ""
+msgstr "Coletando dados…"
 
 #: applications/luci-app-v2raya/root/usr/share/luci/menu.d/luci-app-v2raya.json:13
 msgid "Configuration"
@@ -28,11 +28,11 @@ msgstr "Configuração"
 
 #: applications/luci-app-v2raya/htdocs/luci-static/resources/view/v2raya/config.js:93
 msgid "Debug"
-msgstr "Debug"
+msgstr "Depuração"
 
 #: applications/luci-app-v2raya/htdocs/luci-static/resources/view/v2raya/config.js:104
 msgid "Disable log color output"
-msgstr ""
+msgstr "Desativar saída colorida do registo"
 
 #: applications/luci-app-v2raya/htdocs/luci-static/resources/view/v2raya/config.js:106
 msgid "Disable log timestamp"
@@ -44,7 +44,7 @@ msgstr "Ativar"
 
 #: applications/luci-app-v2raya/htdocs/luci-static/resources/view/v2raya/config.js:96
 msgid "Error"
-msgstr "Falha"
+msgstr "Erro"
 
 #: applications/luci-app-v2raya/root/usr/share/rpcd/acl.d/luci-app-v2raya.json:3
 msgid "Grant access to v2rayA configuration"
@@ -52,7 +52,7 @@ msgstr ""
 
 #: applications/luci-app-v2raya/htdocs/luci-static/resources/view/v2raya/config.js:77
 msgid "IPv6 support"
-msgstr ""
+msgstr "Suporte a IPv6"
 
 #: applications/luci-app-v2raya/htdocs/luci-static/resources/view/v2raya/config.js:94
 msgid "Info"
@@ -80,7 +80,7 @@ msgstr ""
 
 #: applications/luci-app-v2raya/htdocs/luci-static/resources/view/v2raya/config.js:91
 msgid "Log level"
-msgstr ""
+msgstr "Nível do registo"
 
 #: applications/luci-app-v2raya/htdocs/luci-static/resources/view/v2raya/config.js:99
 msgid "Max log retention period"
@@ -88,7 +88,7 @@ msgstr ""
 
 #: applications/luci-app-v2raya/htdocs/luci-static/resources/view/v2raya/config.js:33
 msgid "NOT RUNNING"
-msgstr "NÃO EM EXECUÇÃO"
+msgstr "NÃO ESTÁ EM EXECUÇÃO"
 
 #: applications/luci-app-v2raya/htdocs/luci-static/resources/view/v2raya/config.js:84
 msgid "Nftables support"
@@ -106,11 +106,11 @@ msgstr ""
 
 #: applications/luci-app-v2raya/htdocs/luci-static/resources/view/v2raya/config.js:30
 msgid "Open Web Interface"
-msgstr ""
+msgstr "Abrir Interface Web"
 
 #: applications/luci-app-v2raya/htdocs/luci-static/resources/view/v2raya/config.js:31
 msgid "RUNNING"
-msgstr "EXECUTADO"
+msgstr "EM EXECUÇÃO"
 
 #: applications/luci-app-v2raya/htdocs/luci-static/resources/view/v2raya/log.js:65
 msgid "Refresh every %d seconds."
@@ -138,7 +138,7 @@ msgstr "Erro desconhecido: %s"
 
 #: applications/luci-app-v2raya/htdocs/luci-static/resources/view/v2raya/config.js:95
 msgid "Warn"
-msgstr ""
+msgstr "Aviso"
 
 #: applications/luci-app-v2raya/htdocs/luci-static/resources/view/v2raya/config.js:31
 #: applications/luci-app-v2raya/htdocs/luci-static/resources/view/v2raya/config.js:33

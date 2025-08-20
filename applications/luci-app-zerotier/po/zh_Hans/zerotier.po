@@ -7,30 +7,112 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: applications/luci-app-zerotier/htdocs/luci-static/resources/view/zerotier/base.js:80
-msgid "Allow ZeroTier clients access your LAN network."
-msgstr "允许 ZeroTier 客户端访问您的局域网。"
+#: applications/luci-app-zerotier/htdocs/luci-static/resources/view/zerotier/config.js:125
+msgid "Allow DNS"
+msgstr "允许 DNS"
 
-#: applications/luci-app-zerotier/htdocs/luci-static/resources/view/zerotier/base.js:79
-msgid "Auto NAT clients"
-msgstr "自动客户端 NAT"
+#: applications/luci-app-zerotier/htdocs/luci-static/resources/view/zerotier/config.js:126
+msgid "Allow ZeroTier to set DNS servers."
+msgstr "允许 ZeroTier 设置 DNS 服务器。"
+
+#: applications/luci-app-zerotier/htdocs/luci-static/resources/view/zerotier/config.js:113
+msgid ""
+"Allow ZeroTier to set IP addresses and routes (local/private ranges only)."
+msgstr "允许 ZeroTier 设置 IP 地址和路由（仅限本地/私有范围）。"
+
+#: applications/luci-app-zerotier/htdocs/luci-static/resources/view/zerotier/config.js:118
+msgid "Allow ZeroTier to set global/public/not-private range IPs and routes."
+msgstr "允许 ZeroTier 设置全局/公共/非私有范围的 IP 和路由。"
+
+#: applications/luci-app-zerotier/htdocs/luci-static/resources/view/zerotier/config.js:122
+msgid "Allow ZeroTier to set the default route on the system."
+msgstr "允许 ZeroTier 设置系统的默认路由。"
+
+#: applications/luci-app-zerotier/htdocs/luci-static/resources/view/zerotier/config.js:121
+msgid "Allow default route"
+msgstr "允许默认路由"
+
+#: applications/luci-app-zerotier/htdocs/luci-static/resources/view/zerotier/config.js:133
+msgid "Allow forward"
+msgstr "允许转发"
+
+#: applications/luci-app-zerotier/htdocs/luci-static/resources/view/zerotier/config.js:134
+msgid "Allow forward traffic from/to the ZeroTier network."
+msgstr "允许来自/到 ZeroTier 网络的转发流量。"
+
+#: applications/luci-app-zerotier/htdocs/luci-static/resources/view/zerotier/config.js:117
+msgid "Allow global IP/route"
+msgstr "允许全局 IP/路由"
+
+#: applications/luci-app-zerotier/htdocs/luci-static/resources/view/zerotier/config.js:129
+msgid "Allow input"
+msgstr "允许入站"
+
+#: applications/luci-app-zerotier/htdocs/luci-static/resources/view/zerotier/config.js:87
+msgid "Allow input traffic"
+msgstr "允许入站流量"
+
+#: applications/luci-app-zerotier/htdocs/luci-static/resources/view/zerotier/config.js:130
+msgid "Allow input traffic from the ZeroTier network."
+msgstr "允许来自 ZeroTier 网络的入站流量。"
+
+#: applications/luci-app-zerotier/htdocs/luci-static/resources/view/zerotier/config.js:88
+msgid "Allow input traffic to the ZeroTier daemon."
+msgstr "允许外部流量进入 ZeroTier 守护进程。"
+
+#: applications/luci-app-zerotier/htdocs/luci-static/resources/view/zerotier/config.js:112
+msgid "Allow managed IP/route"
+msgstr "允许管理 IP/路由"
+
+#: applications/luci-app-zerotier/htdocs/luci-static/resources/view/zerotier/config.js:71
+msgid "Client secret"
+msgstr "客户端密钥"
+
+#: applications/luci-app-zerotier/htdocs/luci-static/resources/view/zerotier/config.js:60
+msgid "Collecting data…"
+msgstr "正在收集数据中…"
+
+#: applications/luci-app-zerotier/htdocs/luci-static/resources/view/zerotier/config.js:79
+msgid "Config path"
+msgstr "配置路径"
 
 #: applications/luci-app-zerotier/root/usr/share/luci/menu.d/luci-app-zerotier.json:14
-msgid "Base settings"
-msgstr "基本设置"
+msgid "Configuration"
+msgstr "配置"
 
-#: applications/luci-app-zerotier/htdocs/luci-static/resources/view/zerotier/base.js:66
-msgid "Collecting data ..."
-msgstr "收集数据中 ..."
+#: applications/luci-app-zerotier/htdocs/luci-static/resources/view/zerotier/config.js:83
+msgid "Copy config path"
+msgstr "复制配置目录"
 
-#: applications/luci-app-zerotier/htdocs/luci-static/resources/view/zerotier/base.js:85
+#: applications/luci-app-zerotier/htdocs/luci-static/resources/view/zerotier/config.js:84
+msgid ""
+"Copy the contents of the persistent configuration directory to memory "
+"instead of linking it, this avoids writing to flash."
+msgstr "复制持久配置目录的内容到内存中，而不是链接它，以避免写入闪存。"
+
+#: applications/luci-app-zerotier/htdocs/luci-static/resources/view/zerotier/config.js:91
 msgid ""
 "Create or manage your ZeroTier network, and auth clients who could access."
 msgstr "创建或管理您的 ZeroTier 网络，并允许客户端接入。"
 
-#: applications/luci-app-zerotier/htdocs/luci-static/resources/view/zerotier/base.js:72
+#: applications/luci-app-zerotier/htdocs/luci-static/resources/view/zerotier/config.js:66
+#: applications/luci-app-zerotier/htdocs/luci-static/resources/view/zerotier/config.js:104
 msgid "Enable"
 msgstr "启用"
+
+#: applications/luci-app-zerotier/htdocs/luci-static/resources/view/zerotier/config.js:145
+msgid ""
+"Enable network address and port translation (NAT) for outbound traffic for "
+"this network."
+msgstr "为此网络的出站流量开启网络地址和端口转换（NAT 或 NAPT）。"
+
+#: applications/luci-app-zerotier/htdocs/luci-static/resources/view/zerotier/config.js:137
+msgid "Forward interfaces"
+msgstr "转发接口"
+
+#: applications/luci-app-zerotier/htdocs/luci-static/resources/view/zerotier/config.js:64
+msgid "Global configuration"
+msgstr "全局配置"
 
 #: applications/luci-app-zerotier/root/usr/share/rpcd/acl.d/luci-app-zerotier.json:3
 msgid "Grant access to ZeroTier configuration"
@@ -52,6 +134,19 @@ msgstr "接口名称"
 msgid "Interface info"
 msgstr "接口信息"
 
+#: applications/luci-app-zerotier/htdocs/luci-static/resources/view/zerotier/config.js:138
+#: applications/luci-app-zerotier/htdocs/luci-static/resources/view/zerotier/config.js:149
+msgid "Leave empty for all."
+msgstr "留空表示全部。"
+
+#: applications/luci-app-zerotier/htdocs/luci-static/resources/view/zerotier/config.js:68
+msgid "Listen port"
+msgstr "监听端口"
+
+#: applications/luci-app-zerotier/htdocs/luci-static/resources/view/zerotier/config.js:74
+msgid "Local config path"
+msgstr "本地配置路径"
+
 #: applications/luci-app-zerotier/htdocs/luci-static/resources/view/zerotier/interface.js:87
 msgid "MAC Address"
 msgstr "MAC 地址"
@@ -60,11 +155,19 @@ msgstr "MAC 地址"
 msgid "MTU"
 msgstr "MTU"
 
-#: applications/luci-app-zerotier/htdocs/luci-static/resources/view/zerotier/base.js:36
+#: applications/luci-app-zerotier/htdocs/luci-static/resources/view/zerotier/config.js:148
+msgid "Masquerade interfaces"
+msgstr "伪装接口"
+
+#: applications/luci-app-zerotier/htdocs/luci-static/resources/view/zerotier/config.js:144
+msgid "Masquerading"
+msgstr "IP 动态伪装"
+
+#: applications/luci-app-zerotier/htdocs/luci-static/resources/view/zerotier/config.js:37
 msgid "NOT RUNNING"
 msgstr "未运行"
 
-#: applications/luci-app-zerotier/htdocs/luci-static/resources/view/zerotier/base.js:76
+#: applications/luci-app-zerotier/htdocs/luci-static/resources/view/zerotier/config.js:108
 msgid "Network ID"
 msgstr "网络 ID"
 
@@ -72,15 +175,33 @@ msgstr "网络 ID"
 msgid "Network Interface Information"
 msgstr "网络接口信息"
 
+#: applications/luci-app-zerotier/htdocs/luci-static/resources/view/zerotier/config.js:98
+msgid "Network configuration"
+msgstr "网络配置"
+
 #: applications/luci-app-zerotier/htdocs/luci-static/resources/view/zerotier/interface.js:77
 msgid "No interface online."
 msgstr "没有在线的接口。"
 
-#: applications/luci-app-zerotier/htdocs/luci-static/resources/view/zerotier/base.js:86
+#: applications/luci-app-zerotier/htdocs/luci-static/resources/view/zerotier/config.js:92
 msgid "Open website"
 msgstr "打开网站"
 
-#: applications/luci-app-zerotier/htdocs/luci-static/resources/view/zerotier/base.js:34
+#: applications/luci-app-zerotier/htdocs/luci-static/resources/view/zerotier/config.js:75
+msgid ""
+"Path of the optional file local.conf (see <a target=\"_blank\" "
+"href=\"%s\">documentation</a>)."
+msgstr ""
+"可选配置文件 local.conf 的路径（请参阅 <a target=\"_blank\" href=\"%s\">文档"
+"</a>）。"
+
+#: applications/luci-app-zerotier/htdocs/luci-static/resources/view/zerotier/config.js:80
+msgid ""
+"Persistent configuration directory (to keep other configurations such as "
+"controller or moons, etc.)."
+msgstr "持久配置目录（用于保留其他配置，例如 controller 或 moon 等）。"
+
+#: applications/luci-app-zerotier/htdocs/luci-static/resources/view/zerotier/config.js:35
 msgid "RUNNING"
 msgstr "运行中"
 
@@ -100,19 +221,19 @@ msgstr "无法获取接口 %s 的信息：%s。"
 msgid "Unable to get interface info: %s."
 msgstr "无法获取接口信息：%s。"
 
-#: applications/luci-app-zerotier/htdocs/luci-static/resources/view/zerotier/base.js:34
-#: applications/luci-app-zerotier/htdocs/luci-static/resources/view/zerotier/base.js:36
-#: applications/luci-app-zerotier/htdocs/luci-static/resources/view/zerotier/base.js:52
+#: applications/luci-app-zerotier/htdocs/luci-static/resources/view/zerotier/config.js:35
+#: applications/luci-app-zerotier/htdocs/luci-static/resources/view/zerotier/config.js:37
+#: applications/luci-app-zerotier/htdocs/luci-static/resources/view/zerotier/config.js:46
 #: applications/luci-app-zerotier/htdocs/luci-static/resources/view/zerotier/interface.js:73
 #: applications/luci-app-zerotier/root/usr/share/luci/menu.d/luci-app-zerotier.json:3
 msgid "ZeroTier"
 msgstr "ZeroTier"
 
-#: applications/luci-app-zerotier/htdocs/luci-static/resources/view/zerotier/base.js:84
+#: applications/luci-app-zerotier/htdocs/luci-static/resources/view/zerotier/config.js:90
 msgid "ZeroTier Central"
 msgstr "ZeroTier 管理中心"
 
-#: applications/luci-app-zerotier/htdocs/luci-static/resources/view/zerotier/base.js:53
+#: applications/luci-app-zerotier/htdocs/luci-static/resources/view/zerotier/config.js:47
 #: applications/luci-app-zerotier/htdocs/luci-static/resources/view/zerotier/interface.js:74
 msgid "ZeroTier is an open source, cross-platform and easy to use virtual LAN."
 msgstr "ZeroTier 是一个开源、跨平台且易于使用的虚拟局域网 VPN。"

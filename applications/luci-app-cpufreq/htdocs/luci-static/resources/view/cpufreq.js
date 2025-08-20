@@ -10,15 +10,15 @@
 'require view';
 
 return view.extend({
-	load: function() {
+	load() {
 		return Promise.all([
 			uci.load('cpufreq'),
 			L.resolveDefault(fs.exec_direct('/etc/init.d/cpufreq', [ 'get_policies' ], 'json'), {})
 		]);
 	},
 
-	render: function(data) {
-		var m, s, o;
+	render(data) {
+		let m, s, o;
 
 		m = new form.Map('cpufreq', _('CPU Freq Settings'),
 			_('Set CPU Scaling Governor to Max Performance or Balance Mode'));
@@ -38,28 +38,28 @@ return view.extend({
 			}
 		} else {
 			/* Mark user edited */
-			var ss = m.section(form.NamedSection, 'global', 'settings');
-			var so = ss.option(form.HiddenValue, 'set');
+			let ss = m.section(form.NamedSection, 'global', 'settings');
+			let so = ss.option(form.HiddenValue, 'set');
 			so.load = (/* ... */) => { return 1 };
 			so.readonly = true;
 			so.rmempty = false;
 
-			for (var i in data[1]) {
-				var index = data[1][i].index;
+			for (let i in data[1]) {
+				let index = data[1][i].index;
 				s.tab(index, i, _('<h4>Apply for CPU %s.</h4>').format(data[1][i].cpus));
 
 				o = s.taboption(index, form.ListValue, 'governor' + index, _('CPU Scaling Governor'));
-				for (var gov of data[1][i].governors)
+				for (let gov of data[1][i].governors)
 					o.value(gov);
 				o.rmempty = false;
 
 				o = s.taboption(index, form.ListValue, 'minfreq' + index, _('Min Idle CPU Freq'));
-				for (var freq of data[1][i].freqs)
+				for (let freq of data[1][i].freqs)
 					o.value(freq);
 				o.rmempty = false;
 
 				o = s.taboption(index, form.ListValue, 'maxfreq' + index, _('Max Turbo Boost CPU Freq'));
-				for (var freq of data[1][i].freqs)
+				for (let freq of data[1][i].freqs)
 					o.value(freq);
 				o.validate = function(section_id, value) {
 					if (!section_id)
@@ -67,7 +67,7 @@ return view.extend({
 					else if (value === null || value === '')
 						return _('Expecting: %s').format('non-empty value');
 
-					var minfreq = this.map.lookupOption('minfreq' + index, section_id)[0].formvalue(section_id);
+					let minfreq = this.map.lookupOption('minfreq' + index, section_id)[0].formvalue(section_id);
 					if (parseInt(value) < parseInt(minfreq))
 						return _('Max CPU Freq cannot be lower than Min CPU Freq.');
 

@@ -1,14 +1,14 @@
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2023-06-21 04:38+0000\n"
-"Last-Translator: Quy <haonguyen93056@gmail.com>\n"
+"PO-Revision-Date: 2025-05-14 10:34+0000\n"
+"Last-Translator: Lộc SuperVipPro <locsupervippro@gmail.com>\n"
 "Language-Team: Vietnamese <https://hosted.weblate.org/projects/openwrt/"
 "luciapplicationsfrpc/vi/>\n"
 "Language: vi\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 4.18.1\n"
+"X-Generator: Weblate 5.12-dev\n"
 
 #: applications/luci-app-frpc/htdocs/luci-static/resources/view/frpc.js:214
 msgid "Add new proxy..."
@@ -41,10 +41,10 @@ msgstr "Người dùng Admin"
 #: applications/luci-app-frpc/htdocs/luci-static/resources/view/frpc.js:28
 msgid ""
 "AdminAddr specifies the address that the admin server binds to.<br />By "
-"default, this value is \"127.0.0.1\"."
+"default, this value is \"0.0.0.0\"."
 msgstr ""
 "AdminAddr chỉ định địa chỉ mà máy chủ quản trị liên kết đến.<br />Theo mặc "
-"định, giá trị này là \"127.0.0.1\"."
+"định, giá trị này là \"0.0.0.0\"."
 
 #: applications/luci-app-frpc/htdocs/luci-static/resources/view/frpc.js:29
 msgid ""
@@ -230,7 +230,7 @@ msgstr "Tệp nhật ký"
 
 #: applications/luci-app-frpc/htdocs/luci-static/resources/view/frpc.js:24
 msgid "Log level"
-msgstr "Cấp độ log"
+msgstr "Mức độ nhật ký"
 
 #: applications/luci-app-frpc/htdocs/luci-static/resources/view/frpc.js:25
 msgid "Log max days"
@@ -391,10 +391,10 @@ msgstr "Cổng máy chủ"
 #: applications/luci-app-frpc/htdocs/luci-static/resources/view/frpc.js:20
 msgid ""
 "ServerAddr specifies the address of the server to connect to.<br />By "
-"default, this value is \"0.0.0.0\"."
+"default, this value is \"127.0.0.1\"."
 msgstr ""
 "ServerAddr chỉ định địa chỉ của máy chủ để kết nối.<br />Theo mặc định, giá "
-"trị này là \"0.0.0.0\"."
+"trị này là \"127.0.0.1\"."
 
 #: applications/luci-app-frpc/htdocs/luci-static/resources/view/frpc.js:21
 msgid ""

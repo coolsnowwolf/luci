@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2021-12-14 02:53+0000\n"
+"PO-Revision-Date: 2025-03-05 18:43+0000\n"
 "Last-Translator: Kristoffer Grundström <swedishsailfishosuser@tutanota.com>\n"
 "Language-Team: Swedish <https://hosted.weblate.org/projects/openwrt/"
 "luciapplicationsudpxy/sv/>\n"
@@ -8,75 +8,125 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 4.10-dev\n"
+"X-Generator: Weblate 5.10.3-dev\n"
 
-#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:30
-msgid "Bind IP/Interface"
-msgstr "Bind IP/Gränssnitt"
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:207
+msgid "-1 is all."
+msgstr "-1 är allt."
 
-#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:47
-msgid "Buffer messages"
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:211
+msgid "-1 is unlimited."
+msgstr "-1 är obegränsat."
+
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:117
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:121
+msgid "Absent Interface"
+msgstr "Frånvarande gränssnitt"
+
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:207
+msgid "Buffer message amount"
+msgstr "Buffra meddelande-mängd"
+
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:211
+msgid "Buffer time limit"
+msgstr "Tidsgräns för buffring"
+
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:198
+msgid "Client amount upper limit"
 msgstr ""
 
-#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:44
-msgid "Buffer size"
-msgstr ""
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:175
+msgid "Client statistics"
+msgstr "Klient-statistik"
 
-#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:50
-msgid "Buffer time"
-msgstr ""
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:144
+msgid "Custom Value"
+msgstr "Anpassat värde"
 
-#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:16
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:181
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:193
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:201
+msgid "Default"
+msgstr "Standard"
+
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:163
 msgid "Enabled"
 msgstr "Aktiverad"
 
 #: applications/luci-app-udpxy/root/usr/share/rpcd/acl.d/luci-app-udpxy.json:3
 msgid "Grant UCI access for luci-app-udpxy"
+msgstr "Godkänn UCI-åtkomst för luci-app-udpxy"
+
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:177
+msgid "HTTP Listen interface"
+msgstr "Lyssningsgränssnittet för HTTP"
+
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:204
+msgid "Ingress buffer size"
 msgstr ""
 
-#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:42
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:201
 msgid "Log file"
 msgstr "Loggfil"
 
-#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:39
-msgid "Max clients"
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:186
+msgid "Multicast subscribe Source Network"
 msgstr ""
 
-#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:56
-msgid "Multicast subscription renew"
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:192
+msgid "Multicast subscribe source interface"
 msgstr ""
 
-#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:53
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:215
 msgid "Nice increment"
-msgstr ""
+msgstr "Trevlig ökning"
 
-#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:33
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:181
 msgid "Port"
 msgstr "Port"
 
-#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:22
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:219
+msgid "Renew multicast subscription periodicity"
+msgstr ""
+
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:169
 msgid "Respawn"
 msgstr "Återuppliva"
 
-#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:36
-msgid "Source IP/Interface"
-msgstr ""
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:204
+msgid "Unit: bytes, Kb, Mb; Max 2097152 bytes"
+msgstr "Enhet: bytes, Kb, Mb; Maximalt 2097152 bytes"
 
-#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:28
-msgid "Status"
-msgstr "Status"
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:219
+msgid "Unit: seconds; 0 is skip."
+msgstr "Enhet: sekunder; 0 är hoppa över."
 
-#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:25
-msgid "Verbose"
-msgstr ""
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:172
+msgid "Verbose logging"
+msgstr "Detaljerad loggning"
 
-#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:9
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:187
+msgid "When the network is reloaded, the udpxy is reloaded"
+msgstr "När nätverket har laddats om så laddas udpxy om"
+
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:136
+msgid "custom"
+msgstr "anpassad"
+
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:156
 #: applications/luci-app-udpxy/root/usr/share/luci/menu.d/luci-app-udpxy.json:3
 msgid "udpxy"
-msgstr ""
+msgstr "udpxy"
 
-#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:10
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:157
 msgid ""
-"udpxy is a UDP-to-HTTP multicast traffic relay daemon, here you can "
-"configure the settings."
+"udpxy is an IPTV stream relay, a UDP-to-HTTP multicast traffic relay daemon "
+"which forwards multicast UDP streams to HTTP clients."
 msgstr ""
+"udpxy är ett relä för IPTV-strömmar, en UDP-till-HTTP-daemon för multicast-"
+"trafik som vidarebefordrar UDP-strömmar för multicast till HTTP-klienter."
+
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:39
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:135
+msgid "unspecified"
+msgstr "o-specificerad"

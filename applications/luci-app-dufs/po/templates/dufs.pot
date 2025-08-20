@@ -1,64 +1,64 @@
 msgid ""
 msgstr "Content-Type: text/plain; charset=UTF-8"
 
-#: applications/luci-app-dufs/htdocs/luci-static/resources/view/dufs.js:92
+#: applications/luci-app-dufs/htdocs/luci-static/resources/view/dufs.js:98
 msgid "Add auth roles, e.g. %s."
 msgstr ""
 
-#: applications/luci-app-dufs/htdocs/luci-static/resources/view/dufs.js:83
+#: applications/luci-app-dufs/htdocs/luci-static/resources/view/dufs.js:89
 msgid "Allow access from Internet"
 msgstr ""
 
-#: applications/luci-app-dufs/htdocs/luci-static/resources/view/dufs.js:94
+#: applications/luci-app-dufs/htdocs/luci-static/resources/view/dufs.js:108
 msgid "Allow all operations"
 msgstr ""
 
-#: applications/luci-app-dufs/htdocs/luci-static/resources/view/dufs.js:99
+#: applications/luci-app-dufs/htdocs/luci-static/resources/view/dufs.js:113
 msgid "Allow delete files/folders"
 msgstr ""
 
-#: applications/luci-app-dufs/htdocs/luci-static/resources/view/dufs.js:102
+#: applications/luci-app-dufs/htdocs/luci-static/resources/view/dufs.js:116
 msgid "Allow search files/folders"
 msgstr ""
 
-#: applications/luci-app-dufs/htdocs/luci-static/resources/view/dufs.js:105
+#: applications/luci-app-dufs/htdocs/luci-static/resources/view/dufs.js:119
 msgid "Allow symlink to files/folders outside root directory"
 msgstr ""
 
-#: applications/luci-app-dufs/htdocs/luci-static/resources/view/dufs.js:96
+#: applications/luci-app-dufs/htdocs/luci-static/resources/view/dufs.js:110
 msgid "Allow upload files/folders"
 msgstr ""
 
-#: applications/luci-app-dufs/htdocs/luci-static/resources/view/dufs.js:108
+#: applications/luci-app-dufs/htdocs/luci-static/resources/view/dufs.js:122
 msgid "Allow zip archive generation"
 msgstr ""
 
-#: applications/luci-app-dufs/htdocs/luci-static/resources/view/dufs.js:91
+#: applications/luci-app-dufs/htdocs/luci-static/resources/view/dufs.js:97
 msgid "Auth roles"
 msgstr ""
 
-#: applications/luci-app-dufs/htdocs/luci-static/resources/view/dufs.js:64
+#: applications/luci-app-dufs/htdocs/luci-static/resources/view/dufs.js:66
 msgid "Collecting data…"
 msgstr ""
 
-#: applications/luci-app-dufs/htdocs/luci-static/resources/view/dufs.js:31
-#: applications/luci-app-dufs/htdocs/luci-static/resources/view/dufs.js:33
-#: applications/luci-app-dufs/htdocs/luci-static/resources/view/dufs.js:50
+#: applications/luci-app-dufs/htdocs/luci-static/resources/view/dufs.js:32
+#: applications/luci-app-dufs/htdocs/luci-static/resources/view/dufs.js:34
+#: applications/luci-app-dufs/htdocs/luci-static/resources/view/dufs.js:52
 #: applications/luci-app-dufs/root/usr/share/luci/menu.d/luci-app-dufs.json:3
 msgid "Dufs"
 msgstr ""
 
-#: applications/luci-app-dufs/htdocs/luci-static/resources/view/dufs.js:51
+#: applications/luci-app-dufs/htdocs/luci-static/resources/view/dufs.js:53
 msgid ""
 "Dufs is a distinctive utility file server that supports static serving, "
 "uploading, searching, accessing control, webdav..."
 msgstr ""
 
-#: applications/luci-app-dufs/htdocs/luci-static/resources/view/dufs.js:70
+#: applications/luci-app-dufs/htdocs/luci-static/resources/view/dufs.js:72
 msgid "Enable"
 msgstr ""
 
-#: applications/luci-app-dufs/htdocs/luci-static/resources/view/dufs.js:81
+#: applications/luci-app-dufs/htdocs/luci-static/resources/view/dufs.js:87
 msgid "Enable CORS"
 msgstr ""
 
@@ -66,54 +66,82 @@ msgstr ""
 msgid "Grant access to Dufs configuration"
 msgstr ""
 
-#: applications/luci-app-dufs/htdocs/luci-static/resources/view/dufs.js:88
+#: applications/luci-app-dufs/htdocs/luci-static/resources/view/dufs.js:94
 msgid "Hidden path"
 msgstr ""
 
-#: applications/luci-app-dufs/htdocs/luci-static/resources/view/dufs.js:89
+#: applications/luci-app-dufs/htdocs/luci-static/resources/view/dufs.js:95
 msgid "Hide paths from directory listings, e.g. %s."
 msgstr ""
 
-#: applications/luci-app-dufs/htdocs/luci-static/resources/view/dufs.js:115
+#: applications/luci-app-dufs/htdocs/luci-static/resources/view/dufs.js:129
 msgid "High"
 msgstr ""
 
-#: applications/luci-app-dufs/htdocs/luci-static/resources/view/dufs.js:74
+#: applications/luci-app-dufs/htdocs/luci-static/resources/view/dufs.js:76
 msgid "Listen address"
 msgstr ""
 
-#: applications/luci-app-dufs/htdocs/luci-static/resources/view/dufs.js:77
+#: applications/luci-app-dufs/htdocs/luci-static/resources/view/dufs.js:79
 msgid "Listen port"
 msgstr ""
 
-#: applications/luci-app-dufs/htdocs/luci-static/resources/view/dufs.js:113
+#: applications/luci-app-dufs/htdocs/luci-static/resources/view/dufs.js:127
 msgid "Low"
 msgstr ""
 
-#: applications/luci-app-dufs/htdocs/luci-static/resources/view/dufs.js:114
+#: applications/luci-app-dufs/htdocs/luci-static/resources/view/dufs.js:128
 msgid "Medium"
 msgstr ""
 
-#: applications/luci-app-dufs/htdocs/luci-static/resources/view/dufs.js:33
+#: applications/luci-app-dufs/htdocs/luci-static/resources/view/dufs.js:34
 msgid "NOT RUNNING"
 msgstr ""
 
-#: applications/luci-app-dufs/htdocs/luci-static/resources/view/dufs.js:112
+#: applications/luci-app-dufs/htdocs/luci-static/resources/view/dufs.js:126
 msgid "None"
 msgstr ""
 
-#: applications/luci-app-dufs/htdocs/luci-static/resources/view/dufs.js:30
+#: applications/luci-app-dufs/htdocs/luci-static/resources/view/dufs.js:31
 msgid "Open Web Interface"
 msgstr ""
 
-#: applications/luci-app-dufs/htdocs/luci-static/resources/view/dufs.js:31
+#: applications/luci-app-dufs/htdocs/luci-static/resources/view/dufs.js:83
+msgid "Path Prefix"
+msgstr ""
+
+#: applications/luci-app-dufs/htdocs/luci-static/resources/view/dufs.js:32
 msgid "RUNNING"
 msgstr ""
 
-#: applications/luci-app-dufs/htdocs/luci-static/resources/view/dufs.js:85
+#: applications/luci-app-dufs/htdocs/luci-static/resources/view/dufs.js:100
+msgid "Render index"
+msgstr ""
+
+#: applications/luci-app-dufs/htdocs/luci-static/resources/view/dufs.js:104
+msgid "Render index or directory list"
+msgstr ""
+
+#: applications/luci-app-dufs/htdocs/luci-static/resources/view/dufs.js:101
+msgid ""
+"Serve index.html when requesting a directory, returns 404 if not found index."
+"html."
+msgstr ""
+
+#: applications/luci-app-dufs/htdocs/luci-static/resources/view/dufs.js:105
+msgid ""
+"Serve index.html when requesting a directory, returns directory listing if "
+"not found index.html."
+msgstr ""
+
+#: applications/luci-app-dufs/htdocs/luci-static/resources/view/dufs.js:91
 msgid "Serve path"
 msgstr ""
 
-#: applications/luci-app-dufs/htdocs/luci-static/resources/view/dufs.js:111
+#: applications/luci-app-dufs/htdocs/luci-static/resources/view/dufs.js:84
+msgid "Specify a (URL) path prefix"
+msgstr ""
+
+#: applications/luci-app-dufs/htdocs/luci-static/resources/view/dufs.js:125
 msgid "Zip compression level"
 msgstr ""

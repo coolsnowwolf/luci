@@ -1,0 +1,17 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Project-Id-Version: PACKAGE VERSION\n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: none\n"
+"Language: zh-Hans\n"
+"MIME-Version: 1.0\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: applications/luci-app-ramfree/root/usr/share/rpcd/acl.d/luci-app-ramfree.json:3
+msgid "Free Your Boom"
+msgstr ""
+
+#: applications/luci-app-ramfree/root/usr/share/luci/menu.d/luci-app-ramfree.json:3
+msgid "Release RAM"
+msgstr "释放内存"

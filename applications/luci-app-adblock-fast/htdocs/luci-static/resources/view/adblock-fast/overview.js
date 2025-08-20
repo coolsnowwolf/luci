@@ -8,20 +8,7 @@
 "require view";
 "require adblock-fast.status as adb";
 
-var pkg = {
-	get Name() {
-		return "adblock-fast";
-	},
-	get URL() {
-		return "https://docs.openwrt.melmac.net/" + pkg.Name + "/";
-	},
-	humanFileSize: function (bytes, si = false, dp = 2) {
-		return `%${si ? 1000 : 1024}.${dp ?? 0}mB`.format(bytes);
-	},
-	isObjEmpty: function (obj) {
-		return Object.keys(obj).length === 0;
-	},
-};
+var pkg = adb.pkg;
 
 return view.extend({
 	load: function () {
@@ -188,17 +175,17 @@ return view.extend({
 				"tab_basic",
 				form.ListValue,
 				"dnsmasq_instance_option",
-				_("Use AdBlocking on the dnsmasq instance(s)"),
+				_("Use ad-blocking on the dnsmasq instance(s)"),
 				_(
-					"You can limit the AdBlocking to the specific dnsmasq instance(s) (%smore information%s)."
+					"You can limit the ad-blocking to the specific dnsmasq instance(s) (%smore information%s)."
 				).format(
 					'<a href="' + pkg.URL + "#dnsmasq_instance" + '" target="_blank">',
 					"</a>"
 				)
 			);
-			o.value("*", _("AdBlock on all instances"));
-			o.value("+", _("AdBlock on select instances"));
-			o.value("-", _("No AdBlock on dnsmasq"));
+			o.value("*", _("Ad-blocking on all instances"));
+			o.value("+", _("Ad-blocking on select instances"));
+			o.value("-", _("No Ad-blocking on dnsmasq"));
 			o.default = "*";
 			o.depends("dns", "dnsmasq.addnhosts");
 			o.depends("dns", "dnsmasq.servers");
@@ -227,7 +214,7 @@ return view.extend({
 				"tab_basic",
 				form.MultiValue,
 				"dnsmasq_instance",
-				_("Pick the dnsmasq instance(s) for AdBlocking")
+				_("Pick the dnsmasq instance(s) for ad-blocking")
 			);
 			Object.values(L.uci.sections("dhcp", "dnsmasq")).forEach(function (
 				element
@@ -252,17 +239,17 @@ return view.extend({
 				"tab_basic",
 				form.ListValue,
 				"smartdns_instance_option",
-				_("Use AdBlocking on the SmartDNS instance(s)"),
+				_("Use ad-blocking on the SmartDNS instance(s)"),
 				_(
-					"You can limit the AdBlocking to the specific SmartDNS instance(s) (%smore information%s)."
+					"You can limit the ad-blocking to the specific SmartDNS instance(s) (%smore information%s)."
 				).format(
 					'<a href="' + pkg.URL + "#smartdns_instance" + '" target="_blank">',
 					"</a>"
 				)
 			);
-			o.value("*", _("AdBlock on all instances"));
-			o.value("+", _("AdBlock on select instances"));
-			o.value("-", _("No AdBlock on SmartDNS"));
+			o.value("*", _("Ad-blocking on all instances"));
+			o.value("+", _("Ad-blocking on select instances"));
+			o.value("-", _("No Ad-blocking on SmartDNS"));
 			o.default = "*";
 			o.depends("dns", "smartdns.domainset");
 			o.retain = true;
@@ -290,7 +277,7 @@ return view.extend({
 				"tab_basic",
 				form.MultiValue,
 				"smartdns_instance",
-				_("Pick the SmartDNS instance(s) for AdBlocking")
+				_("Pick the SmartDNS instance(s) for ad-blocking")
 			);
 			Object.values(L.uci.sections("smartdns", "smartdns")).forEach(function (
 				element
@@ -525,7 +512,21 @@ return view.extend({
 			return val == "allow" ? _("Allow") : _("Block");
 		};
 
+		o = s3.option(form.DummyValue, "_name", _("Name/URL"));
+		o.modalonly = false;
+		o.cfgvalue = function (section_id) {
+			let name = L.uci.get(pkg.Name, section_id, "name");
+			let url = L.uci.get(pkg.Name, section_id, "url");
+			let ret = _("Unknown");
+			return name ? name : url;
+		};
+
+		o = s3.option(form.Value, "name", _("Name"));
+		o.modalonly = true;
+		o.optional = true;
+
 		o = s3.option(form.Value, "url", _("URL"));
+		o.modalonly = true;
 		o.optional = false;
 
 		return Promise.all([status.render(), m.render()]);

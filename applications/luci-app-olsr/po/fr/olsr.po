@@ -3,8 +3,8 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2009-05-19 19:36+0200\n"
-"PO-Revision-Date: 2024-02-01 22:49+0000\n"
-"Last-Translator: ButterflyOfFire <boffire@users.noreply.hosted.weblate.org>\n"
+"PO-Revision-Date: 2025-07-03 07:20+0000\n"
+"Last-Translator: Matthieu Leboeuf <contact@matthieul.dev>\n"
 "Language-Team: French <https://hosted.weblate.org/projects/openwrt/"
 "luciapplicationsolsr/fr/>\n"
 "Language: fr\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Generator: Weblate 5.4-dev\n"
+"X-Generator: Weblate 5.13-dev\n"
 
 #: applications/luci-app-olsr/htdocs/luci-static/resources/view/olsr/status-olsr/mid.js:152
 msgid "Active MID announcements"
@@ -29,7 +29,7 @@ msgstr "Annonces actives sur le réseau d'hôtes"
 #: applications/luci-app-olsr/htdocs/luci-static/resources/view/olsr/frontend/olsrd.js:128
 #: applications/luci-app-olsr/htdocs/luci-static/resources/view/olsr/frontend/olsrd6.js:126
 msgid "Advanced Settings"
-msgstr "Paramètres avancés"
+msgstr "Réglages avancés"
 
 #: applications/luci-app-olsr/htdocs/luci-static/resources/view/olsr/frontend/olsrd.js:69
 #: applications/luci-app-olsr/htdocs/luci-static/resources/view/olsr/frontend/olsrd6.js:69
@@ -267,7 +267,7 @@ msgstr "Sauts"
 
 #: applications/luci-app-olsr/htdocs/luci-static/resources/view/olsr/status-olsr/neighbors.js:271
 msgid "Hostname"
-msgstr "Nom d'hôte"
+msgstr "Nom d'hôte (hostname)"
 
 #: applications/luci-app-olsr/htdocs/luci-static/resources/view/olsr/frontend/olsrdhna.js:14
 msgid ""
@@ -1009,8 +1009,8 @@ msgstr ""
 "Le démon OLSR est une implémentation du protocole Optimized Link State "
 "Routing. En tant que tel, il permet le routage maillé pour tout équipement "
 "de réseau. Il fonctionne sur toute carte wifi qui supporte le mode ad-hoc et "
-"bien sûr sur tout appareil ethernet. Visitez <a href='http://www.olsr."
-"org'>olsrd.org</a> pour obtenir de l'aide et de la documentation."
+"bien sûr sur tout appareil ethernet. Visitez <a href='http://"
+"www.olsr.org'>olsrd.org</a> pour obtenir de l'aide et de la documentation."
 
 #: applications/luci-app-olsr/htdocs/luci-static/resources/view/olsr/frontend/olsrd.js:244
 #: applications/luci-app-olsr/htdocs/luci-static/resources/view/olsr/frontend/olsrd6.js:238

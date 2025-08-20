@@ -7,7 +7,7 @@
 'require uci';
 'require view';
 
-var callServiceList = rpc.declare({
+const callServiceList = rpc.declare({
 	object: 'service',
 	method: 'list',
 	params: ['name'],
@@ -15,8 +15,8 @@ var callServiceList = rpc.declare({
 });
 
 function getServiceStatus() {
-	return L.resolveDefault(callServiceList('dae'), {}).then(function (res) {
-		var isRunning = false;
+	return L.resolveDefault(callServiceList('dae'), {}).then(function(res) {
+		let isRunning = false;
 		try {
 			isRunning = res['dae']['instances']['dae']['running'];
 		} catch (e) { }
@@ -25,36 +25,29 @@ function getServiceStatus() {
 }
 
 function renderStatus(isRunning) {
-	var spanTemp = '<span style="color:%s"><strong>%s %s</strong></span>';
-	var renderHTML;
-	if (isRunning) {
+	let spanTemp = '<span style="color:%s"><strong>%s %s</strong></span>';
+	let renderHTML;
+	if (isRunning)
 		renderHTML = spanTemp.format('green', _('dae'), _('RUNNING'));
-	} else {
+	else
 		renderHTML = spanTemp.format('red', _('dae'), _('NOT RUNNING'));
-	}
 
 	return renderHTML;
 }
 
 return view.extend({
-	load: function() {
-		return Promise.all([
-			uci.load('dae')
-		]);
-	},
-
-	render: function(data) {
-		var m, s, o;
+	render() {
+		let m, s, o;
 
 		m = new form.Map('dae', _('dae'),
 			_('eBPF-based Linux high-performance transparent proxy solution.'));
 
 		s = m.section(form.TypedSection);
 		s.anonymous = true;
-		s.render = function () {
-			poll.add(function () {
-				return L.resolveDefault(getServiceStatus()).then(function (res) {
-					var view = document.getElementById('service_status');
+		s.render = function() {
+			poll.add(function() {
+				return L.resolveDefault(getServiceStatus()).then(function(res) {
+					let view = document.getElementById('service_status');
 					view.innerHTML = renderStatus(res);
 				});
 			});

@@ -8,11 +8,10 @@
 include $(TOPDIR)/rules.mk
 
 LUCI_TITLE:=LuCI Support for LoRaWAN basicstation
-LUCI_DEPENDS:=+basicstation
-LUCI_PKGARCH:=all
+LUCI_DEPENDS:=+luci-base +basicstation
 
 PKG_MAINTAINER:=Marcus Schref <mschref@tdt.de>
-PKG_LICENSE:=APACHE-2.0
+PKG_LICENSE:=Apache-2.0
 
 include ../../luci.mk
 

@@ -11,7 +11,7 @@ local addr = arg[1]
 
 local function s(e)
 local t=0
-local a={' KB',' MB',' GB',' TB'}
+local a={' KB',' MB',' GB',' TB',' PB'}
 repeat
 e=e/1024
 t=t+1
@@ -20,19 +20,8 @@ return string.format("%.1f",e)..a[t]
 end
 
 local function debug_getcon()
-	local info, ip, host, diag_info, lan_int_name
-	lan_int_name = uci:get("openclash", "config", "lan_interface_name") or "0"
-	if lan_int_name == "0" then
-		ip = luci.sys.exec("uci -q get network.lan.ipaddr |awk -F '/' '{print $1}' 2>/dev/null |tr -d '\n'")
-	else
-		ip = luci.sys.exec(string.format("ip address show %s | grep -w 'inet' 2>/dev/null |grep -Eo 'inet [0-9\.]+' | awk '{print $2}' | tr -d '\n'", lan_int_name))
-	end
-	if not ip or ip == "" then
-		ip = luci.sys.exec("ip address show $(uci -q -p /tmp/state get network.lan.ifname) | grep -w 'inet'  2>/dev/null |grep -Eo 'inet [0-9\.]+' | awk '{print $2}' | tr -d '\n'")
-	end
-	if not ip or ip == "" then
-		ip = luci.sys.exec("ip addr show 2>/dev/null | grep -w 'inet' | grep 'global' | grep 'brd' | grep -Eo 'inet [0-9\.]+' | awk '{print $2}' | head -n 1 | tr -d '\n'")
-	end
+	local info, ip, host, diag_info
+	ip = fs.lanip()
 	local port = uci:get("openclash", "config", "cn_port")
 	local passwd = uci:get("openclash", "config", "dashboard_password") or ""
 	if ip and port then
@@ -49,10 +38,6 @@ local function debug_getcon()
 				end
 				if not addr then
 					luci.sys.exec(string.format('echo "%s. SourceIP:【%s】 - Host:【%s】 - DestinationIP:【%s】 - Network:【%s】 - RulePayload:【%s】 - Lastchain:【%s】" >> /tmp/openclash_debug.log', i, (info.connections[i].metadata.sourceIP), host, (info.connections[i].metadata.destinationIP), (info.connections[i].metadata.network), (info.connections[i].rulePayload),(info.connections[i].chains[1])))
-				elseif addr == "netflix-nflxvideo" then
-					if string.match(host, "nflxvideo.net") or string.match(host, "amazonaws.com") then
-						print(host)
-					end
 				else
 					if datatype.hostname(addr) and string.lower(addr) == host  or datatype.ipaddr(addr) and addr == (info.connections[i].metadata.destinationIP) then
 						print("id: "..(info.connections[i].id))

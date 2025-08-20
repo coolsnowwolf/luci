@@ -3,8 +3,8 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-04-17 20:30+0200\n"
-"PO-Revision-Date: 2023-10-06 08:29+0000\n"
-"Last-Translator: Norbert Szentner <upd6la1j@duck.com>\n"
+"PO-Revision-Date: 2025-05-08 13:01+0000\n"
+"Last-Translator: hmzs <hmzs@1szer1.hu>\n"
 "Language-Team: Hungarian <https://hosted.weblate.org/projects/openwrt/"
 "luciapplicationstransmission/hu/>\n"
 "Language: hu\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.1-dev\n"
+"X-Generator: Weblate 5.12-dev\n"
 
 #: applications/luci-app-transmission/htdocs/luci-static/resources/view/transmission.js:65
 msgid "Alternative download speed"
@@ -79,9 +79,8 @@ msgid "Config file directory"
 msgstr "Beállítófájl könyvtára"
 
 #: applications/luci-app-transmission/htdocs/luci-static/resources/view/transmission.js:53
-#, fuzzy
 msgid "Custom Web UI directory"
-msgstr "Beállítófájl könyvtára"
+msgstr "Egyéni Web UI könyvtára"
 
 #: applications/luci-app-transmission/htdocs/luci-static/resources/view/transmission.js:133
 msgid "DHT enabled"
@@ -141,7 +140,8 @@ msgstr "Globális beállítások"
 
 #: applications/luci-app-transmission/root/usr/share/rpcd/acl.d/luci-app-transmission.json:3
 msgid "Grant UCI access for luci-app-transmission"
-msgstr "UCI hozzáférés adása a \"luci-app-transmission\" -nek"
+msgstr ""
+"UCI hozzáférés engedélyezése a <em>luci-app-transmission</em> alkalmazásnak"
 
 #: applications/luci-app-transmission/htdocs/luci-static/resources/view/transmission.js:289
 msgid "Idle seeding limit"
@@ -161,7 +161,7 @@ msgstr "Befejezetlen fájlok mappájának engedélyezése"
 
 #: applications/luci-app-transmission/htdocs/luci-static/resources/view/transmission.js:150
 msgid "Info"
-msgstr "Információ"
+msgstr "Infó"
 
 #: applications/luci-app-transmission/htdocs/luci-static/resources/view/transmission.js:144
 msgid "LPD enabled"
@@ -240,6 +240,8 @@ msgstr "Partner beállítások"
 #: applications/luci-app-transmission/htdocs/luci-static/resources/view/transmission.js:187
 msgid "Peer socket <abbr title=\"Type of Service\">TOS</abbr>"
 msgstr ""
+"Partner foglalat <abbr title=\"Szolgáltatás típusa (Type of Service)\">ToS</"
+"abbr>"
 
 #: applications/luci-app-transmission/htdocs/luci-static/resources/view/transmission.js:204
 msgid "Port forwarding enabled"

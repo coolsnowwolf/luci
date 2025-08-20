@@ -1,14 +1,14 @@
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2023-07-27 06:17+0000\n"
-"Last-Translator: Eric <hamburger2048@users.noreply.hosted.weblate.org>\n"
-"Language-Team: Chinese (Simplified) <https://hosted.weblate.org/projects/"
-"openwrt/luci_modules_luci-mod-dsl/zh_Hans/>\n"
+"PO-Revision-Date: 2025-03-11 16:30+0000\n"
+"Last-Translator: linxincheng <759459182@qq.com>\n"
+"Language-Team: Chinese (Simplified Han script) <https://hosted.weblate.org/"
+"projects/openwrt/luci_modules_luci-mod-dsl/zh_Hans/>\n"
 "Language: zh_Hans\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.0-dev\n"
+"X-Generator: Weblate 5.10.3-dev\n"
 
 #: modules/luci-mod-dsl/htdocs/luci-static/resources/view/status/dsl/stats.js:157
 msgid "ATM Header Error Control Errors (HEC-P)"
@@ -16,7 +16,7 @@ msgstr "ATM 标头错误码错误（HEC-P）"
 
 #: modules/luci-mod-dsl/htdocs/luci-static/resources/view/status/dsl/stats.js:111
 msgid "Actual Data Rate"
-msgstr "实际数据率"
+msgstr "实际码率"
 
 #: modules/luci-mod-dsl/htdocs/luci-static/resources/view/status/dsl/stats.js:134
 msgid "Aggregate Transmit Power (ACTATP)"
@@ -28,11 +28,11 @@ msgstr "Annex"
 
 #: modules/luci-mod-dsl/htdocs/luci-static/resources/view/status/dsl/stats.js:112
 msgid "Attainable Data Rate (ATTNDR)"
-msgstr "可达到的净数据率 （ATTNDR）"
+msgstr "理论码率 （ATTNDR）"
 
 #: modules/luci-mod-dsl/htdocs/luci-static/resources/view/status/dsl/stats.js:118
 msgid "Bitswap"
-msgstr "Bitswap"
+msgstr "位交换"
 
 #: modules/luci-mod-dsl/htdocs/luci-static/resources/view/status/dsl/stats.js:151
 msgid "CRC Errors (CV-C)"
@@ -40,7 +40,7 @@ msgstr "CRC 错误（CV-C）"
 
 #: modules/luci-mod-dsl/htdocs/luci-static/resources/view/status/dsl/stats.js:149
 msgid "Channel Counters"
-msgstr "信道数"
+msgstr "信道计数器"
 
 #: modules/luci-mod-dsl/htdocs/luci-static/resources/view/status/dsl/stats.js:89
 msgid "Connection State"
@@ -68,7 +68,7 @@ msgstr "数据路径计数器"
 
 #: modules/luci-mod-dsl/htdocs/luci-static/resources/view/status/dsl/stats.js:109
 msgid "Data Rates"
-msgstr "数据率"
+msgstr "码率"
 
 #: modules/luci-mod-dsl/htdocs/luci-static/resources/view/status/dsl/graph.js:219
 msgid "Downstream HLOG"
@@ -105,13 +105,6 @@ msgstr "前向纠错秒（FECS)"
 #: modules/luci-mod-dsl/root/usr/share/rpcd/acl.d/luci-mod-dsl.json:3
 msgid "Grant access to luci-mod-dsl"
 msgstr "将权限授予 luci-mod-dsl"
-
-#: modules/luci-mod-dsl/htdocs/luci-static/resources/view/status/dsl/spectrum.js:25
-msgid ""
-"Graphs below show Signal-to-noise ratio, Bit allocation, Quiet line noise "
-"and Channel characteristics function (HLOG) per sub-carrier."
-msgstr ""
-"下方图形显示每一 carrier 的信噪比、位分配，静线噪声和信道特性函数（HLOG）。"
 
 #: modules/luci-mod-dsl/htdocs/luci-static/resources/view/status/dsl/stats.js:125
 msgid "Impulse Noise Protection (INP)"
@@ -235,6 +228,36 @@ msgstr "统计数据"
 #: modules/luci-mod-dsl/htdocs/luci-static/resources/view/status/dsl/graph.js:203
 msgid "Sub-carrier"
 msgstr "每 carrier"
+
+#: modules/luci-mod-dsl/htdocs/luci-static/resources/view/status/dsl/spectrum.js:65
+msgid ""
+"The diagram shows the Channel Characteristics Function (HLOG) per subcarrier "
+"in uplink and downlink direction"
+msgstr "该图表显示了上行和下行方向上每个子载波的信道特性函数（HLOG）"
+
+#: modules/luci-mod-dsl/htdocs/luci-static/resources/view/status/dsl/spectrum.js:55
+msgid ""
+"The diagram shows the quiet line noise (QLN) per subcarrier in uplink and "
+"downlink direction"
+msgstr "该图表显示了上行和下行方向上每个子载波的静线噪声（QLN）"
+
+#: modules/luci-mod-dsl/htdocs/luci-static/resources/view/status/dsl/spectrum.js:25
+msgid ""
+"The following diagrams show graphically prepared DSL characteristics that "
+"are important for evaluating the DSL connection."
+msgstr "以下图表以图形方式展示了对于评估DSL连接至关重要的DSL特性。"
+
+#: modules/luci-mod-dsl/htdocs/luci-static/resources/view/status/dsl/spectrum.js:45
+msgid ""
+"The graph shows th amount of bits actually allocated per subcarrier in the "
+"uplink and downlink direction"
+msgstr "该图表显示了上行和下行方向上每个子载波实际分配的位数"
+
+#: modules/luci-mod-dsl/htdocs/luci-static/resources/view/status/dsl/spectrum.js:35
+msgid ""
+"The graph shows the signal to noise ratio (SNR) per subcarrier in the uplink "
+"and downlink direction"
+msgstr "该图表显示了上行和下行方向上每个子载波的信噪比（SNR）"
 
 #: modules/luci-mod-dsl/htdocs/luci-static/resources/view/status/dsl/stats.js:145
 msgid "Unavailable Seconds (UAS)"

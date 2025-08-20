@@ -1,14 +1,14 @@
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2021-08-12 12:55+0000\n"
-"Last-Translator: Tudós Péter <tudi.sk@gmail.com>\n"
+"PO-Revision-Date: 2025-05-08 13:02+0000\n"
+"Last-Translator: hmzs <hmzs@1szer1.hu>\n"
 "Language-Team: Hungarian <https://hosted.weblate.org/projects/openwrt/"
 "luciapplicationsocserv/hu/>\n"
 "Language: hu\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 4.8-dev\n"
+"X-Generator: Weblate 5.12-dev\n"
 
 #: applications/luci-app-ocserv/luasrc/model/cbi/ocserv/main.lua:124
 #: applications/luci-app-ocserv/luasrc/model/cbi/ocserv/user-config.lua:80
@@ -44,7 +44,7 @@ msgstr "CA tanúsítvány"
 #: applications/luci-app-ocserv/luasrc/model/cbi/ocserv/users.lua:72
 #: applications/luci-app-ocserv/luasrc/view/ocserv_status.htm:57
 msgid "Cipher"
-msgstr "Titkosító"
+msgstr "Kódolás"
 
 #: applications/luci-app-ocserv/luasrc/view/ocserv_status.htm:62
 msgid "Collecting data..."
@@ -117,11 +117,11 @@ msgstr "Tűzfalzóna"
 #: applications/luci-app-ocserv/luasrc/model/cbi/ocserv/main.lua:12
 #: applications/luci-app-ocserv/luasrc/model/cbi/ocserv/user-config.lua:12
 msgid "General Settings"
-msgstr "Általános Beállítások"
+msgstr "Általános beállítások"
 
 #: applications/luci-app-ocserv/root/usr/share/rpcd/acl.d/luci-app-ocserv.json:3
 msgid "Grant UCI access for luci-app-ocserv"
-msgstr ""
+msgstr "UCI hozzáférés engedélyezése a <em>luci-app-ocserv</em> alkalmazásnak"
 
 #: applications/luci-app-ocserv/luasrc/model/cbi/ocserv/users.lua:23
 #: applications/luci-app-ocserv/luasrc/model/cbi/ocserv/users.lua:67
@@ -143,7 +143,7 @@ msgstr "IP"
 #: applications/luci-app-ocserv/luasrc/model/cbi/ocserv/user-config.lua:128
 #: applications/luci-app-ocserv/luasrc/view/ocserv_status.htm:53
 msgid "IP Address"
-msgstr "IP cím"
+msgstr "IP-cím"
 
 #: applications/luci-app-ocserv/luasrc/model/cbi/ocserv/main.lua:58
 #: applications/luci-app-ocserv/luasrc/model/cbi/ocserv/user-config.lua:52
@@ -353,8 +353,8 @@ msgstr "VPN IP-címe"
 #: applications/luci-app-ocserv/luasrc/model/cbi/ocserv/main.lua:95
 #: applications/luci-app-ocserv/luasrc/model/cbi/ocserv/user-config.lua:100
 msgid ""
-"View the CA certificate used by this server. You will need to save it as 'ca."
-"pem' and import it into the clients."
+"View the CA certificate used by this server. You will need to save it as "
+"'ca.pem' and import it into the clients."
 msgstr ""
 "A kiszolgáló által használt CA-tanúsítvány megtekintése. El kell mentenie "
 "„ca.pem” néven, és importálnia kell az ügyfeleknél."

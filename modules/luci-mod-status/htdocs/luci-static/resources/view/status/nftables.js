@@ -93,6 +93,7 @@ var op_translations = {
 
 var action_translations = {
 	'accept': _('Accept packet', 'nft accept action'),
+	'notrack': _('Do not track', 'nft notrack action'),
 	'drop': _('Drop packet', 'nft drop action'),
 	'jump': _('Continue in <strong><a href="#%q.%q">%h</a></strong>', 'nft jump action'),
 	'log': _('Log event "<strong>%h</strong>…"', 'nft log action'),
@@ -145,6 +146,7 @@ return view.extend({
 			if (expr.hasOwnProperty(k)) {
 				switch (k) {
 				case 'accept':
+				case 'notrack':
 				case 'reject':
 				case 'drop':
 				case 'jump':
@@ -361,6 +363,7 @@ return view.extend({
 			}, (action_translations[k] || k).format(this.exprToString(spec.expr)));
 
 		case 'accept':
+		case 'notrack':
 		case 'drop':
 			return E('span', {
 				'class': 'ifacebadge'
@@ -604,7 +607,7 @@ return view.extend({
 		]));
 
 		for (var i = 0; i < data.length; i++)
-			if (typeof(data[i].rule) == 'object' && data[i].rule.table == spec.table && data[i].rule.chain == spec.name)
+			if (typeof(data[i].rule) == 'object' && data[i].rule.table == spec.table && data[i].rule.chain == spec.name && data[i].rule.family == spec.family)
 				node.lastElementChild.appendChild(this.renderRule(data, data[i].rule));
 
 		if (node.lastElementChild.childNodes.length == 1)
@@ -666,7 +669,7 @@ return view.extend({
 		]);
 
 		for (var i = 0; i < data.length; i++)
-			if (typeof(data[i].chain) == 'object' && data[i].chain.table == spec.name)
+			if (typeof(data[i].chain) == 'object' && data[i].chain.table == spec.name && data[i].chain.family == spec.family)
 				node.lastElementChild.lastElementChild.appendChild(this.renderChain(data, data[i].chain));
 
 		return node;

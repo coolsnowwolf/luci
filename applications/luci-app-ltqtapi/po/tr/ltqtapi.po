@@ -1,14 +1,14 @@
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2024-03-31 19:53+0000\n"
-"Last-Translator: Oğuz Han <h4n.3545@gmail.com>\n"
+"PO-Revision-Date: 2024-10-09 17:39+0000\n"
+"Last-Translator: Oğuz Ersen <oguz@ersen.moe>\n"
 "Language-Team: Turkish <https://hosted.weblate.org/projects/openwrt/"
 "luciapplicationsltqtapi/tr/>\n"
 "Language: tr\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.5-dev\n"
+"X-Generator: Weblate 5.8-dev\n"
 
 #: applications/luci-app-ltqtapi/luasrc/controller/ltqtapi.lua:17
 #: applications/luci-app-ltqtapi/luasrc/model/cbi/luci_ltqtapi/account.lua:7
@@ -17,7 +17,7 @@ msgstr "Hesap"
 
 #: applications/luci-app-ltqtapi/luasrc/view/telephony_status.htm:28
 msgid "Collecting data..."
-msgstr "Veri toplama..."
+msgstr "Veriler toplanıyor..."
 
 #: applications/luci-app-ltqtapi/luasrc/model/cbi/luci_ltqtapi/contact.lua:7
 msgid "Contact"
@@ -37,7 +37,7 @@ msgstr "Çevir"
 
 #: applications/luci-app-ltqtapi/luasrc/model/cbi/luci_ltqtapi/account.lua:14
 msgid "Disabled"
-msgstr "Devre dışı bırakıldı"
+msgstr "Devre dışı"
 
 #: applications/luci-app-ltqtapi/root/usr/share/rpcd/acl.d/luci-app-ltqtapi.json:3
 msgid "Grant UCI access for luci-app-ltqtapi"

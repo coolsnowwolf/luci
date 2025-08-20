@@ -1,18 +1,17 @@
-
-# Copyright (C) 2016 Openwrt.org
+# SPDX-License-Identifier: Apache-2.0
 #
-# This is free software, licensed under the Apache License, Version 2.0 .
-#
+# Copyright (C) 2025 ImmortalWrt.org
 
 include $(TOPDIR)/rules.mk
 
 LUCI_TITLE:=LuCI for SMB/CIFS Mount
-LUCI_DEPENDS:=+kmod-fs-cifs +kmod-nls-utf8
-LUCI_PKGARCH:=all
+LUCI_DEPENDS:=+kmod-fs-cifs
 
-PKG_NAME:=luci-app-cifs-mount
-PKG_VERSION:=1
-PKG_RELEASE:=7
+PKG_PROVIDES:=luci-app-cifs
+
+define Package/luci-app-cifs-mount/conffiles
+/etc/config/cifs-mount
+endef
 
 include ../../luci.mk
 

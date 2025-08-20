@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"PO-Revision-Date: 2024-01-06 13:23+0000\n"
-"Last-Translator: ssantos <ssantos@web.de>\n"
+"PO-Revision-Date: 2025-05-14 18:51+0000\n"
+"Last-Translator: Bob Idle <102661087+bobidle@users.noreply.github.com>\n"
 "Language-Team: German <https://hosted.weblate.org/projects/openwrt/"
 "luciapplicationsminidlna/de/>\n"
 "Language: de\n"
@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.4-dev\n"
+"X-Generator: Weblate 5.12-dev\n"
 
 #: applications/luci-app-minidlna/htdocs/luci-static/resources/view/minidlna.js:51
 msgid "Advanced Settings"
@@ -158,7 +158,7 @@ msgstr ""
 
 #: applications/luci-app-minidlna/htdocs/luci-static/resources/view/minidlna.js:90
 msgid ""
-"Set this to enable inotify monitoring to automatically discover new files."
+"Set this to enable inotify monitoring to discover new files automatically."
 msgstr ""
 "Diese Option aktivieren um den Inotify-Mechanismus zum Entdecken neuer "
 "Dateien zu benutzen."
@@ -178,8 +178,8 @@ msgid ""
 "performance on (at least) Sony DLNA products."
 msgstr ""
 "Diese Option setzen um den DLNA-Standard strikt einzuhalten. Damit wird "
-"serverseitiges Herunterskalieren von JPEG-Bildern aktviert was die "
-"Auslieferunsgeschwindigkeit in Verbindung mit Sony DLNA-Produkten negativ "
+"serverseitiges Herunterskalieren von JPEG-Bildern aktiviert was die "
+"Auslieferungsgeschwindigkeit in Verbindung mit Sony DLNA-Produkten negativ "
 "beeinflussen kann."
 
 #: applications/luci-app-minidlna/htdocs/luci-static/resources/view/minidlna.js:78
@@ -208,7 +208,7 @@ msgstr "Status"
 
 #: applications/luci-app-minidlna/htdocs/luci-static/resources/view/minidlna.js:96
 msgid "Strict to DLNA standard"
-msgstr "Stikt nach DLNA-Standard"
+msgstr "Strikt nach DLNA-Standard"
 
 #: applications/luci-app-minidlna/htdocs/luci-static/resources/view/minidlna.js:25
 #: applications/luci-app-minidlna/htdocs/luci-static/resources/view/status/include/80_minidlna.js:28

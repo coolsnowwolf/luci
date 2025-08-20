@@ -5,10 +5,10 @@
 			"ubus": {
 				"service": [ "list" ]
 			},
-			"uci": [ "ipsec" ]
+			"uci": [ "ipsec-vpnd" ]
 		},
 		"write": {
-			"uci": [ "ipsec" ]
+			"uci": [ "ipsec-vpnd" ]
 		}
 	}
 }

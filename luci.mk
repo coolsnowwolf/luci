@@ -28,7 +28,9 @@ LUCI_LANG.da=Dansk (Danish)
 LUCI_LANG.de=Deutsch (German)
 LUCI_LANG.el=Ελληνικά (Greek)
 LUCI_LANG.es=Español (Spanish)
+LUCI_LANG.fa=Farsi (Persian)
 LUCI_LANG.fi=Suomi (Finnish)
+LUCI_LANG.fil=Filipino (Philippinic)
 LUCI_LANG.fr=Français (French)
 LUCI_LANG.he=עִבְרִית (Hebrew)
 LUCI_LANG.hi=हिंदी (Hindi)
@@ -51,6 +53,7 @@ LUCI_LANG.sv=Svenska (Swedish)
 LUCI_LANG.tr=Türkçe (Turkish)
 LUCI_LANG.uk=Українська (Ukrainian)
 LUCI_LANG.vi=Tiếng Việt (Vietnamese)
+LUCI_LANG.yua=Yucateco (Yucatec Maya)
 LUCI_LANG.zh_Hans=简体中文 (Chinese Simplified)
 LUCI_LANG.zh_Hant=繁體中文 (Chinese Traditional)
 #LUCI_LANG_END
@@ -85,18 +88,18 @@ define findrev
       if [ -n "$$1" ]; then
         secs="$$(($$1 % 86400))"; \
         yday="$$(date --utc --date="@$$1" "+%y.%j")"; \
-        printf 'git-%s.%05d-%s' "$$yday" "$$secs" "$$2"; \
+        printf '%s.%05d~%s' "$$yday" "$$secs" "$$2"; \
       else \
-        echo "unknown"; \
+        echo "0"; \
       fi; \
     else \
       ts=$$(find . -type f $(if $(1),-not) -path './po/*' -printf '%T@\n' 2>/dev/null | sort -rn | head -n1 | cut -d. -f1); \
       if [ -n "$$ts" ]; then \
         secs="$$(($$ts % 86400))"; \
         date="$$(date --utc --date="@$$ts" "+%y%m%d")"; \
-        printf '%s.%05d' "$$date" "$$secs"; \
+        printf '0.%s.%05d' "$$date" "$$secs"; \
       else \
-        echo "unknown"; \
+        echo "0"; \
       fi; \
     fi \
   )
@@ -153,7 +156,7 @@ ifneq ($(LUCI_SUBMENU),none)
 endif
   TITLE:=$(if $(LUCI_TITLE),$(LUCI_TITLE),LuCI $(LUCI_NAME) $(LUCI_TYPE))
   DEPENDS:=$(LUCI_DEPENDS)
-  VERSION:=$(if $(PKG_VERSION),$(PKG_VERSION),$(PKG_SRC_VERSION))
+  VERSION:=$(if $(PKG_VERSION),$(if $(PKG_RELEASE),$(PKG_VERSION)-r$(PKG_RELEASE),$(PKG_VERSION)),$(PKG_SRC_VERSION))
   $(if $(LUCI_EXTRA_DEPENDS),EXTRA_DEPENDS:=$(LUCI_EXTRA_DEPENDS))
   $(if $(LUCI_PKGARCH),PKGARCH:=$(LUCI_PKGARCH))
   $(if $(PKG_PROVIDES),PROVIDES:=$(PKG_PROVIDES))
@@ -174,6 +177,7 @@ define Build/Prepare
 		$(CP) ./$$$$d/* $(PKG_BUILD_DIR)/$$$$d/; \
 	  fi; \
 	done
+	$(call Build/Prepare/$(LUCI_NAME))
 	$(call Build/Prepare/Default)
 endef
 
@@ -295,11 +299,11 @@ ifeq ($(PKG_NAME),luci-base)
 
    config LUCI_JSMIN
 	bool "Minify JavaScript sources"
-	default n
+	default y
 
    config LUCI_CSSTIDY
 	bool "Minify CSS files"
-	default n
+	default y
 
    menu "Translations"$(foreach lang,$(LUCI_LANGUAGES),$(if $(LUCI_LANG.$(lang)),
 

@@ -1,8 +1,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"PO-Revision-Date: 2022-08-28 23:17+0000\n"
-"Last-Translator: Kristoffer Grundström <swedishsailfishosuser@tutanota.com>\n"
+"PO-Revision-Date: 2025-07-15 10:11+0000\n"
+"Last-Translator: Stefan Bjornelund the Gnome "
+"<stefan.bjornelund.gnome@gmail.com>\n"
 "Language-Team: Swedish <https://hosted.weblate.org/projects/openwrt/"
 "luciapplicationswatchcat/sv/>\n"
 "Language: sv\n"
@@ -10,32 +11,45 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 4.14.1-dev\n"
+"X-Generator: Weblate 5.13-dev\n"
+
+#: applications/luci-app-watchcat/htdocs/luci-static/resources/view/watchcat.js:94
+msgid ""
+"<i>Applies to Ping Reboot and Periodic Reboot modes</i> <br /> When "
+"rebooting the router, the service will trigger a soft reboot. Entering a non-"
+"zero value here will trigger a delayed hard reboot if the soft reboot were "
+"to fail. Enter the number of seconds to wait for the soft reboot to fail or "
+"use 0 to disable the forced reboot delay."
+msgstr ""
+"<i> Gäller för Ping Reboot och Periodic Reboot lägen </i> <br /> När du "
+"startar om routern kommer tjänsten att utlösa en mjuk omstart. Att ange ett "
+"icke-nollvärde här kommer att utlösa en försenad hård omstart om den mjuka "
+"omstarten skulle misslyckas. Ange antalet sekunder för att vänta på att den "
+"mjuka omstarten ska misslyckas eller använda 0 för att inaktivera den "
+"påtvingade omstarten."
+
+#: applications/luci-app-watchcat/htdocs/luci-static/resources/view/watchcat.js:111
+msgid ""
+"<i>Applies to Ping Reboot and Restart Interface modes</i> <br /> If using "
+"ModemManager, you can have Watchcat restart your ModemManager interface by "
+"specifying its name."
+msgstr ""
 
 #: applications/luci-app-watchcat/htdocs/luci-static/resources/view/watchcat.js:104
 msgid ""
 "<i>Applies to Ping Reboot, Restart Interface, and Run Script modes</i> <br /"
 "> Specify the interface to monitor and react if a ping over it fails."
 msgstr ""
+"<i>Gäller för lägena ping-omstart, starta om gränssnitt och kör skript</i> "
+"<br /> Ange gränssnittet att bevaka och reagera om en pingning över den "
+"misslyckas."
 
 #: applications/luci-app-watchcat/htdocs/luci-static/resources/view/watchcat.js:60
 msgid "Address family for pinging the host"
 msgstr "Adress-familjen för att pinga värden"
 
-#: applications/luci-app-watchcat/htdocs/luci-static/resources/view/watchcat.js:94
-msgid ""
-"Applies to Ping Reboot and Periodic Reboot modes</i> <br /> When rebooting "
-"the router, the service will trigger a soft reboot. Entering a non-zero "
-"value here will trigger a delayed hard reboot if the soft reboot were to "
-"fail. Enter the number of seconds to wait for the soft reboot to fail or use "
-"0 to disable the forced reboot delay."
-msgstr ""
-
-#: applications/luci-app-watchcat/htdocs/luci-static/resources/view/watchcat.js:111
-msgid ""
-"Applies to Ping Reboot and Restart Interface modes</i> <br /> If using "
-"ModemManager, you can have Watchcat restart your ModemManger interface by "
-"specifying its name."
+#: applications/luci-app-watchcat/htdocs/luci-static/resources/view/watchcat.js:65
+msgid "Any"
 msgstr ""
 
 #: applications/luci-app-watchcat/htdocs/luci-static/resources/view/watchcat.js:84
@@ -56,7 +70,7 @@ msgstr "Generella inställningar"
 
 #: applications/luci-app-watchcat/root/usr/share/rpcd/acl.d/luci-app-watchcat.json:3
 msgid "Grant access to LuCI app watchcat"
-msgstr ""
+msgstr "Godkänn åtkomst till LuCi-appen watchcat"
 
 #: applications/luci-app-watchcat/htdocs/luci-static/resources/view/watchcat.js:12
 msgid ""
@@ -92,6 +106,8 @@ msgid ""
 "If using ModemManager, then before restarting the interface, set the modem "
 "to be allowed to use any band."
 msgstr ""
+"Ställ in att modemet ska tillåtas att använda vilket band som helst om "
+"ModemManager används före gränssnittet startas om."
 
 #: applications/luci-app-watchcat/htdocs/luci-static/resources/view/watchcat.js:41
 msgid ""
@@ -141,7 +157,7 @@ msgstr "Paketstorlek för pingning"
 
 #: applications/luci-app-watchcat/htdocs/luci-static/resources/view/watchcat.js:27
 msgid "Ping Reboot"
-msgstr ""
+msgstr "Pinga omstart"
 
 #: applications/luci-app-watchcat/htdocs/luci-static/resources/view/watchcat.js:23
 msgid ""

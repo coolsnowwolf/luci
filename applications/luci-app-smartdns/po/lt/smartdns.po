@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"PO-Revision-Date: 2024-04-02 20:21+0000\n"
-"Last-Translator: Džiugas J <dziugas1959@hotmail.com>\n"
+"PO-Revision-Date: 2025-07-05 23:02+0000\n"
+"Last-Translator: Džiugas Januševičius <dziugas1959@hotmail.com>\n"
 "Language-Team: Lithuanian <https://hosted.weblate.org/projects/openwrt/"
 "luciapplicationssmartdns/lt/>\n"
 "Language: lt\n"
@@ -11,22 +11,24 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "(n%100<10 || n%100>=20) ? 1 : 2);\n"
-"X-Generator: Weblate 5.5-dev\n"
+"X-Generator: Weblate 5.13-dev\n"
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:792
 msgid "Additional Args for upstream dns servers"
-msgstr ""
+msgstr "Papildomi parametrai, skirti išsiuntimo srauto serveriams."
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:886
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:1090
 msgid ""
 "Additional Flags for rules, read help on domain-rule for more information."
 msgstr ""
+"Papildomos taisyklių žymos. Daugiau informacijos rasite domeno-srities "
+"taisyklės žinyne."
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:885
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:1089
 msgid "Additional Rule Flag"
-msgstr ""
+msgstr "Papildoma taisyklės vėliava"
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:346
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:479
@@ -39,6 +41,7 @@ msgstr "Papildomi serverio argumentai"
 msgid ""
 "Additional server args, refer to the help description of the bind option."
 msgstr ""
+"Papildomi serverio argumentai, žr. pririšimo parinkties žinyno aprašymą."
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:132
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:639
@@ -50,6 +53,8 @@ msgid ""
 "Attempts to serve old responses from cache with a TTL of 0 in the response "
 "without waiting for the actual resolution to finish."
 msgstr ""
+"Bandoma pateikti senus atsakymus iš talpyklos su 0-u „TTL“ atsakyme, "
+"nelaukiant, kol baigsis tikroji rezoliucija."
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:161
 msgid "Automatically Set Dnsmasq"
@@ -58,6 +63,8 @@ msgstr "Automatiškai nustatyti „Dnsmasq“"
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:161
 msgid "Automatically set as upstream of dnsmasq when port changes."
 msgstr ""
+"Automatiškai nustatyti kaip išsiunčiamą srautą „dnsmasq“, kai prievadas "
+"pasikeičia."
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:229
 msgid "Bind Device"
@@ -92,18 +99,20 @@ msgid ""
 "Configure IP blacklists that will be filtered from the results of specific "
 "DNS server."
 msgstr ""
+"Konfigūruoti IP draudžiamuosius sąrašus, kurie bus filtruojami pagal savito "
+"„DNS“ serverio rezultatus."
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:929
 msgid "Configure block domain list."
-msgstr ""
+msgstr "Konfigūruoti blokuojamų domenų-sričių sąrašą."
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:950
 msgid "Configure domain rule list."
-msgstr ""
+msgstr "Konfigūruoti domenų-srities taisyklių sąrašą."
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:900
 msgid "Configure forwarding domain name list."
-msgstr ""
+msgstr "Konfigūruoti persiuntimo domeno-srities pavadinimų sąrašą."
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:137
 msgid "Custom Settings"
@@ -156,11 +165,11 @@ msgstr "„DNS64“ Serverio nustatymai"
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:560
 msgid "Description"
-msgstr "Aprašymas"
+msgstr "Aprašas/-ymas"
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:76
 msgid "Dnsmasq Forwarded To Smartdns Failure"
-msgstr ""
+msgstr "„Dnsmasq“ persiųstas į „Smartdns“ triktį/gedimą"
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:719
 msgid "Do not check certificate."
@@ -217,7 +226,7 @@ msgstr "Domeno-srities „TTL min.“"
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:246
 msgid "Domain prefetch"
-msgstr ""
+msgstr "Domeno-srities išankstinis gavimas"
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:1159
 msgid "Donate"
@@ -240,11 +249,14 @@ msgid ""
 "Download domain list files for domain-rule and include config files, please "
 "refresh the page after download to take effect."
 msgstr ""
+"Atsisiųsti domenų-srities sąrašo failus, skirtus domenų-srities taisyklėms, "
+"ir įtraukti konfigūracijos failus, po atsisiuntimo, prašome atnaujinti "
+"puslapį, kad įsigaliotų."
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:240
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:1007
 msgid "Dual-stack IP Selection"
-msgstr ""
+msgstr "Dvisluoksnis IP pasirinkimas"
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:142
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:371
@@ -278,22 +290,24 @@ msgstr "Įgalinti automatinius, kasdieninius atnaujinimus."
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:247
 msgid "Enable domain prefetch, accelerate domain response speed."
 msgstr ""
+"Įjungti/Įgalinti domeno-srities išankstinį gavimą, paspartinti domeno-"
+"srities atsakos greitį."
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:372
 msgid "Enable or disable second DNS server."
-msgstr ""
+msgstr "Įjungti/Įgalinti arba išjungti/Įgalinti antrą „DNS“ serverį."
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:142
 msgid "Enable or disable smartdns server"
-msgstr ""
+msgstr "Įjungti/Įgalinti arba išjungti/Įgalinti „smartdns“ serverį"
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:694
 msgid "Exclude DNS Server from default group."
-msgstr ""
+msgstr "Neįtraukti „DNS“ serverio iš numatytosios grupės."
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:694
 msgid "Exclude Default Group"
-msgstr ""
+msgstr "Neįtraukti numatytąją grupę"
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:215
 msgid "Fastest IP"
@@ -313,7 +327,7 @@ msgstr "Failo tipas"
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:702
 msgid "Filtering IP with blacklist"
-msgstr ""
+msgstr "Filtruojamas IP su draudžiamųjų sąrašu."
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:214
 msgid "First Ping"
@@ -349,13 +363,15 @@ msgstr "Bendri nustatymai"
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:599
 msgid "Generate Coredump"
-msgstr ""
+msgstr "Sugeneruoti „Coredump“"
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:600
 msgid ""
 "Generate Coredump file when smartdns crash, coredump file is located at /tmp/"
 "smartdns.xxx.core."
 msgstr ""
+"Sugeneruoti „Coredump“ failą, kai „smartdns“ užstringa/užlūžta, „coredump“ "
+"failas yra randamas per – „/tmp/smartdns.xxx.core“."
 
 #: applications/luci-app-smartdns/root/usr/share/rpcd/acl.d/luci-app-smartdns.json:3
 msgid "Grant access to LuCI app smartdns"
@@ -363,7 +379,7 @@ msgstr "Duoti prieigą prie „LuCI app smartdns“"
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:737
 msgid "HTTP Host"
-msgstr "„HTTP“ skleidėjas/p.k – vedėjas"
+msgstr "„HTTP“ skleidėjas/vedėjas"
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:808
 msgid "IP Blacklist"
@@ -404,10 +420,14 @@ msgid ""
 "Include other config files from /etc/smartdns/conf.d or custom path, can be "
 "downloaded from the download page."
 msgstr ""
+"Įtraukti kitus konfigūracijos failus iš – „/etc/smartdns/conf.d“ arba "
+"pasirinktinio kelio, juos galima atsisiųsti iš atsisiuntimo puslapio."
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:283
 msgid "Ipset name, Add domain result to ipset when speed check fails."
 msgstr ""
+"„Ipset“ pavadinimas, pridėti domeno-srities rezultatą į – „ipset“, kai "
+"nepavyksta patikrinti greičio."
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:527
 msgid "List of files to download."
@@ -415,7 +435,7 @@ msgstr "Failų sąrašas, kuriuos atsisiųsite."
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:229
 msgid "Listen only on the specified interfaces."
-msgstr ""
+msgstr "Laukti prisijungimo/jungties ryšio tik ant nurodytų sąsajų ir sietuvų."
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:153
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:377
@@ -440,15 +460,15 @@ msgstr "Žurnalo dydis"
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:757
 msgid "Marking Packets"
-msgstr ""
+msgstr "Žymimi paketai"
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:337
 msgid "Maximum TTL for all domain result."
-msgstr ""
+msgstr "Maksimalusis „TTL“, skirtas visiems domenų-sričių rezultatams."
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:329
 msgid "Minimum TTL for all domain result."
-msgstr ""
+msgstr "Minimalusis „TTL“, skirtas visiems domenų-sričių rezultatams."
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:459
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:865
@@ -477,12 +497,15 @@ msgstr "NEVEIKIA"
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:234
 msgid "Name of device name listen on."
 msgstr ""
+"Įrenginio pavadinimas, ant kurio laukiamas prisijungimo/jungties ryšys."
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:304
 msgid ""
 "Nftset name, Add domain result to nftset when speed check fails, format: "
 "[#[4|6]:[family#table#set]]"
 msgstr ""
+"„Nftset“ pavadinimas, pridėti domeno-srities rezultatą prie – „nftset“, kai "
+"greičio patikra nepavyksta, formatas: [#[4|6]:[family#table#set]]"
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:1014
 msgid "No"
@@ -490,29 +513,29 @@ msgstr "Ne"
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:282
 msgid "No Speed IPset Name"
-msgstr ""
+msgstr "IP tinklo pavadinimas be greičio apribojimo"
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:303
 msgid "No Speed NFTset Name"
-msgstr ""
+msgstr "„NFTset“ pavadinimas be greičio apribojimo"
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:718
 msgid "No check certificate"
-msgstr ""
+msgstr "Be patikrinimo, sertifikatas"
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:177
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:1000
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:1025
 msgid "None"
-msgstr "Joks"
+msgstr "Joks (-ia/-ie)"
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:784
 msgid "Only socks5 proxy support udp server."
-msgstr ""
+msgstr "Tik „socks5“ įgaliotasis palaiko „UDP“ serverį."
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:780
 msgid "Please set proxy server first."
-msgstr ""
+msgstr "Prašome pirma nustatyti įgaliotąjį serverį."
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:567
 msgid "Proxy Server"
@@ -525,19 +548,19 @@ msgstr "Įgalioto serverio nustatymai"
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:567
 msgid "Proxy Server URL, format: [socks5|http]://user:pass@ip:port."
 msgstr ""
-"Įgalioto serverio „URL – Saitas“, formatas: [socks5|http]://user:pass@ip:"
-"port."
+"Įgalioto serverio „URL“ – saitas, formatas: [socks5|http]://"
+"user:pass@ip:port."
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:575
 msgid ""
 "Proxy server URL format error, format: [socks5|http]://user:pass@ip:port."
 msgstr ""
-"Įgalioto serverio „URL – Saito“ formato klaida, formatas: [socks5|http]://"
+"Įgalioto serverio „URL“ – saito formato klaida, formatas: [socks5|http]://"
 "user:pass@ip:port."
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:390
 msgid "Query DNS through specific dns server group, such as office, home."
-msgstr ""
+msgstr "Užklausti „DNS“ per konkrečią „DNS“ serverių grupę, pvz., biuro, namų."
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:64
 msgid "RUNNING"
@@ -545,28 +568,30 @@ msgstr "VEIKIA"
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:341
 msgid "Reply Domain TTL Max"
-msgstr ""
+msgstr "Maksimalus „TTL“ domeno-srities atsakas"
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:342
 msgid "Reply maximum TTL for all domain result."
-msgstr ""
+msgstr "Maksimalus „TTL“ atsakas viso domeno-srities rezultatui."
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:1150
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:1151
 msgid "Report bugs"
-msgstr ""
+msgstr "Pranešti trukdžius"
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:267
 msgid "Resolve Local Hostnames"
-msgstr ""
+msgstr "Išspręsti vietinius įrenginio (t.y skleidėjo/vedėjo) pavadinimus"
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:267
 msgid "Resolve local hostnames by reading Dnsmasq lease file."
 msgstr ""
+"Išspręsti vietinius įrenginio (t.y skleidėjo/vedėjo) pavadinimus, skaitant "
+"„Dnsmasg“ nuomos failą."
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:209
 msgid "Response Mode"
-msgstr ""
+msgstr "Atsakymo veiksena"
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:1174
 msgid "Restart"
@@ -582,7 +607,7 @@ msgstr "Antro serverio nustatymai"
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:252
 msgid "Serve expired"
-msgstr ""
+msgstr "Padavimo laikas pasibaigę"
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:389
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:813
@@ -601,33 +626,39 @@ msgstr "Serverio pavadinimas"
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:807
 msgid "Set Specific domain ip address."
-msgstr "Nustatyti specifinį domeno-srities IP adresą."
+msgstr "Nustatyti savitą domeno-srities IP adresą."
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:806
 msgid "Set Specific domain rule list."
-msgstr "Nustatyti specifinį domeno-srities taisyklių sąrašą."
+msgstr "Nustatyti savitą domeno-srities taisyklių sąrašą."
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:808
 msgid "Set Specific ip blacklist."
-msgstr ""
+msgstr "Nustatyti savitą IP draudžiamąją sąrašą."
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:709
 msgid "Set TLS hostname to verify."
 msgstr ""
+"Nustatyti „TLS“ įrenginio (t.y skleidėjo/vedėjo) pavadinimą, kad "
+"patvirtintumėte/patikrintumėte."
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:758
 msgid "Set mark on packets."
-msgstr ""
+msgstr "Nustatyti žymę ant paketų."
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:738
 msgid ""
 "Set the HTTP host used for the query. Use this parameter when the host of "
 "the URL address is an IP address."
 msgstr ""
+"Nustatyti užklausai naudojamą „HTTP“ skleidėją/vedėją. Šį parametrą "
+"naudokite, kai „URL“ – saito adreso skleidėjas/vedėjas yra IP adresas."
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:728
 msgid "Sets the server name indication for query. '-' for disable SNI name."
 msgstr ""
+"Nustato serverio pavadinimo indikaciją užklausai. „-“, kad išjungtumėte "
+"„SNI“ pavadinimą."
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:128
 msgid "Settings"
@@ -635,7 +666,7 @@ msgstr "Nustatymai"
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:402
 msgid "Skip Address Rules"
-msgstr ""
+msgstr "Praleisti adreso taisykles"
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:431
 msgid "Skip Cache"
@@ -647,44 +678,44 @@ msgstr "Praleisti talpyklą."
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:425
 msgid "Skip Dualstack Selection"
-msgstr ""
+msgstr "Praleisti „Dualstack“ pasirinkimą"
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:426
 msgid "Skip Dualstack Selection."
-msgstr ""
+msgstr "Praleisti „Dualstack“ pasirinkimą."
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:414
 msgid "Skip Ipset Rule"
-msgstr ""
+msgstr "Praleisti „Ipset“ taisyklę"
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:408
 msgid "Skip Nameserver Rule"
-msgstr ""
+msgstr "Praleisti „Nameserver“ taisyklę"
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:420
 msgid "Skip SOA Address Rule"
-msgstr ""
+msgstr "Praleisti „SOA“ adreso taisyklę"
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:421
 msgid "Skip SOA address rules."
-msgstr ""
+msgstr "Praleisti „SOA“ adreso taisykles."
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:396
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:837
 msgid "Skip Speed Check"
-msgstr ""
+msgstr "Praleisti greičio patikrą"
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:403
 msgid "Skip address rules."
-msgstr ""
+msgstr "Praleisti adreso taisykles."
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:415
 msgid "Skip ipset rules."
-msgstr ""
+msgstr "Praleisti „Ipset“ taisykles."
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:409
 msgid "Skip nameserver rules."
-msgstr ""
+msgstr "Praleisti „Nameserver“ taisykles."
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:95
 #: applications/luci-app-smartdns/root/usr/share/luci/menu.d/luci-app-smartdns.json:3
@@ -700,6 +731,9 @@ msgid ""
 "SmartDNS is a local high-performance DNS server, supports finding fastest "
 "IP, supports ad filtering, and supports avoiding DNS poisoning."
 msgstr ""
+"„SmartDNS“ – yra vietinis didelio našumo „DNS“ serveris, palaikantis rasti "
+"greičiausią IP adresą, palaikantis reklamų/skelbimų filtravimą ir padedantis "
+"išvengti „DNS“ apsinuodijimo."
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:1142
 msgid "SmartDNS official website"
@@ -714,12 +748,17 @@ msgid ""
 "Smartdns local server port, smartdns will be automatically set as main dns "
 "when the port is 53."
 msgstr ""
+"„SmartDNS“ vietinio serverio prievadas, „SmartDNS“ bus automatiškai "
+"nustatytas kaip pagrindinis „DNS“, kai prievadas yra – 53-is/-ias."
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:210
 msgid ""
 "Smartdns response mode, First Ping: return the first ping IP, Fastest IP: "
 "return the fastest IP, Fastest Response: return the fastest DNS response."
 msgstr ""
+"„SmartDNS“ atsako veiksena, Pirmasis ryšio atsakas: grąžina pirmąjį ryšio "
+"atsako IP. Greičiausias IP: grąžina greičiausią IP. Greičiausias atsakas: "
+"grąžina greičiausią „DNS“ atsaką."
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:147
 msgid "Smartdns server name"
@@ -728,7 +767,7 @@ msgstr "„SmartDNS“ serverio pavadinimas"
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:169
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:1016
 msgid "Smartdns speed check mode."
-msgstr ""
+msgstr "„SmartDNS“ greičio patikros veiksena."
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:1119
 msgid ""
@@ -736,16 +775,20 @@ msgid ""
 "in the domains are never forwarded and always replied to with the specified "
 "IP address which may be IPv4 or IPv6."
 msgstr ""
+"Nurodo IP adresą, kuris bus grąžintas bet kuriam nurodytuose domenuose-"
+"srityse esančiam skleidėjui/vedėjui. Užklausos domenuose-srityse niekada "
+"nebus persiunčiamos ir visada bus atsakomos nurodytu IP adresu, kuris gali "
+"būti IPv4 arba IPv6."
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:169
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:1016
 msgid "Speed Check Mode"
-msgstr ""
+msgstr "Greičio patikros veiksena"
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:202
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:1050
 msgid "Speed check mode is invalid."
-msgstr ""
+msgstr "Greičio patikros veiksena yra negalima."
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:219
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:384
@@ -760,6 +803,7 @@ msgstr "„TCP“ prievadas yra tuščias"
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:708
 msgid "TLS Hostname Verify"
 msgstr ""
+"„TLS“ įrenginio (t.y skleidėjo/vedėjo) pavadinimo patvirtinimas/Patikrinimas"
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:727
 msgid "TLS SNI name"
@@ -767,11 +811,11 @@ msgstr "„TLS SNI“ pavadinimas"
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:746
 msgid "TLS SPKI Pinning"
-msgstr ""
+msgstr "„TLS SPKI“ prisegimas"
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:324
 msgid "TTL for all domain result."
-msgstr ""
+msgstr "„TTL“, skirtas viso domeno-srities rezultatui."
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:1137
 msgid "Technical Support"
@@ -783,7 +827,7 @@ msgstr "„URL“ – Saitas"
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:548
 msgid "URL format error, format: http:// or https://"
-msgstr "„URL – Saito“ formato klaida, formatas: „http://“ arba „https://“"
+msgstr "„URL“ – Saito formato klaida, formatas: „http://“ arba „https://“"
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:523
 msgid "Update"
@@ -811,6 +855,8 @@ msgid ""
 "Upload domain list file, or configure auto download from Download File "
 "Setting page."
 msgstr ""
+"Įkelti domenų-srities sąrašo failą arba sukonfigūruoti automatinį "
+"atsisiuntimą iš atsisiuntimo failo nustatymų puslapio."
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:921
 msgid "Upload domain list file."
@@ -818,25 +864,30 @@ msgstr "Įkelti domenų-sričių sąrašo failą."
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:501
 msgid "Upload smartdns config file to /etc/smartdns/conf.d"
-msgstr ""
+msgstr "Įkelti „smartDNS“ konfigūracijos failą į – „/etc/smartdns/conf.d“"
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:631
 msgid "Upstream Servers"
-msgstr ""
+msgstr "Išsiunčiamo srauto serveriai"
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:632
 msgid ""
 "Upstream Servers, support UDP, TCP protocol. Please configure multiple DNS "
 "servers, including multiple foreign DNS servers."
 msgstr ""
+"Išsiunčiamo srauto serveriai, palaiko „UDP“, „TCP“ protokolą. Prašome "
+"sukonfigūruoti kelis „DNS“ serverius, įskaitant kelis svetimus „DNS“ "
+"serverius."
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:765
 msgid "Use Proxy"
-msgstr ""
+msgstr "Naudoti įgaliotąjį"
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:766
 msgid "Use proxy to connect to upstream DNS server."
 msgstr ""
+"Naudokite įgaliotąjį, kad prisijungtumėte prie išsiunčiamo srauto „DNS“ "
+"serverio."
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:747
 msgid ""
@@ -844,10 +895,13 @@ msgid ""
 "SPKI fingerprint, leaving blank to indicate that the validity of TLS is not "
 "verified."
 msgstr ""
+"Naudojamas „TLS“ serverio galiojimui patvirtinimui/patikrinimui. Reikšmė "
+"yra– „Base64“ užkoduotas „SPKI“ pirštų atspaudas, palikus tuščią reikšmę "
+"nurodoma, kad „TLS“ galiojimas yra nepatvirtintas/nepatikrintas."
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:262
 msgid "Write cache to disk on exit and load on startup."
-msgstr ""
+msgstr "įrašyti talpyklą/podėlį į diską išeinant ir įkelti ją paleidimo metu."
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:1013
 msgid "Yes"
@@ -859,7 +913,7 @@ msgstr "Taip"
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:1012
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:1020
 msgid "default"
-msgstr "numatytas"
+msgstr "numatyta/-s"
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:555
 msgid "domain list (/etc/smartdns/domain-set)"
@@ -873,7 +927,7 @@ msgstr "„https“"
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:452
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:858
 msgid "ipset name format error, format: [#[4|6]:]ipsetname"
-msgstr ""
+msgstr "„Ipset“ pavadinimo formato klaida, formatas: [#[4|6]:]ipsetname"
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:1143
 msgid "open website"

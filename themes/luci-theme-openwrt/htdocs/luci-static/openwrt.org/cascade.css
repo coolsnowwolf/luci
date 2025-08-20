@@ -82,7 +82,7 @@ a img {
 }
 
 #mainmenu {
-	max-width: 200px;
+	max-width: max-content;
 	background: #f5f5f5;
 	border: 1px solid #444;
 	border-width: 0 0 1px 1px;
@@ -240,6 +240,19 @@ hr {
 .modal > textarea {
 	white-space: pre-wrap;
 	overflow: auto;
+}
+
+.modal .button-row {
+	display: flex;
+	justify-content: space-between;
+}
+
+.modal .button-row > :not(:last-child) {
+	margin-right: .5em;
+}
+
+.modal .button-row > :first-child {
+	margin-right: auto;
 }
 
 body.modal-overlay-active {
@@ -1159,6 +1172,12 @@ ul.cbi-tabmenu li.cbi-tab-disabled[data-errors]::after {
 	outline: 2px solid #4b6e9b;
 }
 
+.cbi-dropdown img {
+	/* the following are necessary to constrain (vector) images of any size */
+	max-height: 1.6em;  /* Adjusts image height to fit slightly larger than text line height */
+	width: auto;  /* Preserves aspect ratio */
+}
+
 .cbi-dropdown > ul {
 	margin: 0 !important;
 	padding: 0;
@@ -1327,10 +1346,12 @@ ul.cbi-tabmenu li.cbi-tab-disabled[data-errors]::after {
 	border: 1px outset #000;
 	border-radius: 3px;
 	position: relative;
-	pointer-events: none;
+	pointer-events: auto; /* needed for drag-and-drop in UIDynamicList */
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
+	cursor: move; /* drag-and-drop */
+	user-select: text; /* text selection in drag-and-drop */
 }
 
 .cbi-dynlist > .item::after {
@@ -1351,8 +1372,33 @@ ul.cbi-tabmenu li.cbi-tab-disabled[data-errors]::after {
 	height: auto;
 }
 
+/* indication line for drag-and-drop in UIDynamicList*/
+.cbi-dynlist > .item.drag-over {
+	border-top: 1px solid red;
+}
+
+/* Make item being dragged in UIDynamicList partially transparent*/
+.cbi-dynlist > .item.dragging {
+	opacity: 0.5;
+}
+
+/* prevent pointer changing when over the span element in UIDynamicList */
+.cbi-dynlist > .item > span {
+	pointer-events: none; 
+}
+
 .cbi-dynlist > .add-item {
 	display: flex;
+}
+
+/* indication line for drag-and-drop in UIDynamicList*/
+.cbi-dynlist > .add-item > .cbi-input-text.drag-over {
+	border-top: 1px solid re;
+}
+
+/* indication line for drag-and-drop in UIDynamicList*/
+.cbi-dynlist > .add-item > .cbi-button-add.drag-over {
+	border-top: 1px solid red;
 }
 
 .cbi-dynlist > .add-item > input {
@@ -1441,12 +1487,13 @@ select + .cbi-button {
 
 .zone-forwards {
 	display: flex;
-	flex-wrap: wrap;
+	flex-wrap: nowrap;
 }
 
 .zone-forwards > * {
 	flex: 1 1 45%;
 	padding: 1px;
+	text-wrap: auto;
 }
 
 .zone-forwards > span {
@@ -1512,6 +1559,12 @@ select + .cbi-button {
 	background: #fff;
 }
 
+.ifacebadge img {
+	width: 32px;
+	height: 32px;
+	vertical-align: middle;
+}
+
 .ifacebox-head {
 	background: #eee;
 }
@@ -1532,7 +1585,6 @@ select + .cbi-button {
 .ifacebadge > em {
 	margin-right: 5px;
 	display: inline-block;
-	height: 16px;
 }
 
 .ifacebadge-active {
@@ -1743,7 +1795,7 @@ select + .cbi-button {
 	bottom: 0;
 	width: 32px;
 	content: " ";
-	background: url(../resources/icons/loading.gif) no-repeat center;
+	background: url(../resources/icons/loading.svg) no-repeat center;
 	background-size: 16px;
 }
 
@@ -1751,7 +1803,7 @@ select + .cbi-button {
 
 @media screen and (max-width: 992px) {
 	body {
-		-webkit-text-size-adjust: 100%;
+
 	}
 
 	#maincontainer {

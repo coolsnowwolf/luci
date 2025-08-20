@@ -1,8 +1,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: luci-app-v 2raya\n"
-"PO-Revision-Date: 2024-02-15 22:09+0000\n"
-"Last-Translator: Kristoffer Grundström <swedishsailfishosuser@tutanota.com>\n"
+"PO-Revision-Date: 2025-07-15 10:11+0000\n"
+"Last-Translator: Stefan Bjornelund the Gnome "
+"<stefan.bjornelund.gnome@gmail.com>\n"
 "Language-Team: Swedish <https://hosted.weblate.org/projects/openwrt/"
 "luciapplicationsv2raya/sv/>\n"
 "Language: sv\n"
@@ -10,12 +11,12 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.4\n"
+"X-Generator: Weblate 5.13-dev\n"
 
 #: applications/luci-app-v2raya/htdocs/luci-static/resources/view/v2raya/config.js:79
 #: applications/luci-app-v2raya/htdocs/luci-static/resources/view/v2raya/config.js:86
 msgid "Auto"
-msgstr ""
+msgstr "Auto"
 
 #: applications/luci-app-v2raya/htdocs/luci-static/resources/view/v2raya/config.js:64
 #: applications/luci-app-v2raya/htdocs/luci-static/resources/view/v2raya/log.js:30
@@ -24,11 +25,11 @@ msgstr ""
 
 #: applications/luci-app-v2raya/root/usr/share/luci/menu.d/luci-app-v2raya.json:13
 msgid "Configuration"
-msgstr ""
+msgstr "Konfiguration"
 
 #: applications/luci-app-v2raya/htdocs/luci-static/resources/view/v2raya/config.js:93
 msgid "Debug"
-msgstr ""
+msgstr "Avlusa"
 
 #: applications/luci-app-v2raya/htdocs/luci-static/resources/view/v2raya/config.js:104
 msgid "Disable log color output"
@@ -52,11 +53,11 @@ msgstr ""
 
 #: applications/luci-app-v2raya/htdocs/luci-static/resources/view/v2raya/config.js:77
 msgid "IPv6 support"
-msgstr ""
+msgstr "Stöd för IPv6"
 
 #: applications/luci-app-v2raya/htdocs/luci-static/resources/view/v2raya/config.js:94
 msgid "Info"
-msgstr ""
+msgstr "Info"
 
 #: applications/luci-app-v2raya/htdocs/luci-static/resources/view/v2raya/config.js:73
 msgid "Listening address"
@@ -80,7 +81,7 @@ msgstr ""
 
 #: applications/luci-app-v2raya/htdocs/luci-static/resources/view/v2raya/config.js:91
 msgid "Log level"
-msgstr ""
+msgstr "Logg-nivå"
 
 #: applications/luci-app-v2raya/htdocs/luci-static/resources/view/v2raya/config.js:99
 msgid "Max log retention period"
@@ -97,16 +98,16 @@ msgstr ""
 #: applications/luci-app-v2raya/htdocs/luci-static/resources/view/v2raya/config.js:81
 #: applications/luci-app-v2raya/htdocs/luci-static/resources/view/v2raya/config.js:88
 msgid "Off"
-msgstr ""
+msgstr "Av"
 
 #: applications/luci-app-v2raya/htdocs/luci-static/resources/view/v2raya/config.js:80
 #: applications/luci-app-v2raya/htdocs/luci-static/resources/view/v2raya/config.js:87
 msgid "On"
-msgstr ""
+msgstr "På"
 
 #: applications/luci-app-v2raya/htdocs/luci-static/resources/view/v2raya/config.js:30
 msgid "Open Web Interface"
-msgstr "Öppna webbgränssnitt"
+msgstr "Öppna webbgränssnittet"
 
 #: applications/luci-app-v2raya/htdocs/luci-static/resources/view/v2raya/config.js:31
 msgid "RUNNING"
@@ -138,7 +139,7 @@ msgstr "Okänt fel: %s"
 
 #: applications/luci-app-v2raya/htdocs/luci-static/resources/view/v2raya/config.js:95
 msgid "Warn"
-msgstr ""
+msgstr "Varna"
 
 #: applications/luci-app-v2raya/htdocs/luci-static/resources/view/v2raya/config.js:31
 #: applications/luci-app-v2raya/htdocs/luci-static/resources/view/v2raya/config.js:33

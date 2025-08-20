@@ -6,12 +6,12 @@
 
 include $(TOPDIR)/rules.mk
 
-LUCI_TITLE:=Argon Theme (Design Mod)
+LUCI_TITLE:=Design Theme (Argon Mod)
 LUCI_DEPENDS:=+curl +jsonfilter
-PKG_VERSION:=2.3.2
-PKG_RELEASE:=20250520
+PKG_VERSION:=2.3.3
+PKG_RELEASE:=20250806
 
-define Package/luci-theme-argon/postrm
+define Package/luci-theme-design/postrm
 #!/bin/sh
 [ -n "$${IPKG_INSTROOT}" ] || {
 	uci -q delete luci.themes.Design

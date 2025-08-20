@@ -6,8 +6,8 @@
 'require tools.widgets as widgets';
 
 return view.extend({
-	render: function () {
-		var m, s, o;
+	render() {
+		let m, s, o;
 
 		m = new form.Map('msd_lite', _('Multi Stream daemon Lite'),
 			_('The lightweight version of Multi Stream daemon (msd) Program for organizing IP TV streaming on the network via HTTP.'));

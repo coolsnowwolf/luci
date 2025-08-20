@@ -10,12 +10,12 @@
 			"uci": { "zerotier": true }
 		}
 	},
-	"admin/vpn/zerotier/base": {
-		"title": "Base settings",
+	"admin/vpn/zerotier/config": {
+		"title": "Configuration",
 		"order": 10,
 		"action": {
 			"type": "view",
-			"path": "zerotier/base"
+			"path": "zerotier/config"
 		}
 	},
 	"admin/vpn/zerotier/interface": {

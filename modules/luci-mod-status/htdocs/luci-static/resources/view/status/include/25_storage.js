@@ -17,7 +17,7 @@ var MountSkipList = [
 	"/rom",
 	"/tmp",
 	"/dev",
-	"/boot",
+	"/overlay",
 	"/",
 ]
 
@@ -56,8 +56,8 @@ return baseclass.extend({
 		};
 
 		var fields = {};
-		// existenceChk(fields, _('Disk space'), { used: root.used * 1024, size: root.total * 1024 });
-		// existenceChk(fields, _('Temp space'), { used: tmp.used * 1024, size: tmp.total * 1024 });
+		existenceChk(fields, _('Disk space'), { used: root.used * 1024, size: root.total * 1024 });
+		existenceChk(fields, _('Temp space'), { used: tmp.used * 1024, size: tmp.total * 1024 });
 
 		for (var i = 0; i < mounts.length; i++) {
 			var entry = mounts[i];

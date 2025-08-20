@@ -11,34 +11,7 @@
 "require view";
 "require https-dns-proxy.status as hdp";
 
-var pkg = {
-	get Name() {
-		return "https-dns-proxy";
-	},
-
-	get URL() {
-		return "https://docs.openwrt.melmac.net/" + pkg.Name + "/";
-	},
-
-	templateToRegexp: function (template) {
-		return RegExp(
-			"^" +
-				template
-					.split(/(\{\w+\})/g)
-					.map((part) => {
-						let placeholder = part.match(/^\{(\w+)\}$/);
-						if (placeholder) return `(?<${placeholder[1]}>.*?)`;
-						else return part.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-					})
-					.join("") +
-				"$"
-		);
-	},
-
-	templateToResolver: function (template, args) {
-		return template.replace(/{(\w+)}/g, (_, v) => args[v]);
-	},
-};
+var pkg = hdp.pkg;
 
 return view.extend({
 	load: function () {
@@ -56,7 +29,7 @@ return view.extend({
 				http2_support: null,
 				http3_support: null,
 			},
-			providers: (data[1] && data[1][pkg.Name]) || { providers: [] },
+			providers: (data[1] && data[1][pkg.Name]) || [{ title: "empty" }],
 		};
 		reply.providers.sort(function (a, b) {
 			return _(a.title).localeCompare(_(b.title));
@@ -76,71 +49,82 @@ return view.extend({
 
 		s = m.section(form.NamedSection, "config", pkg.Name);
 
-		o = s.option(
-			form.ListValue,
-			"dnsmasq_config_update_option",
-			_("Update DNSMASQ Config on Start/Stop"),
-			_(
-				"If update option is selected, the %s'DNS Forwards' section of DHCP and DNS%s will be automatically updated to use selected DoH providers (%smore information%s)."
-			).format(
-				'<a href="' + L.url("admin", "network", "dhcp") + '">',
-				"</a>",
-				'<a href="' + pkg.URL + "#default-settings" + '" target="_blank">',
-				"</a>"
-			)
-		);
-		o.value("*", _("Update all configs"));
-		o.value("+", _("Update select configs"));
-		o.value("-", _("Do not update configs"));
-		o.default = "*";
-		o.retain = true;
-		o.cfgvalue = function (section_id) {
-			let val = this.map.data.get(
-				this.map.config,
-				section_id,
-				"dnsmasq_config_update"
-			);
-			if (val && val[0]) {
-				switch (val[0]) {
-					case "*":
-					case "-":
-						return val[0];
-					default:
-						return "+";
-				}
-			} else return "*";
-		};
-		o.write = function (section_id, formvalue) {
-			L.uci.set(pkg.Name, section_id, "dnsmasq_config_update", formvalue);
-		};
+		var dhcp_dnsmasq_values = Object.values(L.uci.sections("dhcp", "dnsmasq"));
+		function isEmpty(obj) {
+			return Object.keys(obj).length === 0;
+		}
 
-		o = s.option(
-			form.MultiValue,
-			"dnsmasq_config_update",
-			_("Select the DNSMASQ Configs to update")
-		);
-		Object.values(L.uci.sections("dhcp", "dnsmasq")).forEach(function (
-			element
-		) {
-			var description;
-			var key;
-			if (element[".name"] === L.uci.resolveSID("dhcp", element[".name"])) {
-				key = element[".index"];
-				description = "dnsmasq[" + element[".index"] + "]";
-			} else {
-				key = element[".name"];
-				description = element[".name"];
-			}
-			o.value(key, description);
-		});
-		o.depends("dnsmasq_config_update_option", "+");
-		o.retain = true;
+		if (!isEmpty(dhcp_dnsmasq_values)) {
+			o = s.option(
+				form.ListValue,
+				"dnsmasq_config_update_option",
+				_("Update DNSMASQ Config on Start/Stop"),
+				_(
+					"If update option is selected, the %s'DNS Forwards' section of DHCP and DNS%s will be automatically updated to use selected DoH providers (%smore information%s)."
+				).format(
+					'<a href="' + L.url("admin", "network", "dhcp") + '">',
+					"</a>",
+					'<a href="' + pkg.URL + "#default-settings" + '" target="_blank">',
+					"</a>"
+				)
+			);
+			o.value("*", _("Update all configs"));
+			o.value("+", _("Update select configs"));
+			o.value("-", _("Do not update configs"));
+			o.default = "*";
+			o.retain = true;
+			o.cfgvalue = function (section_id) {
+				let val = this.map.data.get(
+					this.map.config,
+					section_id,
+					"dnsmasq_config_update"
+				);
+				if (val && val[0]) {
+					switch (val[0]) {
+						case "*":
+						case "-":
+							return val[0];
+						default:
+							return "+";
+					}
+				} else return "*";
+			};
+			o.write = function (section_id, formvalue) {
+				L.uci.set(pkg.Name, section_id, "dnsmasq_config_update", formvalue);
+			};
+
+			o = s.option(
+				form.MultiValue,
+				"dnsmasq_config_update",
+				_("Select the DNSMASQ Configs to update")
+			);
+
+			dhcp_dnsmasq_values.forEach(function (element) {
+				var description;
+				var key;
+				if (element[".name"] === L.uci.resolveSID("dhcp", element[".name"])) {
+					key = element[".index"];
+					description = "dnsmasq[" + element[".index"] + "]";
+				} else {
+					key = element[".name"];
+					description = element[".name"];
+				}
+				o.value(key, description);
+			});
+			o.depends("dnsmasq_config_update_option", "+");
+			o.retain = true;
+		}
 
 		o = s.option(
 			form.ListValue,
 			"force_dns",
 			_("Force Router DNS"),
-			_("Forces Router DNS use on local devices, also known as DNS Hijacking.")
+			_(
+				"Forces Router DNS use on local devices, also known as DNS Hijacking. Only works on `lan` interface by default (%smore information%s)."
+			).format(
+				'<a href="' + pkg.URL + "#force_dns" + '" target="_blank">',
+				"</a>"
+			)
 		);
 		o.value("0", _("Let local devices use their own DNS servers if set"));
 		o.value("1", _("Force Router DNS server to all local devices"));
@@ -345,15 +329,53 @@ return view.extend({
 				};
 				_paramText.remove = _paramText.write;
 			}
+			const _boot_dns = s.option(
+				form.Value,
+				"_bootstrap_dns_" + i,
+				_("Bootstrap DNS")
+			);
+			_boot_dns.template = prov.template;
+			_boot_dns.modalonly = true;
+			_boot_dns.depends("_provider", prov.template);
+			_boot_dns.cfgvalue = function (section_id) {
+				const c_value = this.map.data.get(
+					this.map.config,
+					section_id,
+					"bootstrap_dns"
+				);
+				return c_value || prov.bootstrap_dns || "";
+			};
+			_boot_dns.write = function (section_id, formvalue) {
+				const resolver = this.map.data.get(
+					this.map.config,
+					section_id,
+					"resolver_url"
+				);
+				const regexp = pkg.templateToRegexp(_boot_dns.template);
+				if (regexp.test(resolver)) {
+					console.log(
+						pkg.Name,
+						section_id,
+						"bootstrap_dns",
+						formvalue,
+						this.cfgvalue(section_id)
+					);
+					if (formvalue)
+						L.uci.set(pkg.Name, section_id, "bootstrap_dns", formvalue);
+					else
+						L.uci.set(
+							pkg.Name,
+							section_id,
+							"bootstrap_dns",
+							this.cfgvalue(section_id)
+						);
+				}
+				_boot_dns.remove = _boot_dns.write;
+			};
 		});
 
-		o = s.option(form.Value, "bootstrap_dns", _("Bootstrap DNS"));
-		o.default = "";
-		o.modalonly = true;
-		o.optional = true;
-
 		o = s.option(form.Value, "listen_addr", _("Listen Address"));
-		o.datatype = "ipaddr";
+		o.datatype = "ipaddr('nomask')";
 		o.default = "";
 		o.optional = true;
 		o.placeholder = "127.0.0.1";
@@ -375,13 +397,13 @@ return view.extend({
 		o.optional = true;
 
 		o = s.option(form.Value, "dscp_codepoint", _("DSCP Codepoint"));
-		o.datatype = "and(uinteger, range(0,63))";
+		o.datatype = "range(0,63)";
 		o.default = "";
 		o.modalonly = true;
 		o.optional = true;
 
 		o = s.option(form.Value, "verbosity", _("Logging Verbosity"));
-		o.datatype = "and(uinteger, range(0,4))";
+		o.datatype = "range(0,4)";
 		o.default = "";
 		o.modalonly = true;
 		o.optional = true;
@@ -392,7 +414,7 @@ return view.extend({
 		o.optional = true;
 
 		o = s.option(form.Value, "polling_interval", _("Polling Interval"));
-		o.datatype = "and(uinteger, range(5,3600))";
+		o.datatype = "range(5,3600)";
 		o.default = "";
 		o.modalonly = true;
 		o.optional = true;

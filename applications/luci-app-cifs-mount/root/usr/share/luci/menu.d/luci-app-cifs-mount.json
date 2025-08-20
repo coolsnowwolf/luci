@@ -1,0 +1,13 @@
+{
+	"admin/nas/cifs-mount": {
+		"title": "Mount SMB NetShare",
+		"action": {
+			"type": "view",
+			"path": "cifs-mount"
+		},
+		"depends": {
+			"acl": [ "luci-app-cifs-mount" ],
+			"uci": { "cifs-mount": true }
+		}
+	}
+}

@@ -7,7 +7,7 @@
 'require uci';
 'require view';
 
-var callServiceList = rpc.declare({
+const callServiceList = rpc.declare({
 	object: 'service',
 	method: 'list',
 	params: ['name'],
@@ -15,8 +15,8 @@ var callServiceList = rpc.declare({
 });
 
 function getServiceStatus() {
-	return L.resolveDefault(callServiceList('ddns-go'), {}).then(function (res) {
-		var isRunning = false;
+	return L.resolveDefault(callServiceList('ddns-go'), {}).then(function(res) {
+		let isRunning = false;
 		try {
 			isRunning = res['ddns-go']['instances']['ddns-go']['running'];
 		} catch (e) { }
@@ -25,8 +25,8 @@ function getServiceStatus() {
 }
 
 function renderStatus(isRunning, listen_port, noweb) {
-	var spanTemp = '<em><span style="color:%s"><strong>%s %s</strong></span></em>';
-	var renderHTML;
+	let spanTemp = '<em><span style="color:%s"><strong>%s %s</strong></span></em>';
+	let renderHTML;
 	if (isRunning) {
 		renderHTML = spanTemp.format('green', _('DDNS-Go'), _('RUNNING'));
 		if (noweb !== '1')
@@ -40,15 +40,15 @@ function renderStatus(isRunning, listen_port, noweb) {
 }
 
 return view.extend({
-	load: function() {
+	load() {
 		return Promise.all([
 			uci.load('ddns-go')
 		]);
 	},
 
-	render: function(data) {
-		var m, s, o;
-		var listen_port = (uci.get(data[0], 'config', 'listen') || '[::]:9876').split(':').slice(-1)[0],
+	render(data) {
+		let m, s, o;
+		let listen_port = (uci.get(data[0], 'config', 'listen') || '[::]:9876').split(':').slice(-1)[0],
 		    noweb = uci.get(data[0], 'config', 'noweb') || '0';
 
 		m = new form.Map('ddns-go', _('DDNS-Go'),
@@ -56,16 +56,16 @@ return view.extend({
 
 		s = m.section(form.TypedSection);
 		s.anonymous = true;
-		s.render = function () {
-			poll.add(function () {
-				return L.resolveDefault(getServiceStatus()).then(function (res) {
-					var view = document.getElementById('service_status');
+		s.render = function() {
+			poll.add(function() {
+				return L.resolveDefault(getServiceStatus()).then(function(res) {
+					let view = document.getElementById('service_status');
 					view.innerHTML = renderStatus(res, listen_port, noweb);
 				});
 			});
 
 			return E('div', { class: 'cbi-section', id: 'status_bar' }, [
-					E('p', { id: 'service_status' }, _('Collecting data...'))
+				E('p', { id: 'service_status' }, _('Collecting data...'))
 			]);
 		}
 
@@ -83,6 +83,9 @@ return view.extend({
 		o = s.option(form.Value, 'ttl', _('Update interval'));
 		o.default = '300';
 		o.rmempty = false;
+
+		o = s.option(form.Value, 'dns', _('Custom DNS server'));
+		o.datatype = 'ipaddr';
 
 		o = s.option(form.Flag, 'noweb', _('Disable WebUI'));
 		o.default = o.disabled;

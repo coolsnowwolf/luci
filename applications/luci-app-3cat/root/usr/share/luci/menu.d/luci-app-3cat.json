@@ -1,0 +1,13 @@
+{
+	"admin/services/3cat": {
+		"title": "3cat",
+		"action": {
+			"type": "view",
+			"path": "3cat"
+		},
+		"depends": {
+			"acl": [ "luci-app-3cat" ],
+			"fs": { "/etc/config/3cat": "file" }
+		}
+	}
+}

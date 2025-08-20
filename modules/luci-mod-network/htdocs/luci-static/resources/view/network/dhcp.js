@@ -8,6 +8,7 @@
 'require network';
 'require validation';
 'require tools.widgets as widgets';
+'require tools.dnsrecordhandlers as drh';
 
 var callHostHints, callDUIDHints, callDHCPLeases, CBILeaseStatus, CBILease6Status;
 
@@ -101,7 +102,7 @@ function generateDnsmasqInstanceEntry(data) {
 	}
 	formatString += ')';
 
-	return nameValueMap.get('.name'), formatString;
+	return [nameValueMap.get('.name'), formatString];
 }
 
 function getDHCPPools() {
@@ -221,7 +222,7 @@ function expandAndFormatMAC(macs) {
 		}
 	});
 
-	return result.length ? result.join(' ') : null;
+	return result.length ? result : null;
 }
 
 function isValidMAC(sid, s) {
@@ -277,7 +278,8 @@ return view.extend({
 			callHostHints(),
 			callDUIDHints(),
 			getDHCPPools(),
-			network.getNetworks()
+			network.getNetworks(),
+			uci.load('firewall')
 		]);
 	},
 
@@ -287,7 +289,7 @@ return view.extend({
 		    duids = hosts_duids_pools[1],
 		    pools = hosts_duids_pools[2],
 		    networks = hosts_duids_pools[3],
-		    m, s, o, ss, so;
+		    m, s, o, ss, so, dnss;
 
 		let noi18nstrings = {
 			etc_hosts: '<code>/etc/hosts</code>',
@@ -306,6 +308,36 @@ return view.extend({
 
 		};
 
+		const recordtypes = [
+			'ANY',
+			'A',
+			'AAAA',
+			'ALIAS',
+			'CAA',
+			'CERT',
+			'CNAME',
+			'DS',
+			'HINFO',
+			'HIP',
+			'HTTPS',
+			'KEY',
+			'LOC',
+			'MX',
+			'NAPTR',
+			'NS',
+			'OPENPGPKEY',
+			'PTR',
+			'RP',
+			'SIG',
+			'SOA',
+			'SRV',
+			'SSHFP',
+			'SVCB',
+			'TLSA',
+			'TXT',
+			'URI',
+		]
+
 		function customi18n(template, values) {
 			if (!values)
 				values = noi18nstrings;
@@ -318,11 +350,45 @@ return view.extend({
 		s = m.section(form.TypedSection, 'dnsmasq');
 		s.anonymous = false;
 		s.addremove = true;
+		s.addbtntitle = _('Add server instance', 'Dnsmasq instance');
 
+		s.renderContents = function(/* ... */) {
+			var renderTask = form.TypedSection.prototype.renderContents.apply(this, arguments),
+			    sections = this.cfgsections();
+
+			return Promise.resolve(renderTask).then(function(nodes) {
+				if (sections.length < 2) {
+					nodes.querySelector('#cbi-dhcp-dnsmasq > h3').remove();
+					nodes.querySelector('#cbi-dhcp-dnsmasq > .cbi-section-remove').remove();
+				}
+				else {
+					nodes.querySelectorAll('#cbi-dhcp-dnsmasq > .cbi-section-remove').forEach(function(div, i) {
+						var section = uci.get('dhcp', sections[i]),
+						    hline = div.nextElementSibling,
+						    btn = div.firstElementChild;
+
+						if (!section || section['.anonymous']) {
+							hline.innerText = i ? _('Unnamed instance #%d', 'Dnsmasq instance').format(i+1) : _('Default instance', 'Dnsmasq instance');
+							btn.innerText = i ? _('Remove instance #%d', 'Dnsmasq instance').format(i+1) : _('Remove default instance', 'Dnsmasq instance');
+						}
+						else {
+							hline.innerText = _('Instance "%q"', 'Dnsmasq instance').format(section['.name']);
+							btn.innerText = _('Remove instance "%q"', 'Dnsmasq instance').format(section['.name']);
+						}
+					});
+				}
+
+				nodes.querySelector('#cbi-dhcp-dnsmasq > .cbi-section-create input').placeholder = _('New instance name…', 'Dnsmasq instance');
+
+				return nodes;
+			});
+		};
 
 
 		s.tab('general', _('General'));
+		s.tab('cache', _('Cache'));
 		s.tab('devices', _('Devices &amp; Ports'));
+		s.tab('dnsrecords', _('DNS Records'));
 		s.tab('dnssecopt', _('DNSSEC'));
 		s.tab('filteropts', _('Filter'));
 		s.tab('forward', _('Forwards'));
@@ -330,13 +396,20 @@ return view.extend({
 		s.tab('logging', _('Log'));
 		s.tab('files', _('Resolv &amp; Hosts Files'));
 		s.tab('leases', _('Static Leases'));
-		s.tab('hosts', _('Hostnames'));
 		s.tab('ipsets', _('IP Sets'));
 		s.tab('relay', _('Relay'));
-		s.tab('srvhosts', _('SRV'));
-		s.tab('mxhosts', _('MX'));
-		s.tab('cnamehosts', _('CNAME'));
 		s.tab('pxe_tftp', _('PXE/TFTP'));
+
+		o = s.taboption('cache', form.MultiValue, 'cache_rr',
+			_('Cache arbitrary RR'), _('By default, dnsmasq caches A, AAAA, CNAME and SRV DNS record types.') + '<br/>' +
+			_('This option adds additional record types to the cache.'));
+		o.optional = true;
+		o.create = true;
+		o.multiple = true;
+		o.display_size = 5;
+		recordtypes.forEach(r => {
+			o.value(r);
+		});
 
 		s.taboption('filteropts', form.Flag, 'domainneeded',
 			_('Domain required'),
@@ -346,6 +419,10 @@ return view.extend({
 		s.taboption('general', form.Flag, 'authoritative',
 			_('Authoritative'),
 			_('This is the only DHCP server in the local network.'));
+
+		s.taboption('general', form.Flag, 'dns_redirect',
+			_('DNS redirect'),
+			_('Force redirect all local DNS queries to DNSMasq, a.k.a. DNS Hijacking.'));
 
 		o = s.taboption('general', form.Value, 'local',
 			_('Resolve these locally'),
@@ -434,7 +511,7 @@ return view.extend({
 		o = s.taboption('filteropts', form.Flag, 'rebind_protection',
 			_('Rebind protection'),
 			customi18n(_('Discard upstream responses containing {rfc_1918_link} addresses.') ) + '<br />' +
-			customi18n(_('Discard also upstream responses containing {rfc_4193_link}, Link-Local and private IPv4-Mapped {rfc_4291_link} IPv6 Addresses.') )	
+			customi18n(_('Discard also upstream responses containing {rfc_4193_link}, Link-Local and private IPv4-Mapped {rfc_4291_link} IPv6 Addresses.') )
 		);
 		o.rmempty = false;
 
@@ -574,8 +651,15 @@ return view.extend({
 			_('Query upstream resolvers in the order they appear in the resolv file.'));
 		o.optional = true;
 
+		o = s.taboption('files', form.Flag, 'ignore_hosts_dir',
+			_('Ignore hosts files directory'),
+			_('On: use instance specific hosts file only') + '<br/>' +
+			_('Off: use all files in the directory including the instance specific hosts file')
+		);
+		o.optional = true;
+
 		o = s.taboption('files', form.Flag, 'nohosts',
-			customi18n(_('Ignore {etc_hosts}') )
+			customi18n(_('Ignore {etc_hosts} file') )
 		);
 		o.optional = true;
 
@@ -599,7 +683,7 @@ return view.extend({
 			_('Filter private'),
 			customi18n(
 			_('Reject reverse lookups to {rfc_6303_link} IP ranges ({reverse_arpa}) not in {etc_hosts}.') )
-		); 
+		);
 		o.default = o.enabled;
 
 		s.taboption('filteropts', form.Flag, 'filterwin2k',
@@ -617,6 +701,16 @@ return view.extend({
 			_('Filter IPv4 A records'),
 			_('Remove IPv4 addresses from the results and only return IPv6 addresses.'));
 		o.optional = true;
+
+		o = s.taboption('filteropts', form.MultiValue, 'filter_rr',
+			_('Filter arbitrary RR'), _('Removes records of the specified type(s) from answers.'));
+		o.optional = true;
+		o.create = true;
+		o.multiple = true;
+		o.display_size = 5;
+		recordtypes.forEach(r => {
+			o.value(r);
+		});
 
 		s.taboption('filteropts', form.Flag, 'localise_queries',
 			_('Localise queries'),
@@ -646,6 +740,37 @@ return view.extend({
 			customi18n(_('File listing upstream resolvers, optionally domain-specific, e.g. {servers_file_entry01}, {servers_file_entry02}.') )
 		);
 		o.placeholder = '/etc/dnsmasq.servers';
+
+		o = s.taboption('forward', form.Value, 'addmac',
+			_('Add requestor MAC'),
+			_('Add the MAC address of the requestor to DNS queries which are forwarded upstream.') + ' ' + '<br />' +
+			_('%s uses the default MAC address format encoding').format('<code>enabled</code>') + ' ' + '<br />' +
+			_('%s uses an alternative encoding of the MAC as base64').format('<code>base64</code>') + ' ' + '<br />' +
+			_('%s uses a human-readable encoding of hex-and-colons').format('<code>text</code>'));
+		o.optional = true;
+		o.value('', _('off'));
+		o.value('1', _('enabled (default)'));
+		o.value('base64');
+		o.value('text');
+
+		s.taboption('forward', form.Flag, 'stripmac',
+			_('Remove MAC address before forwarding query'),
+			_('Remove any MAC address information already in downstream queries before forwarding upstream.'));
+
+		o = s.taboption('forward', form.Value, 'addsubnet',
+			_('Add subnet address to forwards'),
+			_('Add a subnet address to the DNS queries which are forwarded upstream, leaving this value empty disables the feature.') + ' ' +
+			_('If an address is specified in the flag, it will be used, otherwise, the address of the requestor will be used.') + ' ' +
+			_('The amount of the address forwarded depends on the prefix length parameter: 32 (128 for IPv6) forwards the whole address, zero forwards none of it but still marks the request so that no upstream nameserver will add client address information either.') + ' ' + '<br />' +
+			_('The default (%s) is zero for both IPv4 and IPv6.').format('<code>0,0</code>') + ' ' + '<br />' +
+			_('%s adds the /24 and /96 subnets of the requestor for IPv4 and IPv6 requestors, respectively.').format('<code>24,96</code>') + ' ' + '<br />' +
+			_('%s adds 1.2.3.0/24 for IPv4 requestors and ::/0 for IPv6 requestors.').format('<code>1.2.3.4/24</code>') + ' ' + '<br />' +
+			_('%s adds 1.2.3.0/24 for both IPv4 and IPv6 requestors.').format('<code>1.2.3.4/24,1.2.3.4/24</code>'));
+		o.optional = true;
+
+		s.taboption('forward', form.Flag, 'stripsubnet',
+			_('Remove subnet address before forwarding query'),
+			_('Remove any subnet address already present in a downstream query before forwarding it upstream.'));
 
 		o = s.taboption('general', form.Flag, 'allservers',
 			_('All servers'),
@@ -800,11 +925,24 @@ return view.extend({
 		so.optional = true;
 
 		Object.values(L.uci.sections('dhcp', 'dnsmasq')).forEach(function(val, index) {
-			var name, display_str = generateDnsmasqInstanceEntry(val);
-			so.value(index, display_str);
+			var [name, display_str] = generateDnsmasqInstanceEntry(val);
+			so.value(name, display_str);
 		});
 
-		o = s.taboption('srvhosts', form.SectionValue, '__srvhosts__', form.TableSection, 'srvhost', null,
+		o = s.taboption('dnsrecords', form.SectionValue, '__dnsrecords__', form.TypedSection, '__dnsrecords__');
+
+		dnss = o.subsection;
+
+		dnss.anonymous = true;
+		dnss.cfgsections = function() { return [ '__dnsrecords__' ] };
+
+		dnss.tab('hosts', _('Hostnames'));
+		dnss.tab('srvhosts', _('SRV'));
+		dnss.tab('mxhosts', _('MX'));
+		dnss.tab('cnamehosts', _('CNAME'));
+		dnss.tab('dnsrr', _('DNS-RR'));
+
+		o = dnss.taboption('srvhosts', form.SectionValue, '__srvhosts__', form.TableSection, 'srvhost', null,
 			_('Bind service records to a domain name: specify the location of services. See <a href="%s">RFC2782</a>.').format('https://datatracker.ietf.org/doc/html/rfc2782')
 			+ '<br />' + _('_service: _sip, _ldap, _imap, _stun, _xmpp-client, … . (Note: while _http is possible, no browsers support SRV records.)')
 			+ '<br />' + _('_proto: _tcp, _udp, _sctp, _quic, … .')
@@ -843,7 +981,7 @@ return view.extend({
 		so.datatype = 'range(0,65535)';
 		so.placeholder = '50';
 
-		o = s.taboption('mxhosts', form.SectionValue, '__mxhosts__', form.TableSection, 'mxhost', null,
+		o = dnss.taboption('mxhosts', form.SectionValue, '__mxhosts__', form.TableSection, 'mxhost', null,
 			_('Bind service records to a domain name: specify the location of services.')
 			 + '<br />' + _('You may add multiple records for the same domain.'));
 
@@ -870,7 +1008,7 @@ return view.extend({
 		so.datatype = 'range(0,65535)';
 		so.placeholder = '0';
 
-		o = s.taboption('cnamehosts', form.SectionValue, '__cname__', form.TableSection, 'cname', null, 
+		o = dnss.taboption('cnamehosts', form.SectionValue, '__cname__', form.TableSection, 'cname', null,
 			_('Set an alias for a hostname.'));
 
 		ss = o.subsection;
@@ -891,7 +1029,7 @@ return view.extend({
 		so.datatype = 'hostname';
 		so.placeholder = 'example.com.';
 
-		o = s.taboption('hosts', form.SectionValue, '__hosts__', form.GridSection, 'domain', null,
+		o = dnss.taboption('hosts', form.SectionValue, '__hosts__', form.GridSection, 'domain', null,
 			_('Hostnames are used to bind a domain name to an IP address. This setting is redundant for hostnames already configured with static leases, but it can be useful to rebind an FQDN.'));
 
 		ss = o.subsection;
@@ -906,7 +1044,7 @@ return view.extend({
 
 		so = ss.option(form.Value, 'ip', _('IP address'));
 		so.rmempty = false;
-		so.datatype = 'ipaddr';
+		so.datatype = 'ipaddr("nomask")';
 
 		var ipaddrs = {};
 
@@ -920,6 +1058,122 @@ return view.extend({
 		L.sortedKeys(ipaddrs, null, 'addr').forEach(function(ipv4) {
 			so.value(ipv4, '%s (%s)'.format(ipv4, ipaddrs[ipv4]));
 		});
+
+		o = dnss.taboption('dnsrr', form.SectionValue, '__dnsrr__', form.GridSection, 'dnsrr', null, 
+			_('Set an arbitrary resource record (RR) type.') + '<br/>' + 
+			_('Hexdata is automatically en/decoded on save and load'));
+
+		ss = o.subsection;
+
+		ss.addremove = true;
+		ss.anonymous = true;
+		ss.sortable  = true;
+		ss.rowcolors = true;
+		ss.nodescriptions = true;
+
+		function hexdecodeload(section_id) {
+			let value = uci.get('dhcp', section_id, 'hexdata') || '';
+			// Remove any spaces or colons from the hex string - they're allowed
+			value = value.replace(/[\s:]/g, '');
+			// Hex-decode the string before displaying
+			let decodedString = '';
+			for (let i = 0; i < value.length; i += 2) {
+				decodedString += String.fromCharCode(parseInt(value.substr(i, 2), 16));
+			}
+			return decodedString;
+		}
+
+		function hexencodesave(section, value) {
+			if (!value || value.length === 0) {
+				uci.unset('dhcp', section, 'hexdata');
+				return;
+			}
+			// Hex-encode the string before saving
+			const encodedArr = value.split('').map(c => c.charCodeAt(0).toString(16).padStart(2, '0')).join('');
+			uci.set('dhcp', section, this.option, encodedArr);
+		}
+
+		so = ss.option(form.Value, 'rrname', _('Resource Record Name'));
+		so.rmempty = false;
+		so.datatype = 'hostname';
+		so.placeholder = 'svcb.example.com.';
+
+		so = ss.option(form.Value, 'rrnumber', _('Resource Record Number'));
+		so.rmempty = false;
+		so.datatype = 'uinteger';
+		so.placeholder = '64';
+
+		so = ss.option(form.Value, '_hexdata', _('Raw Data'));
+		so.rmempty = true;
+		so.datatype = 'string';
+		so.placeholder = 'free-form string';
+		so.load = hexdecodeload;
+		so.write = hexencodesave;
+		so.modalonly = true;
+		so.depends({ rrnumber: '65', '!reverse': true });
+
+		so = ss.option(form.DummyValue, 'hexdata', _('Hex Data'));
+		so.width = '50%';
+		so.rawhtml = true;
+		so.load = function(section_id) {
+			let hexdata = uci.get('dhcp', section_id, 'hexdata') || '';
+			hexdata = hexdata.replace(/[:]/g, '');
+			return hexdata.replace(/(.{2})/g, '$1 ');
+		};
+
+		function writetype65(section_id, value) {
+			let rrnum = uci.get('dhcp', section_id, 'rrnumber');
+			if (rrnum !== '65') return;
+
+			let priority = parseInt(this.section.formvalue(section_id, '_svc_priority'), 10);
+			let target = this.section.formvalue(section_id, '_svc_target') || '.';
+			let params = value.trim().split('\n').map(l => l.trim()).filter(Boolean);
+
+			const hex = drh.buildSvcbHex(priority, target, params);	
+			uci.set('dhcp', section_id, 'hexdata', hex);
+		};
+
+		function loadtype65(section_id) {
+			let rrnum = uci.get('dhcp', section_id, 'rrnumber');
+			if (rrnum !== '65') return null;
+
+			let hexdata = uci.get('dhcp', section_id, 'hexdata');
+			return drh.parseSvcbHex(hexdata);
+		};
+
+		// Type 65 builder fields (hidden unless rrnumber === 65)
+		so = ss.option(form.Value, '_svc_priority', _('Svc Priority'));
+		so.placeholder = 1;
+		so.datatype = 'and(uinteger,min(0),max(65535))'
+		so.modalonly = true;
+		so.depends({ rrnumber: '65' });
+		so.write = writetype65;
+		so.load = function(section_id) {
+			const parsed = loadtype65(section_id);
+			return parsed?.priority?.toString() || '';
+		};
+
+		so = ss.option(form.Value, '_svc_target', _('Svc Target'));
+		so.placeholder = 'svc.example.com.';
+		so.dataype = 'hostname';
+		so.modalonly = true;
+		so.depends({ rrnumber: '65' });
+		so.write = writetype65;
+		so.load = function(section_id) {
+			const parsed = loadtype65(section_id);
+			return parsed?.target || '';
+		};
+
+		so = ss.option(form.TextValue, '_svc_params', _('Svc Parameters'));
+		so.placeholder = 'alpn=h2,h3\nipv4hint=192.0.2.1,192.0.2.2\nipv6hint=2001:db8::1,2001:db8::2\nport=8000';
+		so.modalonly = true;
+		so.rows = 4;
+		so.depends({ rrnumber: '65' });
+		so.write = writetype65;
+		so.load = function(section_id) {
+			const parsed = loadtype65(section_id);
+			return parsed?.params?.join('\n') || '';
+		};
 
 		o = s.taboption('ipsets', form.SectionValue, '__ipsets__', form.GridSection, 'ipset', null,
 			_('List of IP sets to populate with the IPs of DNS lookup results of the FQDNs also specified here.') + '<br />' +
@@ -935,23 +1189,27 @@ return view.extend({
 		ss.modaltitle = _('Edit IP set');
 
 		so = ss.option(form.DynamicList, 'name', _('Name of the set'));
+		uci.sections('firewall', 'ipset', function(s) {
+			if (typeof(s.name) == 'string')
+				so.value(s.name, s.comment ? '%s (%s)'.format(s.name, s.comment) : s.name);
+		});
 		so.rmempty = false;
-		so.editable = true;
+		so.editable = false;
 		so.datatype = 'string';
 
 		so = ss.option(form.DynamicList, 'domain', _('FQDN'));
 		so.rmempty = false;
-		so.editable = true;
+		so.editable = false;
 		so.datatype = 'hostname';
 
 		so = ss.option(form.Value, 'table', _('Netfilter table name'), _('Defaults to fw4.'));
-		so.editable = true;
+		so.editable = false;
 		so.placeholder = 'fw4';
 		so.rmempty = true;
 
 		so = ss.option(form.ListValue, 'table_family', _('Table IP family'), _('Defaults to IPv4+6.') + ' ' + _('Can be hinted by adding 4 or 6 to the name.') + '<br />' +
 			_('Adding an IPv6 to an IPv4 set and vice-versa silently fails.'));
-		so.editable = true;
+		so.editable = false;
 		so.rmempty = true;
 		so.value('inet', _('IPv4+6'));
 		so.value('ip', _('IPv4'));
@@ -993,8 +1251,12 @@ return view.extend({
 		//As a special case, in DHCPv4, it is possible to include more than one hardware address. eg: --dhcp-host=11:22:33:44:55:66,12:34:56:78:90:12,192.168.0.2 This allows an IP address to be associated with multiple hardware addresses, and gives dnsmasq permission to abandon a DHCP lease to one of the hardware addresses when another one asks for a lease
 		so.rmempty  = true;
 		so.cfgvalue = function(section) {
-			var macs = L.toArray(uci.get('dhcp', section, 'mac'));
-			return expandAndFormatMAC(macs);
+			var macs = uci.get('dhcp', section, 'mac');
+			if(!Array.isArray(macs)){
+				return expandAndFormatMAC(L.toArray(macs));
+			} else {
+				return expandAndFormatMAC(macs);
+			}
 		};
 		//removed jows renderwidget function which hindered multi-mac entry
 		so.validate = validateMACAddr.bind(so, pools);
@@ -1079,8 +1341,8 @@ return view.extend({
 		so.optional = true;
 
 		Object.values(L.uci.sections('dhcp', 'dnsmasq')).forEach(function(val, index) {
-			var name, display_str = generateDnsmasqInstanceEntry(val);
-			so.value(index, display_str);
+			var [name, display_str] = generateDnsmasqInstanceEntry(val);
+			so.value(name, display_str);
 		});
 
 

@@ -63,7 +63,7 @@ local api = require "luci.passwall.api"
 												node_select_value = _node_select_value;
 											}
 										}
-										
+
 										if (node_select.tagName == "INPUT") {
 											node_select = document.getElementById("cbi.combobox." + dom_id);
 										}
@@ -132,7 +132,7 @@ local api = require "luci.passwall.api"
 						new_a.href = "#";
 						new_a.setAttribute("onclick","location.href='" + '<%=api.url("node_config")%>' + "/" + node_select_value + "'");
 						new_html = new_a.outerHTML;
-						
+
 						var log_a = document.createElement("a");
 						log_a.innerHTML = "<%:Log%>";
 						log_a.href = "#";

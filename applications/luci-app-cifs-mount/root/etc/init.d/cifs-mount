@@ -1,0 +1,75 @@
+#!/bin/sh /etc/rc.common
+
+START=99
+USE_PROCD=1
+
+CONF="cifs-mount"
+
+mount_cifs() {
+	local cfg="$1"
+
+	local enabled
+	config_get_bool enabled "$cfg" "enabled" "0"
+	[ "$enabled" -eq "1" ] || return 1
+
+	local server remote_path local_path smb_version iocharset ro
+	local username password workgroup options
+
+	config_get server "$cfg" "server"
+	config_get remote_path "$cfg" "remote_path"
+	config_get local_path "$cfg" "local_path"
+	config_get smb_version "$cfg" "smb_version"
+	config_get iocharset "$cfg" "iocharset" "utf8"
+	config_get_bool ro "$cfg" "ro" "0"
+	config_get username "$cfg" "username"
+	config_get password "$cfg" "password"
+	config_get workgroup "$cfg" "workgroup"
+	config_get options "$cfg" "options"
+
+	if [ -z "$server" ] || [ -z "$remote_path" ] || [ -z "$local_path" ]; then
+		return 1
+	fi
+
+	mkdir -p "$local_path"
+	chmod 777 "$local_path"
+
+	local mount_args
+	if [ "$ro" -eq "1" ]; then
+		mount_args="ro"
+	else
+		mount_args="rw"
+	fi
+	[ -z "$smb_version" ] || append mount_args "vers=$smb_version" ","
+	[ "$iocharset" = "-" ] || append mount_args "iocharset=$iocharset" ","
+	if [ "$username" = "guest" ]; then
+		append mount_args "guest" ","
+	else
+		[ -z "$username" ] || append mount_args "user=$username,username=$username" ","
+		[ -z "$password" ] || append mount_args "password=$password" ","
+	fi
+	[ -z "$workgroup" ] || append mount_args "dom=$workgroup" ","
+	[ -z "$options" ] || config_list_foreach "$cfg" "options" "append mount_args " ","
+
+	mount -t cifs -o "$mount_args" "//${server}${remote_path}" "$local_path"
+}
+
+start_service() {
+	config_load "$CONF"
+	config_foreach mount_cifs "mount"
+}
+
+stop_service() {
+	mount | awk '/^\/\/.*type cifs/ {print $3}' | while IFS= read -r mp; do
+		umount -d -l "$mp"
+	done
+}
+
+reload_service() {
+	stop
+	sleep 2s
+	start
+}
+
+service_triggers() {
+	procd_add_reload_trigger "$CONF"
+}

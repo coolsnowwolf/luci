@@ -1,22 +1,22 @@
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2024-01-05 04:02+0000\n"
-"Last-Translator: Yuan Law <traverslombard@outlook.com>\n"
-"Language-Team: Chinese (Traditional) <https://hosted.weblate.org/projects/"
-"openwrt/luciapplicationsttyd/zh_Hant/>\n"
+"PO-Revision-Date: 2025-03-28 20:32+0000\n"
+"Last-Translator: 翻譯得真好下次別翻了 <x86_64-pc-linux-gnu@proton.me>\n"
+"Language-Team: Chinese (Traditional Han script) <https://hosted.weblate.org/"
+"projects/openwrt/luciapplicationsttyd/zh_Hant/>\n"
 "Language: zh_Hant\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.4-dev\n"
+"X-Generator: Weblate 5.11-dev\n"
 
 #: applications/luci-app-ttyd/htdocs/luci-static/resources/view/ttyd/config.js:65
 msgid "Accept only one client and exit on disconnection"
-msgstr "僅接受一個客戶端，並在切斷時退出"
+msgstr "僅接受一個用戶端，並在斷線時退出"
 
 #: applications/luci-app-ttyd/htdocs/luci-static/resources/view/ttyd/config.js:15
 msgid "Add instance"
-msgstr "加入實體"
+msgstr "新增實體"
 
 #: applications/luci-app-ttyd/htdocs/luci-static/resources/view/ttyd/config.js:49
 msgid "Allow URL args"
@@ -27,12 +27,11 @@ msgid ""
 "Allow client to send command line arguments in URL (eg: http://"
 "localhost:7681?arg=foo&arg=bar)"
 msgstr ""
-"容許客戶端在 URL 中發送命令行引數（例如：http://localhost:7681?"
-"arg=foo&arg=bar）"
+"允許用戶端在URL中發送命令列引數 (例如：http://localhost:7681?arg=foo&arg=bar)"
 
 #: applications/luci-app-ttyd/htdocs/luci-static/resources/view/ttyd/config.js:20
 msgid "Bind to UNIX domain socket instead of IP port"
-msgstr ""
+msgstr "綁定到 UNIX 套接字而不是 IP 連接埠"
 
 #: applications/luci-app-ttyd/htdocs/luci-static/resources/view/ttyd/config.js:59
 msgid "Check origin"
@@ -40,15 +39,15 @@ msgstr "檢查原點"
 
 #: applications/luci-app-ttyd/htdocs/luci-static/resources/view/ttyd/config.js:53
 msgid "Client option"
-msgstr "客戶端選項"
+msgstr "用戶端選項"
 
 #: applications/luci-app-ttyd/htdocs/luci-static/resources/view/ttyd/config.js:89
 msgid "Command"
-msgstr "命令"
+msgstr "指令"
 
 #: applications/luci-app-ttyd/root/usr/share/luci/menu.d/luci-app-ttyd.json:23
 msgid "Config"
-msgstr "組態"
+msgstr "設定"
 
 #: applications/luci-app-ttyd/htdocs/luci-static/resources/view/ttyd/config.js:37
 msgid "Credential"
@@ -68,7 +67,7 @@ msgstr "除錯"
 
 #: applications/luci-app-ttyd/htdocs/luci-static/resources/view/ttyd/config.js:51
 msgid "Do not allow clients to write to the TTY"
-msgstr "不容許客戶端寫入 TTY"
+msgstr "不允許用戶端寫入TTY"
 
 #: applications/luci-app-ttyd/htdocs/luci-static/resources/view/ttyd/config.js:59
 msgid "Do not allow websocket connection from different origin"
@@ -92,7 +91,7 @@ msgstr "錯誤"
 
 #: applications/luci-app-ttyd/root/usr/share/rpcd/acl.d/luci-app-ttyd.json:3
 msgid "Grant UCI access for luci-app-ttyd"
-msgstr "授予 luci-app-ttyd 擁有 UCI 存取的權限"
+msgstr "授予luci-app-ttyd存取UCI的權限"
 
 #: applications/luci-app-ttyd/htdocs/luci-static/resources/view/ttyd/config.js:43
 msgid "Group ID"
@@ -120,7 +119,7 @@ msgstr "介面"
 
 #: applications/luci-app-ttyd/htdocs/luci-static/resources/view/ttyd/config.js:94
 msgid "Make sure to set up another authorization method."
-msgstr ""
+msgstr "確保設定另一種授權方法。"
 
 #: applications/luci-app-ttyd/htdocs/luci-static/resources/view/ttyd/config.js:61
 msgid "Max clients"
@@ -128,15 +127,15 @@ msgstr "最大客戶數"
 
 #: applications/luci-app-ttyd/htdocs/luci-static/resources/view/ttyd/config.js:61
 msgid "Maximum clients to support (default: 0, no limit)"
-msgstr "最大支援客戶端數（預設值「0」表示不限制）"
+msgstr "最大支援用戶數 (預設值「0」表示不限制)"
 
 #: applications/luci-app-ttyd/htdocs/luci-static/resources/view/ttyd/config.js:27
 msgid "Network interface to bind (eg: eth0)"
-msgstr ""
+msgstr "要綁定的網路介面（例如：eth0）"
 
 #: applications/luci-app-ttyd/htdocs/luci-static/resources/view/ttyd/config.js:93
 msgid "Note that reverse proxied pages is NOT protected by password like LuCI."
-msgstr ""
+msgstr "請注意，反向代理頁面不像 LuCI 那樣受密碼保護。"
 
 #: applications/luci-app-ttyd/htdocs/luci-static/resources/view/ttyd/config.js:85
 msgid "Notice"
@@ -148,7 +147,7 @@ msgstr "一次"
 
 #: applications/luci-app-ttyd/htdocs/luci-static/resources/view/ttyd/config.js:92
 msgid "Override URL in Terminal tab. For use with reverse proxy."
-msgstr ""
+msgstr "覆寫「終端」標籤中的 URL。與反向代理一起使用。"
 
 #: applications/luci-app-ttyd/htdocs/luci-static/resources/view/ttyd/config.js:22
 msgid "Port"
@@ -174,7 +173,7 @@ msgstr "SSL"
 
 #: applications/luci-app-ttyd/htdocs/luci-static/resources/view/ttyd/config.js:79
 msgid "SSL CA file path for client certificate verification"
-msgstr "用於客戶端憑證驗證的 SSL CA 檔案路徑"
+msgstr "用於用戶端憑證驗證的SSL CA檔案路徑"
 
 #: applications/luci-app-ttyd/htdocs/luci-static/resources/view/ttyd/config.js:79
 msgid "SSL ca"
@@ -198,7 +197,7 @@ msgstr "SSL 金鑰檔案路徑"
 
 #: applications/luci-app-ttyd/htdocs/luci-static/resources/view/ttyd/config.js:53
 msgid "Send option to client"
-msgstr "將選項發送到客戶端"
+msgstr "將選項發送到用戶端"
 
 #: applications/luci-app-ttyd/htdocs/luci-static/resources/view/ttyd/config.js:82
 msgid "Set log level (default: 7)"
@@ -227,19 +226,19 @@ msgstr "報告終端類型（預設值：xterm-256color）"
 
 #: applications/luci-app-ttyd/htdocs/luci-static/resources/view/ttyd/config.js:32
 msgid "UNIX domain socket path (eg: /var/run/ttyd.sock)"
-msgstr ""
+msgstr "UNIX 套接字路徑（例如：/var/run/ttyd.sock）"
 
 #: applications/luci-app-ttyd/htdocs/luci-static/resources/view/ttyd/config.js:20
 msgid "UNIX socket"
-msgstr ""
+msgstr "UNIX套接字"
 
 #: applications/luci-app-ttyd/htdocs/luci-static/resources/view/ttyd/config.js:32
 msgid "UNIX socket path"
-msgstr ""
+msgstr "UNIX套接字路徑"
 
 #: applications/luci-app-ttyd/htdocs/luci-static/resources/view/ttyd/config.js:91
 msgid "URL override"
-msgstr ""
+msgstr "網址覆寫"
 
 #: applications/luci-app-ttyd/htdocs/luci-static/resources/view/ttyd/config.js:40
 msgid "User ID"

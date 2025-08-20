@@ -1,7 +1,0 @@
-
-config ddns-go 'config'
-	option enabled '0'
-	option listen '[::]:9876'
-	option ttl '300'
-	option noweb '0'
-	option insecure '0'

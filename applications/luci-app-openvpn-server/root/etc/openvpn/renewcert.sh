@@ -1,7 +1,7 @@
 #!/bin/sh
 
 export EASYRSA_PKI="/etc/easy-rsa/pki"
-export EASYRSA_VARS_FILE="/etc/easy-rsa/vars"
+export EASYRSA_VARS_FILE="/etc/easy-rsa/vars-server"
 export EASYRSA_CLI="easyrsa --batch"
 
 # Cleanup

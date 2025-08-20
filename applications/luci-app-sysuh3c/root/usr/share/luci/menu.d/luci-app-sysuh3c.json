@@ -1,0 +1,13 @@
+{
+	"admin/services/sysuh3c": {
+		"title": "SYSU H3C Client",
+		"action": {
+			"type": "view",
+			"path": "sysuh3c"
+		},
+		"depends": {
+			"acl": [ "luci-app-sysuh3c" ],
+			"uci": { "sysuh3c": true }
+		}
+	}
+}

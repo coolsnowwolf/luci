@@ -1,15 +1,16 @@
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2023-08-22 18:57+0000\n"
-"Last-Translator: \"Alexey D. Filimonov\" <alexey@filimonic.net>\n"
+"PO-Revision-Date: 2025-08-05 09:41+0000\n"
+"Last-Translator: SnIPeRSnIPeR "
+"<snipersniper@users.noreply.hosted.weblate.org>\n"
 "Language-Team: Russian <https://hosted.weblate.org/projects/openwrt/"
 "luciapplicationsfrpc/ru/>\n"
 "Language: ru\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
-"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Generator: Weblate 5.0-dev\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"X-Generator: Weblate 5.13-dev\n"
 
 #: applications/luci-app-frpc/htdocs/luci-static/resources/view/frpc.js:214
 msgid "Add new proxy..."
@@ -42,10 +43,10 @@ msgstr "Пользователь администратора"
 #: applications/luci-app-frpc/htdocs/luci-static/resources/view/frpc.js:28
 msgid ""
 "AdminAddr specifies the address that the admin server binds to.<br />By "
-"default, this value is \"127.0.0.1\"."
+"default, this value is \"0.0.0.0\"."
 msgstr ""
 "AdminAddr указывает адрес, к которому привязывается сервер администратора."
-"<br />По умолчанию это значение равно \"127.0.0.1\"."
+"<br />По умолчанию это значение равно \"0.0.0.0\"."
 
 #: applications/luci-app-frpc/htdocs/luci-static/resources/view/frpc.js:29
 msgid ""
@@ -153,7 +154,7 @@ msgstr "Пароль HTTP"
 
 #: applications/luci-app-frpc/htdocs/luci-static/resources/view/frpc.js:22
 msgid "HTTP proxy"
-msgstr "Прокси HTTP"
+msgstr "HTTP-прокси"
 
 #: applications/luci-app-frpc/htdocs/luci-static/resources/view/frpc.js:63
 #: applications/luci-app-frpc/htdocs/luci-static/resources/view/frpc.js:77
@@ -176,9 +177,9 @@ msgid ""
 "before the connection is terminated, in seconds. It is not recommended to "
 "change this value.<br />By default, this value is 90."
 msgstr ""
-"HeartBeatTimeout задает максимально допустимую задержку ответа пульса до "
-"разрыва соединения, в секундах. Не рекомендуется изменять это значение.<br /"
-">По умолчанию это значение равно 90."
+"HeartBeatTimeout задаёт максимально допустимую задержку ответа heartbeat до "
+"разрыва соединения (в секундах). Не рекомендуется изменять это значение.<br /"
+">По умолчанию: 90 секунд."
 
 #: applications/luci-app-frpc/htdocs/luci-static/resources/view/frpc.js:38
 msgid "Heartbeat interval"
@@ -199,7 +200,7 @@ msgid ""
 "default, this value is read from the \"http_proxy\" environment variable."
 msgstr ""
 "HttpProxy указывает прокси-адрес для подключения к серверу. Если это "
-"значение равно \"\", сервер будет подключен напрямую.<br />По умолчанию это "
+"значение равно \"\", сервер будет подключён напрямую.<br />По умолчанию это "
 "значение считывается из переменной окружения \"http_proxy\"."
 
 #: applications/luci-app-frpc/htdocs/luci-static/resources/view/frpc.js:53
@@ -264,7 +265,7 @@ msgid ""
 "\"debug\", \"info\", \"warn\", and \"error\".<br />By default, this value is "
 "\"info\"."
 msgstr ""
-"LogLevel задает минимальный уровень журнала. Допустимые значения: \"trace\", "
+"LogLevel задаёт минимальный уровень журнала. Допустимые значения: \"trace\", "
 "\"debug\", \"info\", \"warn\" и \"error\".<br />По умолчанию это значение "
 "равно \"info\"."
 
@@ -291,7 +292,7 @@ msgstr ""
 
 #: applications/luci-app-frpc/htdocs/luci-static/resources/view/frpc.js:165
 msgid "NOT RUNNING"
-msgstr "НЕ ЗАПУЩЕН"
+msgstr "НЕ ЗАПУЩЕНО"
 
 #: applications/luci-app-frpc/htdocs/luci-static/resources/view/frpc.js:15
 msgid ""
@@ -355,7 +356,7 @@ msgstr "ЗАПУЩЕН"
 #: applications/luci-app-frpc/htdocs/luci-static/resources/view/frpc.js:53
 #: applications/luci-app-frpc/htdocs/luci-static/resources/view/frpc.js:226
 msgid "Remote port"
-msgstr "Удаленный порт"
+msgstr "Удалённый порт"
 
 #: applications/luci-app-frpc/htdocs/luci-static/resources/view/frpc.js:14
 msgid "Respawn when crashed"
@@ -375,11 +376,11 @@ msgstr "Запуск демона от имени пользователя"
 
 #: applications/luci-app-frpc/htdocs/luci-static/resources/view/frpc.js:80
 msgid "SOCKS5 password"
-msgstr "SOCKS5 пароль"
+msgstr "SOCKS5-пароль"
 
 #: applications/luci-app-frpc/htdocs/luci-static/resources/view/frpc.js:79
 msgid "SOCKS5 user"
-msgstr "SOCKS5 пользователь"
+msgstr "SOCKS5-пользователь"
 
 #: applications/luci-app-frpc/htdocs/luci-static/resources/view/frpc.js:20
 msgid "Server address"
@@ -396,10 +397,10 @@ msgstr "Порт сервера"
 #: applications/luci-app-frpc/htdocs/luci-static/resources/view/frpc.js:20
 msgid ""
 "ServerAddr specifies the address of the server to connect to.<br />By "
-"default, this value is \"0.0.0.0\"."
+"default, this value is \"127.0.0.1\"."
 msgstr ""
 "ServerAddr указывает адрес сервера для подключения.<br />По умолчанию это "
-"значение равно \"0.0.0.0\"."
+"значение равно \"127.0.0.1\"."
 
 #: applications/luci-app-frpc/htdocs/luci-static/resources/view/frpc.js:21
 msgid ""
@@ -504,7 +505,7 @@ msgid ""
 "clients. If this value is not \"\", proxy names will automatically be "
 "changed to \"{user}.{proxy_name}\".<br />By default, this value is \"\"."
 msgstr ""
-"Пользователь указывает префикс для имен прокси, чтобы отличать их от других "
+"Пользователь указывает префикс для имён прокси, чтобы отличать их от других "
 "клиентов. Если это значение не \"\", имена прокси будут автоматически "
 "изменены на \"{user}.{proxy_name}\".<br />По умолчанию это значение равно "
 "\"\"."

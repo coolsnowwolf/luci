@@ -23,6 +23,7 @@ local DEFAULT_PROXY_MODE = var["-DEFAULT_PROXY_MODE"]
 local NO_PROXY_IPV6 = var["-NO_PROXY_IPV6"]
 local NO_LOGIC_LOG = var["-NO_LOGIC_LOG"]
 local NFTFLAG = var["-NFTFLAG"]
+local SUBNET = var["-SUBNET"]
 
 local uci = api.uci
 local sys = api.sys
@@ -92,12 +93,14 @@ local function insert_array_after(array1, array2, target) --将array2插入到ar
 end
 
 local function get_geosite(list_arg, out_path)
-	local geosite_path = uci:get(appname, "@global_rules[0]", "v2ray_location_asset")
+	local geosite_path = uci:get(appname, "@global_rules[0]", "v2ray_location_asset") or "/usr/share/v2ray/"
 	geosite_path = geosite_path:match("^(.*)/") .. "/geosite.dat"
-	if not is_file_nonzero(geosite_path) then return end
+	if not is_file_nonzero(geosite_path) then return 1 end
 	if api.is_finded("geoview") and list_arg and out_path then
 		sys.exec("geoview -type geosite -append=true -input " .. geosite_path .. " -list '" .. list_arg .. "' -output " .. out_path)
+		return 0
 	end
+	return 1
 end
 
 if not fs.access(FLAG_PATH) then
@@ -125,7 +128,7 @@ else
 	local f_in = io.open(custom_conf_path, "r")
 	if f_in then
 		for line in f_in:lines() do
-			line = line:match("^%s*(.-)%s*$")
+			line = api.trim(line)
 			if line ~= "" and not line:match("^#") then
 				local param, value = line:match("^(%S+)%s+(%S+)$")
 				if param and value then custom_config[param] = value end
@@ -158,46 +161,76 @@ if not REMOTE_GROUP or REMOTE_GROUP == "nil" then
 	sys.call('sed -i "/passwall/d" /etc/smartdns/custom.conf >/dev/null 2>&1')
 end
 
+local force_https_soa = uci:get(appname, "@global[0]", "force_https_soa") or 1
 local proxy_server_name = "passwall-proxy-server"
 config_lines = {
-	"force-qtype-SOA 65",
+	tonumber(force_https_soa) == 1 and "force-qtype-SOA 65" or "force-qtype-SOA -,65",
 	"server 114.114.114.114 -bootstrap-dns",
 	DNS_MODE == "socks" and string.format("proxy-server socks5://%s -name %s", REMOTE_PROXY_SERVER, proxy_server_name) or nil
 }
 if DNS_MODE == "socks" then
-	string.gsub(REMOTE_DNS, '[^' .. "|" .. ']+', function(w)
-		local server_dns = w
-		local server_param = string.format("server %s -group %s -proxy %s", "%s", REMOTE_GROUP, proxy_server_name)
-		server_param = server_param .. " -exclude-default-group"
+	for w in string.gmatch(REMOTE_DNS, '[^|]+') do
+		local server_dns = api.trim(w)
+		local server_param
 
-		local isHTTPS = w:find("https://")
-		if isHTTPS and isHTTPS == 1 then
-			local http_host = nil
-			local url = w
-			local port = 443
-			local s = api.split(w, ",")
-			if s and #s > 1 then
-				url = s[1]
-				local dns_ip = s[2]
-				local host_port = api.get_domain_from_url(s[1])
-				if host_port and #host_port > 0 then
-					http_host = host_port
-					local s2 = api.split(host_port, ":")
-					if s2 and #s2 > 1 then
-						http_host = s2[1]
-						port = s2[2]
-					end 
-					url = url:gsub(http_host, dns_ip)
+		local dnsType = string.match(server_dns, "^(.-)://")
+		dnsType = dnsType and string.lower(dnsType) or nil
+		local dnsServer = string.match(server_dns, "://(.+)") or server_dns
+
+		if dnsType and dnsType ~= "" and dnsType ~= "udp" then
+			if dnsType == "tcp" then
+				server_param = "server-tcp " .. dnsServer
+			elseif dnsType == "tls" then
+				server_param = "server-tls " .. dnsServer
+			elseif dnsType == "quic" then
+				server_param = "server-quic " .. dnsServer
+			elseif dnsType == "https" or dnsType == "h3" then
+				local http_host = nil
+				local url = w
+				local port = 443
+				local s = api.split(w, ",")
+				if s and #s > 1 then
+					url = s[1]
+					local dns_ip = s[2]
+					local host_port = api.get_domain_from_url(s[1])
+					if host_port and #host_port > 0 then
+						http_host = host_port
+						local s2 = api.split(host_port, ":")
+						if s2 and #s2 > 1 then
+							http_host = s2[1]
+							port = s2[2]
+						end
+						url = url:gsub(http_host, dns_ip)
+					end
 				end
+				server_dns = url
+				if http_host then
+					server_dns = server_dns .. " -http-host " .. http_host
+				end
+				server_param = (dnsType == "https" and "server-https " or "server-h3 ") .. server_dns
 			end
-			server_dns = url
-			if http_host then
-				server_dns = server_dns .. " -http-host " .. http_host
-			end
+		else
+			server_param = "server " .. dnsServer
+
 		end
-		server_param = string.format(server_param, server_dns)
+
+		-- 判断是否为本地地址
+		local is_local = w:match("127%.0%.0%.")
+			or w:match("192%.168%.")
+			or w:match("10%.")
+			or w:match("172%.1[6-9]%.")
+			or w:match("172%.2[0-9]%.")
+			or w:match("172%.3[0-1]%.")
+		if not is_local then
+			server_param = server_param .. " -proxy " .. proxy_server_name
+		end
+
+		server_param = server_param .. " -group " .. REMOTE_GROUP .. " -exclude-default-group"
+		if SUBNET and SUBNET ~= "" and SUBNET ~= "0" then
+			server_param = server_param .. " -subnet " .. SUBNET
+		end
 		table.insert(config_lines, server_param)
-	end)
+	end
 	REMOTE_FAKEDNS = 0
 else
 	local server_param = string.format("server %s -group %s -exclude-default-group", TUN_DNS:gsub("#", ":"), REMOTE_GROUP)
@@ -257,8 +290,11 @@ if USE_BLOCK_LIST == "1" and not fs.access(file_block_host) then
 		f_out:close()
 	end
 	if USE_GEOVIEW == "1" and geosite_arg ~= "" and api.is_finded("geoview") then
-		get_geosite(geosite_arg, file_block_host)
-		log("  * 解析[屏蔽列表] Geosite 到屏蔽域名表(blocklist)完成")
+		if get_geosite(geosite_arg, file_block_host) == 0 then
+			log("  * 解析[屏蔽列表] Geosite 到屏蔽域名表(blocklist)完成")
+		else
+			log("  * 解析[屏蔽列表] Geosite 到屏蔽域名表(blocklist)失败！")
+		end
 	end
 end
 if USE_BLOCK_LIST == "1" and is_file_nonzero(file_block_host) then
@@ -329,8 +365,11 @@ if USE_DIRECT_LIST == "1" and not fs.access(file_direct_host) then
 		f_out:close()
 	end
 	if USE_GEOVIEW == "1" and geosite_arg ~= "" and api.is_finded("geoview") then
-		get_geosite(geosite_arg, file_direct_host)
-		log("  * 解析[直连列表] Geosite 到域名白名单(whitelist)完成")
+		if get_geosite(geosite_arg, file_direct_host) == 0 then
+			log("  * 解析[直连列表] Geosite 到域名白名单(whitelist)完成")
+		else
+			log("  * 解析[直连列表] Geosite 到域名白名单(whitelist)失败！")
+		end
 	end
 end
 if USE_DIRECT_LIST == "1" and is_file_nonzero(file_direct_host) then
@@ -374,8 +413,11 @@ if USE_PROXY_LIST == "1" and not fs.access(file_proxy_host) then
 		f_out:close()
 	end
 	if USE_GEOVIEW == "1" and geosite_arg ~= "" and api.is_finded("geoview") then
-		get_geosite(geosite_arg, file_proxy_host)
-		log("  * 解析[代理列表] Geosite 到代理域名表(blacklist)完成")
+		if get_geosite(geosite_arg, file_proxy_host) == 0 then
+			log("  * 解析[代理列表] Geosite 到代理域名表(blacklist)完成")
+		else
+			log("  * 解析[代理列表] Geosite 到代理域名表(blacklist)失败！")
+		end
 	end
 end
 if USE_PROXY_LIST == "1" and is_file_nonzero(file_proxy_host) then
@@ -536,13 +578,18 @@ if uci:get(appname, TCP_NODE, "protocol") == "_shunt" then
 	end
 
 	if USE_GFW_LIST == "1" and CHN_LIST == "0" and USE_GEOVIEW == "1" and api.is_finded("geoview") then  --仅GFW模式解析geosite
+		local return_white, return_shunt
 		if geosite_white_arg ~= "" then
-			get_geosite(geosite_white_arg, file_white_host)
+			return_white = get_geosite(geosite_white_arg, file_white_host)
 		end
 		if geosite_shunt_arg ~= "" then
-			get_geosite(geosite_shunt_arg, file_shunt_host)
+			return_shunt = get_geosite(geosite_shunt_arg, file_shunt_host)
 		end
-		log("  * 解析[分流节点] Geosite 完成")
+		if (return_white == nil or return_white == 0) and (return_shunt == nil or return_shunt == 0) then
+			log("  * 解析[分流节点] Geosite 完成")
+		else
+			log("  * 解析[分流节点] Geosite 失败！")
+		end
 	end
 
 	if is_file_nonzero(file_white_host) then

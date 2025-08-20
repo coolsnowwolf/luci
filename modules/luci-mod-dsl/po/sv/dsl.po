@@ -1,18 +1,19 @@
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2023-10-02 17:46+0000\n"
-"Last-Translator: Kristoffer Grundström <swedishsailfishosuser@tutanota.com>\n"
+"PO-Revision-Date: 2025-07-15 10:11+0000\n"
+"Last-Translator: Stefan Bjornelund the Gnome "
+"<stefan.bjornelund.gnome@gmail.com>\n"
 "Language-Team: Swedish <https://hosted.weblate.org/projects/openwrt/"
 "luci_modules_luci-mod-dsl/sv/>\n"
 "Language: sv\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.1-dev\n"
+"X-Generator: Weblate 5.13-dev\n"
 
 #: modules/luci-mod-dsl/htdocs/luci-static/resources/view/status/dsl/stats.js:157
 msgid "ATM Header Error Control Errors (HEC-P)"
-msgstr ""
+msgstr "ATM Header Error Control Errors (HEC-P)"
 
 #: modules/luci-mod-dsl/htdocs/luci-static/resources/view/status/dsl/stats.js:111
 msgid "Actual Data Rate"
@@ -32,7 +33,7 @@ msgstr ""
 
 #: modules/luci-mod-dsl/htdocs/luci-static/resources/view/status/dsl/stats.js:118
 msgid "Bitswap"
-msgstr ""
+msgstr "Bitswap"
 
 #: modules/luci-mod-dsl/htdocs/luci-static/resources/view/status/dsl/stats.js:151
 msgid "CRC Errors (CV-C)"
@@ -44,7 +45,7 @@ msgstr "Kanal-räknare"
 
 #: modules/luci-mod-dsl/htdocs/luci-static/resources/view/status/dsl/stats.js:89
 msgid "Connection State"
-msgstr ""
+msgstr "Status för anslutning"
 
 #: modules/luci-mod-dsl/htdocs/luci-static/resources/view/status/dsl/stats.js:165
 msgid "Corrected DTUs (rtx-c)"
@@ -106,15 +107,6 @@ msgstr ""
 msgid "Grant access to luci-mod-dsl"
 msgstr "Godkänn åtkomst för luci-mod-dsl"
 
-#: modules/luci-mod-dsl/htdocs/luci-static/resources/view/status/dsl/spectrum.js:25
-#, fuzzy
-msgid ""
-"Graphs below show Signal-to-noise ratio, Bit allocation, Quiet line noise "
-"and Channel characteristics function (HLOG) per sub-carrier."
-msgstr ""
-"Diagrammerna nedan visar signal-till-brusförhållande, Bit-tilldelning, Tyst "
-"linjebrus och kanalens karaktäristiska funktion (HLOG) per under-leverantör."
-
 #: modules/luci-mod-dsl/htdocs/luci-static/resources/view/status/dsl/stats.js:125
 msgid "Impulse Noise Protection (INP)"
 msgstr ""
@@ -161,11 +153,11 @@ msgstr ""
 
 #: modules/luci-mod-dsl/htdocs/luci-static/resources/view/status/dsl/stats.js:102
 msgid "Modem Chipset"
-msgstr ""
+msgstr "Chipset för modem"
 
 #: modules/luci-mod-dsl/htdocs/luci-static/resources/view/status/dsl/stats.js:103
 msgid "Modem Firmware"
-msgstr ""
+msgstr "Inre mjukvara för modemet"
 
 #: modules/luci-mod-dsl/htdocs/luci-static/resources/view/status/dsl/stats.js:133
 msgid "Noise Margin (SNRM)"
@@ -173,7 +165,7 @@ msgstr ""
 
 #: modules/luci-mod-dsl/htdocs/luci-static/resources/view/status/dsl/stats.js:122
 msgid "Noise Protection"
-msgstr ""
+msgstr "Bullerskydd"
 
 #: modules/luci-mod-dsl/htdocs/luci-static/resources/view/status/dsl/stats.js:116
 msgid "On-line Reconfiguration"
@@ -225,11 +217,11 @@ msgstr ""
 
 #: modules/luci-mod-dsl/root/usr/share/luci/menu.d/luci-mod-dsl.json:23
 msgid "Spectrum"
-msgstr ""
+msgstr "Spektrum"
 
 #: modules/luci-mod-dsl/root/usr/share/luci/menu.d/luci-mod-dsl.json:14
 msgid "Stats"
-msgstr ""
+msgstr "Statistik"
 
 #: modules/luci-mod-dsl/htdocs/luci-static/resources/view/status/dsl/graph.js:107
 #: modules/luci-mod-dsl/htdocs/luci-static/resources/view/status/dsl/graph.js:143
@@ -237,6 +229,36 @@ msgstr ""
 #: modules/luci-mod-dsl/htdocs/luci-static/resources/view/status/dsl/graph.js:203
 msgid "Sub-carrier"
 msgstr "Underoperatör"
+
+#: modules/luci-mod-dsl/htdocs/luci-static/resources/view/status/dsl/spectrum.js:65
+msgid ""
+"The diagram shows the Channel Characteristics Function (HLOG) per subcarrier "
+"in uplink and downlink direction"
+msgstr ""
+
+#: modules/luci-mod-dsl/htdocs/luci-static/resources/view/status/dsl/spectrum.js:55
+msgid ""
+"The diagram shows the quiet line noise (QLN) per subcarrier in uplink and "
+"downlink direction"
+msgstr ""
+
+#: modules/luci-mod-dsl/htdocs/luci-static/resources/view/status/dsl/spectrum.js:25
+msgid ""
+"The following diagrams show graphically prepared DSL characteristics that "
+"are important for evaluating the DSL connection."
+msgstr ""
+
+#: modules/luci-mod-dsl/htdocs/luci-static/resources/view/status/dsl/spectrum.js:45
+msgid ""
+"The graph shows th amount of bits actually allocated per subcarrier in the "
+"uplink and downlink direction"
+msgstr ""
+
+#: modules/luci-mod-dsl/htdocs/luci-static/resources/view/status/dsl/spectrum.js:35
+msgid ""
+"The graph shows the signal to noise ratio (SNR) per subcarrier in the uplink "
+"and downlink direction"
+msgstr ""
 
 #: modules/luci-mod-dsl/htdocs/luci-static/resources/view/status/dsl/stats.js:145
 msgid "Unavailable Seconds (UAS)"
@@ -273,15 +295,15 @@ msgstr "dBm/Hz"
 
 #: modules/luci-mod-dsl/htdocs/luci-static/resources/view/status/dsl/stats.js:14
 msgid "off"
-msgstr ""
+msgstr "av"
 
 #: modules/luci-mod-dsl/htdocs/luci-static/resources/view/status/dsl/stats.js:14
 msgid "on"
-msgstr ""
+msgstr "på"
 
 #: modules/luci-mod-dsl/root/usr/share/luci/menu.d/luci-mod-dsl.json:3
 msgid "xDSL"
-msgstr ""
+msgstr "xDSL"
 
 #: modules/luci-mod-dsl/htdocs/luci-static/resources/view/status/dsl/stats.js:104
 msgid "xTU-C Vendor ID"

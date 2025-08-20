@@ -1,0 +1,78 @@
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8"
+
+#: applications/luci-app-cifs-mount/htdocs/luci-static/resources/view/cifs-mount.js:24
+msgid "CIFS/SMB Mount Points"
+msgstr ""
+
+#: applications/luci-app-cifs-mount/htdocs/luci-static/resources/view/cifs-mount.js:58
+msgid "Charset"
+msgstr ""
+
+#: applications/luci-app-cifs-mount/htdocs/luci-static/resources/view/cifs-mount.js:51
+msgid "Default"
+msgstr ""
+
+#: applications/luci-app-cifs-mount/htdocs/luci-static/resources/view/cifs-mount.js:29
+msgid "Edit Mount Point"
+msgstr ""
+
+#: applications/luci-app-cifs-mount/htdocs/luci-static/resources/view/cifs-mount.js:31
+msgid "Enable"
+msgstr ""
+
+#: applications/luci-app-cifs-mount/root/usr/share/rpcd/acl.d/luci-app-cifs-mount.json:3
+msgid "Grant UCI access for luci-app-cifs-mount"
+msgstr ""
+
+#: applications/luci-app-cifs-mount/htdocs/luci-static/resources/view/cifs-mount.js:69
+msgid "Guest"
+msgstr ""
+
+#: applications/luci-app-cifs-mount/root/usr/share/luci/menu.d/luci-app-cifs-mount.json:3
+msgid "Mount SMB NetShare"
+msgstr ""
+
+#: applications/luci-app-cifs-mount/htdocs/luci-static/resources/view/cifs-mount.js:22
+msgid "Mount SMB/CIFS NetShare"
+msgstr ""
+
+#: applications/luci-app-cifs-mount/htdocs/luci-static/resources/view/cifs-mount.js:79
+msgid "Mount options"
+msgstr ""
+
+#: applications/luci-app-cifs-mount/htdocs/luci-static/resources/view/cifs-mount.js:42
+msgid "Mount point"
+msgstr ""
+
+#: applications/luci-app-cifs-mount/htdocs/luci-static/resources/view/cifs-mount.js:59
+msgid "Not set"
+msgstr ""
+
+#: applications/luci-app-cifs-mount/htdocs/luci-static/resources/view/cifs-mount.js:71
+msgid "Password"
+msgstr ""
+
+#: applications/luci-app-cifs-mount/htdocs/luci-static/resources/view/cifs-mount.js:65
+msgid "Read only"
+msgstr ""
+
+#: applications/luci-app-cifs-mount/htdocs/luci-static/resources/view/cifs-mount.js:50
+msgid "SMB version"
+msgstr ""
+
+#: applications/luci-app-cifs-mount/htdocs/luci-static/resources/view/cifs-mount.js:34
+msgid "Server address"
+msgstr ""
+
+#: applications/luci-app-cifs-mount/htdocs/luci-static/resources/view/cifs-mount.js:38
+msgid "Share folder"
+msgstr ""
+
+#: applications/luci-app-cifs-mount/htdocs/luci-static/resources/view/cifs-mount.js:68
+msgid "Username"
+msgstr ""
+
+#: applications/luci-app-cifs-mount/htdocs/luci-static/resources/view/cifs-mount.js:75
+msgid "Workgroup"
+msgstr ""

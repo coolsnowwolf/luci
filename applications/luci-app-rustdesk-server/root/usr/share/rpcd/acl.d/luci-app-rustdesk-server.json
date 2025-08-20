@@ -1,0 +1,14 @@
+{
+	"luci-app-rustdesk-server": {
+		"description": "Grant UCI access for luci-app-rustdesk-server",
+		"read": {
+			"ubus": {
+				"service": [ "list" ]
+			},
+			"uci": [ "rustdesk-server" ]
+		},
+		"write": {
+			"uci": [ "rustdesk-server" ]
+		}
+	}
+}

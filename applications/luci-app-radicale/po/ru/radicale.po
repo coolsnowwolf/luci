@@ -2,17 +2,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: LuCI: radicale\n"
 "POT-Creation-Date: 2018-01-08 23:00+0300\n"
-"PO-Revision-Date: 2023-02-16 13:38+0000\n"
-"Last-Translator: Дмитрий Михирев <bizdelnick@gmail.com>\n"
+"PO-Revision-Date: 2025-05-14 18:22+0000\n"
+"Last-Translator: SnIPeRSnIPeR <feoktistovk@gmail.com>\n"
 "Language-Team: Russian <https://hosted.weblate.org/projects/openwrt/"
 "luciapplicationsradicale/ru/>\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
-"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Generator: Weblate 4.16-dev\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"X-Generator: Weblate 5.12-dev\n"
 "Project-Info: Это технический перевод, не дословный. Главное-удобный русский "
 "интерфейс, все проверялось в графическом режиме, совместим с другими apps\n"
 
@@ -80,7 +80,7 @@ msgid ""
 "Calendars and address books are available for both local and remote access, "
 "possibly limited through authentication policies."
 msgstr ""
-"Календари и адресные книги доступны как для локального, так и для удаленного "
+"Календари и адресные книги доступны как для локального, так и для удалённого "
 "доступа, возможно ограниченного с помощью политик проверки подлинности."
 
 #: applications/luci-app-radicale/luasrc/model/cbi/radicale.lua:284
@@ -284,7 +284,7 @@ msgstr "Не установлена"
 
 #: applications/luci-app-radicale/luasrc/model/cbi/radicale.lua:356
 msgid "None"
-msgstr "Ничего"
+msgstr "Отсутствует"
 
 #: applications/luci-app-radicale/luasrc/model/cbi/radicale.lua:654
 msgid "Number of backup files of log to create."
@@ -496,7 +496,7 @@ msgstr "Требуемое значение ! Целое число >= 0 !"
 #: applications/luci-app-radicale/luasrc/controller/radicale.lua:42
 #: applications/luci-app-radicale/luasrc/controller/radicale.lua:45
 msgid "Version"
-msgstr "Версия"
+msgstr "Версия VRRP"
 
 #: applications/luci-app-radicale/luasrc/controller/radicale.lua:38
 msgid "Version Information"
@@ -520,13 +520,13 @@ msgid ""
 "You can also get groups from the user regex in the collection with {0}, {1}, "
 "etc."
 msgstr ""
-"Можно также получить группы из пользовательского regex вместе с {0}, {1} и т."
-"д."
+"Можно также получить группы из пользовательского regex вместе с {0}, {1} и "
+"т.д."
 
 #: applications/luci-app-radicale/luasrc/model/cbi/radicale.lua:89
 msgid ""
-"You can use Python's ConfigParser interpolation values %(login)s and "
-"%(path)s."
+"You can use Python's ConfigParser interpolation values %(login)s and %"
+"(path)s."
 msgstr ""
 "Вы можете использовать ConfigParser интерполяции Python значений %(логин)ы и "
 "%(путь)и."

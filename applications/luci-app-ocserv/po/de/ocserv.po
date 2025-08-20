@@ -1,14 +1,14 @@
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2024-01-06 13:23+0000\n"
-"Last-Translator: ssantos <ssantos@web.de>\n"
+"PO-Revision-Date: 2025-05-07 12:02+0000\n"
+"Last-Translator: Bob Idle <102661087+bobidle@users.noreply.github.com>\n"
 "Language-Team: German <https://hosted.weblate.org/projects/openwrt/"
 "luciapplicationsocserv/de/>\n"
 "Language: de\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.4-dev\n"
+"X-Generator: Weblate 5.12-dev\n"
 
 #: applications/luci-app-ocserv/luasrc/model/cbi/ocserv/main.lua:124
 #: applications/luci-app-ocserv/luasrc/model/cbi/ocserv/user-config.lua:80
@@ -48,7 +48,7 @@ msgstr "Verschlüsselungsalgorithmus"
 
 #: applications/luci-app-ocserv/luasrc/view/ocserv_status.htm:62
 msgid "Collecting data..."
-msgstr "Sammle Daten..."
+msgstr "Daten werden gesammelt..."
 
 #: applications/luci-app-ocserv/luasrc/model/cbi/ocserv/main.lua:132
 #: applications/luci-app-ocserv/luasrc/model/cbi/ocserv/user-config.lua:111
@@ -171,7 +171,7 @@ msgstr "OpenConnect VPN"
 
 #: applications/luci-app-ocserv/luasrc/model/cbi/ocserv/users.lua:24
 msgid "Password"
-msgstr "Passwort"
+msgstr "Kennwort"
 
 #: applications/luci-app-ocserv/luasrc/model/cbi/ocserv/main.lua:56
 #: applications/luci-app-ocserv/luasrc/model/cbi/ocserv/user-config.lua:50
@@ -195,7 +195,7 @@ msgstr ""
 "aktiviert, muss das darunter liegende Netzwerk ein Subnetz des LANs sein. "
 "Beachten Sie, dass die erste Adresse des angegebenen Subnetzes von ocserv "
 "reserviert wird, sie sollte also nicht verwendet werden. Wenn Sie ein "
-"Netzwerkinm LAN haben, das 192.168.1.0/24 umfasst, verwenden Sie "
+"Netzwerk im LAN haben, das 192.168.1.0/24 umfasst, verwenden Sie "
 "192.168.1.192/26, um die oberen 62 Adressen zu reservieren."
 
 #: applications/luci-app-ocserv/luasrc/model/cbi/ocserv/main.lua:143
@@ -309,7 +309,7 @@ msgstr "Zeit"
 
 #: applications/luci-app-ocserv/luasrc/view/ocserv_status.htm:51
 msgid "User"
-msgstr "Nutzer"
+msgstr "Benutzer"
 
 #: applications/luci-app-ocserv/luasrc/model/cbi/ocserv/main.lua:49
 #: applications/luci-app-ocserv/luasrc/model/cbi/ocserv/user-config.lua:37
@@ -354,8 +354,8 @@ msgstr "VPN-IP-Adresse"
 #: applications/luci-app-ocserv/luasrc/model/cbi/ocserv/main.lua:95
 #: applications/luci-app-ocserv/luasrc/model/cbi/ocserv/user-config.lua:100
 msgid ""
-"View the CA certificate used by this server. You will need to save it as 'ca."
-"pem' and import it into the clients."
+"View the CA certificate used by this server. You will need to save it as "
+"'ca.pem' and import it into the clients."
 msgstr ""
 "CA Zertifikat des Servers anzeigen. Das Zertifikat muss als 'ca.pem' "
 "gespeichert werden und in die Clienten importiert werden."

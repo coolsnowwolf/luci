@@ -1,0 +1,14 @@
+
+config mount
+	option enabled '0'
+	option server ''
+	option remote_path '/share'
+	option local_path '/mnt'
+	option smb_version ''
+	option iocharset 'utf8'
+	option ro '0'
+	option username ''
+	option password ''
+	option workgroup 'WORKGROUP'
+	option options ''
+

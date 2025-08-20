@@ -7,7 +7,7 @@
 'require uci';
 'require view';
 
-var callServiceList = rpc.declare({
+const callServiceList = rpc.declare({
 	object: 'service',
 	method: 'list',
 	params: ['name'],
@@ -15,8 +15,8 @@ var callServiceList = rpc.declare({
 });
 
 function getServiceStatus() {
-	return L.resolveDefault(callServiceList('microsocks'), {}).then(function (res) {
-		var isRunning = false;
+	return L.resolveDefault(callServiceList('microsocks'), {}).then(function(res) {
+		let isRunning = false;
 		try {
 			isRunning = res['microsocks']['instances']['microsocks']['running'];
 		} catch (e) { }
@@ -25,36 +25,35 @@ function getServiceStatus() {
 }
 
 function renderStatus(isRunning) {
-	var spanTemp = '<em><span style="color:%s"><strong>%s %s</strong></span></em>';
-	var renderHTML;
-	if (isRunning) {
+	let spanTemp = '<em><span style="color:%s"><strong>%s %s</strong></span></em>';
+	let renderHTML;
+	if (isRunning)
 		renderHTML = spanTemp.format('green', _('MicroSocks'), _('RUNNING'));
-	} else {
+	else
 		renderHTML = spanTemp.format('red', _('MicroSocks'), _('NOT RUNNING'));
-	}
 
 	return renderHTML;
 }
 
 return view.extend({
 	render: function() {
-		var m, s, o;
+		let m, s, o;
 
 		m = new form.Map('microsocks', _('MicroSocks'),
 			_('MicroSocks - multithreaded, small, efficient SOCKS5 server.'));
 
 		s = m.section(form.TypedSection);
 		s.anonymous = true;
-		s.render = function () {
-			poll.add(function () {
-				return L.resolveDefault(getServiceStatus()).then(function (res) {
-					var view = document.getElementById('service_status');
+		s.render = function() {
+			poll.add(function() {
+				return L.resolveDefault(getServiceStatus()).then(function(res) {
+					let view = document.getElementById('service_status');
 					view.innerHTML = renderStatus(res);
 				});
 			});
 
 			return E('div', { class: 'cbi-section', id: 'status_bar' }, [
-					E('p', { id: 'service_status' }, _('Collecting data...'))
+				E('p', { id: 'service_status' }, _('Collecting data...'))
 			]);
 		}
 

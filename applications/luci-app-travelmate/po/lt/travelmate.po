@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"PO-Revision-Date: 2024-03-27 01:01+0000\n"
-"Last-Translator: Džiugas J <dziugas1959@hotmail.com>\n"
+"PO-Revision-Date: 2025-07-05 23:02+0000\n"
+"Last-Translator: Džiugas Januševičius <dziugas1959@hotmail.com>\n"
 "Language-Team: Lithuanian <https://hosted.weblate.org/projects/openwrt/"
 "luciapplicationstravelmate/lt/>\n"
 "Language: lt\n"
@@ -11,7 +11,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "(n%100<10 || n%100>=20) ? 1 : 2);\n"
-"X-Generator: Weblate 5.5-dev\n"
+"X-Generator: Weblate 5.13-dev\n"
 
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:76
 msgid "-- AP Selection --"
@@ -21,91 +21,104 @@ msgstr "-- „AP“ pasirinkimas --"
 msgid "AP QR-Codes..."
 msgstr "„AP QR-Kodai“..."
 
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:1039
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:1037
 msgid "Add Uplink %q"
-msgstr ""
+msgstr "Pridėti „%q“ aukštynkriptį"
 
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:870
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:868
 msgid "Add Uplink..."
-msgstr ""
+msgstr "Pridėti aukštynkriptį..."
 
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:295
 msgid "Additional Settings"
 msgstr "Papildomi nustatymai"
 
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:366
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:365
 msgid ""
 "Additional trigger delay in seconds before travelmate processing begins."
 msgstr ""
+"Papildomas suaktyvinimo atidėjimas sekundėmis prieš prasidedant – "
+"„Travelmate“ apdorojimui."
 
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:439
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:996
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:994
 msgid "Anonymous Identity"
 msgstr "Anonimiška tapatybė"
 
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:420
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:979
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:977
 msgid "Authentication"
 msgstr "Autentifikavimas"
 
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:539
 msgid "Auto Added Open Uplink"
-msgstr ""
+msgstr "Automatiškai pridėtas atviras aukštynkryptis"
 
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:618
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:617
 msgid "Auto Login Script"
 msgstr "Automatinio prisijungimo skriptas"
 
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:353
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:352
 msgid "AutoAdd Open Uplinks"
-msgstr ""
+msgstr "Automatiškai pridėti atvirus aukštynkrypčius"
 
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:601
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:600
 msgid ""
 "Automatically (re-)enable the uplink after <em>n</em> minutes, e.g. after "
 "failed login attempts.<br /> The default of '0' disables this feature."
 msgstr ""
+"Automatiškai (iš naujo) įjungi/įgalinti aukštynkriptį po <em>n</em> minutes/-"
+"čių, pvz.: po nesėkmingo prisijungimo bandymo.<br /> Numatytasis nustatymas "
+"– „0-is“ išjungia/išgalina šią funkciją."
 
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:353
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:352
 msgid ""
 "Automatically add open uplinks like hotel captive portals to your wireless "
 "config."
 msgstr ""
+"Automatiškai pridėti atvirus aukštynkrypčius, pvz., „viešbučių“ perimanti "
+"prieigą pagal paskirties portalą į Jūsų belaidės/bevielės konfigūraciją."
 
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:583
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:582
 msgid ""
 "Automatically disable the uplink after <em>n</em> minutes, e.g. for timed "
 "connections.<br /> The default of '0' disables this feature."
 msgstr ""
+"Automatiškai išjungti/išgalinti aukštynkryptį po <em>n</em> minutes/-čių, "
+"pvz.: laiko nustatytiems prisijungimams.<br /> Numatytasis nustatymas yra – "
+"„0-is“ išjungia/išgalina šią funkciją."
 
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:678
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:677
 msgid ""
 "Automatically handle VPN connections.<br /> Please note: This feature "
 "requires the additional configuration of <em>Wireguard</em> or <em>OpenVPN</"
 "em>."
 msgstr ""
+"Automatiškai tvarkyti „VPN“ ryšius.<br /> Atkreipkite dėmesį: šiai funkcijai "
+"reikia papildomos – <em>„Wireguard“</em> arba <em>„OpenVPN“</em> "
+"konfigūracijos."
 
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:303
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:506
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:759
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:930
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:757
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:928
 msgid "BSSID"
 msgstr "„BSSID“"
 
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:422
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:982
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:980
 msgid "CHAP"
 msgstr "„CHAP“"
 
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:314
 msgid "Captive Portal Detection"
-msgstr ""
+msgstr "Perimančios prieigos pagal paskirtį portalo aptikimas"
 
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:391
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:390
 msgid "Captive Portal URL"
-msgstr ""
+msgstr "Perimančios prieigos pagal paskirtį portalo „URL“ – saitas"
 
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:757
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:755
 msgid "Channel"
 msgstr "Kanalas"
 
@@ -114,6 +127,9 @@ msgid ""
 "Check the internet availability, handle captive portal redirections and keep "
 "the uplink connection 'alive'."
 msgstr ""
+"Patikrinkite interneto prieinamumą, tvarkykite perimančios prieigos pagal "
+"paskirtį portalo peradresavimus ir palaikykite aukštynkrypties ryšį „gyvą/"
+"reaguojantį“."
 
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:148
 msgid ""
@@ -124,16 +140,23 @@ msgid ""
 "<em>Please note:</em> On first start please call the 'Interface Wizard' "
 "once, to make the necessary network- and firewall settings."
 msgstr ""
+"„Travelmate“ paketo konfigūracija, kad įjungtu/įgalintų kelionių/eigų "
+"maršrutizatoriaus funkcijas. Norėdami gauti daugiau informacijos, <a "
+"href=\"https://github.com/openwrt/packages/blob/master/net/travelmate/files/"
+"README.md\" target=\"_blank\" rel=\"noreferrer noopener\" >žiūrėkite "
+"internetinę dokumentaciją </a>. <br /> <em>Atkreipkite dėmesį:</em> Pirmą "
+"kartą paleidus, prašome iškviesti – „Sąsajos vedlį“, kad atliktumėte "
+"reikiamus tinklo ir užkardos nustatymus."
 
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:528
 msgid "Connection End"
 msgstr "Prisijungimo pabaiga"
 
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:600
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:599
 msgid "Connection End Expiry"
 msgstr "Prisijungimo pabaigos galiojimo laikas"
 
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:371
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:370
 msgid "Connection Limit"
 msgstr "Prisijungimo limitas"
 
@@ -141,7 +164,7 @@ msgstr "Prisijungimo limitas"
 msgid "Connection Start"
 msgstr "Prisijungimo pradžia"
 
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:582
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:581
 msgid "Connection Start Expiry"
 msgstr "Prisijungimo pradžios galiojimo laikas"
 
@@ -149,39 +172,39 @@ msgstr "Prisijungimo pradžios galiojimo laikas"
 msgid "Device"
 msgstr "Įrenginys"
 
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:903
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:901
 msgid "Device Name"
 msgstr "Įrenginio pavadinimas"
 
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:448
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:1005
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:1003
 msgid "Disabled"
-msgstr "Išjungtas/-i"
+msgstr "Išjungta/Neįgalinta (-s/-i)"
 
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:46
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:131
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:772
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:1045
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:770
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:1043
 msgid "Dismiss"
 msgstr "Nepaisyti"
 
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:261
 msgid "Drag to reorder"
-msgstr ""
+msgstr "Vilkite, kad pakeistumėte eiliškumą/eilės vietą ar tvarką"
 
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:421
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:420
 msgid "E-Mail Hook"
 msgstr "El. pašto pririšimas"
 
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:439
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:438
 msgid "E-Mail Profile"
 msgstr "El. pašto profilis"
 
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:424
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:423
 msgid "E-Mail Receiver Address"
 msgstr "El. pašto gavėjo adresas"
 
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:429
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:428
 msgid "E-Mail Sender Address"
 msgstr "El. pašto siuntėjo adresas"
 
@@ -189,32 +212,32 @@ msgstr "El. pašto siuntėjo adresas"
 msgid "E-Mail Settings"
 msgstr "El. pašto nustatymai"
 
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:434
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:433
 msgid "E-Mail Topic"
 msgstr "El. pašto tema"
 
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:425
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:985
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:983
 msgid "EAP-GTC"
 msgstr "„EAP-GTC“"
 
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:426
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:986
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:984
 msgid "EAP-MD5"
 msgstr "„EAP-MD5“"
 
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:427
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:987
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:985
 msgid "EAP-MSCHAPV2"
 msgstr "„EAP-MSCHAPV2“"
 
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:411
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:971
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:969
 msgid "EAP-Method"
 msgstr "„EAP-Metodas“"
 
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:428
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:988
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:986
 msgid "EAP-TLS"
 msgstr "„EAP-TLS“"
 
@@ -233,6 +256,8 @@ msgstr "Įjungti „travelmate“ tarnybą."
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:304
 msgid "Enable verbose debug logging in case of any processing errors."
 msgstr ""
+"Įjungti/Įgalinti plačią/išsamią/daugiažodį derinimo/trukdžių šalinimo "
+"žurnalą, jei atsiranda bet kokių apdorojimo klaidų."
 
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:272
 msgid "Enable/Disable this network"
@@ -241,11 +266,11 @@ msgstr "Įjungti/Išjungti šį tinklą"
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:301
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:284
 msgid "Enabled"
-msgstr "Įjungta/Įgalinta (-as)"
+msgstr "Įjungtas/Įgalintas"
 
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:307
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:760
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:936
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:758
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:934
 msgid "Encryption"
 msgstr "Šifravimas"
 
@@ -253,14 +278,16 @@ msgstr "Šifravimas"
 msgid "Ext. Hooks"
 msgstr "Išor. pririšimai"
 
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:619
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:618
 msgid ""
 "External script reference which will be called for automated captive portal "
 "logins."
 msgstr ""
+"Išorinio skripto pamatinis, kuris bus iškviestas naudojant automatinius "
+"perimančios prieigos pagal paskirtį portalo prisijungimus."
 
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:416
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:976
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:974
 msgid "FAST"
 msgstr "GREITAS"
 
@@ -268,25 +295,29 @@ msgstr "GREITAS"
 msgid "General Settings"
 msgstr "Bendri nustatymai"
 
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:349
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:348
 msgid "Generate a random unicast MAC address for each uplink connection."
 msgstr ""
+"Sugeneruoti atsitiktinį „unicast MAC“ adresą, kiekvienam aukštynkripties "
+"ryšiui."
 
 #: applications/luci-app-travelmate/root/usr/share/rpcd/acl.d/luci-app-travelmate.json:3
 msgid "Grant access to LuCI app travelmate"
 msgstr "Duoti prieigą prie „LuCI-app-travelmate“"
 
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:381
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:380
 msgid ""
 "How long should travelmate wait for a successful wlan uplink connection."
 msgstr ""
+"Kiek laiko – „travelmate“ turėtų laukti sėkmingo „Wlan“ aukštynkripties "
+"ryšio."
 
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:435
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:993
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:991
 msgid "Identity"
 msgstr "Tapatybė"
 
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:922
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:920
 msgid "Ignore BSSID"
 msgstr "Ignoruoti „BSSID“"
 
@@ -294,27 +325,27 @@ msgstr "Ignoruoti „BSSID“"
 msgid "Information"
 msgstr "Informacija"
 
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:907
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:905
 msgid "Interface Name"
 msgstr "Sąsajos ir/arba sietuvo pavadinimas"
 
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:381
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:380
 msgid "Interface Timeout"
 msgstr "Sąsajos ir/arba Sietuvo užklausos laikas"
 
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:23
 msgid "Interface Wizard"
-msgstr ""
+msgstr "Sąsajos ir/arba Sietuvo vediklis"
 
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:283
 msgid "Interface Wizard..."
-msgstr ""
+msgstr "Sąsajos ir/arba Sietuvo vediklis..."
 
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:254
 msgid "Last Run"
 msgstr "Paskutinį kartą vykdytą"
 
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:357
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:356
 msgid "Limit AutoAdd"
 msgstr "Riboti automatinį pridėjimą"
 
@@ -326,11 +357,13 @@ msgstr "Riboti „VPN“ apdorojimą"
 msgid "Limit VPN processing to certain interfaces."
 msgstr "Riboti „VPN“ apdorojimą kai kurioms/-iems sąsajoms ir/arba sietuvams."
 
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:357
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:356
 msgid ""
 "Limit the maximum number of automatically added open uplinks. To disable "
 "this limitation set it to '0'."
 msgstr ""
+"Apriboti maksimalų automatiškai pridėtų atvirų aukštynkrypčių skaičių. "
+"Norėdami išjungti šį apribojimą, nustatykite jį į – „0-į“."
 
 #: applications/luci-app-travelmate/root/usr/share/luci/menu.d/luci-app-travelmate.json:35
 msgid "Log View"
@@ -341,29 +374,31 @@ msgid "MAC Address"
 msgstr "„MAC“ adresas"
 
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:423
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:983
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:981
 msgid "MSCHAP"
 msgstr "„MSCHAP“"
 
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:424
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:984
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:982
 msgid "MSCHAPV2"
 msgstr "„MSCHAPV2“"
 
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:443
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:1000
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:998
 msgid "Mgmt. Frame Protection"
-msgstr ""
+msgstr "Valdymas/Tvarkymas. Kadro apsauga"
 
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:376
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:375
 msgid ""
 "Minimum signal quality threshold as percent for conditional uplink (dis-) "
 "connections."
 msgstr ""
+"Minimalus signalo kokybės slenkstis procentais, skirtas sąlyginiams "
+"aukštynkriptiems (atsi-) jungimams."
 
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:340
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:339
 msgid "Net Error Check"
-msgstr ""
+msgstr "Tinklo klaidos patikrinimas"
 
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:327
 msgid "OWE"
@@ -374,17 +409,19 @@ msgid "On/Off"
 msgstr "Įjungti/Išjungti"
 
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:449
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:1006
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:1004
 msgid "Optional"
 msgstr "Pasirenkamas"
 
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:386
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:385
 msgid "Overall Timeout"
-msgstr ""
+msgstr "Bendras pasibaigusios užklausos laikas"
 
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:386
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:385
 msgid "Overall retry timeout in seconds."
 msgstr ""
+"Bendras pakartojimo/bandymo iš naujo pasibaigusios užklausos laikas "
+"sekundėmis."
 
 #: applications/luci-app-travelmate/root/usr/share/luci/menu.d/luci-app-travelmate.json:19
 msgid "Overview"
@@ -394,46 +431,53 @@ msgstr "Apžiūra"
 msgid ""
 "Overview of all configured uplinks for travelmate. You can edit, remove or "
 "prioritize existing uplinks by drag &#38; drop and scan for new ones.<br /> "
-"The currently used uplink connection is emphasized in <span style=\"color:"
-"rgb(51, 119, 204);font-weight:bold\">blue</span>, an encrypted VPN uplink "
-"connection is emphasized in <span style=\"color:rgb(68, 170, 68);font-weight:"
-"bold\">green</span>."
+"The currently used uplink connection is emphasized in <span "
+"style=\"color:rgb(51, 119, 204);font-weight:bold\">blue</span>, an encrypted "
+"VPN uplink connection is emphasized in <span style=\"color:rgb(68, 170, "
+"68);font-weight:bold\">green</span>."
 msgstr ""
+"Visų sukonfigūruotų „travelmate“ aukštynkrypčių apžvalga. Jūs galite "
+"redaguoti, pašalinti arba teikti pirmenybę esamoms aukštynkryptiems "
+"nuvilkdami &#38; numesdami ir nuskaitydami naujas.<br /> Šiuo metu "
+"naudojamas auktynkrypties ryšys yra pabrėžiamas <span style=\"color:rgb(51, "
+"119, 204);font-weight:bold\">mėlynai</span>, šifruotas „VPN“ aukštynkrypties "
+"ryšys yra pabrėžiamas<span style=\"color:rgb(68, 170, 68);font-"
+"weight:bold\">žaliai</span>."
 
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:421
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:981
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:979
 msgid "PAP"
 msgstr "„PAP“"
 
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:415
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:975
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:973
 msgid "PEAP"
 msgstr "„PEAP“"
 
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:398
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:405
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:960
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:966
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:958
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:964
 msgid "Password"
 msgstr "Slaptažodis"
 
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:481
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:1033
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:1031
 msgid "Password of Private Key"
 msgstr "Privataus rakto slaptažodis"
 
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:465
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:1020
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:1018
 msgid "Path to CA-Certificate"
 msgstr "Kelias į „CA-Sertifikatas“"
 
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:471
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:1025
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:1023
 msgid "Path to Client-Certificate"
 msgstr "Kelias į „Kliento-Sertifikatas“"
 
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:476
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:1029
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:1027
 msgid "Path to Private Key"
 msgstr "Kelias į privatų raktą"
 
@@ -444,22 +488,27 @@ msgstr "Prašome įdiegti atskirą „qrencode“ prog. įrang. paketą."
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:296
 msgid ""
 "Please note: E-Mail notifications require the separate setup of the "
-"<em>mstmp</em> package.<br /><p>&#xa0;</p>"
+"<em>msmtp</em> package.<br /><p>&#xa0;</p>"
 msgstr ""
+"Atkreipkite dėmesį: norint gauti el. pašto pranešimus, reikia atskirai "
+"nustatyti – <em>„msmtp“</em> paketą.<br /><p>&#xa0;</p>"
 
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:345
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:344
 msgid "ProActive Uplink Switch"
-msgstr ""
+msgstr "Iniciatyvus/Aktyvus („Proactive“) aukštynkripties komutatorius"
 
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:345
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:344
 msgid ""
 "Proactively scan and switch to a higher prioritized uplink, despite of an "
 "already existing connection."
 msgstr ""
+"Iniciatyviai/Aktyviai („Proactively“) skenuoti ir per(si)jungti į aukštesnio "
+"prioriteto aukštynkrypties ryšį, nepaisant jau esamo ryšio."
 
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:439
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:438
 msgid "Profile used by 'msmtp' for travelmate notification E-Mails."
 msgstr ""
+"Profilis, kurį naudoja „msmtp“, skirta – „travelmate“ el. pašto pranešimams."
 
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:116
 msgid "QR-Code Overview"
@@ -469,13 +518,13 @@ msgstr "„QR-Kodo“ peržiūra"
 msgid "Radio Selection"
 msgstr "Radijo pasirinkimas"
 
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:349
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:348
 msgid "Randomize MAC Addresses"
 msgstr "Sumaišyti „MAC“ adresus"
 
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:424
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:423
 msgid "Receiver address for travelmate notification E-Mails."
-msgstr ""
+msgstr "Gavėjo adresas, skirtas – „travelmate“ el. pašto pranešimams."
 
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:279
 msgid "Remove"
@@ -487,16 +536,18 @@ msgstr "Pašalinti šį tinklą"
 
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:117
 msgid ""
-"Render the QR-Code of the selected Access Point to comfortably transfer the "
-"WLAN credentials to your mobile devices."
+"Render the QR-Code of the selected Access Point to transfer the WLAN "
+"credentials to your mobile devices comfortably."
 msgstr ""
+"Perteikti pasirinkto prieigos taško „QR“ kodą, kad galėtumėte patogiai "
+"perkelti „WLAN“ kredencialus į savo mobiliuosius įrenginius."
 
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:777
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:775
 msgid "Repeat Scan"
 msgstr "Atkartoti skenavimą"
 
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:450
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:1007
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:1005
 msgid "Required"
 msgstr "Reikalaujama/Privaloma"
 
@@ -508,10 +559,12 @@ msgstr "Paleisti iš naujo sąsają ir/arba sietuvą"
 msgid ""
 "Restrict travelmate to a single radio or change the overall scanning order."
 msgstr ""
+"Apriboti „travelmate“ iki vieno radijo ryšio arba pakeisti bendrą skenavimo "
+"tvarką."
 
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:371
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:370
 msgid "Retry limit to connect to an uplink."
-msgstr ""
+msgstr "Pakartojimų/Bandymų iš naujo prisijungiant prie aukštynkrypties, riba."
 
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:246
 msgid "Run Flags"
@@ -519,103 +572,112 @@ msgstr "Vykdymo vėliavos"
 
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:299
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:495
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:758
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:916
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:756
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:914
 msgid "SSID"
 msgstr "„SSID“"
 
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:912
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:910
 msgid "SSID (hidden)"
-msgstr "„SSID“ (paslėptas/-a)"
+msgstr "„SSID“ (paslėpta/-s)"
 
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:64
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:1050
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:1048
 msgid "Save"
 msgstr "Išsaugoti"
 
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:741
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:739
 msgid "Scan on"
 msgstr "Įjungtas skenavimas"
 
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:657
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:656
 msgid "Script Arguments"
 msgstr "Skripto argumentai"
 
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:429
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:428
 msgid "Sender address for travelmate notification E-Mails."
-msgstr "Siuntėjo adresas „travelmate“ pranešimams per el. paštą."
+msgstr "Siuntėjo adresas, skirtas – „travelmate“ el. pašto pranešimams."
 
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:421
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:420
 msgid "Sends notification E-Mails after every succesful uplink connect."
 msgstr ""
+"Siunčia pranešimus el. paštu po kiekvieno sėkmingo aukštynkrypties "
+"prisijungimo."
 
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:409
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:408
 msgid "Service Priority"
-msgstr "Tarnybos prioritetas"
+msgstr "Tarnybos pirmenybė"
 
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:292
 msgid "Settings"
 msgstr "Nustatymai"
 
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:376
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:375
 msgid "Signal Quality Threshold"
-msgstr ""
+msgstr "Signalo kokybės slenkstis"
 
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:658
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:657
 msgid ""
 "Space separated list of additional arguments passed to the Auto Login "
 "Script, i.e. username and password"
 msgstr ""
+"Tarpais atskirtas papildomų argumentų, perduodamų – automatinio prisijungimo "
+"skriptui, sąrašas, t.y. naudojo/vartotojo vardas (t.y slapyvardis) ir "
+"slaptažodis"
 
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:329
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:328
 msgid "Standard VPN Service"
 msgstr "Tipinė „VPN“ tarnyba"
 
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:335
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:334
 msgid "Standard VPN interface"
 msgstr "Tipinė „VPN“ sąsaja"
 
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:335
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:334
 msgid ""
 "Standard VPN interface which will be automatically added to new STA profiles."
 msgstr ""
+"Standartinė/-is „VPN“ sąsaja ir/arba sietuvas, kuri/-is bus automatiškai "
+"įtraukta/-as į naujus „STA“ profilius."
 
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:329
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:328
 msgid ""
 "Standard VPN service which will be automatically added to new STA profiles."
 msgstr ""
+"Standartinė „VPN“ tarnyba, kuri bus automatiškai įtraukta į naujus „STA“ "
+"profilius."
 
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:764
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:762
 msgid "Starting wireless scan on '"
-msgstr ""
+msgstr "Pradedamas belaidis/bevielis skenavimas per '"
 
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:230
 msgid "Station ID"
-msgstr ""
+msgstr "Stoties ID"
 
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:238
 msgid "Station Interfaces"
-msgstr ""
+msgstr "Stoties sąsajos ir/arba sietuvai"
 
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:234
 msgid "Station MAC"
-msgstr ""
+msgstr "Stoties „MAC“"
 
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:226
 msgid "Status / Version"
 msgstr "Būklė / Versija"
 
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:756
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:754
 msgid "Strength"
 msgstr "Stiprumas"
 
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:413
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:973
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:971
 msgid "TLS"
 msgstr "„TLS“"
 
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:414
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:974
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:972
 msgid "TTLS"
 msgstr "„TTLS“"
 
@@ -629,40 +691,47 @@ msgstr "Užkardos zonos pavadinimas"
 
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:39
 msgid "The interface metric"
-msgstr ""
+msgstr "Sąsajos ir/arba Sietuvo metrika"
 
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:710
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:709
 msgid "The logical vpn network interface like 'wg0'."
-msgstr ""
+msgstr "Loginė/-is „VPN“ tinklo sąsaja ir/arba sietuvas, pvz.: „wg0“."
 
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:391
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:390
 msgid ""
 "The selected URL will be used for connectivity- and captive portal checks."
 msgstr ""
+"Pasirinktas „URL“ – saitas bus naudojamas ryšio ir perimančios prieigos "
+"pagal paskirtį patikrinimams."
 
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:409
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:408
 msgid "The selected priority will be used for travelmate processes."
-msgstr ""
+msgstr "Pasirinkta pirmenybė bus naudojama „travelmate“ vyksmams."
 
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:400
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:399
 msgid ""
 "The selected user agent will be used for connectivity- and captive portal "
 "checks."
 msgstr ""
+"Pasirinktas naudotojo/vartotojo agentas bus naudojamas ryšio ir perimančios "
+"prieigos pagal paskirtį patikrinimams."
 
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:59
 msgid "The uplink interface has been updated."
-msgstr ""
+msgstr "Aukštynkripčio sąsaja ir/arba sietuvas buvo atnaujinta/-s."
 
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:29
 msgid "The uplink interface name"
-msgstr ""
+msgstr "Aukštynkrypčio sąsajos ir/arba sietuvo pavadinimas"
 
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:540
 msgid ""
 "This option is selected by default if this uplink was added automatically "
 "and counts as 'Open Uplink'."
 msgstr ""
+"Ši parinktis yra parinkta pagal numatytuosius nustatymus, jei šitas "
+"aukštynkryptis buvo pridėtas automatiškai ir skaičiuojamas kaip – „Atidaryti "
+"aukštynkryptį“."
 
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:24
 msgid ""
@@ -670,10 +739,14 @@ msgid ""
 "creates an IPv4- and an IPv6 alias network interface with all required "
 "network- and firewall settings."
 msgstr ""
+"Norėdami naudoti – „Travelmate“, Jūs turite vieną kartą nustatyti "
+"aukštynkrypties sąsają ir/arba sietuvą. Šis vedlys sukuria IPv4 ir IPv6 "
+"pseudonimo tinklo sąsają ir/arba sietuvą su visais reikalingais tinklo ir "
+"užkardos parametrais."
 
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:434
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:433
 msgid "Topic for travelmate notification E-Mails."
-msgstr ""
+msgstr "Tema/Dalykas, skirtas – „travelmate“ el. pašto pranešimams."
 
 #: applications/luci-app-travelmate/root/usr/share/luci/menu.d/luci-app-travelmate.json:3
 msgid "Travelmate"
@@ -683,36 +756,36 @@ msgstr "„Travelmate“"
 msgid "Travelmate Settings"
 msgstr "„Travelmate“ nustatymai"
 
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:340
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:339
 msgid "Treat missing internet availability as an error."
-msgstr ""
+msgstr "Laikyti trūkstamą interneto prieinamumą kaip klaidą."
 
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:366
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:365
 msgid "Trigger Delay"
-msgstr ""
+msgstr "Suaktyvinimo atidėjimas"
 
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:458
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:1014
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:1012
 msgid "Use system certificates"
 msgstr "Naudoti sistemos sertifikatus"
 
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:557
 msgid "Use the specified MAC address for this uplink."
-msgstr ""
+msgstr "Naudoti šios aukštynkrypties nurodytą „MAC“ adresą."
 
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:400
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:399
 msgid "User Agent"
-msgstr ""
+msgstr "Naudotojo/Vartotojo agentas"
 
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:678
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:677
 msgid "VPN Hook"
 msgstr "„VPN“ pririšimas"
 
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:710
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:709
 msgid "VPN Interface"
 msgstr "„VPN“ sąsaja"
 
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:695
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:694
 msgid "VPN Service"
 msgstr "„VPN“ tarnyba"
 
@@ -729,21 +802,22 @@ msgid "VPN processing"
 msgstr "„VPN“ apdorojimas"
 
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:458
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:1014
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:1012
 msgid "Validate server certificate using built-in system CA bundle"
 msgstr ""
+"Patvirtinti serverio sertifikatą naudodami įmontuota sistemos „CA“ paketą"
 
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:304
 msgid "Verbose Debug Logging"
-msgstr ""
+msgstr "Platus/Išsamus/Daugiažodiškas derinimo/trukdžių šalinimo žurnalinimas"
 
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:323
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:952
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:950
 msgid "WPA Ent. (CCMP)"
 msgstr "„WPA Enterprise“ („CCMP“)"
 
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:324
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:953
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:951
 msgid "WPA Ent. (TKIP)"
 msgstr "„WPA Enterprise“ („TKIP“)"
 
@@ -752,71 +826,71 @@ msgid "WPA Flags"
 msgstr "„WPA vėliavos“"
 
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:313
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:942
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:940
 msgid "WPA Pers."
 msgstr "„WPA Personal“."
 
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:314
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:943
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:941
 msgid "WPA Pers. (CCMP)"
 msgstr "„WPA Personal“ („CCMP“)"
 
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:315
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:944
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:942
 msgid "WPA Pers. (TKIP)"
 msgstr "„WPA Personal“ („TKIP“)"
 
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:325
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:954
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:952
 msgid "WPA/WPA2 Ent. (CCMP)"
 msgstr "„WPA/WPA2 Enterprise“ („CCMP“)"
 
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:326
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:955
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:953
 msgid "WPA/WPA2 Ent. (TKIP)"
 msgstr "„WPA/WPA2 Enterprise“ („TKIP“)"
 
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:316
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:945
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:943
 msgid "WPA/WPA2 Pers. (CCMP)"
 msgstr "„WPA/WPA2 Personal“ („CCMP“)"
 
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:317
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:946
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:944
 msgid "WPA/WPA2 Pers. (TKIP)"
 msgstr "„WPA/WPA2 Personal“ („TKIP“)"
 
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:320
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:949
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:947
 msgid "WPA2 Ent."
 msgstr "„WPA2 Enterprise“."
 
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:321
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:950
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:948
 msgid "WPA2 Ent. (CCMP)"
 msgstr "„WPA2 Enterprise“ („CCMP“)"
 
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:322
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:951
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:949
 msgid "WPA2 Ent. (TKIP)"
 msgstr "„WPA2 Enterprise“ („TKIP“)"
 
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:310
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:939
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:937
 msgid "WPA2 Pers."
 msgstr "„WPA2 Personal“."
 
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:311
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:940
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:938
 msgid "WPA2 Pers. (CCMP)"
 msgstr "„WPA2 Personal“ („CCMP“)"
 
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:312
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:941
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:939
 msgid "WPA2 Pers. (TKIP)"
 msgstr "„WPA2 Personal“ („TKIP“)"
 
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:948
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:946
 msgid "WPA2/WPA3 Ent."
 msgstr "„WPA2/WPA3 Enterprise“."
 
@@ -825,11 +899,11 @@ msgid "WPA2/WPA3 Ent. (CCMP)"
 msgstr "„WPA2/WPA3 Enterprise“ („CCMP“)"
 
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:309
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:938
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:936
 msgid "WPA2/WPA3 Pers. (CCMP)"
 msgstr "„WPA2/WPA3 Personal“ („CCMP“)"
 
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:947
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:945
 msgid "WPA3 Ent."
 msgstr "„WPA3 Enterprise“."
 
@@ -837,54 +911,56 @@ msgstr "„WPA3 Enterprise“."
 msgid "WPA3 Ent. (CCMP)"
 msgstr "„WPA3 Enterprise“ („CCMP“)"
 
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:956
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:954
 msgid "WPA3 OWE (CCMP)"
 msgstr "„WPA3 OWE“ („CCMP“)"
 
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:308
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:937
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:935
 msgid "WPA3 Pers. (SAE)"
 msgstr "„WPA3 Personal“ („SAE“)"
 
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:766
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:764
 msgid "Wireless Scan"
-msgstr "Belaidis skenavimas"
+msgstr "Belaidžio/Bevielio skenavimas"
 
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:253
 msgid "Wireless Settings"
-msgstr "Belaidžio tinklo nustatymai"
+msgstr "Belaidžio/Bevielio tinklo nustatymai"
 
 #: applications/luci-app-travelmate/root/usr/share/luci/menu.d/luci-app-travelmate.json:27
 msgid "Wireless Stations"
-msgstr ""
+msgstr "Belaidės/Bevielės stotys"
 
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:430
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:990
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:988
 msgid "auth=MSCHAPV2"
 msgstr "auth=„MSCHAPV2“"
 
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:429
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:989
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:987
 msgid "auth=PAP"
 msgstr "auth=„PAP“"
 
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:328
-#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:957
+#: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/stations.js:955
 msgid "none"
-msgstr "joks"
+msgstr "joks (-ia/-ie)"
 
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:310
 msgid "use both radios, normal sort order (radio0 radio1)"
 msgstr ""
+"naudoti abu radijo imtuvus, įprasta rūšiavimo tvarka („radio0“, „radio1“)"
 
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:311
 msgid "use both radios, reverse sort order (radio1 radio0)"
 msgstr ""
+"naudoti abu radijo imtuvus, atvirkštinė rūšiavimo tvarka („radio1“, „radio0“)"
 
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:308
 msgid "use the first radio only (radio0)"
-msgstr ""
+msgstr "naudoti tik pirmąjį radijo imtuvą („radio0“)"
 
 #: applications/luci-app-travelmate/htdocs/luci-static/resources/view/travelmate/overview.js:309
 msgid "use the second radio only (radio1)"
-msgstr ""
+msgstr "naudoti tik antrąjį radijo imtuvą („radio1“)"

@@ -1,84 +1,132 @@
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2020-02-02 09:02+0000\n"
+"PO-Revision-Date: 2025-05-12 14:57+0000\n"
 "Last-Translator: Pavel Borecki <pavel.borecki@gmail.com>\n"
 "Language-Team: Czech <https://hosted.weblate.org/projects/openwrt/"
 "luciapplicationsudpxy/cs/>\n"
 "Language: cs\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
-"X-Generator: Weblate 3.11-dev\n"
+"Plural-Forms: nplurals=3; plural=((n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2);\n"
+"X-Generator: Weblate 5.12-dev\n"
 
-#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:30
-msgid "Bind IP/Interface"
-msgstr "Navázat na IP adresu / rozhraní"
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:207
+msgid "-1 is all."
+msgstr "-1 znamená vše."
 
-#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:47
-msgid "Buffer messages"
-msgstr "Vyrovnávací paměť zpráv"
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:211
+msgid "-1 is unlimited."
+msgstr "-1 znamená neomezeno."
 
-#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:44
-msgid "Buffer size"
-msgstr "Velikost vyrovnávací paměti"
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:117
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:121
+msgid "Absent Interface"
+msgstr "Chybějící rozhraní"
 
-#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:50
-msgid "Buffer time"
-msgstr "Časová délka pokrývaná vyrovnávací pamětí"
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:207
+msgid "Buffer message amount"
+msgstr "Množství vyrovnávací paměti zpráv"
 
-#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:16
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:211
+msgid "Buffer time limit"
+msgstr "Časový limit vyrovnávací paměti"
+
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:198
+msgid "Client amount upper limit"
+msgstr "Horní limit počtu klientů"
+
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:175
+msgid "Client statistics"
+msgstr "Statistiky klientů"
+
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:144
+msgid "Custom Value"
+msgstr "Uživatelsky určená hodnota"
+
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:181
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:193
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:201
+msgid "Default"
+msgstr "Výchozí"
+
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:163
 msgid "Enabled"
-msgstr "Zapnuto"
+msgstr "Povoleno"
 
 #: applications/luci-app-udpxy/root/usr/share/rpcd/acl.d/luci-app-udpxy.json:3
 msgid "Grant UCI access for luci-app-udpxy"
-msgstr ""
+msgstr "Udělit luci-app-udpxy přístup do UCI nastavování"
 
-#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:42
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:177
+msgid "HTTP Listen interface"
+msgstr "Rozhraní na kterém očekávat HTTP spojení"
+
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:204
+msgid "Ingress buffer size"
+msgstr "Velikost vyrovnávací paměti vstupu"
+
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:201
 msgid "Log file"
-msgstr "Soubor pro záznam událostí"
+msgstr "Soubor se záznamem událostí"
 
-#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:39
-msgid "Max clients"
-msgstr "Nejvýše klientů"
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:186
+msgid "Multicast subscribe Source Network"
+msgstr "Zdrojová síť přihlášení se k odběru vícesměrového vysílání"
 
-#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:56
-msgid "Multicast subscription renew"
-msgstr "Obnovení přihlášení k odběru vícesměrového vysílání"
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:192
+msgid "Multicast subscribe source interface"
+msgstr "Zdrojové rozhraní přihlášení se k odběru vícesměrového vysílání"
 
-#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:53
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:215
 msgid "Nice increment"
 msgstr "Přírůstek hodnoty nice"
 
-#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:33
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:181
 msgid "Port"
 msgstr "Port"
 
-#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:22
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:219
+msgid "Renew multicast subscription periodicity"
+msgstr "Periodicky obnovovat přihlášení se k odběru vícesměrového vysílání"
+
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:169
 msgid "Respawn"
 msgstr "V případě výpadku znovu spustit"
 
-#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:36
-msgid "Source IP/Interface"
-msgstr "Zdrojová IP adresa / rozhraní"
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:204
+msgid "Unit: bytes, Kb, Mb; Max 2097152 bytes"
+msgstr "Jednotka:: bajty, Kb, Mb – nejvýše 2097152 bajtů"
 
-#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:28
-msgid "Status"
-msgstr "Stav"
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:219
+msgid "Unit: seconds; 0 is skip."
+msgstr "Jednotka: sekundy; 0 znamená přeskočit."
 
-#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:25
-msgid "Verbose"
-msgstr "Podrobné"
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:172
+msgid "Verbose logging"
+msgstr "Podrobnější zaznamenávání událostí"
 
-#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:9
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:187
+msgid "When the network is reloaded, the udpxy is reloaded"
+msgstr "Při znovunačtení sítě je totéž provedeno s udpxy"
+
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:136
+msgid "custom"
+msgstr "uživatelsky určené"
+
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:156
 #: applications/luci-app-udpxy/root/usr/share/luci/menu.d/luci-app-udpxy.json:3
 msgid "udpxy"
 msgstr "udpxy"
 
-#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:10
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:157
 msgid ""
-"udpxy is a UDP-to-HTTP multicast traffic relay daemon, here you can "
-"configure the settings."
+"udpxy is an IPTV stream relay, a UDP-to-HTTP multicast traffic relay daemon "
+"which forwards multicast UDP streams to HTTP clients."
 msgstr ""
-"udpxy je proces služby pro předávání provozu vícesměrového vysílání UDP na "
-"HTTP. Zde je možné provést nastavení."
+"udpxy je předávání IPTV proudů – proces služby předávání vícesměrového "
+"provozu UDP na HTTP, který přeposílá vícesměrové UDP proudy na HTTP klienty."
+
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:39
+#: applications/luci-app-udpxy/htdocs/luci-static/resources/view/udpxy.js:135
+msgid "unspecified"
+msgstr "neurčeno"

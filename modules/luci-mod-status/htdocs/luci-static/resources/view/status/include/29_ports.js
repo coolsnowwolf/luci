@@ -210,20 +210,24 @@ function buildInterfaceMapping(zones, networks) {
 }
 
 function formatSpeed(carrier, speed, duplex) {
-	if (speed && duplex) {
+	if ((speed > 0) && duplex) {
 		var d = (duplex == 'half') ? '\u202f(H)' : '',
 		    e = E('span', { 'title': _('Speed: %d Mibit/s, Duplex: %s').format(speed, duplex) });
 
-		switch (speed) {
-		case 10:    e.innerText = '10\u202fM' + d;  break;
-		case 100:   e.innerText = '100\u202fM' + d; break;
-		case 1000:  e.innerText = '1\u202fGbE' + d; break;
-		case 2500:  e.innerText = '2.5\u202fGbE';   break;
-		case 5000:  e.innerText = '5\u202fGbE';     break;
-		case 10000: e.innerText = '10\u202fGbE';    break;
-		case 25000: e.innerText = '25\u202fGbE';    break;
-		case 40000: e.innerText = '40\u202fGbE';    break;
-		default:    e.innerText = '%d\u202fMbE%s'.format(speed, d);
+		switch (true) {
+		case (speed < 1000):
+			e.innerText = '%d\u202fM%s'.format(speed, d);
+			break;
+		case (speed == 1000):
+			e.innerText = '1\u202fGbE' + d;
+			break;
+		case (speed >= 1e6 && speed < 1e9):
+			e.innerText = '%f\u202fTbE'.format(speed / 1e6);
+			break;
+		case (speed >= 1e9):
+			e.innerText = '%f\u202fPbE'.format(speed / 1e9);
+			break;
+		default: e.innerText = '%f\u202fGbE'.format(speed / 1000);
 		}
 
 		return e;
@@ -265,7 +269,7 @@ function renderNetworkBadge(network, zonename) {
 	if (l3dev)
 		span.appendChild(E('img', {
 			'title': l3dev.getI18n(),
-			'src': L.resource('icons/%s%s.png'.format(l3dev.getType(), l3dev.isUp() ? '' : '_disabled'))
+			'src': L.resource('icons/%s%s.svg'.format(l3dev.getType(), l3dev.isUp() ? '' : '_disabled'))
 		}));
 	else
 		span.appendChild(E('em', _('(no interfaces attached)')));
@@ -301,7 +305,6 @@ return baseclass.extend({
 	load: function() {
 		return Promise.all([
 			L.resolveDefault(callGetBuiltinEthernetPorts(), []),
-			L.resolveDefault(fs.read('/etc/board.json'), '{}'),
 			firewall.getZones(),
 			network.getNetworks(),
 			uci.load('network')
@@ -312,54 +315,30 @@ return baseclass.extend({
 		if (L.hasSystemFeature('swconfig'))
 			return null;
 
-		var board = JSON.parse(data[1]),
-		    known_ports = [],
-		    port_map = buildInterfaceMapping(data[2], data[3]);
+		var known_ports = [],
+		    port_map = buildInterfaceMapping(data[1], data[2]);
 
-		if (Array.isArray(data[0]) && data[0].length > 0) {
+		if (Array.isArray(data[0]) && data[0].length > 0)
 			known_ports = data[0].map(port => ({
 				...port,
 				netdev: network.instantiateDevice(port.device)
 			}));
-		}
-		else {
-			if (L.isObject(board) && L.isObject(board.network)) {
-				for (var k = 'lan'; k != null; k = (k == 'lan') ? 'wan' : null) {
-					if (!L.isObject(board.network[k]))
-						continue;
-
-					if (Array.isArray(board.network[k].ports))
-						for (let i = 0; i < board.network[k].ports.length; i++)
-							known_ports.push({
-								role: k,
-								device: board.network[k].ports[i],
-								netdev: network.instantiateDevice(board.network[k].ports[i])
-							});
-					else if (typeof(board.network[k].device) == 'string')
-						known_ports.push({
-							role: k,
-							device: board.network[k].device,
-							netdev: network.instantiateDevice(board.network[k].device)
-						});
-				}
-			}
-		}
 
 		known_ports.sort(function(a, b) {
 			return L.naturalCompare(a.device, b.device);
 		});
 
-		return E('div', { 'style': 'display:grid;grid-template-columns:repeat(auto-fit, minmax(70px, 1fr));margin-bottom:1em' }, known_ports.map(function(port) {
+		return E('div', { 'style': 'display:grid;grid-template-columns:repeat(auto-fit, minmax(100px, 1fr));margin-bottom:1em;align-items:center;justify-items:center;text-align:center' }, known_ports.map(function(port) {
 			var speed = port.netdev.getSpeed(),
 			    duplex = port.netdev.getDuplex(),
 			    carrier = port.netdev.getCarrier(),
 			    pmap = port_map[port.netdev.getName()],
 			    pzones = (pmap && pmap.zones.length) ? pmap.zones.sort(function(a, b) { return L.naturalCompare(a.getName(), b.getName()) }) : [ null ];
 
-			return E('div', { 'class': 'ifacebox', 'style': 'margin:.25em;min-width:70px;max-width:100px' }, [
+			return E('div', { 'class': 'ifacebox', 'style': 'margin:.25em;width:100px' }, [
 				E('div', { 'class': 'ifacebox-head', 'style': 'font-weight:bold' }, [ port.netdev.getName() ]),
 				E('div', { 'class': 'ifacebox-body' }, [
-					E('img', { 'src': L.resource('icons/port_%s.png').format(carrier ? 'up' : 'down') }),
+					E('img', { 'src': L.resource('icons/port_%s.svg').format(carrier ? 'up' : 'down') }),
 					E('br'),
 					formatSpeed(carrier, speed, duplex)
 				]),
