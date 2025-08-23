@@ -1,0 +1,23 @@
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8"
+
+#: applications/luci-app-uugamebooster/htdocs/luci-static/resources/view/uugamebooster.js:70
+msgid "Enable"
+msgstr "启用"
+
+#: applications/luci-app-uugamebooster/htdocs/luci-static/resources/view/uugamebooster.js:32
+#: applications/luci-app-uugamebooster/htdocs/luci-static/resources/view/uugamebooster.js:34
+msgid "UU GameAcc"
+msgstr "UU游戏加速器"
+
+#: applications/luci-app-uugamebooster/htdocs/luci-static/resources/view/uugamebooster.js:50
+msgid "UU Game Accelerator"
+msgstr "UU游戏加速器"
+
+#: applications/luci-app-uugamebooster/htdocs/luci-static/resources/view/uugamebooster.js:51
+msgid "A Paid Game Acceleration service"
+msgstr "一个付费主机游戏加速器 (开启服务后，使用手机APP绑定路由器并指定加速主机)"
+
+#: applications/luci-app-uugamebooster/htdocs/luci-static/resources/view/uugamebooster.js:64
+msgid "Collecting data..."
+msgstr "正在收集数据中..."
