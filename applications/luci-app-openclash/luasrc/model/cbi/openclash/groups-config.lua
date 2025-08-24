@@ -50,20 +50,14 @@ for t,f in ipairs(fs.glob("/etc/openclash/config/*"))do
 end
 
 o = s:option(ListValue, "type", translate("Group Type"))
-o.rmempty = true
+o.rmempty = false
 o.description = translate("Choose The Operation Mode")
 o:value("select", translate("Manual-Select"))
+o:value("smart", translate("Smart-Select"))
 o:value("url-test", translate("URL-Test"))
 o:value("fallback", translate("Fallback"))
 o:value("load-balance", translate("Load-Balance"))
 o:value("relay", translate("Relay-Traffic"))
-
-o = s:option(ListValue, "strategy", translate("Strategy Type"))
-o.rmempty = true
-o.description = translate("Choose The Load-Balance's Strategy Type")
-o:value("consistent-hashing", translate("Consistent-hashing"))
-o:value("round-robin", translate("Round-robin"))
-o:depends("type", "load-balance")
 
 o = s:option(Value, "name", translate("Group Name"))
 o.rmempty = false
@@ -73,23 +67,63 @@ o = s:option(ListValue, "disable_udp", translate("Disable UDP"))
 o:value("false", translate("Disable"))
 o:value("true", translate("Enable"))
 o.default = "false"
-o.rmempty = false
+o.rmempty = true
 
 o = s:option(Value, "test_url", translate("Test URL"))
 o:value("http://cp.cloudflare.com/generate_204")
 o:value("http://www.gstatic.com/generate_204")
 o:value("https://cp.cloudflare.com/generate_204")
-o.rmempty = false
+o.rmempty = true
 o:depends("type", "url-test")
 o:depends("type", "fallback")
 o:depends("type", "load-balance")
+o:depends("type", "smart")
 
 o = s:option(Value, "test_interval", translate("Test Interval(s)"))
 o.default = "300"
-o.rmempty = false
+o.rmempty = true
 o:depends("type", "url-test")
 o:depends("type", "fallback")
 o:depends("type", "load-balance")
+o:depends("type", "smart")
+
+o = s:option(ListValue, "strategy", translate("Strategy Type"))
+o.rmempty = true
+o.description = translate("Choose The Load-Balance's Strategy Type")
+o:value("round-robin", translate("Round-robin"))
+o:value("consistent-hashing", translate("Consistent-hashing"))
+o:value("sticky-sessions", translate("Sticky-sessions"))
+o:depends("type", "load-balance")
+
+o = s:option(ListValue, "strategy_smart", translate("Strategy Type"))
+o.rmempty = true
+o.description = translate("Choose The Smart's Strategy Type")
+o:value("round-robin", translate("Round-robin"))
+o:value("sticky-sessions", translate("Sticky-sessions"))
+o:depends("type", "smart")
+
+o = s:option(ListValue, "uselightgbm", translate("Uselightgbm"))
+o.description = translate("Use LightGBM Model For Smart Group Weight Prediction")
+o:value("false", translate("Disable"))
+o:value("true", translate("Enable"))
+o.default = "false"
+o.rmempty = true
+o:depends("type", "smart")
+
+o = s:option(ListValue, "collectdata", translate("Collectdata"))
+o.description = translate("Collect Datas For Smart Group Model Training")
+o:value("false", translate("Disable"))
+o:value("true", translate("Enable"))
+o.default = "false"
+o.rmempty = true
+o:depends("type", "smart")
+
+o = s:option(Value, "policy_priority", translate("Policy Priority"))
+o.description = translate("The Priority Of The Nodes, The Higher Than 1, The More Likely It Is To Be Selected, The Default Is 1, Support Regex")
+o.rmempty = true
+o.placeholder = "Premium:0.9;SG:1.3"
+o.rmempty = true
+o:depends("type", "smart")
 
 o = s:option(Value, "tolerance", translate("Tolerance(ms)"))
 o.default = "150"
@@ -100,18 +134,8 @@ o = s:option(Value, "policy_filter", translate("Provider Filter"))
 o.rmempty = true
 o.placeholder = "bgp|sg"
 
--- [[ interface-name ]]--
-o = s:option(Value, "interface_name", translate("interface-name"))
-o.rmempty = true
-o.placeholder = translate("eth0")
-
--- [[ routing-mark ]]--
-o = s:option(Value, "routing_mark", translate("routing-mark"))
-o.rmempty = true
-o.placeholder = translate("2333")
-
 o = s:option(DynamicList, "other_group", translate("Other Group (Support Regex)"))
-o.description = font_red..bold_on..translate("The Added Proxy Groups Must Exist Except 'DIRECT' & 'REJECT'")..bold_off..font_off
+o.description = font_red..bold_on..translate("The Added Proxy Groups Must Exist Except 'DIRECT' & 'REJECT' & 'REJECT-DROP' & 'PASS' & 'GLOBAL'")..bold_off..font_off
 o:value("all", translate("All Groups"))
 uci:foreach("openclash", "groups",
 		function(s)
@@ -121,6 +145,9 @@ uci:foreach("openclash", "groups",
 		end)
 o:value("DIRECT")
 o:value("REJECT")
+o:value("REJECT-DROP")
+o:value("PASS")
+o:value("GLOBAL")
 o.rmempty = true
 
 local t = {

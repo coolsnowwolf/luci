@@ -38,7 +38,7 @@ local function get_domain_excluded()
 	if not content then return nil end
 	local hosts = {}
 	string.gsub(content, '[^' .. "\n" .. ']+', function(w)
-		local s = w:gsub("^%s*(.-)%s*$", "%1") -- Trim
+		local s = api.trim(w)
 		if s == "" then return end
 		if s:find("#") and s:find("#") == 1 then return end
 		if not s:find("#") or s:find("#") ~= 1 then table.insert(hosts, s) end
@@ -58,10 +58,12 @@ function gen_outbound(flag, node, tag, proxy_table)
 		local proxy_tag = nil
 		local fragment = nil
 		local noise = nil
+		local run_socks_instance = true
 		if proxy_table ~= nil and type(proxy_table) == "table" then
 			proxy_tag = proxy_table.tag or nil
 			fragment = proxy_table.fragment or nil
 			noise = proxy_table.noise or nil
+			run_socks_instance = proxy_table.run_socks_instance
 		end
 
 		if node.type ~= "Xray" then
@@ -71,18 +73,20 @@ function gen_outbound(flag, node, tag, proxy_table)
 			if tag and node_id and tag ~= node_id then
 				config_file = string.format("%s_%s_%s_%s.json", flag, tag, node_id, new_port)
 			end
-			sys.call(string.format('/usr/share/%s/app.sh run_socks "%s"> /dev/null',
-				appname,
-				string.format("flag=%s node=%s bind=%s socks_port=%s config_file=%s relay_port=%s",
-					new_port, --flag
-					node_id, --node
-					"127.0.0.1", --bind
-					new_port, --socks port
-					config_file, --config file
-					(proxy_tag and relay_port) and tostring(relay_port) or "" --relay port
+			if run_socks_instance then
+				sys.call(string.format('/usr/share/%s/app.sh run_socks "%s"> /dev/null',
+					appname,
+					string.format("flag=%s node=%s bind=%s socks_port=%s config_file=%s relay_port=%s",
+						new_port, --flag
+						node_id, --node
+						"127.0.0.1", --bind
+						new_port, --socks port
+						config_file, --config file
+						(proxy_tag and relay_port) and tostring(relay_port) or "" --relay port
+						)
 					)
 				)
-			)
+			end
 			node = {}
 			node.protocol = "socks"
 			node.transport = "tcp"
@@ -150,18 +154,21 @@ function gen_outbound(flag, node, tag, proxy_table)
 				tlsSettings = (node.stream_security == "tls") and {
 					serverName = node.tls_serverName,
 					allowInsecure = (node.tls_allowInsecure == "1") and true or false,
-					fingerprint = (node.type == "Xray" and node.utls == "1" and node.fingerprint and node.fingerprint ~= "") and node.fingerprint or nil
+					fingerprint = (node.type == "Xray" and node.utls == "1" and node.fingerprint and node.fingerprint ~= "") and node.fingerprint or nil,
+					echConfigList = (node.ech == "1") and node.ech_config or nil,
+					echForceQuery = (node.ech == "1") and (node.ech_ForceQuery or "none") or nil
 				} or nil,
 				realitySettings = (node.stream_security == "reality") and {
 					serverName = node.tls_serverName,
 					publicKey = node.reality_publicKey,
 					shortId = node.reality_shortId or "",
 					spiderX = node.reality_spiderX or "/",
-					fingerprint = (node.type == "Xray" and node.fingerprint and node.fingerprint ~= "") and node.fingerprint or "chrome"
+					fingerprint = (node.type == "Xray" and node.fingerprint and node.fingerprint ~= "") and node.fingerprint or "chrome",
+					mldsa65Verify = (node.use_mldsa65Verify == "1") and node.reality_mldsa65Verify or nil
 				} or nil,
-				rawSettings = ((node.transport == "raw" or node.transport == "tcp") and node.protocol ~= "socks") and {
+				rawSettings = ((node.transport == "raw" or node.transport == "tcp") and node.protocol ~= "socks" and (node.tcp_guise and node.tcp_guise ~= "none")) and {
 					header = {
-						type = node.tcp_guise or "none",
+						type = node.tcp_guise,
 						request = (node.tcp_guise == "http") and {
 							path = node.tcp_guise_http_path or {"/"},
 							headers = {
@@ -179,7 +186,10 @@ function gen_outbound(flag, node, tag, proxy_table)
 					readBufferSize = tonumber(node.mkcp_readBufferSize),
 					writeBufferSize = tonumber(node.mkcp_writeBufferSize),
 					seed = (node.mkcp_seed and node.mkcp_seed ~= "") and node.mkcp_seed or nil,
-					header = {type = node.mkcp_guise}
+					header = {
+						type = node.mkcp_guise,
+						domain = node.mkcp_domain
+					}
 				} or nil,
 				wsSettings = (node.transport == "ws") and {
 					path = node.ws_path or "/",
@@ -369,19 +379,19 @@ function gen_config_server(node)
 			local fallbackStr = node.fallback_list[i]
 			if fallbackStr then
 				local tmp = {}
-				string.gsub(fallbackStr, '[^' .. "," .. ']+', function(w)
+				string.gsub(fallbackStr, '[^,]+', function(w)
 					table.insert(tmp, w)
 				end)
 				local dest = tmp[1] or ""
 				local path = tmp[2]
-				if dest:find("%.") then
-				else
+				local xver = tonumber(tmp[3])
+				if not dest:find("%.") then
 					dest = tonumber(dest)
 				end
 				fallbacks[i] = {
 					path = path,
 					dest = dest,
-					xver = 1
+					xver = xver
 				}
 			end
 		end
@@ -453,7 +463,8 @@ function gen_config_server(node)
 								certificateFile = node.tls_certificateFile,
 								keyFile = node.tls_keyFile
 							}
-						}
+						},
+						echServerKeys = (node.ech == "1") and node.ech_key or nil
 					} or nil,
 					rawSettings = (node.transport == "raw" or node.transport == "tcp") and {
 						header = {
@@ -475,7 +486,10 @@ function gen_config_server(node)
 						readBufferSize = tonumber(node.mkcp_readBufferSize),
 						writeBufferSize = tonumber(node.mkcp_writeBufferSize),
 						seed = (node.mkcp_seed and node.mkcp_seed ~= "") and node.mkcp_seed or nil,
-						header = {type = node.mkcp_guise}
+						header = {
+							type = node.mkcp_guise,
+							domain = node.mkcp_domain
+						}
 					} or nil,
 					wsSettings = (node.transport == "ws") and {
 						host = node.ws_host or nil,
@@ -535,7 +549,8 @@ function gen_config_server(node)
 				dest = node.reality_dest,
 				serverNames = node.reality_serverNames or {},
 				privateKey = node.reality_private_key,
-				shortIds = node.reality_shortId or ""
+				shortIds = node.reality_shortId or "",
+				mldsa65Seed = (node.use_mldsa65Seed == "1") and node.reality_mldsa65Seed or nil
 			} or nil
 		end
 	end
@@ -577,6 +592,7 @@ function gen_config(var)
 	local remote_dns_query_strategy = var["-remote_dns_query_strategy"]
 	local remote_dns_detour = var["-remote_dns_detour"]
 	local dns_cache = var["-dns_cache"]
+	local no_run = var["-no_run"]
 
 	local dns_domain_rules = {}
 	local dns = nil
@@ -584,7 +600,8 @@ function gen_config(var)
 	local inbounds = {}
 	local outbounds = {}
 	local routing = nil
-	local observatory = nil
+	local burstObservatory = nil
+ 	local strategy = nil
 	local COMMON = {}
 
 	local CACHE_TEXT_FILE = CACHE_PATH .. "/cache_" .. flag .. ".txt"
@@ -723,7 +740,7 @@ function gen_config(var)
 			end
 			if is_new_blc_node then
 				local blc_node = uci:get_all(appname, blc_node_id)
-				local outbound = gen_outbound(flag, blc_node, blc_node_tag, { fragment = xray_settings.fragment == "1" or nil, noise = xray_settings.noise == "1" or nil })
+				local outbound = gen_outbound(flag, blc_node, blc_node_tag, { fragment = xray_settings.fragment == "1" or nil, noise = xray_settings.noise == "1" or nil, run_socks_instance = not no_run })
 				if outbound then
 					outbound.tag = outbound.tag .. ":" .. blc_node.remarks
 					table.insert(outbounds, outbound)
@@ -749,7 +766,7 @@ function gen_config(var)
 			if is_new_node then
 				local fallback_node = uci:get_all(appname, fallback_node_id)
 				if fallback_node.protocol ~= "_balancing" then
-					local outbound = gen_outbound(flag, fallback_node, fallback_node_id, { fragment = xray_settings.fragment == "1" or nil, noise = xray_settings.noise == "1" or nil })
+					local outbound = gen_outbound(flag, fallback_node, fallback_node_id, { fragment = xray_settings.fragment == "1" or nil, noise = xray_settings.noise == "1" or nil, run_socks_instance = not no_run })
 					if outbound then
 						outbound.tag = outbound.tag .. ":" .. fallback_node.remarks
 						table.insert(outbounds, outbound)
@@ -758,19 +775,33 @@ function gen_config(var)
 				end
 			end
 		end
+		if _node.balancingStrategy == "leastLoad" then
+			strategy = {
+				type = _node.balancingStrategy,
+				settings = {
+					expected = _node.expected and tonumber(_node.expected) and tonumber(_node.expected) or 2,
+					maxRTT = "1s"
+				}
+			}
+		else
+			strategy = { type = _node.balancingStrategy or "random" }
+		end
 		table.insert(balancers, {
 			tag = balancer_tag,
 			selector = valid_nodes,
 			fallbackTag = fallback_node_tag,
-			strategy = { type = _node.balancingStrategy or "random" }
+			strategy = strategy
 		})
-		if _node.balancingStrategy == "leastPing" or fallback_node_tag then
-			if not observatory then
-				observatory = {
+		if _node.balancingStrategy == "leastPing" or _node.balancingStrategy == "leastLoad" or fallback_node_tag then
+			if not burstObservatory then
+				burstObservatory = {
 					subjectSelector = { "blc-" },
-					probeUrl = _node.useCustomProbeUrl and _node.probeUrl or nil,
-					probeInterval = _node.probeInterval or "1m",
-					enableConcurrency = true
+					pingConfig = {
+						destination = _node.useCustomProbeUrl and _node.probeUrl or nil,
+						interval = (api.format_go_time(_node.probeInterval) ~= "0s") and api.format_go_time(_node.probeInterval) or "1m",
+						sampling = 3,
+						timeout = "5s"
+					}
 				}
 			end
 		end
@@ -913,7 +944,8 @@ function gen_config(var)
 								})
 							end
 							local proxy_table = {
-								tag = use_proxy and preproxy_tag or nil
+								tag = use_proxy and preproxy_tag or nil,
+								run_socks_instance = not no_run
 							}
 							if not proxy_table.tag then
 								if xray_settings.fragment == "1" then
@@ -1029,6 +1061,7 @@ function gen_config(var)
 						domains = {}
 						string.gsub(e.domain_list, '[^' .. "\r\n" .. ']+', function(w)
 							if w:find("#") == 1 then return end
+							if w:find("rule-set:", 1, true) == 1 or w:find("rs:") == 1 then return end
 							table.insert(domains, w)
 							table.insert(domain_table.domain, w)
 						end)
@@ -1042,6 +1075,7 @@ function gen_config(var)
 						ip = {}
 						string.gsub(e.ip_list, '[^' .. "\r\n" .. ']+', function(w)
 							if w:find("#") == 1 then return end
+							if w:find("rule-set:", 1, true) == 1 or w:find("rs:") == 1 then return end
 							table.insert(ip, w)
 						end)
 						if #ip == 0 then ip = nil end
@@ -1125,7 +1159,7 @@ function gen_config(var)
 				sys.call(string.format("mkdir -p %s && touch %s/%s", api.TMP_IFACE_PATH, api.TMP_IFACE_PATH, node.iface))
 			end
 		else
-			local outbound = gen_outbound(flag, node, nil, { fragment = xray_settings.fragment == "1" or nil, noise = xray_settings.fragment == "1" or nil })
+			local outbound = gen_outbound(flag, node, nil, { fragment = xray_settings.fragment == "1" or nil, noise = xray_settings.noise == "1" or nil, run_socks_instance = not no_run })
 			if outbound then
 				outbound.tag = outbound.tag .. ":" .. node.remarks
 				COMMON.default_outbound_tag, last_insert_outbound = set_outbound_detour(node, outbound, outbounds)
@@ -1148,9 +1182,14 @@ function gen_config(var)
 	end
 	
 	if dns_listen_port then
-		local rules = {}
+		local direct_dns_tag = "dns-in-direct"
+		local remote_dns_tag = "dns-in-remote"
+		local remote_fakedns_tag = "dns-in-remote-fakedns"
+		local default_dns_tag = "dns-in-default"
+		local dns_servers = {}
+
 		local _remote_dns_proto = "tcp"
-	
+
 		if not routing then
 			routing = {
 				domainStrategy = "IPOnDemand",
@@ -1159,7 +1198,7 @@ function gen_config(var)
 		end
 	
 		dns = {
-			tag = "dns-in1",
+			tag = "dns-global",
 			hosts = {},
 			disableCache = (dns_cache and dns_cache == "0") and true or false,
 			disableFallback = true,
@@ -1195,7 +1234,7 @@ function gen_config(var)
 		local _remote_dns_ip = nil
 	
 		local _remote_dns = {
-			_flag = "remote",
+			tag = remote_dns_tag,
 			queryStrategy = (remote_dns_query_strategy and remote_dns_query_strategy ~= "") and remote_dns_query_strategy or "UseIPv4"
 		}
 
@@ -1223,17 +1262,10 @@ function gen_config(var)
 		end
 
 		if _remote_dns.address then
-			table.insert(dns.servers, _remote_dns)
-			if remote_dns_detour == "direct" then
-				table.insert(routing.rules, 1, {
-					ip = {
-						_remote_dns_ip
-					},
-					port = _remote_dns.port,
-					network = _remote_dns_proto,
-					outboundTag = "direct"
-				})
-			end
+			table.insert(dns_servers, {
+				outboundTag = remote_dns_detour == "direct" and "direct" or nil,
+				server = _remote_dns
+			})
 		end
 
 		local _remote_fakedns = nil
@@ -1256,10 +1288,12 @@ function gen_config(var)
 				table.insert(fakedns, fakedns6)
 			end
 			_remote_fakedns = {
-				_flag = "remote_fakedns",
+				tag = remote_fakedns_tag,
 				address = "fakedns",
 			}
-			table.insert(dns.servers, _remote_fakedns)
+			table.insert(dns_servers, {
+				server = _remote_fakedns
+			})
 		end
 	
 		local _direct_dns = nil
@@ -1271,27 +1305,25 @@ function gen_config(var)
 			end)
 			if #domain > 0 then
 				table.insert(dns_domain_rules, 1, {
+					shunt_rule_name = "logic-vpslist",
 					outboundTag = "direct",
 					domain = domain
 				})
 			end
 
 			_direct_dns = {
-				_flag = "direct",
+				tag = direct_dns_tag,
 				address = direct_dns_udp_server,
 				port = tonumber(direct_dns_udp_port) or 53,
 				queryStrategy = (direct_dns_query_strategy and direct_dns_query_strategy ~= "") and direct_dns_query_strategy or "UseIP",
 			}
-			table.insert(routing.rules, 1, {
-				ip = {
-					direct_dns_udp_server
-				},
-				port = tonumber(direct_dns_udp_port) or 53,
-				network = "udp",
-				outboundTag = "direct"
-			})
 
-			table.insert(dns.servers, _direct_dns)
+			if _direct_dns.address then
+				table.insert(dns_servers, {
+					outboundTag = "direct",
+					server = _direct_dns
+				})
+			end
 		end
 	
 		if dns_listen_port then
@@ -1342,37 +1374,39 @@ function gen_config(var)
 			})
 		end
 	
-		local default_dns_flag = "remote"
+		local default_dns_tag_name = remote_dns_tag
 		if (not COMMON.default_balancer_tag and not COMMON.default_outbound_tag) or COMMON.default_outbound_tag == "direct" then
-			default_dns_flag = "direct"
+			default_dns_tag_name = direct_dns_tag
 		end
 	
-		if dns.servers and #dns.servers > 0 then
-			local dns_servers = nil
-			for index, value in ipairs(dns.servers) do
-				if not dns_servers and value["_flag"] == default_dns_flag then
-					if value["_flag"] == "remote" and remote_dns_fake then
-						value["_flag"] = "default"
-						break
+		if dns_servers and #dns_servers > 0 then
+			-- Default DNS logic
+			local default_dns_server = nil
+			for index, value in ipairs(dns_servers) do
+				if not default_dns_server and value.server.tag == default_dns_tag_name then
+					default_dns_server = api.clone(value)
+					default_dns_server.server.tag = default_dns_tag
+					if value.server.tag == remote_dns_tag then
+						if remote_dns_fake then
+							default_dns_server.server = api.clone(_remote_fakedns)
+							default_dns_server.server.tag = default_dns_tag
+						else
+							default_dns_server.outboundTag = value.outboundTag or COMMON.default_outbound_tag
+							default_dns_server.balancerTag = COMMON.default_balancer_tag
+						end
 					end
-					dns_servers = {
-						_flag = "default",
-						address = value.address,
-						port = value.port,
-						queryStrategy = value.queryStrategy
-					}
+					table.insert(dns_servers, 1, default_dns_server)
 					break
 				end
 			end
-			if dns_servers then
-				table.insert(dns.servers, 1, dns_servers)
-			end
 
-			--按分流顺序DNS
+			-- Shunt rule DNS logic
 			if dns_domain_rules and #dns_domain_rules > 0 then
 				for index, value in ipairs(dns_domain_rules) do
 					if value.domain and (value.outboundTag or value.balancerTag) then
 						local dns_server = nil
+						local dns_outboundTag = value.outboundTag
+						local dns_balancerTag = value.balancerTag
 						if value.outboundTag == "direct" then
 							dns_server = api.clone(_direct_dns)
 						else
@@ -1380,47 +1414,67 @@ function gen_config(var)
 								dns_server = api.clone(_remote_fakedns)
 							else
 								dns_server = api.clone(_remote_dns)
+								if remote_dns_detour == "direct" then
+									dns_outboundTag = "direct"
+									dns_balancerTag = nil
+								end
 							end
 						end
 						dns_server.domains = value.domain
 						if value.shunt_rule_name then
-							dns_server["_flag"] = value.shunt_rule_name
+							dns_server.tag = "dns-in-" .. value.shunt_rule_name
 						end
 
 						if dns_server then
-							table.insert(dns.servers, dns_server)
+							table.insert(dns_servers, {
+								outboundTag = dns_outboundTag,
+								balancerTag = dns_balancerTag,
+								server = dns_server
+							})
 						end
 					end
 				end
 			end
 
-			for i = #dns.servers, 1, -1 do
-				local v = dns.servers[i]
-				if v["_flag"] ~= "default" then
-					if not v.domains or #v.domains == 0 then
-						table.remove(dns.servers, i)
+			for i = #dns_servers, 1, -1 do
+				local value = dns_servers[i]
+				if value.server.tag ~= direct_dns_tag and value.server.tag ~= remote_dns_tag then
+					-- DNS rule must be at the front, prevents being matched by rules.
+					if (value.outboundTag or value.balancerTag) and value.server.address ~= "fakedns" then
+						table.insert(routing.rules, 1, {
+							inboundTag = {
+								value.server.tag
+							},
+							outboundTag = value.outboundTag,
+							balancerTag = value.balancerTag
+						})
+					end
+					if (value.server.domains and #value.server.domains > 0) or value.server.tag == default_dns_tag then
+						-- Only keep default DNS server or has domains DNS server.
+						table.insert(dns.servers, 1, value.server)
 					end
 				end
 			end
 		end
-	
-		local default_rule_index = #routing.rules > 0 and #routing.rules or 1
+
+		local default_rule_index = nil
 		for index, value in ipairs(routing.rules) do
 			if value.ruleTag == "default" then
 				default_rule_index = index
 				break
 			end
 		end
-		for index, value in ipairs(rules) do
-			local t = rules[#rules + 1 - index]
-			table.insert(routing.rules, default_rule_index, t)
+		if default_rule_index then
+			local default_rule = api.clone(routing.rules[default_rule_index])
+			table.remove(routing.rules, default_rule_index)
+			table.insert(routing.rules, default_rule)
 		end
-	
+
 		local dns_hosts_len = 0
 		for key, value in pairs(dns.hosts) do
 			dns_hosts_len = dns_hosts_len + 1
 		end
-	
+
 		if dns_hosts_len == 0 then
 			dns.hosts = nil
 		end
@@ -1476,7 +1530,7 @@ function gen_config(var)
 			-- 传出连接
 			outbounds = outbounds,
 			-- 连接观测
-			observatory = observatory,
+			burstObservatory = burstObservatory,
 			-- 路由
 			routing = routing,
 			-- 本地策略
@@ -1550,7 +1604,7 @@ function gen_config(var)
 		end
 
 		for index, value in ipairs(config.outbounds) do
-			if not value["_flag_proxy_tag"] and value["_id"] and value.server and value.server_port then
+			if not value["_flag_proxy_tag"] and value["_id"] and value.server and value.server_port and not no_run then
 				sys.call(string.format("echo '%s' >> %s", value["_id"], api.TMP_PATH .. "/direct_node_list"))
 			end
 			for k, v in pairs(config.outbounds[index]) do
@@ -1708,7 +1762,7 @@ function gen_dns_config(var)
 		}
 	
 		dns = {
-			tag = "dns-in1",
+			tag = "dns-global",
 			hosts = {},
 			disableCache = (dns_cache == "1") and false or true,
 			disableFallback = true,
@@ -1757,7 +1811,7 @@ function gen_dns_config(var)
 			end
 
 			local _remote_dns = {
-				_flag = "remote"
+				tag = "dns-in-remote"
 			}
 	
 			if remote_dns_udp_server then
@@ -1803,7 +1857,7 @@ function gen_dns_config(var)
 			})
 
 			local _direct_dns = {
-				_flag = "direct"
+				tag = "dns-in-direct"
 			}
 	
 			if direct_dns_udp_server then
@@ -1887,7 +1941,7 @@ function gen_dns_config(var)
 	
 		table.insert(routing.rules, {
 			inboundTag = {
-				"dns-in1"
+				"dns-global"
 			},
 			outboundTag = dns_out_tag
 		})

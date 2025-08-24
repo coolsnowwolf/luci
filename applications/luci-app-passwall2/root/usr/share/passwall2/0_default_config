@@ -51,7 +51,7 @@ config global_rules
 config global_app
 	option xray_file '/usr/bin/xray'
 	option hysteria_file '/usr/bin/hysteria'
-	option singbox_file '/usr/bin/sing-box'
+	option sing_box_file '/usr/bin/sing-box'
 
 config global_subscribe
 	option filter_keyword_mode '1'
@@ -87,70 +87,108 @@ config nodes 'myshunt'
 config shunt_rules 'DirectGame'
 	option remarks 'DirectGame'
 	option network 'tcp,udp'
-	option domain_list 'api.steampowered.com
-regexp:\.cm.steampowered.com$
-regexp:\.steamserver.net$
+	option domain_list '# steam直连域名获取国内CDN走国内线路下载
+cm.steampowered.com
+steamserver.net
+
+# steam国内CDN华为云
+steampipe.steamcontent.tnkjmec.com
+# steam国内CDN白山云
+st.dl.eccdnx.com
+st.dl.bscstorage.net
+st.dl.pinyuncloud.com
+# steam国内CDN新流云(原金山云)(支持ipv6)
+dl.steam.clngaa.com
+# steam国内CDN网宿
+cdn.mileweb.cs.steampowered.com.8686c.com
+cdn-ws.content.steamchina.com
+# steam国内CDN腾讯云 (蒸汽中国独占)
+cdn-qc.content.steamchina.com
+# steam国内CDN阿里云(支持ipv6)
+cdn-ali.content.steamchina.com
+xz.pphimalayanrt.com
+lv.queniujq.cn
+alibaba.cdn.steampipe.steamcontent.com
+
+# 国内游戏geosite域名
 geosite:category-games@cn
+rule-set:remote:https://raw.githubusercontent.com/lyc8503/sing-box-rules/rule-set-geosite/geosite-category-games%40cn.srs
 '
 
-	option ip_list '103.10.124.0/24
-103.10.125.0/24
+	option ip_list '# steam直连IP
+45.121.184.0/24
+103.10.124.0/23
 103.28.54.0/24
 146.66.152.0/24
 146.66.155.0/24
 153.254.86.0/24
-155.133.224.0/23
-155.133.226.0/24
-155.133.227.0/24
+155.133.224.0/22
 155.133.230.0/24
-155.133.232.0/24
-155.133.233.0/24
+155.133.232.0/23
 155.133.234.0/24
-155.133.236.0/23
-155.133.238.0/24
-155.133.239.0/24
+155.133.236.0/22
 155.133.240.0/23
-155.133.245.0/24
+155.133.244.0/23
 155.133.246.0/24
-155.133.248.0/24
-155.133.249.0/24
-155.133.250.0/24
-155.133.251.0/24
-155.133.252.0/24
-155.133.253.0/24
-155.133.254.0/24
-155.133.255.0/24
-162.254.192.0/24
-162.254.193.0/24
-162.254.194.0/23
-162.254.195.0/24
-162.254.196.0/24
-162.254.197.0/24
-162.254.198.0/24
-162.254.199.0/24
-185.25.182.0/24
-185.25.183.0/24
-190.217.33.0/24
+155.133.248.0/21
+162.254.192.0/21
+185.25.182.0/23
+190.217.32.0/22
 192.69.96.0/22
-205.185.194.0/24
 205.196.6.0/24
-208.64.200.0/24
-208.64.201.0/24
-208.64.202.0/24
-208.64.203.0/24
-208.78.164.0/22'
+208.64.200.0/22
+208.78.164.0/22
+205.185.194.0/24'
 
 config shunt_rules 'ProxyGame'
 	option remarks 'ProxyGame'
-	option domain_list 'geosite:category-games
-domain:store.steampowered.com
-'
+	option domain_list '# steam 商店/客服/聊天/网页布局/API/二维码 代理URL
+steamcommunity.com
+www.steamcommunity.com
+store.steampowered.com
+checkout.steampowered.com
+api.steampowered.com
+help.steampowered.com
+login.steampowered.com
+store.akamai.steamstatic.com
+steambroadcast.akamaized.net
+steamvideo-a.akamaihd.net
+steamusercontent-a.akamaihd.net
+steamstore-a.akamaihd.net
+steamcommunity-a.akamaihd.net
+steamcdn-a.akamaihd.net
+steamuserimages-a.akamaihd.net
+community.akamai.steamstatic.com
+avatars.akamai.steamstatic.com
+community.steamstatic.com
+cdn.akamai.steamstatic.com
+avatars.steamstatic.com
+shared.akamai.steamstatic.com
+clan.akamai.steamstatic.com
+cdn.cloudflare.steamstatic.com
+community.cloudflare.steamstatic.com
+store.cloudflare.steamstatic.com
+avatars.cloudflare.steamstatic.com
+clan.cloudflare.steamstatic.com
+shared.cloudflare.steamstatic.com
+steam-chat.com
+steamcloud-ugc.storage.googleapis.com
+steamcloud-eu-ams.storage.googleapis.com
+steamcloud-eu-fra.storage.googleapis.com
+steamcloud-finland.storage.googleapis.com
+steamcloud-saopaulo.storage.googleapis.com
+steamcloud-singapore.storage.googleapis.com
+steamcloud-sydney.storage.googleapis.com
+steamcloud-taiwan.storage.googleapis.com
+steamcloud-eu.storage.googleapis.com
+
+geosite:category-games
+rule-set:remote:https://raw.githubusercontent.com/lyc8503/sing-box-rules/rule-set-geosite/geosite-category-games.srs'
 
 config shunt_rules 'Direct'
 	option network 'tcp,udp'
 	option remarks 'Direct'
-	option ip_list 'geoip:private
-114.114.114.114
+	option ip_list '114.114.114.114
 114.114.115.115
 223.5.5.5
 223.6.6.6
@@ -182,17 +220,20 @@ domain:xn--ngstr-lra8j.com'
 config shunt_rules 'Netflix'
 	option remarks 'Netflix'
 	option network 'tcp,udp'
-	option domain_list 'geosite:netflix'
+	option domain_list 'geosite:netflix
+rule-set:remote:https://raw.githubusercontent.com/lyc8503/sing-box-rules/rule-set-geosite/geosite-netflix.srs'
 	
 config shunt_rules 'OpenAI'
 	option remarks 'OpenAI'
 	option network 'tcp,udp'
-	option domain_list 'geosite:openai'
+	option domain_list 'geosite:openai
+rule-set:remote:https://raw.githubusercontent.com/lyc8503/sing-box-rules/rule-set-geosite/geosite-openai.srs'
 
 config shunt_rules 'Proxy'
 	option network 'tcp,udp'
 	option remarks 'Proxy'
-	option domain_list 'geosite:geolocation-!cn'
+	option domain_list 'geosite:geolocation-!cn
+rule-set:remote:https://raw.githubusercontent.com/lyc8503/sing-box-rules/rule-set-geosite/geosite-geolocation-!cn.srs'
 	option ip_list '149.154.160.0/20
 91.108.4.0/22
 91.108.56.0/24
@@ -221,8 +262,10 @@ config shunt_rules 'Proxy'
 config shunt_rules 'China'
 	option remarks 'China'
 	option network 'tcp,udp'
-	option ip_list 'geoip:cn'
-	option domain_list 'geosite:cn'
+	option ip_list 'geoip:cn
+rule-set:remote:https://raw.githubusercontent.com/lyc8503/sing-box-rules/rule-set-geoip/geoip-cn.srs'
+	option domain_list 'geosite:cn
+rule-set:remote:https://raw.githubusercontent.com/lyc8503/sing-box-rules/rule-set-geosite/geosite-cn.srs'
 
 config shunt_rules 'QUIC'
 	option remarks 'QUIC'
