@@ -34,7 +34,7 @@ return view.extend({
 		o.optional = false;
 		o.rmempty = false;
 		if (vrrp_scripts != '') {
-			for (i = 0; i < vrrp_scripts.length; i++) {
+			for (let i = 0; i < vrrp_scripts.length; i++) {
 				o.value(vrrp_scripts[i]['name']);
 			}
 		}
@@ -54,7 +54,9 @@ return view.extend({
 		var s, o;
 
 		s = m.section(form.GridSection, 'vrrp_script', _('VRRP Script'),
-			_('Adds a script to be executed periodically. Its exit code will be recorded for all VRRP instances and sync groups which are monitoring it'));
+			_('Adds a script to be executed periodically.') + ' ' +
+			_('Its exit code will be recorded for all VRRP ' +
+			  'instances and sync groups which are monitoring it'));
 		s.anonymous = true;
 		s.addremove = true;
 		s.nodescriptions = true;
