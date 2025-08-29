@@ -18,7 +18,7 @@ return view.extend({
 
 	render: function(data) {
 		var hosts = data[0];
-		var m, s, o;
+		let m, s, o;
 
 		m = new form.Map('keepalived');
 
@@ -64,7 +64,8 @@ return view.extend({
 		o.depends({ 'sync' : '1', 'sync_mode' : 'send' });
 
 		o = s.option(form.Value, 'sync_dir', _('Sync Directory'),
-			_('Sender will send files to this location of receiver. Must be same on Master/Backup'));
+			_('Sender will send files to this location of receiver.') + ' ' +
+			_('Must be same on Master/Backup'));
 		o.default = '/usr/share/keepalived/rsync';
 		o.optional = false;
 		o.rmempty = false;
