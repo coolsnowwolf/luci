@@ -151,6 +151,12 @@ msgstr "VFS 对象"
 msgid "Workgroup"
 msgstr "工作组"
 
+msgid "Auto Share"
+msgstr "自动共享"
+
+msgid "Auto share local disk which connected"
+msgstr "自动匿名共享路由器所连接的硬盘"
+
 #~ msgid "Browseable"
 #~ msgstr "可浏览"
 

@@ -11,10 +11,19 @@ s:tab("template", translate("Edit Template"))
 s:taboption("general", Value, "name", translate("Hostname"))
 s:taboption("general", Value, "description", translate("Description"))
 s:taboption("general", Value, "workgroup", translate("Workgroup"))
+
+e = s:taboption("general", Flag, "enabled", translate("Enabled"))
+e.rmempty = false
+e.default = "1"
+
 h = s:taboption("general", Flag, "homes", translate("Share home-directories"),
         translate("Allow system users to reach their home directories via " ..
                 "network shares"))
 h.rmempty = false
+a = s:taboption("general", Flag, "autoshare", translate("Auto Share"),
+        translate("Auto share local disk which connected"))
+a.rmempty = false
+a.default = "1"
 
 macos = s:taboption("general", Flag, "macos", translate("Enable macOS compatible shares"))
 macos.description = translate("Enables Apple's AAPL extension globally and adds macOS compatibility options to all shares.")
@@ -68,17 +77,18 @@ br.default = "yes"
 ro = s:option(Flag, "read_only", translate("Read-only"))
 ro.enabled = "yes"
 ro.disabled = "no"
-ro.default = "yes"
+ro.default = "no"
 
-s:option(Flag, "force_root", translate("Force Root"))
+fr = s:option(Flag, "force_root", translate("Force Root"))
+fr.default = "1"
+fr.rmempty = false
 
 au = s:option(Value, "users", translate("Allowed users"))
 au.rmempty = true
 
 go = s:option(Flag, "guest_ok", translate("Allow guests"))
-go.enabled = "yes"
-go.disabled = "no"
-go.default = "no"
+go.default = "1"
+go.rmempty = false
 
 gon = s:option(Flag, "guest_only", translate("Guests only"))
 gon.enabled = "yes"
