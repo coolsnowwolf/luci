@@ -39,6 +39,18 @@ if nixio.fs.access("/usr/sbin/winbindd") then
 	s:taboption("general", Flag, "disable_winbind", translate("Disable Winbind"))
 end
 
+e = s:taboption("general", Flag, "disable_async_io", translate("Disable Async IO"))
+e.rmempty = false
+e.default = "0"
+
+e = s:taboption("general", Flag, "allow_legacy_protocols", translate("Allow SMBv1 Protocols"))
+e.rmempty = false
+e.default = "0"
+
+e = s:taboption("general", Flag, "enable_extra_tuning", translate("Enable Extra Tuning"))
+e.rmempty = false
+e.default = "0"
+
 tmpl = s:taboption("template", Value, "_tmpl",
 	translate("Edit the template that is used for generating the samba configuration."), 
 	translate("This is the content of the file '/etc/samba/smb.conf.template' from which your samba configuration will be generated. " ..
@@ -75,9 +87,8 @@ br.disabled = "no"
 br.default = "yes"
 
 ro = s:option(Flag, "read_only", translate("Read-only"))
-ro.enabled = "yes"
-ro.disabled = "no"
-ro.default = "no"
+ro.default = "0"
+ro.rmempty = false
 
 fr = s:option(Flag, "force_root", translate("Force Root"))
 fr.default = "1"
@@ -94,6 +105,7 @@ gon = s:option(Flag, "guest_only", translate("Guests only"))
 gon.enabled = "yes"
 gon.disabled = "no"
 gon.default = "no"
+go.rmempty = false
 
 iown = s:option(Flag, "inherit_owner", translate("Inherit owner"))
 iown.enabled = "yes"

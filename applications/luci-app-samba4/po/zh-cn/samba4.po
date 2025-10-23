@@ -154,6 +154,15 @@ msgstr "工作组"
 msgid "Auto Share"
 msgstr "自动共享"
 
+msgid "Disable Async IO"
+msgstr "禁用 Async IO"
+
+msgid "Allow SMBv1 Protocols"
+msgstr "允许 SMBv1 协议"
+
+msgid "Enable Extra Tuning"
+msgstr "增强性能模式"
+
 msgid "Auto share local disk which connected"
 msgstr "自动匿名共享路由器所连接的硬盘"
 
