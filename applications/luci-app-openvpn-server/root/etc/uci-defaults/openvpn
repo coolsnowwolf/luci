@@ -48,7 +48,7 @@ uci -q batch <<-EOF >/dev/null
 EOF
 
 if [ ! -f "/etc/openvpn/pki/ca.crt" ]; then
-	sh /etc/openvpn/renewcert.sh 2>&1 >/dev/null
+	sh /etc/openvpn/renewcert.sh & 2>&1 >/dev/null
 fi
 
 rm -f /tmp/luci-indexcache
