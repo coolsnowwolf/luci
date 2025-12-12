@@ -2546,6 +2546,9 @@ td>table>tbody>tr>td,
   width: auto
 }
 
+.cbi-section-table-row>.cbi-value-field{
+	min-width: 10rem
+}
 /* progressbar */
 .cbi-progressbar {
   position: relative;
