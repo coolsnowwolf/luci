@@ -16,7 +16,7 @@ s = m:section(TypedSection, "defaults", translate("General Settings"))
 s.anonymous = true
 s.addremove = false
 
-s:option(Flag, "syn_flood", translate("Enable SYN-flood protection"))
+s:option(Flag, "synflood_protect", translate("Enable SYN-flood protection"))
 
 o = s:option(Flag, "drop_invalid", translate("Drop invalid packets"))
 
