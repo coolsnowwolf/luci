@@ -257,8 +257,8 @@ function defaults.set(self, opt, val)
 	return _set("firewall", self.sid, opt, val)
 end
 
-function defaults.syn_flood(self)
-	return (self:get("syn_flood") == "1")
+function defaults.synflood_protect(self)
+	return (self:get("synflood_protect") == "1")
 end
 
 function defaults.drop_invalid(self)
