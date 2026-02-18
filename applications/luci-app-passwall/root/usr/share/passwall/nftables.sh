@@ -1351,8 +1351,8 @@ add_firewall_rule() {
 
 	[ -d "${TMP_IFACE_PATH}" ] && {
 		for iface in $(ls ${TMP_IFACE_PATH}); do
-			nft "insert rule $NFTABLE_NAME $nft_output_chain oif $iface counter return"
-			nft "insert rule $NFTABLE_NAME PSW_OUTPUT_MANGLE_V6 oif $iface counter return"
+			nft "add rule $NFTABLE_NAME $nft_output_chain oif $iface counter return"
+			nft "add rule $NFTABLE_NAME PSW_OUTPUT_MANGLE_V6 oif $iface counter return"
 		done
 	}
 
@@ -1470,8 +1470,9 @@ stop() {
 		uci -q commit ${CONFIG}
 		#flush_table
 		flush_nftset
-		rm -rf /tmp/etc/passwall_tmp/singbox*
-		rm -rf /tmp/etc/passwall_tmp/dnsmasq*
+		rm -rf $TMP_PATH2/singbox*
+		rm -rf $TMP_PATH2/dnsmasq*
+		rm -rf $TMP_PATH2/geo_output
 	}
 	flush_include
 }

@@ -122,7 +122,7 @@ o.group = {"",""}
 o:depends("_node_sel_other", "1")
 o.remove = function(self, section)
 	local v = s.fields["shunt_udp_node"]:formvalue(section)
-	if not f then
+	if not v then
 		return m:del(section, self.option)
 	end
 end
@@ -212,10 +212,25 @@ o:value("dnsmasq", "Dnsmasq")
 o:value("chinadns-ng", translate("ChinaDNS-NG (recommended)"))
 if api.is_finded("smartdns") then
 	o:value("smartdns", "SmartDNS")
+	o.write = function(self, section, value)
+		if value ~= "smartdns" then
+			m:del(section, "group_domestic")
+		end
+		return ListValue.write(self, section, value)
+	end
+
 	o = s:taboption("DNS", Value, "group_domestic", translate("Domestic group name"))
 	o.placeholder = "local"
+	o.rmempty = false
 	o:depends("dns_shunt", "smartdns")
 	o.description = translate("You only need to configure domestic DNS packets in SmartDNS, and fill in the domestic DNS group name here.")
+	o.validate = function(self, value, section)
+		value = api.trim(value)
+		if value == "" then
+			return nil, translatef("%s cannot be empty.", "SmartDNS " .. translate("Domestic group name"))
+		end
+		return value
+	end
 end
 
 o = s:taboption("DNS", ListValue, "direct_dns_mode", translate("Direct DNS") .. " " .. translate("Request protocol"))
@@ -362,8 +377,8 @@ end
 
 o = s:taboption("DNS", ListValue, "xray_dns_mode", translate("Remote DNS") .. " " .. translate("Request protocol"))
 o.default = "tcp"
-o:value("udp", "UDP")
 o:value("tcp", "TCP")
+o:value("udp", "UDP")
 o:value("tcp+doh", "TCP + DoH (" .. translate("A/AAAA type") .. ")")
 o:depends("dns_mode", "xray")
 o:depends("smartdns_dns_mode", "xray")
@@ -371,23 +386,26 @@ o.cfgvalue = function(self, section)
 	return m:get(section, "v2ray_dns_mode")
 end
 o.write = function(self, section, value)
-	if s.fields["dns_mode"]:formvalue(section) == "xray" or s.fields["smartdns_dns_mode"]:formvalue(section) == "xray" then
+	local f = s.fields["smartdns_dns_mode"]
+	if s.fields["dns_mode"]:formvalue(section) == "xray" or (f and f:formvalue(section) == "xray") then
 		return m:set(section, "v2ray_dns_mode", value)
 	end
 end
 
 o = s:taboption("DNS", ListValue, "singbox_dns_mode", translate("Remote DNS") .. " " .. translate("Request protocol"))
 o.default = "tcp"
-o:value("udp", "UDP")
 o:value("tcp", "TCP")
+o:value("udp", "UDP")
 o:value("doh", "DoH")
+o:value("http3", "HTTP3(DoH3)")
 o:depends("dns_mode", "sing-box")
 o:depends("smartdns_dns_mode", "sing-box")
 o.cfgvalue = function(self, section)
 	return m:get(section, "v2ray_dns_mode")
 end
 o.write = function(self, section, value)
-	if s.fields["dns_mode"]:formvalue(section) == "sing-box" or s.fields["smartdns_dns_mode"]:formvalue(section) == "sing-box" then
+	local f = s.fields["smartdns_dns_mode"]
+	if s.fields["dns_mode"]:formvalue(section) == "sing-box" or (f and f:formvalue(section) == "sing-box") then
 		return m:set(section, "v2ray_dns_mode", value)
 	end
 end
@@ -440,6 +458,7 @@ o:value("https://doh.libredns.gr/ads,116.202.176.26", "116.202.176.26 (LibreDNS-
 o.validate = doh_validate
 o:depends({xray_dns_mode = "tcp+doh"})
 o:depends({singbox_dns_mode = "doh"})
+o:depends({singbox_dns_mode = "http3"})
 
 o = s:taboption("DNS", Value, "remote_dns_client_ip", translate("EDNS Client Subnet"))
 o.description = translate("Notify the DNS server when the DNS query is notified, the location of the client (cannot be a private IP address).") .. "<br />" ..

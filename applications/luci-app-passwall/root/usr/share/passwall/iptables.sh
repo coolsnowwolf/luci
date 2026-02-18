@@ -59,7 +59,7 @@ dst() {
 
 comment() {
 	local name=$(echo $1 | sed 's/ /_/g')
-	echo "-m comment --comment '$name'"
+	echo "-m comment --comment "${name}""
 }
 
 #解决端口超过15个ipt无效，支持单端口、端口范围
@@ -1313,8 +1313,8 @@ add_firewall_rule() {
 
 	[ -d "${TMP_IFACE_PATH}" ] && {
 		for iface in $(ls ${TMP_IFACE_PATH}); do
-			$ipt_n -I PSW_OUTPUT -o $iface -j RETURN
-			$ipt_m -I PSW_OUTPUT -o $iface -j RETURN
+			$ipt_n -A PSW_OUTPUT -o $iface -j RETURN
+			$ipt_m -A PSW_OUTPUT -o $iface -j RETURN
 		done
 	}
 
@@ -1421,7 +1421,6 @@ gen_include() {
 					ipset -! add $IPSET_WAN \${wan_ip}
 				done
 			}
-			fi
 		EOF
 		)
 	}
@@ -1486,8 +1485,9 @@ stop() {
 		uci -q delete ${CONFIG}.@global[0].flush_set
 		uci -q commit ${CONFIG}
 		flush_ipset
-		rm -rf /tmp/etc/passwall_tmp/singbox*
-		rm -rf /tmp/etc/passwall_tmp/dnsmasq*
+		rm -rf $TMP_PATH2/singbox*
+		rm -rf $TMP_PATH2/dnsmasq*
+		rm -rf $TMP_PATH2/geo_output
 	}
 	flush_include
 }
