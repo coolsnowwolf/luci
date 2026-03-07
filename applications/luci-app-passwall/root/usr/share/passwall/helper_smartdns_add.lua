@@ -188,7 +188,7 @@ if not REMOTE_GROUP or REMOTE_GROUP == "nil" then
 	sys.call('sed -i "/passwall/d" /etc/smartdns/custom.conf >/dev/null 2>&1')
 end
 
-local force_https_soa = uci:get(appname, "@global[0]", "force_https_soa") or 1
+local force_https_soa = uci:get(appname, "@global[0]", "force_https_soa") or 0
 local proxy_server_name = "passwall-proxy-server"
 config_lines = {
 	tonumber(LISTEN_PORT) ~= 0 and "bind [::]:" .. LISTEN_PORT .. "@lo" or "",

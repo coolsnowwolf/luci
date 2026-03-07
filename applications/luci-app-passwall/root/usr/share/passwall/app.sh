@@ -301,7 +301,7 @@ run_dns2socks() {
 }
 
 run_chinadns_ng() {
-	local _flag _listen_port _dns_local _dns_trust _no_ipv6_trust _use_direct_list _use_proxy_list _gfwlist _chnlist _default_mode _default_tag _no_logic_log _tcp_node _remote_fakedns
+	local _flag _listen_port _dns_local _dns_trust _no_ipv6_trust _use_direct_list _use_proxy_list _gfwlist _chnlist _default_mode _default_tag _no_logic_log _tcp_node _remote_fakedns _filter_https
 	local _extra_param=""
 	eval_set_val $@
 
@@ -313,7 +313,7 @@ run_chinadns_ng() {
 	_extra_param="${_extra_param} -USE_DIRECT_LIST ${_use_direct_list} -USE_PROXY_LIST ${_use_proxy_list} -USE_BLOCK_LIST ${_use_block_list}"
 	_extra_param="${_extra_param} -GFWLIST ${_gfwlist} -CHNLIST ${_chnlist} -NO_IPV6_TRUST ${_no_ipv6_trust} -DEFAULT_MODE ${_default_mode}"
 	_extra_param="${_extra_param} -DEFAULT_TAG ${_default_tag} -NFTFLAG ${nftflag} -NO_LOGIC_LOG ${_no_logic_log} -REMOTE_FAKEDNS ${_remote_fakedns}"
-	_extra_param="${_extra_param} -LOG_FILE ${_LOG_FILE}"
+	_extra_param="${_extra_param} -FILTER_HTTPS ${_filter_https} -LOG_FILE ${_LOG_FILE}"
 
 	lua $APP_PATH/helper_chinadns_add.lua ${_extra_param} > ${_CONF_FILE}
 	ln_run "$(first_type chinadns-ng)" chinadns-ng "${_LOG_FILE}" -C ${_CONF_FILE}
@@ -1478,7 +1478,8 @@ start_dns() {
 			_default_tag=$(config_t_get global chinadns_ng_default_tag smart) \
 			_no_logic_log=0 \
 			_tcp_node=${TCP_NODE} \
-			_remote_fakedns=${fakedns:-0}
+			_remote_fakedns=${fakedns:-0} \
+			_filter_https=$(config_t_get global force_https_soa 0)
 
 		USE_DEFAULT_DNS="chinadns_ng"
 	}
@@ -1694,7 +1695,8 @@ acl_app() {
 										_default_tag=${chinadns_ng_default_tag:-smart} \
 										_no_logic_log=1 \
 										_tcp_node=${tcp_node} \
-										_remote_fakedns=0
+										_remote_fakedns=${remote_fakedns:-0} \
+										_filter_https=${force_https_soa:-0}
 
 									use_default_dns="chinadns_ng"
 								}
@@ -1775,7 +1777,7 @@ acl_app() {
 				[ -n "$tcp_node" ] && {
 					local protocol=$(config_n_get $tcp_node protocol)
 					[ "$protocol" = "_shunt" ] && [ "$udp_node" != "default" ] && {
-						udp_node = "tcp"
+						udp_node="tcp"
 					}
 				}
 				if [ "$udp_node" = "default" ]; then
@@ -1834,7 +1836,7 @@ acl_app() {
 			}
 			unset enabled sid remarks sources interface tcp_no_redir_ports udp_no_redir_ports use_global_config tcp_node udp_node use_direct_list use_proxy_list use_block_list use_gfw_list chn_list tcp_proxy_mode udp_proxy_mode filter_proxy_ipv6 dns_mode remote_dns v2ray_dns_mode remote_dns_doh remote_dns_client_ip
 			unset _ip _mac _iprange _ipset _ip_or_mac source_list tcp_port udp_port config_file _extra_param
-			unset _china_ng_listen _chinadns_local_dns _direct_dns_mode chinadns_ng_default_tag dnsmasq_filter_proxy_ipv6
+			unset _china_ng_listen _chinadns_local_dns _direct_dns_mode chinadns_ng_default_tag dnsmasq_filter_proxy_ipv6 remote_fakedns force_https_soa
 		done
 		unset socks_port redir_port dns_port dnsmasq_port chinadns_port
 	}

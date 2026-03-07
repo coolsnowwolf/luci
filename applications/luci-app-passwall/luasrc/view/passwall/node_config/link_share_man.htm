@@ -684,6 +684,31 @@ local current_node = map:get(section)
 				params = params.substring(1);
 			}
 			url += params;
+		} else if (v_type === "sing-box" && opt.get(dom_prefix + "protocol").value === "naive") {
+			protocol = "naive+https";
+			var v_username = opt.get(dom_prefix + "username");
+			var v_password = opt.get(dom_prefix + "password");
+			var v_port = opt.get(dom_prefix + "port");
+			url = encodeURIComponent(v_username.value) +
+				":" + encodeURIComponent(v_password.value) +
+				"@" + _address +
+				":" + v_port.value + "?";
+
+			var params = "security=tls";
+			params += opt.query("sni", dom_prefix + "tls_serverName");
+			params += opt.query("insecure-concurrency", dom_prefix + "naive_insecure_concurrency");
+			params += opt.query("ech", dom_prefix + "ech_config");
+			params += opt.query("uot", dom_prefix + "uot");
+			if (opt.get(dom_prefix + "naive_quic")?.checked) {
+				protocol = "naive+quic";
+				params += opt.query("congestion_control", dom_prefix + "naive_congestion_control");
+			}
+
+			params += "#" + encodeURI(v_alias.value);
+			if (params[0] == "&") {
+				params = params.substring(1);
+			}
+			url += params;
 		}
 		if (url) {
 			url = protocol.toLowerCase() + "://" + url;
@@ -1038,10 +1063,7 @@ local current_node = map:get(section)
 						opt.set(dom_prefix + 'reality', false);
 						opt.set(dom_prefix + 'alpn', queryParam.alpn || 'default');
 						opt.set(dom_prefix + 'tls_serverName', queryParam.sni || '');
-						opt.set(dom_prefix + 'tls_allowInsecure', true);
-						if ((queryParam.allowinsecure ?? '0') === '0' && (queryParam.insecure ?? '0') === '0') {
-							opt.set(dom_prefix + 'tls_allowInsecure', false);
-						}
+						opt.set(dom_prefix + 'tls_allowInsecure', !((queryParam.allowinsecure ?? '0') === '0' && (queryParam.insecure ?? '0') === '0'));
 						if (queryParam.fp && queryParam.fp.trim() != "") {
 							opt.set(dom_prefix + 'utls', true);
 							opt.set(dom_prefix + 'fingerprint', queryParam.fp);
@@ -1287,21 +1309,12 @@ local current_node = map:get(section)
 			queryParam.security = queryParam.security || "tls";
 			opt.set(dom_prefix + 'tls', queryParam.security === "tls");
 			if (queryParam.security === "tls") {
-				var tls_serverName = queryParam.peer;
-				if (queryParam.sni) {
-					tls_serverName = queryParam.sni
-				}
-				tls_serverName = tls_serverName || "";
-				opt.set(dom_prefix + 'tls_serverName', tls_serverName);
+				opt.set(dom_prefix + 'tls_serverName', queryParam.peer || queryParam.sni || "");
 				opt.set(dom_prefix + 'alpn', queryParam.alpn || 'default');
 				opt.set(dom_prefix + 'tls_CertSha', queryParam.pcs || '');
 				opt.set(dom_prefix + 'tls_CertByName', queryParam.vcn || '');
 			}
-			opt.set(dom_prefix + 'tls_allowInsecure', true);
-			if ((queryParam.allowinsecure ?? '0') === '0' && (queryParam.insecure ?? '0') === '0') {
-				opt.set(dom_prefix + 'tls_allowInsecure', false);
-			}
-
+			opt.set(dom_prefix + 'tls_allowInsecure', !((queryParam.allowinsecure ?? '0') === '0' && (queryParam.insecure ?? '0') === '0'));
 			opt.set(dom_prefix + 'tcp_fast_open', queryParam.tfo);
 			opt.set(dom_prefix + 'use_finalmask', !!queryParam.fm);
 			opt.set(dom_prefix + 'finalmask', queryParam.fm || "");
@@ -1333,11 +1346,8 @@ local current_node = map:get(section)
 			opt.set(dom_prefix + 'uuid', ssm.id);
 			opt.set(dom_prefix + 'tls', ssm.tls === "tls");
 			if (ssm.tls === "tls") {
-				var tls_serverName = ssm.host;
-				if (ssm.sni) {
-					tls_serverName = ssm.sni
-				}
-				opt.set(dom_prefix + 'tls_serverName', tls_serverName);
+				opt.set(dom_prefix + 'tls_serverName', ssm.sni || ssm.host);
+				opt.set(dom_prefix + 'tls_allowInsecure', !((ssm.allowinsecure ?? '0') === '0' && (ssm.insecure ?? '0') === '0'));
 			}
 			ssm.net = ssm.net.toLowerCase();
 			if (ssm.net === "kcp" || ssm.net === "mkcp")
@@ -1449,10 +1459,7 @@ local current_node = map:get(section)
 					opt.set(dom_prefix + 'reality', false);
 					opt.set(dom_prefix + 'alpn', queryParam.alpn || 'default');
 					opt.set(dom_prefix + 'tls_serverName', queryParam.sni || '');
-					opt.set(dom_prefix + 'tls_allowInsecure', true);
-					if ((queryParam.allowinsecure ?? '0') === '0' && (queryParam.insecure ?? '0') === '0') {
-						opt.set(dom_prefix + 'tls_allowInsecure', false);
-					}
+					opt.set(dom_prefix + 'tls_allowInsecure', !((queryParam.allowinsecure ?? '0') === '0' && (queryParam.insecure ?? '0') === '0'));
 					if (queryParam.fp && queryParam.fp.trim() != "") {
 						opt.set(dom_prefix + 'utls', true);
 						opt.set(dom_prefix + 'fingerprint', queryParam.fp);
@@ -1610,9 +1617,7 @@ local current_node = map:get(section)
 			opt.set(dom_prefix + 'port', m.port || "443");
 
 			opt.set(dom_prefix + 'tls_serverName', queryParam.sni || "");
-			if (queryParam.insecure && queryParam.insecure == "1") {
-				opt.set(dom_prefix + 'tls_allowInsecure', true);
-			}
+			opt.set(dom_prefix + 'tls_allowInsecure', !((queryParam.allowinsecure ?? '0') === '0' && (queryParam.insecure ?? '0') === '0'));
 			opt.set(dom_prefix + 'tls_CertSha', queryParam.pcs || '');
 			opt.set(dom_prefix + 'tls_CertByName', queryParam.vcn || '');
 			if (m.hash) {
@@ -1660,10 +1665,7 @@ local current_node = map:get(section)
 			opt.set(dom_prefix + 'tuic_alpn', queryParam.alpn || 'default');
 			opt.set(dom_prefix + 'tls_serverName', queryParam.sni || '');
 			opt.set(dom_prefix + 'tls_disable_sni', queryParam.disable_sni === "1");
-			opt.set(dom_prefix + 'tls_allowInsecure', true);
-			if ((queryParam.allowinsecure ?? '0') === '0' && (queryParam.insecure ?? '0') === '0') {
-				opt.set(dom_prefix + 'tls_allowInsecure', false);
-			}
+			opt.set(dom_prefix + 'tls_allowInsecure', !((queryParam.allowinsecure ?? '0') === '0' && (queryParam.insecure ?? '0') === '0' && (queryParam.allow_insecure ?? '0') === '0'));
 			if (hash) {
 				opt.set('remarks', decodeURIComponent(hash.substr(1)));
 			}
@@ -1703,10 +1705,7 @@ local current_node = map:get(section)
 					opt.set(dom_prefix + 'reality', false);
 					opt.set(dom_prefix + 'alpn', queryParam.alpn || 'default');
 					opt.set(dom_prefix + 'tls_serverName', queryParam.sni || '');
-					opt.set(dom_prefix + 'tls_allowInsecure', true);
-					if ((queryParam.allowinsecure ?? '0') === '0' && (queryParam.insecure ?? '0') === '0') {
-						opt.set(dom_prefix + 'tls_allowInsecure', false);
-					}
+					opt.set(dom_prefix + 'tls_allowInsecure', !((queryParam.allowinsecure ?? '0') === '0' && (queryParam.insecure ?? '0') === '0'));
 					if (queryParam.fp && queryParam.fp.trim() != "") {
 						opt.set(dom_prefix + 'utls', true);
 						opt.set(dom_prefix + 'fingerprint', queryParam.fp);
@@ -1727,6 +1726,55 @@ local current_node = map:get(section)
 			}
 			if (m.hash) {
 				opt.set('remarks', decodeURIComponent(m.hash.substr(1)));
+			}
+		}
+		if (ssu[0] === "naive+https" || ssu[0] === "naive+quic") {
+			if (has_singbox) {
+				dom_prefix = "singbox_"
+				opt.set('type', "sing-box");
+			}
+			opt.set(dom_prefix + 'protocol', "naive");
+			var _parsedUrl = new URL("http://" + ssu[1]);
+			var username = _parsedUrl.username;
+			var password = _parsedUrl.password;
+			var hostname = _parsedUrl.hostname;
+			var port = _parsedUrl.port;
+			var search = _parsedUrl.search;
+			var hash = _parsedUrl.hash;
+			if (!username || !password) {  //某些链接会把username和password之间的:进行编码
+				const decoded = decodeURIComponent(username || password || "");
+				const i = decoded.indexOf(":");
+				if (i > -1) {
+					username = decoded.slice(0, i);
+					password = decoded.slice(i + 1);
+				}
+			}
+			opt.set(dom_prefix + 'username', decodeURIComponent(username));
+			opt.set(dom_prefix + 'password', decodeURIComponent(password));
+			opt.set(dom_prefix + 'address', unbracketIP(hostname));
+			opt.set(dom_prefix + 'port', port || "443");
+			var queryParam = {};
+			if (search.length > 1) {
+				var query = search.split('?')
+				var queryParams = query[1];
+				var queryArray = queryParams.split('&');
+				var params;
+				for (i = 0; i < queryArray.length; i++) {
+					params = queryArray[i].split('=');
+					queryParam[decodeURIComponent(params[0])] = decodeURIComponent(params[1] || '');
+				}
+			}
+			opt.set(dom_prefix + 'naive_insecure_concurrency', queryParam['insecure-concurrency'] || '0');
+			opt.set(dom_prefix + 'uot', (queryParam.uot ?? '0') === '1');
+			opt.set(dom_prefix + 'tls_serverName', queryParam.sni || '');
+			opt.set(dom_prefix + 'ech', !!queryParam.ech);
+			opt.set(dom_prefix + 'ech_config', queryParam.ech || '');
+			if (ssu[0] === "naive+quic") {
+				opt.set(dom_prefix + 'naive_quic', true);
+				opt.set(dom_prefix + 'naive_congestion_control', queryParam.congestion_control || 'bbr');
+			}
+			if (hash) {
+				opt.set('remarks', decodeURIComponent(hash.substr(1)));
 			}
 		}
 		if (dom_prefix && dom_prefix != null) {

@@ -90,14 +90,14 @@ function gen_config(var)
 		quic = {
 			initStreamReceiveWindow = (node.hysteria2_recv_window) and tonumber(node.hysteria2_recv_window) or nil,
 			initConnReceiveWindow = (node.hysteria2_recv_window_conn) and tonumber(node.hysteria2_recv_window_conn) or nil,
-			maxIdleTimeout = (function()
-						local timeoutStr = tostring(node.hysteria2_idle_timeout or "")
-						local timeout = tonumber(timeoutStr:match("^%d+"))
-						if timeout and timeout >= 4 and timeout <= 120 then
-							return tostring(timeout) .. "s"
-						end
-						return nil
-					end)(),
+			maxIdleTimeout = (function(t)
+				t = tonumber(tostring(t or "30"):match("^%d+"))
+				return (t and t >= 4 and t <= 120) and t .. "s" or "30s"
+			end)(node.hysteria2_idle_timeout),
+			keepAlivePeriod = (function(t)
+				t = tonumber(tostring(t or "0"):match("^%d+"))
+				return (t and t >= 2 and t <= 60) and t .. "s" or nil
+			end)(node.hysteria2_keep_alive_period),
 			disablePathMTUDiscovery = (node.hysteria2_disable_mtu_discovery) and true or false,
 		},
 		bandwidth = (node.hysteria2_up_mbps or node.hysteria2_down_mbps) and {

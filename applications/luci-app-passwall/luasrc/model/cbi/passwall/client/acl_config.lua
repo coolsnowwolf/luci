@@ -523,6 +523,11 @@ o.description = desc
 		.. "</ul>"
 o:depends({dns_shunt = "chinadns-ng", tcp_proxy_mode = "proxy", chn_list = "direct"})
 
+o = s:option(Flag, "force_https_soa", translate("Force HTTPS SOA"), translate("Force queries with qtype 65 to respond with an SOA record."))
+o.default = "0"
+o.rmempty = false
+o:depends({dns_shunt = "chinadns-ng"})
+
 o = s:option(ListValue, "use_default_dns", translate("Default DNS"))
 o.default = "direct"
 o:value("remote", translate("Remote DNS"))
