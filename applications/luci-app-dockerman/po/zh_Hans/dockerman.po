@@ -1,15 +1,14 @@
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2026-02-20 00:35+0000\n"
-"Last-Translator: 大王叫我来巡山 "
-"<hamburger2048@users.noreply.hosted.weblate.org>\n"
+"PO-Revision-Date: 2026-03-06 16:33+0000\n"
+"Last-Translator: nKsyn <e.nksyn@gmail.com>\n"
 "Language-Team: Chinese (Simplified Han script) <https://hosted.weblate.org/"
 "projects/openwrt/luciapplicationsdockerman/zh_Hans/>\n"
 "Language: zh_Hans\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.16.1-dev\n"
+"X-Generator: Weblate 5.17-dev\n"
 
 #: applications/luci-app-dockerman/htdocs/luci-static/resources/view/dockerman/container_new.js:487
 msgid "/mnt/path"
@@ -132,7 +131,7 @@ msgstr "块 IO 权重"
 #: applications/luci-app-dockerman/htdocs/luci-static/resources/view/dockerman/container_new.js:721
 msgid ""
 "Block IO weight (relative weight) accepts a weight value between 10 and 1000."
-msgstr "块 IO 权重(相对权重)接受10到1000之间的数值。"
+msgstr "块 IO 权重（相对权重）的有效值为 10 到 1000 之间的数值。"
 
 #: applications/luci-app-dockerman/htdocs/luci-static/resources/view/dockerman/network_new.js:59
 msgid "Bridge (Support direct communication between MAC VLANs)"
@@ -465,7 +464,7 @@ msgstr "DNS 名称"
 
 #: applications/luci-app-dockerman/htdocs/luci-static/resources/view/dockerman/configuration.js:73
 msgid "Debug"
-msgstr "调试"
+msgstr "调试 (Debug)"
 
 #: applications/luci-app-dockerman/htdocs/luci-static/resources/view/dockerman/configuration.js:57
 msgid "Default bridge"
@@ -610,7 +609,7 @@ msgstr "复制/编辑"
 
 #: applications/luci-app-dockerman/htdocs/luci-static/resources/view/dockerman/container_new.js:66
 msgid "Duplicate/Edit Container: %s"
-msgstr "复制/编辑容器： %s"
+msgstr "复制/编辑容器：%s"
 
 #: applications/luci-app-dockerman/htdocs/luci-static/resources/dockerman/common.js:422
 msgid "Edit"
@@ -676,7 +675,7 @@ msgstr "环境变量 (-e)"
 #: applications/luci-app-dockerman/htdocs/luci-static/resources/view/dockerman/container.js:1816
 #: applications/luci-app-dockerman/htdocs/luci-static/resources/view/dockerman/container.js:1924
 msgid "Error"
-msgstr "错误"
+msgstr "错误 (Error)"
 
 #: applications/luci-app-dockerman/htdocs/luci-static/resources/view/dockerman/container.js:1673
 #: applications/luci-app-dockerman/htdocs/luci-static/resources/view/dockerman/container.js:1687
@@ -693,7 +692,7 @@ msgstr "示例："
 
 #: applications/luci-app-dockerman/htdocs/luci-static/resources/view/dockerman/configuration.js:84
 msgid "Example: tcp://0.0.0.0:2375"
-msgstr "示例： tcp：//0.0.0.0：2375"
+msgstr "示例：tcp：//0.0.0.0：2375"
 
 #: applications/luci-app-dockerman/htdocs/luci-static/resources/view/dockerman/network_new.js:118
 msgid "Exclude IPs"
@@ -722,11 +721,11 @@ msgstr "未能连接到控制面板"
 
 #: applications/luci-app-dockerman/htdocs/luci-static/resources/view/dockerman/overview.js:90
 msgid "Failed to execute \"/etc/init.d/%s %s\" action: %s"
-msgstr "执行 \"/etc/init.d/%s %s\" 操作失败： %s"
+msgstr "执行 \"/etc/init.d/%s %s\" 操作失败：%s"
 
 #: applications/luci-app-dockerman/htdocs/luci-static/resources/view/dockerman/events.js:321
 msgid "Failed to load events: %s"
-msgstr "加载事件失败： %s"
+msgstr "加载事件失败：%s"
 
 #: applications/luci-app-dockerman/htdocs/luci-static/resources/view/dockerman/container.js:1675
 #: applications/luci-app-dockerman/htdocs/luci-static/resources/view/dockerman/container.js:1686
@@ -951,7 +950,7 @@ msgstr "索引服务器地址"
 #: applications/luci-app-dockerman/htdocs/luci-static/resources/view/dockerman/network.js:57
 #: applications/luci-app-dockerman/htdocs/luci-static/resources/view/dockerman/overview.js:161
 msgid "Info"
-msgstr "信息"
+msgstr "信息 (Info)"
 
 #: applications/luci-app-dockerman/htdocs/luci-static/resources/view/dockerman/network.js:73
 #: applications/luci-app-dockerman/htdocs/luci-static/resources/view/dockerman/network_new.js:72
@@ -1135,7 +1134,7 @@ msgstr "跃点数"
 
 #: applications/luci-app-dockerman/htdocs/luci-static/resources/view/dockerman/container_new.js:679
 msgid "Microseconds of CPU time that the container can get in a CPU period"
-msgstr "容器在一个 CPU 周期可以获得的 CPU 时间（单位： 微秒）"
+msgstr "容器在一个 CPU 周期可以获得的 CPU 时间（单位：微秒）"
 
 #: applications/luci-app-dockerman/htdocs/luci-static/resources/view/dockerman/container.js:1649
 msgid "Missing header or CORS interfering"
@@ -1308,11 +1307,11 @@ msgstr "无卷可用"
 #: applications/luci-app-dockerman/htdocs/luci-static/resources/view/dockerman/configuration.js:83
 msgid ""
 "Note that dockerd no longer listens on IP:port without TLS options after v27."
-msgstr "注意： v27 版本后的 dockerd 不再监听没有 TLS 选项的 IP：port。"
+msgstr "注意：v27 版本后的 dockerd 不再监听没有 TLS 选项的 IP：port。"
 
 #: applications/luci-app-dockerman/htdocs/luci-static/resources/view/dockerman/containers.js:51
 msgid "Note: docker provides no container import facility."
-msgstr "注： docker 不提供容器导入工具。"
+msgstr "注：docker 不提供容器导入工具。"
 
 #: applications/luci-app-dockerman/htdocs/luci-static/resources/view/dockerman/events.js:116
 #: applications/luci-app-dockerman/htdocs/luci-static/resources/view/dockerman/events.js:151
@@ -1370,7 +1369,7 @@ msgstr "覆盖网络"
 
 #: applications/luci-app-dockerman/root/usr/share/luci/menu.d/luci-app-dockerman.json:19
 msgid "Overview"
-msgstr "概况"
+msgstr "概览"
 
 #: applications/luci-app-dockerman/htdocs/luci-static/resources/view/dockerman/container.js:839
 msgid "PID"
@@ -1486,27 +1485,27 @@ msgstr "进程"
 
 #: applications/luci-app-dockerman/htdocs/luci-static/resources/view/dockerman/container_new.js:319
 msgid "Propagation: private"
-msgstr "传播： private"
+msgstr "传播：private"
 
 #: applications/luci-app-dockerman/htdocs/luci-static/resources/view/dockerman/container_new.js:320
 msgid "Propagation: rprivate"
-msgstr "传播： rprivate"
+msgstr "传播：rprivate"
 
 #: applications/luci-app-dockerman/htdocs/luci-static/resources/view/dockerman/container_new.js:322
 msgid "Propagation: rshared"
-msgstr "传播： rshared"
+msgstr "传播：rshared"
 
 #: applications/luci-app-dockerman/htdocs/luci-static/resources/view/dockerman/container_new.js:324
 msgid "Propagation: rslave"
-msgstr "传播： rslave"
+msgstr "传播：rslave"
 
 #: applications/luci-app-dockerman/htdocs/luci-static/resources/view/dockerman/container_new.js:321
 msgid "Propagation: shared"
-msgstr "传播： shared"
+msgstr "传播：shared"
 
 #: applications/luci-app-dockerman/htdocs/luci-static/resources/view/dockerman/container_new.js:323
 msgid "Propagation: slave"
-msgstr "传播： slave"
+msgstr "传播：slave"
 
 #: applications/luci-app-dockerman/htdocs/luci-static/resources/dockerman/common.js:429
 msgid "Prune"
@@ -1708,7 +1707,7 @@ msgstr "状态"
 
 #: applications/luci-app-dockerman/htdocs/luci-static/resources/view/dockerman/container.js:695
 msgid "Stats"
-msgstr "数据"
+msgstr "统计"
 
 #: applications/luci-app-dockerman/htdocs/luci-static/resources/view/dockerman/container.js:458
 #: applications/luci-app-dockerman/htdocs/luci-static/resources/view/dockerman/container.js:706
@@ -1817,7 +1816,7 @@ msgstr "容器使用的主机名"
 
 #: applications/luci-app-dockerman/htdocs/luci-static/resources/view/dockerman/container_new.js:673
 msgid "The length of a CPU period in microseconds"
-msgstr "CPU 周期长度（单位： 微秒）"
+msgstr "CPU 周期长度（单位：微秒）"
 
 #: applications/luci-app-dockerman/htdocs/luci-static/resources/view/dockerman/container_new.js:728
 msgid "The logging configuration for this container"
@@ -1827,7 +1826,7 @@ msgstr "该容器的日志记录配置"
 msgid ""
 "The user that commands are run as inside the container. (format: name|"
 "uid[:group|gid])"
-msgstr "容器内运行命令的用户。（格式： name|uid[:group|gid]）"
+msgstr "容器内运行命令的用户。（格式：name|uid[:group|gid]）"
 
 #: applications/luci-app-dockerman/htdocs/luci-static/resources/view/dockerman/containers.js:50
 msgid ""
@@ -2014,7 +2013,7 @@ msgstr "卷概览"
 #: applications/luci-app-dockerman/htdocs/luci-static/resources/view/dockerman/configuration.js:75
 #: applications/luci-app-dockerman/htdocs/luci-static/resources/view/dockerman/container.js:1755
 msgid "Warning"
-msgstr "警告"
+msgstr "警告 (Warning)"
 
 #: applications/luci-app-dockerman/htdocs/luci-static/resources/view/dockerman/container.js:1070
 msgid "WebSocket"

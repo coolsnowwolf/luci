@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2026-02-19 02:41+0000\n"
+"PO-Revision-Date: 2026-02-28 09:36+0000\n"
 "Last-Translator: EESF-2 <eesf-2@users.noreply.hosted.weblate.org>\n"
 "Language-Team: Chinese (Traditional Han script) <https://hosted.weblate.org/"
 "projects/openwrt/luciapplicationslldpd/zh_Hant/>\n"
@@ -57,7 +57,7 @@ msgstr "行為"
 
 #: applications/luci-app-lldpd/htdocs/luci-static/resources/view/lldpd/config.js:356
 msgid "Building"
-msgstr ""
+msgstr "建置中"
 
 #: applications/luci-app-lldpd/htdocs/luci-static/resources/view/lldpd/config.js:716
 msgid ""
@@ -103,7 +103,7 @@ msgstr ""
 
 #: applications/luci-app-lldpd/htdocs/luci-static/resources/view/lldpd/status.js:46
 #: applications/luci-app-lldpd/htdocs/luci-static/resources/view/lldpd/status.js:65
-#: applications/luci-app-lldpd/htdocs/luci-static/resources/view/lldpd/status.js:613
+#: applications/luci-app-lldpd/htdocs/luci-static/resources/view/lldpd/status.js:614
 msgid "Collecting data..."
 msgstr "收集資料中..."
 
@@ -168,7 +168,7 @@ msgstr ""
 msgid "Disabled"
 msgstr "已停用"
 
-#: applications/luci-app-lldpd/htdocs/luci-static/resources/view/lldpd/status.js:619
+#: applications/luci-app-lldpd/htdocs/luci-static/resources/view/lldpd/status.js:620
 msgid "Discovered Neighbors"
 msgstr ""
 
@@ -308,15 +308,15 @@ msgstr "傳入"
 
 #: applications/luci-app-lldpd/htdocs/luci-static/resources/view/lldpd/status.js:60
 msgid "Insert count"
-msgstr ""
+msgstr "插入計數"
 
 #: applications/luci-app-lldpd/htdocs/luci-static/resources/view/lldpd/config.js:666
 msgid "Interface MAC address"
 msgstr "介面 MAC 位址"
 
-#: applications/luci-app-lldpd/htdocs/luci-static/resources/view/lldpd/status.js:620
+#: applications/luci-app-lldpd/htdocs/luci-static/resources/view/lldpd/status.js:621
 msgid "Interface Statistics"
-msgstr "介面統計資訊"
+msgstr "介面統計資料"
 
 #: applications/luci-app-lldpd/htdocs/luci-static/resources/view/lldpd/config.js:667
 #: applications/luci-app-lldpd/htdocs/luci-static/resources/view/lldpd/status.js:112
@@ -338,13 +338,13 @@ msgstr ""
 msgid "LLDP"
 msgstr "LLDP"
 
-#: applications/luci-app-lldpd/htdocs/luci-static/resources/view/lldpd/status.js:603
+#: applications/luci-app-lldpd/htdocs/luci-static/resources/view/lldpd/status.js:604
 msgid "LLDP Status"
 msgstr "LLDP 狀態"
 
 #: applications/luci-app-lldpd/htdocs/luci-static/resources/view/lldpd/config.js:583
 msgid "LLDP-MED device class"
-msgstr ""
+msgstr "LLDP-MED 裝置類別"
 
 #: applications/luci-app-lldpd/htdocs/luci-static/resources/view/lldpd/config.js:625
 msgid "LLDP-MED fast-start"
@@ -385,7 +385,7 @@ msgstr ""
 msgid "Latitude"
 msgstr "緯度"
 
-#: applications/luci-app-lldpd/htdocs/luci-static/resources/view/lldpd/status.js:608
+#: applications/luci-app-lldpd/htdocs/luci-static/resources/view/lldpd/status.js:609
 msgid "Local Chassis"
 msgstr ""
 
@@ -464,9 +464,9 @@ msgstr "網路介面"
 msgid "Network Interfaces"
 msgstr "網路介面"
 
-#: applications/luci-app-lldpd/htdocs/luci-static/resources/view/lldpd/status.js:562
-#: applications/luci-app-lldpd/htdocs/luci-static/resources/view/lldpd/status.js:592
-#: applications/luci-app-lldpd/htdocs/luci-static/resources/view/lldpd/status.js:596
+#: applications/luci-app-lldpd/htdocs/luci-static/resources/view/lldpd/status.js:563
+#: applications/luci-app-lldpd/htdocs/luci-static/resources/view/lldpd/status.js:593
+#: applications/luci-app-lldpd/htdocs/luci-static/resources/view/lldpd/status.js:597
 msgid "No data to display"
 msgstr "沒有資料可以顯示"
 
@@ -641,7 +641,7 @@ msgstr "系統主機名稱"
 
 #: applications/luci-app-lldpd/htdocs/luci-static/resources/view/lldpd/config.js:436
 msgid "System management IO"
-msgstr ""
+msgstr "系統管理 IO"
 
 #: applications/luci-app-lldpd/htdocs/luci-static/resources/view/lldpd/config.js:429
 msgid "System management IO advertisements"
@@ -682,7 +682,7 @@ msgid ""
 "The delay between transmissions of LLDP PDU. The default value is 30 seconds."
 msgstr ""
 
-#: applications/luci-app-lldpd/htdocs/luci-static/resources/view/lldpd/status.js:604
+#: applications/luci-app-lldpd/htdocs/luci-static/resources/view/lldpd/status.js:605
 msgid ""
 "This page allows you to see discovered LLDP neighbors, local interfaces "
 "statistics and local chassis information."
@@ -755,11 +755,11 @@ msgstr "已啟用"
 
 #: applications/luci-app-lldpd/htdocs/luci-static/resources/lldpd.js:48
 msgid "keep only one neighbor"
-msgstr ""
+msgstr "僅保留一個鄰居"
 
 #: applications/luci-app-lldpd/htdocs/luci-static/resources/lldpd.js:47
 msgid "keep only one protocol"
-msgstr ""
+msgstr "僅保留一個協定"
 
 #: applications/luci-app-lldpd/htdocs/luci-static/resources/view/lldpd/config.js:929
 msgid "replace"

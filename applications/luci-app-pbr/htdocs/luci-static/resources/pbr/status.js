@@ -11,10 +11,10 @@ var pkg = {
 		return "pbr";
 	},
 	get LuciCompat() {
-		return 24;
+		return 25;
 	},
 	get ReadmeCompat() {
-		return "1.2.1";
+		return "1.2.2";
 	},
 	get URL() {
 		return (
@@ -125,31 +125,39 @@ var RPC = {
 		});
 	},
 	setInitAction: function (name, action) {
-		_setInitAction(name, action).then(
-			function (result) {
-				this.emit("setInitAction", result);
-			}.bind(this),
-		);
+		_setInitAction(name, action)
+			.then(
+				function (result) {
+					this.emit("setInitAction", { result: result, action: action });
+				}.bind(this),
+			)
+			.catch(
+				function (error) {
+					// Even if RPC call fails/times out, emit event to start polling
+					// This handles cases where the backend task starts but RPC times out
+					this.emit("setInitAction", { timeout: true, action: action });
+				}.bind(this),
+			);
 	},
 };
 
-// Poll service status until completion (for long-running operations like download)
-var pollServiceStatus = function (callback) {
+// Poll service status until the expected running state is reached.
+// expectRunning: true for start/restart, false for stop.
+var pollServiceStatus = function (expectRunning, callback) {
 	var maxAttempts = 300; // Max 5 minutes of polling
 	var attempt = 0;
 
 	var checkStatus = function () {
 		attempt++;
 
-		// Use the RPC function directly from the module scope
 		L.resolveDefault(getInitStatus(pkg.Name), {})
 			.then(function (statusData) {
-				var currentStatus =
+				var isRunning =
 					statusData && statusData[pkg.Name] && statusData[pkg.Name].running;
 
-				// Check if completed or failed
-				if (currentStatus === true) {
-					callback(true, currentStatus);
+				// Check if the expected state has been reached
+				if (expectRunning ? isRunning === true : isRunning !== true) {
+					callback(true);
 				}
 				// Check if timed out
 				else if (attempt >= maxAttempts) {
@@ -157,7 +165,7 @@ var pollServiceStatus = function (callback) {
 				}
 				// Continue polling
 				else {
-					setTimeout(checkStatus, 1000); // Check again in 1 second
+					setTimeout(checkStatus, 1000);
 				}
 			})
 			.catch(function (err) {
@@ -170,7 +178,7 @@ var pollServiceStatus = function (callback) {
 			});
 	};
 
-	// Start polling after 2 seconds delay (give backend time to start the task)
+	// Start polling after a delay to give the backend time to start the task
 	setTimeout(checkStatus, 3000);
 };
 
@@ -364,7 +372,7 @@ var status = baseclass.extend({
 					{ class: "cbi-value-title" },
 					_("Service Warnings"),
 				);
-				var text = "";
+				text = "";
 				reply.ubus.warnings.forEach((element) => {
 					if (element.code && warningTable[element.code]) {
 						text += pkg.formatMessage(element.info, warningTable[element.code]);
@@ -373,7 +381,7 @@ var status = baseclass.extend({
 					}
 				});
 				text += _("Warnings encountered, please check the %sREADME%s").format(
-					'<a href="' + pkg.URL + '#WarningMessagesDetails" target="_blank">',
+					'<a href="' + pkg.URL + '#warning-messages-details" target="_blank">',
 					"</a>!<br />",
 				);
 				var warningsText = E("div", { class: "cbi-value-description" }, text);
@@ -522,26 +530,13 @@ var status = baseclass.extend({
 					errorUplinkDown: _(
 						"Uplink/WAN interface is still down, increase value of 'procd_boot_trigger_delay' option",
 					),
-					errorUnexpectedExit: _(
-						"Unexpected exit or service termination: '%s'",
-					),
-					errorNoDownloadWithSecureReload: _(
-						"Policy '%s' refers to URL which can't be downloaded in 'secure_reload' mode",
-					),
-					errorIncompatibleUserFile: _(
-						"Incompatible custom user file detected '%s'",
-					),
-					errorTryFailed: _("Command failed: '%s'"),
-					errorMktempFileCreate: _(
-						"Failed to create temporary file with mktemp mask: '%s'",
-					),
 				};
 				var errorsTitle = E(
 					"label",
 					{ class: "cbi-value-title" },
 					_("Service Errors"),
 				);
-				var text = "";
+				text = "";
 				reply.ubus.errors.forEach((element) => {
 					if (element.code && errorTable[element.code]) {
 						text += pkg.formatMessage(element.info, errorTable[element.code]);
@@ -550,7 +545,7 @@ var status = baseclass.extend({
 					}
 				});
 				text += _("Errors encountered, please check the %sREADME%s").format(
-					'<a href="' + pkg.URL + '#ErrorMessagesDetails" target="_blank">',
+					'<a href="' + pkg.URL + '#error-messages-details" target="_blank">',
 					"</a>!<br />",
 				);
 				var errorsText = E("div", { class: "cbi-value-description" }, text);
@@ -740,12 +735,24 @@ var status = baseclass.extend({
 });
 
 RPC.on("setInitAction", function (reply) {
-	// Don't immediately hide modal and reload
-	// Instead, poll status until the operation actually completes
-	pollServiceStatus(function () {
+	var action = reply && reply.action;
+	if (action === "start" || action === "restart" || action === "reload") {
+		// Long-running: poll until service is running
+		pollServiceStatus(true, function () {
+			ui.hideModal();
+			location.reload();
+		});
+	} else if (action === "stop") {
+		// Poll until service has stopped
+		pollServiceStatus(false, function () {
+			ui.hideModal();
+			location.reload();
+		});
+	} else {
+		// enable/disable are fast, just reload immediately
 		ui.hideModal();
 		location.reload();
-	});
+	}
 });
 
 return L.Class.extend({
