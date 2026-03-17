@@ -149,7 +149,7 @@ return view.extend({
 		o.value('/usr/share/wechatpush/api/telegram.json', _('Telegram'),
 			_('Telegram Bot Push'));
 		o.value('/usr/share/wechatpush/api/msmtp.json', _('msmtp'),
-			_('To send emails using msmtp, you must manually install msmtp and configure `/etc/msmtprc`.'));
+			_('To send emails using msmtp, you can manually install msmtp and configure `/etc/msmtprc`, or configure the SMTP service here to override the default msmtp configuration file.'));
 		o.value('/usr/share/wechatpush/api/diy.json', _('Custom Push'),
 			_('By modifying the JSON file, you can use a custom API'));
 
@@ -222,19 +222,60 @@ return view.extend({
 		o.rmempty = false;
 		o.depends('jsonpath', '/usr/share/wechatpush/api/pushplus.json');
 
-		o = s.taboption('basic', form.Value, 'tg_token', _('TG_token'));
+		o = s.taboption('basic', form.Value, 'tg_token', _('Bot Token'));
 		o.description = _('Get Bot') + ' <a href="https://t.me/BotFather" target="_blank">' + _('Click here') + '</a>' + _('<br />Send a message to the created bot to initiate a conversation.');
 		o.rmempty = false;
 		o.depends('jsonpath', '/usr/share/wechatpush/api/telegram.json');
 
-		o = s.taboption('basic', form.Value, 'chat_id', _('TG_chatid'));
+		o = s.taboption('basic', form.Value, 'tg_chat_id', _('Chat ID'));
 		o.description = _('Get chat_id') + ' <a href="https://t.me/getuserIDbot" target="_blank">' + _('Click here') + '</a>' + _('<br />If you want to send to a group/channel, please create a non-Chinese group/channel (for easier chatid lookup, you can rename it later).<br />Add the bot to the group, send a message, and use https://api.telegram.org/bot token /getUpdates to obtain the chatid.');
+		o.rmempty = false;
+		o.depends('jsonpath', '/usr/share/wechatpush/api/telegram.json');
+
+		o = s.taboption('basic', form.Value, 'tg_thread_id', _('Message Thread ID'));
+		o.description = _('Optional: specify a thread (topic) ID for forum-style Telegram chats.');
+		o.rmempty = false;
+		o.optional = true;
+		o.depends('jsonpath', '/usr/share/wechatpush/api/telegram.json');
+
+		o = s.taboption('basic', form.Value, 'tg_api_server', _('API Server URL'));
+		o.placeholder = 'https://api.telegram.org';
 		o.rmempty = false;
 		o.depends('jsonpath', '/usr/share/wechatpush/api/telegram.json');
 
 		o = s.taboption('basic', form.Value, 'recipient_email', _('Recipient Email Address'));
 		o.depends('jsonpath', '/usr/share/wechatpush/api/msmtp.json');
+		o.rmempty = false;
 		o.description = _('opkg update<br />opkg install msmtp');
+
+		o = s.taboption('basic', form.Value, 'smtp_host', _('SMTP Host'));
+		o.depends('jsonpath', '/usr/share/wechatpush/api/msmtp.json');
+		o.placeholder = "mail.oursite.example";
+
+		o = s.taboption('basic', form.Value, 'smtp_port', _('SMTP Port'));
+		o.depends('jsonpath', '/usr/share/wechatpush/api/msmtp.json');
+		o.placeholder = "25";
+
+		o = s.taboption('basic', form.Flag, 'smtp_tls', _('Enable TLS'));
+		o.depends('jsonpath', '/usr/share/wechatpush/api/msmtp.json');
+
+		o = s.taboption('basic', form.Flag, 'smtp_starttls', _('Enable STARTTLS'));
+		o.depends('jsonpath', '/usr/share/wechatpush/api/msmtp.json');
+
+		o = s.taboption('basic', form.Value, 'smtp_user', _('User'));
+		o.depends('jsonpath', '/usr/share/wechatpush/api/msmtp.json');
+
+		o = s.taboption('basic', form.Value, 'smtp_passwordeval', _('Password Command'));
+		o.depends('jsonpath', '/usr/share/wechatpush/api/msmtp.json');
+		o.description = _('Set the password for authentication to the output (stdout) of the command.');
+
+		o = s.taboption('basic', form.Value, 'smtp_from', _('From Address'));
+		o.depends('jsonpath', '/usr/share/wechatpush/api/msmtp.json');
+		o.placeholder = "user@oursite.example";
+
+		o = s.taboption('basic', form.Value, 'smtp_from_full_name', _('From Full Name'));
+		o.depends('jsonpath', '/usr/share/wechatpush/api/msmtp.json');
+		o.description = _('If set, it is usually displayed as a nickname of the sender in email clients.');
 
 		o = s.taboption('basic', form.TextValue, 'diy_json', _('Custom Push'));
 		o.rows = 28;
@@ -326,6 +367,10 @@ return view.extend({
 		o.depends('oui_data', '2');
 
 		o = s.taboption('basic', form.Flag, 'reset_regularly', _('Reset Traffic Data Every Day at Midnight'));
+
+		o = s.taboption('basic', form.Flag, 'prefer_client_page', _('Prefer displaying online devices'));
+		o.default = '1';
+		o.description = _('Only effective when service is running');
 
 		o = s.taboption('basic', form.Flag, 'debuglevel', _('Enable Logging'));
 
