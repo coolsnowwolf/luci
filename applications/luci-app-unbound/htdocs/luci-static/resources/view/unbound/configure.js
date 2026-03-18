@@ -118,6 +118,7 @@ return view.extend({
 			pfx.depends('dns64', '1');
 
 			const exga = s.taboption('advanced', form.Flag, 'exclude_ipv6_ga', _('Exclude IPv6 GA'));
+			exga.rmempty = false;
 
 			const din = s.taboption('advanced', form.DynamicList, 'domain_insecure', _('Domain Insecure'),
 				_('List domains to bypass checks of DNSSEC'));
@@ -266,12 +267,12 @@ return view.extend({
 
 			const tlm = s.taboption('resource', form.Value, 'ttl_min', _('TTL Minimum'),
 				_('Prevent excessively short cache periods'));
-			tlm.datatype = 'and(uinteger,min(0),max(1200))';
+			tlm.datatype = 'and(uinteger,min(0),max(1800))';
 			tlm.placeholder = '120';
 
 			const tlnm = s.taboption('resource', form.Value, 'ttl_neg_max', _('TTL Neg Max'));
-			tlm.datatype = 'and(uinteger,min(0),max(1200))';
-			tlm.placeholder = '1000';
+			tlnm.datatype = 'and(uinteger,min(0),max(1200))';
+			tlnm.placeholder = '1000';
 
 			const rtt = s.taboption('resource', form.Value, 'rate_limit', _('Query Rate Limit'),
 				_('Prevent client query overload; zero is off'));
