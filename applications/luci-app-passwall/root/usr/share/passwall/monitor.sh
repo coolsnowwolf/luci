@@ -1,30 +1,58 @@
 #!/bin/sh
 
-. /usr/share/passwall/utils.sh
+DIR="$(cd "$(dirname "$0")" && pwd)"
+. $DIR/utils.sh
 LOCK_FILE=${LOCK_PATH}/${CONFIG}_monitor.lock
 
-ENABLED=$(config_t_get global enabled 0)
-[ "$ENABLED" != 1 ] && return 1
-ENABLED=$(config_t_get global_delay start_daemon 0)
-[ "$ENABLED" != 1 ] && return 1
+MAX_RESTART_COUNT=10
+RESTART_STATS_DIR="${TMP_PATH}/script_rstats"
+mkdir -p "$RESTART_STATS_DIR"
+
 sleep 58s
-while [ "$ENABLED" -eq 1 ]; do
+last_cleanup_date=$(date +%Y%m%d)
+while [ 1 -eq 1 ]; do
 	[ -f "$LOCK_FILE" ] && {
 		sleep 6s
 		continue
 	}
 	touch $LOCK_FILE
 
-	for filename in $(ls ${TMP_SCRIPT_FUNC_PATH}); do
-		cmd=$(cat ${TMP_SCRIPT_FUNC_PATH}/${filename})
-		cmd_check=$(echo $cmd | awk -F '>' '{print $1}')
-		[ -n "$(echo $cmd_check | grep "dns2socks")" ] && cmd_check=$(echo $cmd_check | sed "s#:# #g")
-		icount=$(pgrep -f "$(echo $cmd_check)" | wc -l)
-		if [ $icount = 0 ]; then
+	for file in "$TMP_SCRIPT_FUNC_PATH"/*; do
+		[ -f "$file" ] || continue
+		IFS= read -r cmd < "$file"
+		[ -z "$cmd" ] && continue
+		cmd_check=$(printf '%s' "$cmd" | sed 's/>.*$//;s/[[:space:]]*$//')
+
+		case "$cmd_check" in
+			*dns2socks*) cmd_check=${cmd_check//:/ } ;;
+		esac
+
+		filename=$(basename "$file")
+		stats_file="${RESTART_STATS_DIR}/${filename}.count"
+		if [ -s "$stats_file" ]; then
+			read restart_count < "$stats_file"
+			[ -z "$restart_count" ] && restart_count=0
+		else
+			restart_count=0
+		fi
+		# 检查是否超过最大重启次数
+		[ "$restart_count" -ge "$MAX_RESTART_COUNT" ] && continue
+
+		if ! pgrep -f "$cmd_check" >/dev/null; then
+			restart_count=$((restart_count + 1))
+			echo "$restart_count" > "$stats_file"
 			#echo "${cmd} 进程挂掉，重启" >> /tmp/log/passwall.log
-			eval $(echo "nohup ${cmd} 2>&1 &") >/dev/null 2>&1 &
+			eval "$cmd 2>&1 &"
+			sleep 1
 		fi
 	done
+
+	# 每天清理一次统计文件（跨天后执行一次）
+	current_date=$(date +%Y%m%d)
+	if [ "$current_date" != "$last_cleanup_date" ]; then
+		rm -f "${RESTART_STATS_DIR:?}"/* 2>/dev/null
+		last_cleanup_date="$current_date"
+	fi
 
 	rm -f $LOCK_FILE
 	sleep 58s

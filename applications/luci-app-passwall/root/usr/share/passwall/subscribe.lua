@@ -604,7 +604,7 @@ local function processData(szType, content, add_mode, group)
 			result.tls_serverName = (info.sni and info.sni ~= "") and info.sni or info.host
 			result.tls_CertSha = info.pcs
 			result.tls_CertByName = info.vcn
-			local insecure = info.allowinsecure or info.insecure
+			local insecure = info.allowinsecure or info.allowInsecure or info.insecure
 			result.tls_allowInsecure = (insecure == "1" or insecure == "0") and insecure or (allowInsecure_default and "1" or "0")
 		else
 			result.tls = "0"
@@ -890,7 +890,7 @@ local function processData(szType, content, add_mode, group)
 							result.reality_mldsa65Verify = params.pqv or nil
 						end
 					end
-					local insecure = params.allowinsecure or params.insecure
+					local insecure = params.allowinsecure or params.allowInsecure or params.insecure
 					result.tls_allowInsecure = (insecure == "1" or insecure == "0") and insecure or (allowInsecure_default and "1" or "0")
 					result.uot = params.udp
 				elseif (params.type ~= "tcp" and params.type ~= "raw") and (params.headerType and params.headerType ~= "none") then
@@ -995,7 +995,7 @@ local function processData(szType, content, add_mode, group)
 			result.tls_serverName = params.peer or params.sni or ""
 			result.tls_CertSha = params.pcs
 			result.tls_CertByName = params.vcn
-			local insecure = params.allowinsecure or params.insecure
+			local insecure = params.allowinsecure or params.allowInsecure or params.insecure
 			result.tls_allowInsecure = (insecure == "1" or insecure == "0") and insecure or (allowInsecure_default and "1" or "0")
 
 			if not params.type then params.type = "tcp" end
@@ -1064,8 +1064,7 @@ local function processData(szType, content, add_mode, group)
 				result.quic_security = params.quicSecurity or "none"
 			end
 			if params.type == 'grpc' then
-				if params.path then result.grpc_serviceName = params.path end
-				if params.serviceName then result.grpc_serviceName = params.serviceName end
+				result.grpc_serviceName = params.serviceName or params.path
 				result.grpc_mode = params.mode or "gun"
 			end
 			if params.type == 'xhttp' then
@@ -1234,10 +1233,8 @@ local function processData(szType, content, add_mode, group)
 				result.httpupgrade_host = params.host
 				result.httpupgrade_path = params.path
 			end
-
 			result.encryption = params.encryption or "none"
-
-			result.flow = params.flow and params.flow:gsub("-udp443", "") or nil
+			result.flow = params.flow
 
 			result.tls = "0"
 			if params.security == "tls" or params.security == "reality" then
@@ -1262,7 +1259,7 @@ local function processData(szType, content, add_mode, group)
 					result.use_mldsa65Verify = (params.pqv and params.pqv ~= "") and "1" or nil
 					result.reality_mldsa65Verify = params.pqv or nil
 				end
-				local insecure = params.allowinsecure or params.insecure
+				local insecure = params.allowinsecure or params.allowInsecure or params.insecure
 				result.tls_allowInsecure = (insecure == "1" or insecure == "0") and insecure or (allowInsecure_default and "1" or "0")
 			end
 
@@ -1319,7 +1316,7 @@ local function processData(szType, content, add_mode, group)
 		result.hysteria_auth_type = "string"
 		result.hysteria_auth_password = params.auth
 		result.tls_serverName = params.peer or params.sni or ""
-		local insecure = params.allowinsecure or params.insecure
+		local insecure = params.allowinsecure or params.allowInsecure or params.insecure
 		result.tls_allowInsecure = (insecure == "1" or insecure == "0") and insecure or (allowInsecure_default and "1" or "0")
 		result.alpn = params.alpn
 		result.hysteria_up_mbps = params.upmbps
@@ -1474,7 +1471,7 @@ local function processData(szType, content, add_mode, group)
 			for _, v in pairs(split(query[2], '&')) do
 				local s = v:find("=", 1, true)
 				if s and s > 1 then
-					params[v:sub(1, s - 1)] = UrlDecode(v:sub(s + 1))
+					params[v:sub(1, s - 1):lower()] = UrlDecode(v:sub(s + 1))
 				end
 			end
 			-- [2001:4860:4860::8888]:443
@@ -1491,7 +1488,7 @@ local function processData(szType, content, add_mode, group)
 				result.address = host_port
 			end
 			result.tls = "0"
-			if (not params.security or params.security == "") and params.sni and params.sni ~= "" then
+			if not params.security or params.security == "" then
 				params.security = "tls"
 			end
 			if params.security == "tls" or params.security == "reality" then

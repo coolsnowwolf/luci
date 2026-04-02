@@ -26,10 +26,11 @@ NFTSET_BLACK6="passwall_black6"
 NFTSET_WHITE6="passwall_white6"
 NFTSET_BLOCK6="passwall_block6"
 
-FORCE_INDEX=0
-
 USE_SHUNT_TCP=0
 USE_SHUNT_UDP=0
+
+# ASCII code for PSW1.Use whatever,just not the same.
+FWMARK="0x50535731"
 
 FWI=$(uci -q get firewall.passwall.path 2>/dev/null)
 FAKE_IP="198.18.0.0/15"
@@ -120,17 +121,15 @@ REDIRECT() {
 	local s="counter redirect"
 	[ -n "$1" ] && {
 		local s="$s to :$1"
-		[ "$2" == "MARK" ] && s="counter meta mark set $1"
 		[ "$2" == "TPROXY" ] && {
-			s="counter meta mark 1 tproxy to :$1"
+			s="counter meta mark ${FWMARK} tproxy to :$1"
 		}
 		[ "$2" == "TPROXY4" ] && {
-			s="counter meta mark 1 tproxy ip to :$1"
+			s="counter meta mark ${FWMARK} tproxy ip to :$1"
 		}
 		[ "$2" == "TPROXY6" ] && {
-			s="counter meta mark 1 tproxy ip6 to :$1"
+			s="counter meta mark ${FWMARK} tproxy ip6 to :$1"
 		}
-
 	}
 	echo $s
 }
@@ -221,10 +220,10 @@ gen_nftset() {
 	[ $# -gt 0 ] || [ ! -t 0 ] && insert_nftset "$nftset_name" "$timeout_argument_element" "$@"
 }
 
-get_jump_ipt() {
+get_jump_nft() {
 	case "$1" in
 	direct)
-		echo "mark != 1 counter return"
+		echo "mark != ${FWMARK} counter return"
 		;;
 	proxy)
 		if [ -n "$2" ] && [ -n "$(echo $2 | grep "^counter")" ]; then
@@ -326,6 +325,10 @@ load_acl() {
 					local gateway device
 					network_get_gateway gateway "${interface}"
 					network_get_device device "${interface}"
+					# network_get_device returns empty for non-UP interfaces (e.g. auto='0').
+					# Try ubus directly, then check if the name is a kernel device.
+					[ -z "${device}" ] && device=$(ubus call "network.interface.${interface}" status 2>/dev/null | jsonfilter -e '@.device' 2>/dev/null)
+					[ -z "${device}" ] && [ -d "/sys/class/net/${interface}" ] && device="${interface}"
 					[ -z "${device}" ] && device="${interface}"
 					_ipt_source="iifname ${device} "
 					msg="源接口【${device}】，"
@@ -443,14 +446,14 @@ load_acl() {
 							nft "add rule $NFTABLE_NAME PSW_MANGLE_V6 meta l4proto tcp ${_ipt_source} $(factor $tcp_proxy_drop_ports "tcp dport") ip6 daddr $FAKE_IP_6 counter drop comment \"$remarks\"" 2>/dev/null
 							[ "${use_proxy_list}" = "1" ] && nft "add rule $NFTABLE_NAME PSW_MANGLE_V6 meta l4proto tcp ${_ipt_source} $(factor $tcp_proxy_drop_ports "tcp dport") ip6 daddr @$black6_set_name counter drop comment \"$remarks\"" 2>/dev/null
 							[ "${use_gfw_list}" = "1" ] && nft "add rule $NFTABLE_NAME PSW_MANGLE_V6 meta l4proto tcp ${_ipt_source} $(factor $tcp_proxy_drop_ports "tcp dport") ip6 daddr @$gfw6_set_name counter drop comment \"$remarks\"" 2>/dev/null
-							[ "${chn_list}" != "0" ] && nft "add rule $NFTABLE_NAME PSW_MANGLE_V6 meta l4proto tcp ${_ipt_source} $(factor $tcp_proxy_drop_ports "tcp dport") ip6 daddr @$NFTSET_CHN6 $(get_jump_ipt ${chn_list} "counter drop") comment \"$remarks\"" 2>/dev/null
+							[ "${chn_list}" != "0" ] && nft "add rule $NFTABLE_NAME PSW_MANGLE_V6 meta l4proto tcp ${_ipt_source} $(factor $tcp_proxy_drop_ports "tcp dport") ip6 daddr @$NFTSET_CHN6 $(get_jump_nft ${chn_list} "counter drop") comment \"$remarks\"" 2>/dev/null
 							[ "${use_shunt_tcp}" = "1" ] && nft "add rule $NFTABLE_NAME PSW_MANGLE_V6 meta l4proto tcp ${_ipt_source} $(factor $tcp_proxy_drop_ports "tcp dport") ip6 daddr @$shunt6_set_name counter drop comment \"$remarks\"" 2>/dev/null
 							[ "${tcp_proxy_mode}" != "disable" ] && nft "add rule $NFTABLE_NAME PSW_MANGLE_V6 meta l4proto tcp ${_ipt_source} $(factor $tcp_proxy_drop_ports "tcp dport") counter drop comment \"$remarks\"" 2>/dev/null
 						}
 						nft "add rule $NFTABLE_NAME $nft_prerouting_chain ip protocol tcp ${_ipt_source} $(factor $tcp_proxy_drop_ports "tcp dport") ip daddr $FAKE_IP counter drop comment \"$remarks\""
 						[ "${use_proxy_list}" = "1" ] && nft "add rule $NFTABLE_NAME $nft_prerouting_chain ip protocol tcp ${_ipt_source} $(factor $tcp_proxy_drop_ports "tcp dport") ip daddr @$black_set_name counter drop comment \"$remarks\""
 						[ "${use_gfw_list}" = "1" ] && nft "add rule $NFTABLE_NAME $nft_prerouting_chain ip protocol tcp ${_ipt_source} $(factor $tcp_proxy_drop_ports "tcp dport") ip daddr @$gfw_set_name counter drop comment \"$remarks\""
-						[ "${chn_list}" != "0" ] && nft "add rule $NFTABLE_NAME $nft_prerouting_chain ip protocol tcp ${_ipt_source} $(factor $tcp_proxy_drop_ports "tcp dport") ip daddr @$NFTSET_CHN $(get_jump_ipt ${chn_list} "counter drop") comment \"$remarks\""
+						[ "${chn_list}" != "0" ] && nft "add rule $NFTABLE_NAME $nft_prerouting_chain ip protocol tcp ${_ipt_source} $(factor $tcp_proxy_drop_ports "tcp dport") ip daddr @$NFTSET_CHN $(get_jump_nft ${chn_list} "counter drop") comment \"$remarks\""
 						[ "${use_shunt_tcp}" = "1" ] && nft "add rule $NFTABLE_NAME $nft_prerouting_chain ip protocol tcp ${_ipt_source} $(factor $tcp_proxy_drop_ports "tcp dport") ip daddr @$shunt_set_name counter drop comment \"$remarks\""
 						[ "${tcp_proxy_mode}" != "disable" ] && nft "add rule $NFTABLE_NAME $nft_prerouting_chain ip protocol tcp ${_ipt_source} $(factor $tcp_proxy_drop_ports "tcp dport") counter drop comment \"$remarks\""
 						echolog "     - ${msg}屏蔽代理 TCP 端口[${tcp_proxy_drop_ports}]"
@@ -461,14 +464,14 @@ load_acl() {
 							nft "add rule $NFTABLE_NAME PSW_MANGLE_V6 meta l4proto udp ${_ipt_source} $(factor $udp_proxy_drop_ports "udp dport") ip6 daddr $FAKE_IP_6 counter drop comment \"$remarks\"" 2>/dev/null
 							[ "${use_proxy_list}" = "1" ] && nft "add rule $NFTABLE_NAME PSW_MANGLE_V6 meta l4proto udp ${_ipt_source} $(factor $udp_proxy_drop_ports "udp dport") ip6 daddr @$black6_set_name counter drop comment \"$remarks\"" 2>/dev/null
 							[ "${use_gfw_list}" = "1" ] && nft "add rule $NFTABLE_NAME PSW_MANGLE_V6 meta l4proto udp ${_ipt_source} $(factor $udp_proxy_drop_ports "udp dport") ip6 daddr @$gfw6_set_name counter drop comment \"$remarks\"" 2>/dev/null
-							[ "${chn_list}" != "0" ] && nft "add rule $NFTABLE_NAME PSW_MANGLE_V6 meta l4proto udp ${_ipt_source} $(factor $udp_proxy_drop_ports "udp dport") ip6 daddr @$NFTSET_CHN6 $(get_jump_ipt ${chn_list} "counter drop") comment \"$remarks\"" 2>/dev/null
+							[ "${chn_list}" != "0" ] && nft "add rule $NFTABLE_NAME PSW_MANGLE_V6 meta l4proto udp ${_ipt_source} $(factor $udp_proxy_drop_ports "udp dport") ip6 daddr @$NFTSET_CHN6 $(get_jump_nft ${chn_list} "counter drop") comment \"$remarks\"" 2>/dev/null
 							[ "${use_shunt_udp}" = "1" ] && nft "add rule $NFTABLE_NAME PSW_MANGLE_V6 meta l4proto udp ${_ipt_source} $(factor $udp_proxy_drop_ports "udp dport") ip6 daddr @$shunt6_set_name counter drop comment \"$remarks\"" 2>/dev/null
 							[ "${udp_proxy_mode}" != "disable" ] && nft "add rule $NFTABLE_NAME PSW_MANGLE_V6 meta l4proto udp ${_ipt_source} $(factor $udp_proxy_drop_ports "udp dport") counter drop comment \"$remarks\"" 2>/dev/null
 						}
 						nft "add rule $NFTABLE_NAME PSW_MANGLE ip protocol udp ${_ipt_source} $(factor $udp_proxy_drop_ports "udp dport") ip daddr $FAKE_IP counter drop comment \"$remarks\"" 2>/dev/null
 						[ "${use_proxy_list}" = "1" ] && nft "add rule $NFTABLE_NAME PSW_MANGLE ip protocol udp ${_ipt_source} $(factor $udp_proxy_drop_ports "udp dport") ip daddr @$black_set_name counter drop comment \"$remarks\"" 2>/dev/null
 						[ "${use_gfw_list}" = "1" ] && nft "add rule $NFTABLE_NAME PSW_MANGLE ip protocol udp ${_ipt_source} $(factor $udp_proxy_drop_ports "udp dport") ip daddr @$gfw_set_name counter drop comment \"$remarks\"" 2>/dev/null
-						[ "${chn_list}" != "0" ] && nft "add rule $NFTABLE_NAME PSW_MANGLE ip protocol udp ${_ipt_source} $(factor $udp_proxy_drop_ports "udp dport") ip daddr @$NFTSET_CHN $(get_jump_ipt ${chn_list} "counter drop") comment \"$remarks\"" 2>/dev/null
+						[ "${chn_list}" != "0" ] && nft "add rule $NFTABLE_NAME PSW_MANGLE ip protocol udp ${_ipt_source} $(factor $udp_proxy_drop_ports "udp dport") ip daddr @$NFTSET_CHN $(get_jump_nft ${chn_list} "counter drop") comment \"$remarks\"" 2>/dev/null
 						[ "${use_shunt_udp}" = "1" ] && nft "add rule $NFTABLE_NAME PSW_MANGLE ip protocol udp ${_ipt_source} $(factor $udp_proxy_drop_ports "udp dport") ip daddr @$shunt_set_name counter drop comment \"$remarks\"" 2>/dev/null
 						[ "${udp_proxy_mode}" != "disable" ] && nft "add rule $NFTABLE_NAME PSW_MANGLE ip protocol udp ${_ipt_source} $(factor $udp_proxy_drop_ports "udp dport") counter drop comment \"$remarks\"" 2>/dev/null
 						echolog "     - ${msg}屏蔽代理 UDP 端口[${udp_proxy_drop_ports}]"
@@ -493,7 +496,7 @@ load_acl() {
 							nft "add rule $NFTABLE_NAME PSW_ICMP_REDIRECT ip protocol icmp ${_ipt_source} ip daddr $FAKE_IP $(REDIRECT) comment \"$remarks\""
 							[ "${use_proxy_list}" = "1" ] && nft "add rule $NFTABLE_NAME PSW_ICMP_REDIRECT ip protocol icmp ${_ipt_source} ip daddr @$black_set_name $(REDIRECT) comment \"$remarks\""
 							[ "${use_gfw_list}" = "1" ] && nft "add rule $NFTABLE_NAME PSW_ICMP_REDIRECT ip protocol icmp ${_ipt_source} ip daddr @$gfw_set_name $(REDIRECT) comment \"$remarks\""
-							[ "${chn_list}" != "0" ] && nft "add rule $NFTABLE_NAME PSW_ICMP_REDIRECT ip protocol icmp ${_ipt_source} ip daddr @$NFTSET_CHN $(get_jump_ipt ${chn_list}) comment \"$remarks\""
+							[ "${chn_list}" != "0" ] && nft "add rule $NFTABLE_NAME PSW_ICMP_REDIRECT ip protocol icmp ${_ipt_source} ip daddr @$NFTSET_CHN $(get_jump_nft ${chn_list}) comment \"$remarks\""
 							[ "${use_shunt_tcp}" = "1" ] && nft "add rule $NFTABLE_NAME PSW_ICMP_REDIRECT ip protocol icmp ${_ipt_source} ip daddr @$shunt_set_name $(REDIRECT) comment \"$remarks\""
 							[ "${tcp_proxy_mode}" != "disable" ] && nft "add rule $NFTABLE_NAME PSW_ICMP_REDIRECT ip protocol icmp ${_ipt_source} $(REDIRECT) comment \"$remarks\""
 							nft "add rule $NFTABLE_NAME PSW_ICMP_REDIRECT ip protocol icmp ${_ipt_source} return comment \"$remarks\""
@@ -504,7 +507,7 @@ load_acl() {
 							nft "add rule $NFTABLE_NAME PSW_ICMP_REDIRECT meta l4proto icmpv6 ${_ipt_source} ip6 daddr $FAKE_IP_6 $(REDIRECT) comment \"$remarks\"" 2>/dev/null
 							[ "${use_proxy_list}" = "1" ] && nft "add rule $NFTABLE_NAME PSW_ICMP_REDIRECT meta l4proto icmpv6 ${_ipt_source} ip6 daddr @$black6_set_name $(REDIRECT) comment \"$remarks\"" 2>/dev/null
 							[ "${use_gfw_list}" = "1" ] && nft "add rule $NFTABLE_NAME PSW_ICMP_REDIRECT meta l4proto icmpv6 ${_ipt_source} ip6 daddr @$gfw6_set_name $(REDIRECT) comment \"$remarks\"" 2>/dev/null
-							[ "${chn_list}" != "0" ] && nft "add rule $NFTABLE_NAME PSW_ICMP_REDIRECT meta l4proto icmpv6 ${_ipt_source} ip6 daddr @$NFTSET_CHN6 $(get_jump_ipt ${chn_list}) comment \"$remarks\"" 2>/dev/null
+							[ "${chn_list}" != "0" ] && nft "add rule $NFTABLE_NAME PSW_ICMP_REDIRECT meta l4proto icmpv6 ${_ipt_source} ip6 daddr @$NFTSET_CHN6 $(get_jump_nft ${chn_list}) comment \"$remarks\"" 2>/dev/null
 							[ "${use_shunt_tcp}" = "1" ] && nft "add rule $NFTABLE_NAME PSW_ICMP_REDIRECT meta l4proto icmpv6 ${_ipt_source} ip6 daddr @$shunt6_set_name $(REDIRECT) comment \"$remarks\"" 2>/dev/null
 							[ "${tcp_proxy_mode}" != "disable" ] && nft "add rule $NFTABLE_NAME PSW_ICMP_REDIRECT meta l4proto icmpv6 ${_ipt_source} $(REDIRECT) comment \"$remarks\"" 2>/dev/null
 							nft "add rule $NFTABLE_NAME PSW_ICMP_REDIRECT meta l4proto icmpv6 ${_ipt_source} return comment \"$remarks\"" 2>/dev/null
@@ -513,7 +516,7 @@ load_acl() {
 						nft "add rule $NFTABLE_NAME $nft_chain ip protocol tcp ${_ipt_source} ip daddr $FAKE_IP ${nft_j} comment \"$remarks\""
 						[ "${use_proxy_list}" = "1" ] && nft "add rule $NFTABLE_NAME $nft_chain ip protocol tcp ${_ipt_source} $(factor $tcp_redir_ports "tcp dport") ip daddr @$black_set_name ${nft_j} comment \"$remarks\" "
 						[ "${use_gfw_list}" = "1" ] && nft "add rule $NFTABLE_NAME $nft_chain ip protocol tcp ${_ipt_source} $(factor $tcp_redir_ports "tcp dport") ip daddr @$gfw_set_name ${nft_j} comment \"$remarks\" "
-						[ "${chn_list}" != "0" ] && nft "add rule $NFTABLE_NAME $nft_chain ip protocol tcp ${_ipt_source} $(factor $tcp_redir_ports "tcp dport") ip daddr @$NFTSET_CHN $(get_jump_ipt ${chn_list} "${nft_j}") comment \"$remarks\" "
+						[ "${chn_list}" != "0" ] && nft "add rule $NFTABLE_NAME $nft_chain ip protocol tcp ${_ipt_source} $(factor $tcp_redir_ports "tcp dport") ip daddr @$NFTSET_CHN $(get_jump_nft ${chn_list} "${nft_j}") comment \"$remarks\" "
 						[ "${use_shunt_tcp}" = "1" ] && nft "add rule $NFTABLE_NAME $nft_chain ip protocol tcp ${_ipt_source} $(factor $tcp_redir_ports "tcp dport") ip daddr @$shunt_set_name ${nft_j} comment \"$remarks\""
 						[ "${tcp_proxy_mode}" != "disable" ] && nft "add rule $NFTABLE_NAME $nft_chain ip protocol tcp ${_ipt_source} $(factor $tcp_redir_ports "tcp dport") ${nft_j} comment \"$remarks\""
 						[ -n "${is_tproxy}" ] && nft "add rule $NFTABLE_NAME $nft_chain ip protocol tcp ${_ipt_source} $(REDIRECT $tcp_port TPROXY4) comment \"$remarks\""
@@ -522,7 +525,7 @@ load_acl() {
 							nft "add rule $NFTABLE_NAME PSW_MANGLE_V6 meta l4proto tcp ${_ipt_source} ip6 daddr $FAKE_IP_6 counter jump PSW_RULE comment \"$remarks\""
 							[ "${use_proxy_list}" = "1" ] && nft "add rule $NFTABLE_NAME PSW_MANGLE_V6 meta l4proto tcp ${_ipt_source} $(factor $tcp_redir_ports "tcp dport") ip6 daddr @$black6_set_name counter jump PSW_RULE comment \"$remarks\"" 2>/dev/null
 							[ "${use_gfw_list}" = "1" ] && nft "add rule $NFTABLE_NAME PSW_MANGLE_V6 meta l4proto tcp ${_ipt_source} $(factor $tcp_redir_ports "tcp dport") ip6 daddr @$gfw6_set_name counter jump PSW_RULE comment \"$remarks\"" 2>/dev/null
-							[ "${chn_list}" != "0" ] && nft "add rule $NFTABLE_NAME PSW_MANGLE_V6 meta l4proto tcp ${_ipt_source} $(factor $tcp_redir_ports "tcp dport") ip6 daddr @$NFTSET_CHN6 $(get_jump_ipt ${chn_list} "counter jump PSW_RULE") comment \"$remarks\" "
+							[ "${chn_list}" != "0" ] && nft "add rule $NFTABLE_NAME PSW_MANGLE_V6 meta l4proto tcp ${_ipt_source} $(factor $tcp_redir_ports "tcp dport") ip6 daddr @$NFTSET_CHN6 $(get_jump_nft ${chn_list} "counter jump PSW_RULE") comment \"$remarks\" "
 							[ "${use_shunt_tcp}" = "1" ] && nft "add rule $NFTABLE_NAME PSW_MANGLE_V6 meta l4proto tcp ${_ipt_source} $(factor $tcp_redir_ports "tcp dport") ip6 daddr @$shunt6_set_name counter jump PSW_RULE comment \"$remarks\"" 2>/dev/null
 							[ "${tcp_proxy_mode}" != "disable" ] && nft "add rule $NFTABLE_NAME PSW_MANGLE_V6 meta l4proto tcp ${_ipt_source} $(factor $tcp_redir_ports "tcp dport") counter jump PSW_RULE comment \"$remarks\"" 2>/dev/null
 							nft "add rule $NFTABLE_NAME PSW_MANGLE_V6 meta l4proto tcp ${_ipt_source} $(REDIRECT $tcp_port TPROXY) comment \"$remarks\"" 2>/dev/null
@@ -544,7 +547,7 @@ load_acl() {
 						nft "add rule $NFTABLE_NAME PSW_MANGLE ip protocol udp ${_ipt_source} ip daddr $FAKE_IP counter jump PSW_RULE comment \"$remarks\""
 						[ "${use_proxy_list}" = "1" ] && nft "add rule $NFTABLE_NAME PSW_MANGLE ip protocol udp ${_ipt_source} $(factor $udp_redir_ports "udp dport") ip daddr @$black_set_name counter jump PSW_RULE comment \"$remarks\""
 						[ "${use_gfw_list}" = "1" ] && nft "add rule $NFTABLE_NAME PSW_MANGLE ip protocol udp ${_ipt_source} $(factor $udp_redir_ports "udp dport") ip daddr @$gfw_set_name counter jump PSW_RULE comment \"$remarks\""
-						[ "${chn_list}" != "0" ] && nft "add rule $NFTABLE_NAME PSW_MANGLE ip protocol udp ${_ipt_source} $(factor $udp_redir_ports "udp dport") ip daddr @$NFTSET_CHN $(get_jump_ipt ${chn_list} "counter jump PSW_RULE") comment \"$remarks\""
+						[ "${chn_list}" != "0" ] && nft "add rule $NFTABLE_NAME PSW_MANGLE ip protocol udp ${_ipt_source} $(factor $udp_redir_ports "udp dport") ip daddr @$NFTSET_CHN $(get_jump_nft ${chn_list} "counter jump PSW_RULE") comment \"$remarks\""
 						[ "${use_shunt_udp}" = "1" ] && nft "add rule $NFTABLE_NAME PSW_MANGLE ip protocol udp ${_ipt_source} $(factor $udp_redir_ports "udp dport") ip daddr @$shunt_set_name counter jump PSW_RULE comment \"$remarks\""
 						[ "${udp_proxy_mode}" != "disable" ] && nft "add rule $NFTABLE_NAME PSW_MANGLE ip protocol udp ${_ipt_source} $(factor $udp_redir_ports "udp dport") counter jump PSW_RULE comment \"$remarks\""
 						nft "add rule $NFTABLE_NAME PSW_MANGLE ip protocol udp ${_ipt_source} $(REDIRECT $udp_port TPROXY4) comment \"$remarks\""
@@ -553,7 +556,7 @@ load_acl() {
 							nft "add rule $NFTABLE_NAME PSW_MANGLE_V6 meta l4proto udp ${_ipt_source} ip6 daddr $FAKE_IP_6 counter jump PSW_RULE comment \"$remarks\""
 							[ "${use_proxy_list}" = "1" ] && nft "add rule $NFTABLE_NAME PSW_MANGLE_V6 meta l4proto udp ${_ipt_source} $(factor $udp_redir_ports "udp dport") ip6 daddr @$black6_set_name counter jump PSW_RULE comment \"$remarks\"" 2>/dev/null
 							[ "${use_gfw_list}" = "1" ] && nft "add rule $NFTABLE_NAME PSW_MANGLE_V6 meta l4proto udp ${_ipt_source} $(factor $udp_redir_ports "udp dport") ip6 daddr @$gfw6_set_name counter jump PSW_RULE comment \"$remarks\"" 2>/dev/null
-							[ "${chn_list}" != "0" ] && nft "add rule $NFTABLE_NAME PSW_MANGLE_V6 meta l4proto udp ${_ipt_source} $(factor $udp_redir_ports "udp dport") ip6 daddr @$NFTSET_CHN6 $(get_jump_ipt ${chn_list} "counter jump PSW_RULE") comment \"$remarks\"" 2>/dev/null
+							[ "${chn_list}" != "0" ] && nft "add rule $NFTABLE_NAME PSW_MANGLE_V6 meta l4proto udp ${_ipt_source} $(factor $udp_redir_ports "udp dport") ip6 daddr @$NFTSET_CHN6 $(get_jump_nft ${chn_list} "counter jump PSW_RULE") comment \"$remarks\"" 2>/dev/null
 							[ "${use_shunt_udp}" = "1" ] && nft "add rule $NFTABLE_NAME PSW_MANGLE_V6 meta l4proto udp ${_ipt_source} $(factor $udp_redir_ports "udp dport") ip6 daddr @$shunt6_set_name counter jump PSW_RULE comment \"$remarks\"" 2>/dev/null
 							[ "${udp_proxy_mode}" != "disable" ] && nft "add rule $NFTABLE_NAME PSW_MANGLE_V6 meta l4proto udp ${_ipt_source} $(factor $udp_redir_ports "udp dport") counter jump PSW_RULE comment \"$remarks\"" 2>/dev/null
 							nft "add rule $NFTABLE_NAME PSW_MANGLE_V6 meta l4proto udp ${_ipt_source} $(REDIRECT $udp_port TPROXY) comment \"$remarks\"" 2>/dev/null
@@ -630,7 +633,7 @@ load_acl() {
 					nft "add rule $NFTABLE_NAME PSW_MANGLE_V6 meta l4proto tcp $(factor $TCP_PROXY_DROP_PORTS "tcp dport") ip6 daddr $FAKE_IP_6 counter drop comment \"默认\""
 					[ "${USE_PROXY_LIST}" = "1" ] && nft "add rule $NFTABLE_NAME PSW_MANGLE_V6 meta l4proto tcp $(factor $TCP_PROXY_DROP_PORTS "tcp dport") ip6 daddr @$NFTSET_BLACK6 counter drop comment \"默认\""
 					[ "${USE_GFW_LIST}" = "1" ] && nft "add rule $NFTABLE_NAME PSW_MANGLE_V6 meta l4proto tcp $(factor $TCP_PROXY_DROP_PORTS "tcp dport") ip6 daddr @$NFTSET_GFW6 counter drop comment \"默认\""
-					[ "${CHN_LIST}" != "0" ] && nft "add rule $NFTABLE_NAME PSW_MANGLE_V6 meta l4proto tcp $(factor $TCP_PROXY_DROP_PORTS "tcp dport") ip6 daddr @$NFTSET_CHN6 $(get_jump_ipt ${CHN_LIST} "counter drop") comment \"默认\""
+					[ "${CHN_LIST}" != "0" ] && nft "add rule $NFTABLE_NAME PSW_MANGLE_V6 meta l4proto tcp $(factor $TCP_PROXY_DROP_PORTS "tcp dport") ip6 daddr @$NFTSET_CHN6 $(get_jump_nft ${CHN_LIST} "counter drop") comment \"默认\""
 					[ "${USE_SHUNT_TCP}" = "1" ] && nft "add rule $NFTABLE_NAME PSW_MANGLE_V6 meta l4proto tcp $(factor $TCP_PROXY_DROP_PORTS "tcp dport") ip6 daddr @$NFTSET_SHUNT6 counter drop comment \"默认\""
 					[ "${TCP_PROXY_MODE}" != "disable" ] && nft "add rule $NFTABLE_NAME PSW_MANGLE_V6 meta l4proto tcp $(factor $TCP_PROXY_DROP_PORTS "tcp dport") counter drop comment \"默认\""
 				}
@@ -638,7 +641,7 @@ load_acl() {
 				nft "add rule $NFTABLE_NAME $nft_prerouting_chain ip protocol tcp $(factor $TCP_PROXY_DROP_PORTS "tcp dport") ip daddr $FAKE_IP counter drop comment \"默认\""
 				[ "${USE_PROXY_LIST}" = "1" ] && nft "add rule $NFTABLE_NAME $nft_prerouting_chain ip protocol tcp $(factor $TCP_PROXY_DROP_PORTS "tcp dport") ip daddr @$NFTSET_BLACK counter drop comment \"默认\""
 				[ "${USE_GFW_LIST}" = "1" ] && nft "add rule $NFTABLE_NAME $nft_prerouting_chain ip protocol tcp $(factor $TCP_PROXY_DROP_PORTS "tcp dport") ip daddr @$NFTSET_GFW counter drop comment \"默认\""
-				[ "${CHN_LIST}" != "0" ] && nft "add rule $NFTABLE_NAME $nft_prerouting_chain ip protocol tcp $(factor $TCP_PROXY_DROP_PORTS "tcp dport") ip daddr @$NFTSET_CHN $(get_jump_ipt ${CHN_LIST} "counter drop") comment \"默认\""
+				[ "${CHN_LIST}" != "0" ] && nft "add rule $NFTABLE_NAME $nft_prerouting_chain ip protocol tcp $(factor $TCP_PROXY_DROP_PORTS "tcp dport") ip daddr @$NFTSET_CHN $(get_jump_nft ${CHN_LIST} "counter drop") comment \"默认\""
 				[ "${USE_SHUNT_TCP}" = "1" ] && nft "add rule $NFTABLE_NAME $nft_prerouting_chain ip protocol tcp $(factor $TCP_PROXY_DROP_PORTS "tcp dport") ip daddr @$NFTSET_SHUNT counter drop comment \"默认\""
 				[ "${TCP_PROXY_MODE}" != "disable" ] && nft "add rule $NFTABLE_NAME $nft_prerouting_chain ip protocol tcp $(factor $TCP_PROXY_DROP_PORTS "tcp dport") counter drop comment \"默认\""
 				echolog "     - ${msg}屏蔽代理 TCP 端口[${TCP_PROXY_DROP_PORTS}]"
@@ -649,14 +652,14 @@ load_acl() {
 					nft "add rule $NFTABLE_NAME PSW_MANGLE_V6 meta l4proto udp $(factor $UDP_PROXY_DROP_PORTS "udp dport") ip6 daddr $FAKE_IP_6 counter drop comment \"默认\""
 					[ "${USE_PROXY_LIST}" = "1" ] && nft "add rule $NFTABLE_NAME PSW_MANGLE_V6 meta l4proto udp $(factor $UDP_PROXY_DROP_PORTS "udp dport") ip6 daddr @$NFTSET_BLACK6 counter drop comment \"默认\""
 					[ "${USE_GFW_LIST}" = "1" ] && nft "add rule $NFTABLE_NAME PSW_MANGLE_V6 meta l4proto udp $(factor $UDP_PROXY_DROP_PORTS "udp dport") ip6 daddr @$NFTSET_GFW6 counter drop comment \"默认\""
-					[ "${CHN_LIST}" != "0" ] && nft "add rule $NFTABLE_NAME PSW_MANGLE_V6 meta l4proto udp $(factor $UDP_PROXY_DROP_PORTS "udp dport") ip6 daddr @$NFTSET_CHN6 $(get_jump_ipt ${CHN_LIST} "counter drop") comment \"默认\""
+					[ "${CHN_LIST}" != "0" ] && nft "add rule $NFTABLE_NAME PSW_MANGLE_V6 meta l4proto udp $(factor $UDP_PROXY_DROP_PORTS "udp dport") ip6 daddr @$NFTSET_CHN6 $(get_jump_nft ${CHN_LIST} "counter drop") comment \"默认\""
 					[ "${USE_SHUNT_UDP}" = "1" ] && nft "add rule $NFTABLE_NAME PSW_MANGLE_V6 meta l4proto udp $(factor $UDP_PROXY_DROP_PORTS "udp dport") ip6 daddr @$NFTSET_SHUNT6 counter drop comment \"默认\""
 					[ "${UDP_PROXY_MODE}" != "disable" ] && nft "add rule $NFTABLE_NAME PSW_MANGLE_V6 meta l4proto udp $(factor $UDP_PROXY_DROP_PORTS "udp dport") counter drop comment \"默认\""
 				}
 				nft "add rule $NFTABLE_NAME PSW_MANGLE ip protocol udp $(factor $UDP_PROXY_DROP_PORTS "udp dport") ip daddr $FAKE_IP counter drop comment \"默认\""
 				[ "${USE_PROXY_LIST}" = "1" ] && nft "add rule $NFTABLE_NAME PSW_MANGLE ip protocol udp $(factor $UDP_PROXY_DROP_PORTS "udp dport") ip daddr @$NFTSET_BLACK counter drop comment \"默认\""
 				[ "${USE_GFW_LIST}" = "1" ] && nft "add rule $NFTABLE_NAME PSW_MANGLE ip protocol udp $(factor $UDP_PROXY_DROP_PORTS "udp dport") ip daddr @$NFTSET_GFW counter drop comment \"默认\""
-				[ "${CHN_LIST}" != "0" ] && nft "add rule $NFTABLE_NAME PSW_MANGLE ip protocol udp $(factor $UDP_PROXY_DROP_PORTS "udp dport") ip daddr @$NFTSET_CHN $(get_jump_ipt ${CHN_LIST} "counter drop") comment \"默认\""
+				[ "${CHN_LIST}" != "0" ] && nft "add rule $NFTABLE_NAME PSW_MANGLE ip protocol udp $(factor $UDP_PROXY_DROP_PORTS "udp dport") ip daddr @$NFTSET_CHN $(get_jump_nft ${CHN_LIST} "counter drop") comment \"默认\""
 				[ "${USE_SHUNT_UDP}" = "1" ] && nft "add rule $NFTABLE_NAME PSW_MANGLE ip protocol udp $(factor $UDP_PROXY_DROP_PORTS "udp dport") ip daddr @$NFTSET_SHUNT counter drop comment \"默认\""
 				[ "${UDP_PROXY_MODE}" != "disable" ] && nft "add rule $NFTABLE_NAME PSW_MANGLE ip protocol udp $(factor $UDP_PROXY_DROP_PORTS "udp dport") counter drop comment \"默认\""
 				echolog "     - ${msg}屏蔽代理 UDP 端口[${UDP_PROXY_DROP_PORTS}]"
@@ -686,7 +689,7 @@ load_acl() {
 					nft "add rule $NFTABLE_NAME PSW_ICMP_REDIRECT ip protocol icmp ip daddr $FAKE_IP $(REDIRECT) comment \"默认\""
 					[ "${USE_PROXY_LIST}" = "1" ] && nft "add rule $NFTABLE_NAME PSW_ICMP_REDIRECT ip protocol icmp ip daddr @$NFTSET_BLACK $(REDIRECT) comment \"默认\""
 					[ "${USE_GFW_LIST}" = "1" ] && nft "add rule $NFTABLE_NAME PSW_ICMP_REDIRECT ip protocol icmp ip daddr @$NFTSET_GFW $(REDIRECT) comment \"默认\""
-					[ "${CHN_LIST}" != "0" ] && nft "add rule $NFTABLE_NAME PSW_ICMP_REDIRECT ip protocol icmp ip daddr @$NFTSET_CHN $(get_jump_ipt ${CHN_LIST}) comment \"默认\""
+					[ "${CHN_LIST}" != "0" ] && nft "add rule $NFTABLE_NAME PSW_ICMP_REDIRECT ip protocol icmp ip daddr @$NFTSET_CHN $(get_jump_nft ${CHN_LIST}) comment \"默认\""
 					[ "${USE_SHUNT_TCP}" = "1" ] && nft "add rule $NFTABLE_NAME PSW_ICMP_REDIRECT ip protocol icmp ip daddr @$NFTSET_SHUNT $(REDIRECT) comment \"默认\""
 					[ "${TCP_PROXY_MODE}" != "disable" ] && nft "add rule $NFTABLE_NAME PSW_ICMP_REDIRECT ip protocol icmp $(REDIRECT) comment \"默认\""
 					nft "add rule $NFTABLE_NAME PSW_ICMP_REDIRECT ip protocol icmp return comment \"默认\""
@@ -697,7 +700,7 @@ load_acl() {
 					nft "add rule $NFTABLE_NAME PSW_ICMP_REDIRECT meta l4proto icmpv6 ip6 daddr $FAKE_IP_6 $(REDIRECT) comment \"默认\""
 					[ "${USE_PROXY_LIST}" = "1" ] && nft "add rule $NFTABLE_NAME PSW_ICMP_REDIRECT meta l4proto icmpv6 ip6 daddr @$NFTSET_BLACK6 $(REDIRECT) comment \"默认\""
 					[ "${USE_GFW_LIST}" = "1" ] && nft "add rule $NFTABLE_NAME PSW_ICMP_REDIRECT meta l4proto icmpv6 ip6 daddr @$NFTSET_GFW6 $(REDIRECT) comment \"默认\""
-					[ "${CHN_LIST}" != "0" ] && nft "add rule $NFTABLE_NAME PSW_ICMP_REDIRECT meta l4proto icmpv6 ip6 daddr @$NFTSET_CHN6 $(get_jump_ipt ${CHN_LIST}) comment \"默认\""
+					[ "${CHN_LIST}" != "0" ] && nft "add rule $NFTABLE_NAME PSW_ICMP_REDIRECT meta l4proto icmpv6 ip6 daddr @$NFTSET_CHN6 $(get_jump_nft ${CHN_LIST}) comment \"默认\""
 					[ "${USE_SHUNT_TCP}" = "1" ] && nft "add rule $NFTABLE_NAME PSW_ICMP_REDIRECT meta l4proto icmpv6 ip6 daddr @$NFTSET_SHUNT6 $(REDIRECT) comment \"默认\""
 					[ "${TCP_PROXY_MODE}" != "disable" ] && nft "add rule $NFTABLE_NAME PSW_ICMP_REDIRECT meta l4proto icmpv6 $(REDIRECT) comment \"默认\""
 					nft "add rule $NFTABLE_NAME PSW_ICMP_REDIRECT meta l4proto icmpv6 return comment \"默认\""
@@ -706,7 +709,7 @@ load_acl() {
 				nft "add rule $NFTABLE_NAME $nft_chain ip protocol tcp ip daddr $FAKE_IP ${nft_j} comment \"默认\""
 				[ "${USE_PROXY_LIST}" = "1" ] && nft "add rule $NFTABLE_NAME $nft_chain ip protocol tcp $(factor $TCP_REDIR_PORTS "tcp dport") ip daddr @$NFTSET_BLACK ${nft_j} comment \"默认\""
 				[ "${USE_GFW_LIST}" = "1" ] && nft "add rule $NFTABLE_NAME $nft_chain ip protocol tcp $(factor $TCP_REDIR_PORTS "tcp dport") ip daddr @$NFTSET_GFW ${nft_j} comment \"默认\""
-				[ "${CHN_LIST}" != "0" ] && nft "add rule $NFTABLE_NAME $nft_chain ip protocol tcp $(factor $TCP_REDIR_PORTS "tcp dport") ip daddr @$NFTSET_CHN $(get_jump_ipt ${CHN_LIST} "${nft_j}") comment \"默认\""
+				[ "${CHN_LIST}" != "0" ] && nft "add rule $NFTABLE_NAME $nft_chain ip protocol tcp $(factor $TCP_REDIR_PORTS "tcp dport") ip daddr @$NFTSET_CHN $(get_jump_nft ${CHN_LIST} "${nft_j}") comment \"默认\""
 				[ "${USE_SHUNT_TCP}" = "1" ] && nft "add rule $NFTABLE_NAME $nft_chain ip protocol tcp $(factor $TCP_REDIR_PORTS "tcp dport") ip daddr @$NFTSET_SHUNT ${nft_j} comment \"默认\""
 				[ "${TCP_PROXY_MODE}" != "disable" ] && nft "add rule $NFTABLE_NAME $nft_chain ip protocol tcp $(factor $TCP_REDIR_PORTS "tcp dport") ${nft_j} comment \"默认\""
 				[ -n "${is_tproxy}" ] && nft "add rule $NFTABLE_NAME $nft_chain ip protocol tcp $(REDIRECT $TCP_REDIR_PORT TPROXY4) comment \"默认\""
@@ -716,7 +719,7 @@ load_acl() {
 					nft "add rule $NFTABLE_NAME PSW_MANGLE_V6 meta l4proto tcp ip6 daddr $FAKE_IP_6 counter jump PSW_RULE comment \"默认\""
 					[ "${USE_PROXY_LIST}" = "1" ] && nft "add rule $NFTABLE_NAME PSW_MANGLE_V6 meta l4proto tcp $(factor $TCP_REDIR_PORTS "tcp dport") ip6 daddr @$NFTSET_BLACK6 counter jump PSW_RULE comment \"默认\""
 					[ "${USE_GFW_LIST}" = "1" ] && nft "add rule $NFTABLE_NAME PSW_MANGLE_V6 meta l4proto tcp $(factor $TCP_REDIR_PORTS "tcp dport") ip6 daddr @$NFTSET_GFW6 counter jump PSW_RULE comment \"默认\""
-					[ "${CHN_LIST}" != "0" ] && nft "add rule $NFTABLE_NAME PSW_MANGLE_V6 meta l4proto tcp $(factor $TCP_REDIR_PORTS "tcp dport") ip6 daddr @$NFTSET_CHN6 $(get_jump_ipt ${CHN_LIST} "counter jump PSW_RULE") comment \"默认\""
+					[ "${CHN_LIST}" != "0" ] && nft "add rule $NFTABLE_NAME PSW_MANGLE_V6 meta l4proto tcp $(factor $TCP_REDIR_PORTS "tcp dport") ip6 daddr @$NFTSET_CHN6 $(get_jump_nft ${CHN_LIST} "counter jump PSW_RULE") comment \"默认\""
 					[ "${USE_SHUNT_TCP}" = "1" ] && nft "add rule $NFTABLE_NAME PSW_MANGLE_V6 meta l4proto tcp $(factor $TCP_REDIR_PORTS "tcp dport") ip6 daddr @$NFTSET_SHUNT6 counter jump PSW_RULE comment \"默认\""
 					[ "${TCP_PROXY_MODE}" != "disable" ] && nft "add rule $NFTABLE_NAME PSW_MANGLE_V6 meta l4proto tcp $(factor $TCP_REDIR_PORTS "tcp dport") counter jump PSW_RULE comment \"默认\""
 					nft "add rule $NFTABLE_NAME PSW_MANGLE_V6 meta l4proto tcp $(REDIRECT $TCP_REDIR_PORT TPROXY) comment \"默认\""
@@ -739,7 +742,7 @@ load_acl() {
 				nft "add rule $NFTABLE_NAME PSW_MANGLE ip protocol udp ip daddr $FAKE_IP counter jump PSW_RULE comment \"默认\""
 				[ "${USE_PROXY_LIST}" = "1" ] && nft "add rule $NFTABLE_NAME PSW_MANGLE ip protocol udp $(factor $UDP_REDIR_PORTS "udp dport") ip daddr @$NFTSET_BLACK counter jump PSW_RULE comment \"默认\""
 				[ "${USE_GFW_LIST}" = "1" ] && nft "add rule $NFTABLE_NAME PSW_MANGLE ip protocol udp $(factor $UDP_REDIR_PORTS "udp dport") ip daddr @$NFTSET_GFW counter jump PSW_RULE comment \"默认\""
-				[ "${CHN_LIST}" != "0" ] && nft "add rule $NFTABLE_NAME PSW_MANGLE ip protocol udp $(factor $UDP_REDIR_PORTS "udp dport") ip daddr @$NFTSET_CHN $(get_jump_ipt ${CHN_LIST} "counter jump PSW_RULE") comment \"默认\""
+				[ "${CHN_LIST}" != "0" ] && nft "add rule $NFTABLE_NAME PSW_MANGLE ip protocol udp $(factor $UDP_REDIR_PORTS "udp dport") ip daddr @$NFTSET_CHN $(get_jump_nft ${CHN_LIST} "counter jump PSW_RULE") comment \"默认\""
 				[ "${USE_SHUNT_UDP}" = "1" ] && nft "add rule $NFTABLE_NAME PSW_MANGLE ip protocol udp $(factor $UDP_REDIR_PORTS "udp dport") ip daddr @$NFTSET_SHUNT counter jump PSW_RULE comment \"默认\""
 				[ "${UDP_PROXY_MODE}" != "disable" ] && nft "add rule $NFTABLE_NAME PSW_MANGLE ip protocol udp $(factor $UDP_REDIR_PORTS "udp dport") counter jump PSW_RULE comment \"默认\""
 				nft "add rule $NFTABLE_NAME PSW_MANGLE ip protocol udp $(REDIRECT $UDP_REDIR_PORT TPROXY4) comment \"默认\""
@@ -749,7 +752,7 @@ load_acl() {
 					nft "add rule $NFTABLE_NAME PSW_MANGLE_V6 meta l4proto udp ip6 daddr $FAKE_IP_6 counter jump PSW_RULE comment \"默认\""
 					[ "${USE_PROXY_LIST}" = "1" ] && nft "add rule $NFTABLE_NAME PSW_MANGLE_V6 meta l4proto udp $(factor $UDP_REDIR_PORTS "udp dport") ip6 daddr @$NFTSET_BLACK6 counter jump PSW_RULE comment \"默认\""
 					[ "${USE_GFW_LIST}" = "1" ] && nft "add rule $NFTABLE_NAME PSW_MANGLE_V6 meta l4proto udp $(factor $UDP_REDIR_PORTS "udp dport") ip6 daddr @$NFTSET_GFW6 counter jump PSW_RULE comment \"默认\""
-					[ "${CHN_LIST}" != "0" ] && nft "add rule $NFTABLE_NAME PSW_MANGLE_V6 meta l4proto udp $(factor $UDP_REDIR_PORTS "udp dport") ip6 daddr @$NFTSET_CHN6 $(get_jump_ipt ${CHN_LIST} "counter jump PSW_RULE") comment \"默认\""
+					[ "${CHN_LIST}" != "0" ] && nft "add rule $NFTABLE_NAME PSW_MANGLE_V6 meta l4proto udp $(factor $UDP_REDIR_PORTS "udp dport") ip6 daddr @$NFTSET_CHN6 $(get_jump_nft ${CHN_LIST} "counter jump PSW_RULE") comment \"默认\""
 					[ "${USE_SHUNT_UDP}" = "1" ] && nft "add rule $NFTABLE_NAME PSW_MANGLE_V6 meta l4proto udp $(factor $UDP_REDIR_PORTS "udp dport") ip6 daddr @$NFTSET_SHUNT6 counter jump PSW_RULE comment \"默认\""
 					[ "${UDP_PROXY_MODE}" != "disable" ] && nft "add rule $NFTABLE_NAME PSW_MANGLE_V6 meta l4proto udp $(factor $UDP_REDIR_PORTS "udp dport") counter jump PSW_RULE comment \"默认\""
 					nft "add rule $NFTABLE_NAME PSW_MANGLE_V6 meta l4proto udp $(REDIRECT $UDP_REDIR_PORT TPROXY) comment \"默认\""
@@ -790,50 +793,76 @@ filter_vpsip() {
 }
 
 filter_server_port() {
-	local address=${1}
-	local port=${2}
-	local stream=${3}
-	stream=$(echo ${3} | tr 'A-Z' 'a-z')
-	local _is_tproxy
-	_is_tproxy=${is_tproxy}
-	[ "$stream" == "udp" ] && _is_tproxy="TPROXY"
-
-	for _ipt in 4 6; do
-		[ "$_ipt" == "4" ] && _ip_type=ip
-		[ "$_ipt" == "6" ] && _ip_type=ip6
-		nft "list chain $NFTABLE_NAME $nft_output_chain" 2>/dev/null | grep -q "${address}:${port}"
-		if [ $? -ne 0 ]; then
-			nft "insert rule $NFTABLE_NAME $nft_output_chain meta l4proto $stream $_ip_type daddr $address $stream dport $port return comment \"${address}:${port}\"" 2>/dev/null
-		fi
+	local address="$1"
+	local port=$(echo "$2" | tr ':' '-' | tr -d ' ')
+	local stream=$(echo "$3" | tr 'A-Z' 'a-z')
+	local _ip_type _port_expr _ver _is_tproxy
+	local _nft_output_chain="PSW_OUTPUT_NAT"
+	[ "$(config_t_get global_forwarding tcp_proxy_way redirect)" = "tproxy" ] && _is_tproxy="TPROXY"
+	[ "$stream" = "udp" ] && _is_tproxy="TPROXY"
+	[ -n "$_is_tproxy" ] && _nft_output_chain="PSW_OUTPUT_MANGLE"
+	case "$port" in
+		*,*) _port_expr="{ $port }" ;;
+		*)   _port_expr="$port" ;;
+	esac
+	for _ver in 4 6; do
+		[ "$_ver" = "4" ] && _ip_type="ip"
+		[ "$_ver" = "6" ] && _ip_type="ip6" && _nft_output_chain="PSW_OUTPUT_MANGLE_V6"
+		nft list chain "$NFTABLE_NAME" "$_nft_output_chain" 2>/dev/null | grep -q "comment \"${address}:${port}:${stream}\"" || \
+		nft insert rule "$NFTABLE_NAME" "$_nft_output_chain" meta l4proto "$stream" $_ip_type daddr "$address" "$stream" dport $_port_expr return comment "\"${address}:${port}:${stream}\"" 2>/dev/null
 	done
 }
 
 filter_node() {
-	local node=${1}
-	local stream=${2}
-	if [ -n "$node" ]; then
-		local address=$(config_n_get $node address)
-		local port=$(config_n_get $node port)
-		[ -z "$address" ] && [ -z "$port" ] && {
-			return 1
-		}
-		filter_server_port $address $port $stream
-		filter_server_port $address $port $stream
-	fi
+	local node="$1" stream="$2"
+	[ -z "$node" ] && return 1
+	local address=$(config_n_get "$node" address)
+	local port=$(config_n_get "$node" port)
+	local hop=$(config_n_get "$node" hysteria2_hop)
+	[ -n "$hop" ] && port="${port:+$port,}$hop"
+	[ -z "$address" -o -z "$port" ] && return 1
+	filter_server_port "$address" "$port" "$stream"
 }
 
 filter_direct_node_list() {
 	[ ! -s "$TMP_PATH/direct_node_list" ] && return
-	for _node_id in $(cat $TMP_PATH/direct_node_list | awk '!seen[$0]++'); do
+	awk '!seen[$0]++' "$TMP_PATH/direct_node_list" | while read -r _node_id; do
 		filter_node "$_node_id" TCP
 		filter_node "$_node_id" UDP
 		unset _node_id
 	done
 }
 
+
+del_script_mwan3() {
+	[ -s "/etc/init.d/mwan3" ] && sed -i "/${CONFIG}/d" /etc/init.d/mwan3 >/dev/null 2>&1
+}
+
+add_script_mwan3() {
+	del_script_mwan3
+	[ -s "/etc/init.d/mwan3" ] && {
+		sed -i '/start_service()/,/}/ s/^}/    \/usr\/share\/passwall\/nftables.sh mwan3_start\n}/' /etc/init.d/mwan3
+		sed -i '/stop_service().*{/a \    \/usr\/share\/passwall\/nftables.sh mwan3_stop' /etc/init.d/mwan3
+	}
+}
+
+mwan3_stop() {
+	local handles=$(nft -a list chain ip mangle mwan3_hook 2>/dev/null | grep "${FWMARK}" | awk -F '# handle ' '{print$2}')
+	for handle in $handles; do
+		nft delete rule ip mangle mwan3_hook handle ${handle} 2>/dev/null
+	done
+}
+
+mwan3_start() {
+	mwan3_stop
+	nft list chain ip mangle mwan3_hook >/dev/null 2>&1 && nft insert rule ip mangle mwan3_hook ct mark ${FWMARK} counter return >/dev/null 2>&1
+}
+
 add_firewall_rule() {
 	echolog "开始加载 nftables 防火墙规则..."
 	gen_nft_tables
+	add_script_mwan3
+	mwan3_start
 	gen_nftset $NFTSET_WAN ipv4_addr 0 "-1"
 	gen_nftset $NFTSET_VPS ipv4_addr 0 "-1"
 	gen_nftset $NFTSET_GFW ipv4_addr "2d" 0
@@ -1008,7 +1037,8 @@ add_firewall_rule() {
 
 	nft "add chain $NFTABLE_NAME PSW_DIVERT"
 	nft "flush chain $NFTABLE_NAME PSW_DIVERT"
-	nft "add rule $NFTABLE_NAME PSW_DIVERT meta l4proto tcp socket transparent 1 mark set 1 counter accept"
+	# Only TCP, UDP Invalid.
+	nft "add rule $NFTABLE_NAME PSW_DIVERT meta l4proto tcp socket transparent 1 mark set ${FWMARK} counter accept"
 
 	nft "add chain $NFTABLE_NAME PSW_DNS"
 	nft "flush chain $NFTABLE_NAME PSW_DNS"
@@ -1023,26 +1053,27 @@ add_firewall_rule() {
 	# for ipv4 ipv6 tproxy mark
 	nft "add chain $NFTABLE_NAME PSW_RULE"
 	nft "flush chain $NFTABLE_NAME PSW_RULE"
-	nft "add rule $NFTABLE_NAME PSW_RULE meta mark set ct mark counter"
-	nft "add rule $NFTABLE_NAME PSW_RULE meta mark 1 counter return"
-	nft "add rule $NFTABLE_NAME PSW_RULE tcp flags &(fin|syn|rst|ack) == syn meta mark set mark and 0x0 xor 0x1 counter"
-	nft "add rule $NFTABLE_NAME PSW_RULE meta l4proto udp ct state new meta mark set mark and 0x0 xor 0x1 counter"
-	nft "add rule $NFTABLE_NAME PSW_RULE ct mark set mark counter"
+	nft "add rule $NFTABLE_NAME PSW_RULE counter meta mark set ct mark"
+	nft "add rule $NFTABLE_NAME PSW_RULE meta mark ${FWMARK} counter return"
+	nft "add rule $NFTABLE_NAME PSW_RULE tcp flags & (fin|syn|rst|ack) == syn counter meta mark set ${FWMARK}"
+	nft "add rule $NFTABLE_NAME PSW_RULE meta l4proto udp ct state { new, related } counter meta mark set ${FWMARK}"
+	nft "add rule $NFTABLE_NAME PSW_RULE counter ct mark set mark"
 
 	#ipv4 tproxy mode and udp
 	nft "add chain $NFTABLE_NAME PSW_MANGLE"
 	nft "flush chain $NFTABLE_NAME PSW_MANGLE"
 	nft "add rule $NFTABLE_NAME PSW_MANGLE ip daddr @$NFTSET_LAN counter return"
 	nft "add rule $NFTABLE_NAME PSW_MANGLE ip daddr @$NFTSET_VPS counter return"
+	nft "add rule $NFTABLE_NAME PSW_MANGLE ct direction reply counter return"
 
 	nft "add chain $NFTABLE_NAME PSW_OUTPUT_MANGLE"
 	nft "flush chain $NFTABLE_NAME PSW_OUTPUT_MANGLE"
 	nft "add rule $NFTABLE_NAME PSW_OUTPUT_MANGLE ip daddr @$NFTSET_LAN counter return"
 	nft "add rule $NFTABLE_NAME PSW_OUTPUT_MANGLE ip daddr @$NFTSET_VPS counter return"
-
 	[ "${USE_BLOCK_LIST}" = "1" ] && nft "add rule $NFTABLE_NAME PSW_OUTPUT_MANGLE ip daddr @$NFTSET_BLOCK counter drop"
 	[ "${USE_DIRECT_LIST}" = "1" ] && nft "add rule $NFTABLE_NAME PSW_OUTPUT_MANGLE ip daddr @$NFTSET_WHITE counter return"
-	nft "add rule $NFTABLE_NAME PSW_OUTPUT_MANGLE meta mark 0xff counter return"
+	nft "add rule $NFTABLE_NAME PSW_OUTPUT_MANGLE ct direction reply counter return"
+	nft "add rule $NFTABLE_NAME PSW_OUTPUT_MANGLE meta mark 255 counter return"
 
 	# jump chains
 	nft "add rule $NFTABLE_NAME mangle_prerouting counter jump PSW_DIVERT"
@@ -1063,7 +1094,7 @@ add_firewall_rule() {
 		nft "add rule $NFTABLE_NAME PSW_OUTPUT_NAT ip daddr @$NFTSET_VPS counter return"
 		[ "${USE_BLOCK_LIST}" = "1" ] && nft "add rule $NFTABLE_NAME PSW_OUTPUT_NAT ip daddr @$NFTSET_BLOCK counter drop"
 		[ "${USE_DIRECT_LIST}" = "1" ] && nft "add rule $NFTABLE_NAME PSW_OUTPUT_NAT ip daddr @$NFTSET_WHITE counter return"
-		nft "add rule $NFTABLE_NAME PSW_OUTPUT_NAT meta mark 0xff counter return"
+		nft "add rule $NFTABLE_NAME PSW_OUTPUT_NAT meta mark 255 counter return"
 	}
 
 	#icmp ipv6-icmp redirect
@@ -1094,14 +1125,15 @@ add_firewall_rule() {
 	fi
 	unset WAN_IP wan_ip
 
-	ip rule add fwmark 1 lookup 100
-	ip route add local 0.0.0.0/0 dev lo table 100
+	ip rule add fwmark ${FWMARK} table 999 priority 999
+	ip route add local 0.0.0.0/0 dev lo table 999
 
 	#ipv6 tproxy mode and udp
 	nft "add chain $NFTABLE_NAME PSW_MANGLE_V6"
 	nft "flush chain $NFTABLE_NAME PSW_MANGLE_V6"
 	nft "add rule $NFTABLE_NAME PSW_MANGLE_V6 ip6 daddr @$NFTSET_LAN6 counter return"
 	nft "add rule $NFTABLE_NAME PSW_MANGLE_V6 ip6 daddr @$NFTSET_VPS6 counter return"
+	nft "add rule $NFTABLE_NAME PSW_MANGLE_V6 ct direction reply counter return"
 
 	nft "add chain $NFTABLE_NAME PSW_OUTPUT_MANGLE_V6"
 	nft "flush chain $NFTABLE_NAME PSW_OUTPUT_MANGLE_V6"
@@ -1109,7 +1141,8 @@ add_firewall_rule() {
 	nft "add rule $NFTABLE_NAME PSW_OUTPUT_MANGLE_V6 ip6 daddr @$NFTSET_VPS6 counter return"
 	[ "${USE_BLOCK_LIST}" = "1" ] && nft "add rule $NFTABLE_NAME PSW_OUTPUT_MANGLE_V6 ip6 daddr @$NFTSET_BLOCK6 counter drop"
 	[ "${USE_DIRECT_LIST}" = "1" ] && nft "add rule $NFTABLE_NAME PSW_OUTPUT_MANGLE_V6 ip6 daddr @$NFTSET_WHITE6 counter return"
-	nft "add rule $NFTABLE_NAME PSW_OUTPUT_MANGLE_V6 meta mark 0xff counter return"
+	nft "add rule $NFTABLE_NAME PSW_OUTPUT_MANGLE_V6 ct direction reply counter return"
+	nft "add rule $NFTABLE_NAME PSW_OUTPUT_MANGLE_V6 meta mark 255 counter return"
 
 	[ -n "$IPT_APPEND_DNS" ] && {
 		local local_dns dns_address dns_port
@@ -1144,8 +1177,8 @@ add_firewall_rule() {
 		}
 		unset WAN6_IP wan6_ip
 
-		ip -6 rule add fwmark 1 table 100
-		ip -6 route add local ::/0 dev lo table 100
+		ip -6 rule add fwmark ${FWMARK} table 999 priority 999
+		ip -6 route add local ::/0 dev lo table 999
 	}
 
 	[ "$TCP_UDP" = "1" ] && [ -z "$UDP_NODE" ] && UDP_NODE=$TCP_NODE
@@ -1189,7 +1222,7 @@ add_firewall_rule() {
 				nft add rule $NFTABLE_NAME $nft_output_chain ip protocol tcp ip daddr $FAKE_IP $(factor $TCP_PROXY_DROP_PORTS "tcp dport") counter drop
 				[ "${USE_PROXY_LIST}" = "1" ] && nft add rule $NFTABLE_NAME $nft_output_chain ip protocol tcp ip daddr @$NFTSET_BLACK $(factor $TCP_PROXY_DROP_PORTS "tcp dport") counter drop
 				[ "${USE_GFW_LIST}" = "1" ] && nft add rule $NFTABLE_NAME $nft_output_chain ip protocol tcp ip daddr @$NFTSET_GFW $(factor $TCP_PROXY_DROP_PORTS "tcp dport") counter drop
-				[ "${CHN_LIST}" != "0" ] && nft add rule $NFTABLE_NAME $nft_output_chain ip protocol tcp ip daddr @$NFTSET_CHN $(factor $TCP_PROXY_DROP_PORTS "tcp dport") $(get_jump_ipt ${CHN_LIST} "counter drop")
+				[ "${CHN_LIST}" != "0" ] && nft add rule $NFTABLE_NAME $nft_output_chain ip protocol tcp ip daddr @$NFTSET_CHN $(factor $TCP_PROXY_DROP_PORTS "tcp dport") $(get_jump_nft ${CHN_LIST} "counter drop")
 				[ "${USE_SHUNT_TCP}" = "1" ] && nft add rule $NFTABLE_NAME $nft_output_chain ip protocol tcp ip daddr @$NFTSET_SHUNT $(factor $TCP_PROXY_DROP_PORTS "tcp dport") counter drop
 				[ "${LOCALHOST_TCP_PROXY_MODE}" != "disable" ] && nft add rule $NFTABLE_NAME $nft_output_chain ip protocol tcp $(factor $TCP_PROXY_DROP_PORTS "tcp dport") counter drop
 				echolog "  - ${msg}屏蔽代理 TCP 端口[${TCP_PROXY_DROP_PORTS}]"
@@ -1199,7 +1232,7 @@ add_firewall_rule() {
 				nft add rule $NFTABLE_NAME PSW_OUTPUT_MANGLE ip protocol udp ip daddr $FAKE_IP $(factor $UDP_PROXY_DROP_PORTS "udp dport") counter drop
 				[ "${USE_PROXY_LIST}" = "1" ] && nft add rule $NFTABLE_NAME PSW_OUTPUT_MANGLE ip protocol udp ip daddr @$NFTSET_BLACK $(factor $UDP_PROXY_DROP_PORTS "udp dport") counter drop
 				[ "${USE_GFW_LIST}" = "1" ] && nft add rule $NFTABLE_NAME PSW_OUTPUT_MANGLE ip protocol udp ip daddr @$NFTSET_GFW $(factor $UDP_PROXY_DROP_PORTS "udp dport") counter drop
-				[ "${CHN_LIST}" != "0" ] && nft add rule $NFTABLE_NAME PSW_OUTPUT_MANGLE ip protocol udp ip daddr @$NFTSET_CHN $(factor $UDP_PROXY_DROP_PORTS "udp dport") $(get_jump_ipt ${CHN_LIST} "counter drop")
+				[ "${CHN_LIST}" != "0" ] && nft add rule $NFTABLE_NAME PSW_OUTPUT_MANGLE ip protocol udp ip daddr @$NFTSET_CHN $(factor $UDP_PROXY_DROP_PORTS "udp dport") $(get_jump_nft ${CHN_LIST} "counter drop")
 				[ "${USE_SHUNT_UDP}" = "1" ] && nft add rule $NFTABLE_NAME PSW_OUTPUT_MANGLE ip protocol udp ip daddr @$NFTSET_SHUNT $(factor $UDP_PROXY_DROP_PORTS "udp dport") counter drop
 				[ "${LOCALHOST_UDP_PROXY_MODE}" != "disable" ] && nft add rule $NFTABLE_NAME PSW_OUTPUT_MANGLE ip protocol udp $(factor $UDP_PROXY_DROP_PORTS "udp dport") counter drop
 				echolog "  - ${msg}屏蔽代理 UDP 端口[${UDP_PROXY_DROP_PORTS}]"
@@ -1240,7 +1273,7 @@ add_firewall_rule() {
 				nft "add rule $NFTABLE_NAME PSW_ICMP_REDIRECT oif lo ip protocol icmp ip daddr $FAKE_IP counter redirect"
 				[ "${USE_PROXY_LIST}" = "1" ] && nft "add rule $NFTABLE_NAME PSW_ICMP_REDIRECT oif lo ip protocol icmp ip daddr @$NFTSET_BLACK counter redirect"
 				[ "${USE_GFW_LIST}" = "1" ] && nft "add rule $NFTABLE_NAME PSW_ICMP_REDIRECT oif lo ip protocol icmp ip daddr @$NFTSET_GFW counter redirect"
-				[ "${CHN_LIST}" != "0" ] && nft "add rule $NFTABLE_NAME PSW_ICMP_REDIRECT oif lo ip protocol icmp ip daddr @$NFTSET_CHN $(get_jump_ipt ${CHN_LIST})"
+				[ "${CHN_LIST}" != "0" ] && nft "add rule $NFTABLE_NAME PSW_ICMP_REDIRECT oif lo ip protocol icmp ip daddr @$NFTSET_CHN $(get_jump_nft ${CHN_LIST})"
 				[ "${USE_SHUNT_TCP}" = "1" ] && nft "add rule $NFTABLE_NAME PSW_ICMP_REDIRECT oif lo ip protocol icmp ip daddr @$NFTSET_SHUNT counter redirect"
 				[ -n "${LOCALHOST_TCP_PROXY_MODE}" ] && [ "${LOCALHOST_TCP_PROXY_MODE}" != "disable" ] && nft "add rule $NFTABLE_NAME PSW_ICMP_REDIRECT oif lo ip protocol icmp counter redirect"
 				nft "add rule $NFTABLE_NAME PSW_ICMP_REDIRECT oif lo ip protocol icmp counter return"
@@ -1250,7 +1283,7 @@ add_firewall_rule() {
 				nft "add rule $NFTABLE_NAME PSW_ICMP_REDIRECT oif lo meta l4proto icmpv6 ip6 daddr $FAKE_IP_6 counter redirect"
 				[ "${USE_PROXY_LIST}" = "1" ] && nft "add rule $NFTABLE_NAME PSW_ICMP_REDIRECT oif lo meta l4proto icmpv6 ip6 daddr @$NFTSET_BLACK6 counter redirect"
 				[ "${USE_GFW_LIST}" = "1" ] && nft "add rule $NFTABLE_NAME PSW_ICMP_REDIRECT oif lo meta l4proto icmpv6 ip6 daddr @$NFTSET_GFW6 counter redirect"
-				[ "${CHN_LIST}" != "0" ] && nft "add rule $NFTABLE_NAME PSW_ICMP_REDIRECT oif lo meta l4proto icmpv6 ip6 daddr @$NFTSET_CHN6 $(get_jump_ipt ${CHN_LIST})"
+				[ "${CHN_LIST}" != "0" ] && nft "add rule $NFTABLE_NAME PSW_ICMP_REDIRECT oif lo meta l4proto icmpv6 ip6 daddr @$NFTSET_CHN6 $(get_jump_nft ${CHN_LIST})"
 				[ "${USE_SHUNT_TCP}" = "1" ] && nft "add rule $NFTABLE_NAME PSW_ICMP_REDIRECT oif lo meta l4proto icmpv6 ip6 daddr @$NFTSET_SHUNT6 counter redirect"
 				[ -n "${LOCALHOST_TCP_PROXY_MODE}" ] && [ "${LOCALHOST_TCP_PROXY_MODE}" != "disable" ] && nft "add rule $NFTABLE_NAME PSW_ICMP_REDIRECT oif lo meta l4proto icmpv6 counter redirect"
 				nft "add rule $NFTABLE_NAME PSW_ICMP_REDIRECT oif lo meta l4proto icmpv6 counter return"
@@ -1268,7 +1301,7 @@ add_firewall_rule() {
 				nft "add rule $NFTABLE_NAME $nft_chain ip protocol tcp ip daddr $FAKE_IP ${nft_j}"
 				[ "${USE_PROXY_LIST}" = "1" ] && nft "add rule $NFTABLE_NAME $nft_chain ip protocol tcp ip daddr @$NFTSET_BLACK $(factor $TCP_REDIR_PORTS "tcp dport") ${nft_j}"
 				[ "${USE_GFW_LIST}" = "1" ] && nft "add rule $NFTABLE_NAME $nft_chain ip protocol tcp ip daddr @$NFTSET_GFW $(factor $TCP_REDIR_PORTS "tcp dport") ${nft_j}"
-				[ "${CHN_LIST}" != "0" ] && nft "add rule $NFTABLE_NAME $nft_chain ip protocol tcp ip daddr @$NFTSET_CHN $(factor $TCP_REDIR_PORTS "tcp dport") $(get_jump_ipt ${CHN_LIST} "${nft_j}")"
+				[ "${CHN_LIST}" != "0" ] && nft "add rule $NFTABLE_NAME $nft_chain ip protocol tcp ip daddr @$NFTSET_CHN $(factor $TCP_REDIR_PORTS "tcp dport") $(get_jump_nft ${CHN_LIST} "${nft_j}")"
 				[ "${USE_SHUNT_TCP}" = "1" ] && nft "add rule $NFTABLE_NAME $nft_chain ip protocol tcp ip daddr @$NFTSET_SHUNT $(factor $TCP_REDIR_PORTS "tcp dport") ${nft_j}"
 				[ "${LOCALHOST_TCP_PROXY_MODE}" != "disable" ] && nft "add rule $NFTABLE_NAME $nft_chain ip protocol tcp $(factor $TCP_REDIR_PORTS "tcp dport") ${nft_j}"
 				[ -n "${is_tproxy}" ] && nft "add rule $NFTABLE_NAME PSW_MANGLE ip protocol tcp iif lo $(REDIRECT $TCP_REDIR_PORT TPROXY4) comment \"本机\""
@@ -1282,7 +1315,7 @@ add_firewall_rule() {
 					nft "add rule $NFTABLE_NAME PSW_OUTPUT_MANGLE_V6 meta l4proto tcp ip6 daddr $FAKE_IP_6 counter jump PSW_RULE"
 					[ "${USE_PROXY_LIST}" = "1" ] && nft "add rule $NFTABLE_NAME PSW_OUTPUT_MANGLE_V6 meta l4proto tcp ip6 daddr @$NFTSET_BLACK6 $(factor $TCP_REDIR_PORTS "tcp dport") counter jump PSW_RULE"
 					[ "${USE_GFW_LIST}" = "1" ] && nft "add rule $NFTABLE_NAME PSW_OUTPUT_MANGLE_V6 meta l4proto tcp ip6 daddr @$NFTSET_GFW6 $(factor $TCP_REDIR_PORTS "tcp dport") counter jump PSW_RULE"
-					[ "${CHN_LIST}" != "0" ] && nft "add rule $NFTABLE_NAME PSW_OUTPUT_MANGLE_V6 meta l4proto tcp ip6 daddr @$NFTSET_CHN6 $(factor $TCP_REDIR_PORTS "tcp dport") $(get_jump_ipt ${CHN_LIST} "counter jump PSW_RULE")"
+					[ "${CHN_LIST}" != "0" ] && nft "add rule $NFTABLE_NAME PSW_OUTPUT_MANGLE_V6 meta l4proto tcp ip6 daddr @$NFTSET_CHN6 $(factor $TCP_REDIR_PORTS "tcp dport") $(get_jump_nft ${CHN_LIST} "counter jump PSW_RULE")"
 					[ "${USE_SHUNT_TCP}" = "1" ] && nft "add rule $NFTABLE_NAME PSW_OUTPUT_MANGLE_V6 meta l4proto tcp ip6 daddr @$NFTSET_SHUNT6 $(factor $TCP_REDIR_PORTS "tcp dport") counter jump PSW_RULE"
 					[ "${LOCALHOST_TCP_PROXY_MODE}" != "disable" ] && nft "add rule $NFTABLE_NAME PSW_OUTPUT_MANGLE_V6 meta l4proto tcp $(factor $TCP_REDIR_PORTS "tcp dport") counter jump PSW_RULE"
 					nft "add rule $NFTABLE_NAME PSW_MANGLE_V6 meta l4proto tcp iif lo $(REDIRECT $TCP_REDIR_PORT TPROXY) comment \"本机\""
@@ -1320,7 +1353,7 @@ add_firewall_rule() {
 				nft "add rule $NFTABLE_NAME PSW_OUTPUT_MANGLE ip protocol udp ip daddr $FAKE_IP counter jump PSW_RULE"
 				[ "${USE_PROXY_LIST}" = "1" ] && nft "add rule $NFTABLE_NAME PSW_OUTPUT_MANGLE ip protocol udp ip daddr @$NFTSET_BLACK $(factor $UDP_REDIR_PORTS "udp dport") counter jump PSW_RULE"
 				[ "${USE_GFW_LIST}" = "1" ] && nft "add rule $NFTABLE_NAME PSW_OUTPUT_MANGLE ip protocol udp ip daddr @$NFTSET_GFW $(factor $UDP_REDIR_PORTS "udp dport") counter jump PSW_RULE"
-				[ "${CHN_LIST}" != "0" ] && nft "add rule $NFTABLE_NAME PSW_OUTPUT_MANGLE ip protocol udp ip daddr @$NFTSET_CHN $(factor $UDP_REDIR_PORTS "udp dport") $(get_jump_ipt ${CHN_LIST} "counter jump PSW_RULE")"
+				[ "${CHN_LIST}" != "0" ] && nft "add rule $NFTABLE_NAME PSW_OUTPUT_MANGLE ip protocol udp ip daddr @$NFTSET_CHN $(factor $UDP_REDIR_PORTS "udp dport") $(get_jump_nft ${CHN_LIST} "counter jump PSW_RULE")"
 				[ "${USE_SHUNT_UDP}" = "1" ] && nft "add rule $NFTABLE_NAME PSW_OUTPUT_MANGLE ip protocol udp ip daddr @$NFTSET_SHUNT $(factor $UDP_REDIR_PORTS "udp dport") counter jump PSW_RULE"
 				[ "${LOCALHOST_UDP_PROXY_MODE}" != "disable" ] && nft "add rule $NFTABLE_NAME PSW_OUTPUT_MANGLE ip protocol udp $(factor $UDP_REDIR_PORTS "udp dport") counter jump PSW_RULE"
 				nft "add rule $NFTABLE_NAME PSW_MANGLE ip protocol udp iif lo $(REDIRECT $UDP_REDIR_PORT TPROXY4) comment \"本机\""
@@ -1333,7 +1366,7 @@ add_firewall_rule() {
 					nft "add rule $NFTABLE_NAME PSW_OUTPUT_MANGLE_V6 meta l4proto udp ip6 daddr $FAKE_IP_6 counter jump PSW_RULE"
 					[ "${USE_PROXY_LIST}" = "1" ] && nft "add rule $NFTABLE_NAME PSW_OUTPUT_MANGLE_V6 meta l4proto udp ip6 daddr @$NFTSET_BLACK6 $(factor $UDP_REDIR_PORTS "udp dport") counter jump PSW_RULE"
 					[ "${USE_GFW_LIST}" = "1" ] && nft "add rule $NFTABLE_NAME PSW_OUTPUT_MANGLE_V6 meta l4proto udp ip6 daddr @$NFTSET_GFW6 $(factor $UDP_REDIR_PORTS "udp dport") counter jump PSW_RULE"
-					[ "${CHN_LIST}" != "0" ] && nft "add rule $NFTABLE_NAME PSW_OUTPUT_MANGLE_V6 meta l4proto udp ip6 daddr @$NFTSET_CHN6 $(factor $UDP_REDIR_PORTS "udp dport") $(get_jump_ipt ${CHN_LIST} "counter jump PSW_RULE")"
+					[ "${CHN_LIST}" != "0" ] && nft "add rule $NFTABLE_NAME PSW_OUTPUT_MANGLE_V6 meta l4proto udp ip6 daddr @$NFTSET_CHN6 $(factor $UDP_REDIR_PORTS "udp dport") $(get_jump_nft ${CHN_LIST} "counter jump PSW_RULE")"
 					[ "${USE_SHUNT_UDP}" = "1" ] && nft "add rule $NFTABLE_NAME PSW_OUTPUT_MANGLE_V6 meta l4proto udp ip6 daddr @$NFTSET_SHUNT6 $(factor $UDP_REDIR_PORTS "udp dport") counter jump PSW_RULE"
 					[ "${LOCALHOST_UDP_PROXY_MODE}" != "disable" ] && nft "add rule $NFTABLE_NAME PSW_OUTPUT_MANGLE_V6 meta l4proto udp $(factor $UDP_REDIR_PORTS "udp dport") counter jump PSW_RULE"
 					nft "add rule $NFTABLE_NAME PSW_MANGLE_V6 meta l4proto udp iif lo $(REDIRECT $UDP_REDIR_PORT TPROXY) comment \"本机\""
@@ -1343,7 +1376,7 @@ add_firewall_rule() {
 		fi
 
 		nft "add rule $NFTABLE_NAME mangle_output oif lo counter return comment \"PSW_OUTPUT_MANGLE\""
-		nft "add rule $NFTABLE_NAME mangle_output meta mark 1 counter return comment \"PSW_OUTPUT_MANGLE\""
+		nft "add rule $NFTABLE_NAME mangle_output meta mark ${FWMARK} counter return comment \"PSW_OUTPUT_MANGLE\""
 	}
 
 	#  加载ACLS
@@ -1376,11 +1409,11 @@ del_firewall_rule() {
 	# Need to be removed at the end, otherwise it will show "Resource busy"
 	nft delete chain $NFTABLE_NAME handle $(nft -a list chains | grep -E "PSW_RULE" | awk -F '# handle ' '{print$2}') 2>/dev/null
 
-	ip rule del fwmark 1 lookup 100 2>/dev/null
-	ip route del local 0.0.0.0/0 dev lo table 100 2>/dev/null
+	ip rule del fwmark ${FWMARK} 2>/dev/null
+	ip route del local 0.0.0.0/0 dev lo table 999 2>/dev/null
 
-	ip -6 rule del fwmark 1 table 100 2>/dev/null
-	ip -6 route del local ::/0 dev lo table 100 2>/dev/null
+	ip -6 rule del fwmark ${FWMARK} 2>/dev/null
+	ip -6 route del local ::/0 dev lo table 999 2>/dev/null
 
 	destroy_nftset $NFTSET_LOCAL
 	destroy_nftset $NFTSET_WAN
@@ -1403,6 +1436,8 @@ del_firewall_rule() {
 	#destroy_nftset $NFTSET_BLACK6
 	destroy_nftset $NFTSET_BLOCK6
 	destroy_nftset $NFTSET_WHITE6
+
+	del_script_mwan3
 
 	echolog "删除 nftables 规则完成。"
 }
@@ -1485,6 +1520,12 @@ insert_nftset)
 	;;
 filter_direct_node_list)
 	filter_direct_node_list
+	;;
+mwan3_start)
+	mwan3_start
+	;;
+mwan3_stop)
+	mwan3_stop
 	;;
 stop)
 	stop

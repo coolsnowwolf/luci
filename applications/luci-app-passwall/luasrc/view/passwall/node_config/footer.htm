@@ -2,8 +2,6 @@
 local api = self.api
 -%>
 <script type="text/javascript">
-	let node_id = "<%=self.section%>";
-	let url = '<%=api.url("node_config")%>/' + node_id;
 	//<![CDATA[
 	document.addEventListener("DOMContentLoaded", function () {
 		waitForElement('select[name*="<%=api.appname%>"][name*="type"]', function(el) {
@@ -13,8 +11,12 @@ local api = self.api
 				if (o_val != el.value) {
 					let save = true;
 					if (save) {
+						//document.getElementsByClassName('cbi-button-save')[0].click();
 						update_node({
-							type: getOption("type").value
+							remarks: getOption("remarks").value,
+							group: getOption("group").value,
+							type: getOption("type").value,
+							//protocol: ''
 						});
 					}
 				}
@@ -29,11 +31,14 @@ local api = self.api
 					let name = name_split[name_split.length - 1];
 					let save = true;
 					if (save) {
+						//document.getElementsByClassName('cbi-button-save')[0].click();
 						update_node({
+							remarks: getOption("remarks").value,
+							group: getOption("group").value,
 							protocol: getOption(name).value
 						});
 					} else {
-						window.location.href = url + "?select_proto=" + el.value;
+						window.location.href = node_config_url + "?select_proto=" + el.value;
 					}
 				}
 			});

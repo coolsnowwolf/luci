@@ -25,7 +25,6 @@ local function _n(name)
 	return option_prefix .. name
 end
 
-local formvalue_key = "cbid." .. appname .. "." .. arg[1] .. "."
 local formvalue_proto = luci.http.formvalue(formvalue_key .. _n("protocol"))
 
 if formvalue_proto then s.val["protocol"] = formvalue_proto end
@@ -298,6 +297,7 @@ o = s:option(ListValue, _n("flow"), translate("flow"))
 o.default = ""
 o:value("", translate("Disable"))
 o:value("xtls-rprx-vision")
+o:value("xtls-rprx-vision-udp443")
 o:depends({ [_n("protocol")] = "vless" })
 
 ---- [[hysteria2]]
