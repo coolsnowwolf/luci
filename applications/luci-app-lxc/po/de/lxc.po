@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2026-03-04 20:22+0000\n"
-"Last-Translator: ssantos <ssantos@web.de>\n"
+"PO-Revision-Date: 2026-03-23 18:10+0000\n"
+"Last-Translator: HerbJul <19JulianHerbst95@web.de>\n"
 "Language-Team: German <https://hosted.weblate.org/projects/openwrt/"
 "luciapplicationslxc/de/>\n"
 "Language: de\n"
@@ -105,7 +105,7 @@ msgstr "Gewähre UCI Zugriff auf luci-app-lxc"
 
 #: applications/luci-app-lxc/root/usr/share/luci/menu.d/luci-app-lxc.json:3
 msgid "LXC Container mgr"
-msgstr ""
+msgstr "LXC Container mgr"
 
 #: applications/luci-app-lxc/htdocs/luci-static/resources/view/lxc/overview.js:453
 msgid "LXC Containers"
@@ -158,21 +158,23 @@ msgstr "Stopp"
 
 #: applications/luci-app-lxc/htdocs/luci-static/resources/view/lxc/overview.js:34
 msgid "Template download in progress, please be patient!"
-msgstr ""
+msgstr "Vorlage herunterladen im Bearbeitung, bitte Geduld!"
 
 #: applications/luci-app-lxc/htdocs/luci-static/resources/view/lxc/overview.js:54
 msgid "The Name field must not be empty!"
-msgstr ""
+msgstr "Das Feld 'Name' darf nicht leer sein!"
 
 #: applications/luci-app-lxc/htdocs/luci-static/resources/view/lxc/overview.js:294
 msgid "There are no containers available yet."
-msgstr ""
+msgstr "Es sind noch keine Container verfügbar."
 
 #: applications/luci-app-lxc/htdocs/luci-static/resources/view/lxc/overview.js:299
 msgid "There are no templates for your architecture available."
-msgstr ""
+msgstr "Es gibt keine Vorlagen für Ihre Architektur."
 
 #: applications/luci-app-lxc/htdocs/luci-static/resources/view/lxc/overview.js:162
 msgid ""
 "This will completely remove a stopped LXC container from disk. Are you sure?"
 msgstr ""
+"Dies wird einen gestoppten LXC-Container vollständig von der Festplatte "
+"entfernen. Bist du sicher?"

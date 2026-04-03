@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2026-02-12 22:14+0000\n"
+"PO-Revision-Date: 2026-03-27 06:10+0000\n"
 "Last-Translator: EESF-2 <eesf-2@users.noreply.hosted.weblate.org>\n"
 "Language-Team: Chinese (Traditional Han script) <https://hosted.weblate.org/"
 "projects/openwrt/luciapplicationsnut/zh_Hant/>\n"
@@ -14,7 +14,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.16-dev\n"
+"X-Generator: Weblate 5.17-dev\n"
 
 #: applications/luci-app-nut/htdocs/luci-static/resources/view/nut/nut_monitor.js:16
 msgid "%s is mutually exclusive to other choices"
@@ -181,7 +181,7 @@ msgstr "IP 位址"
 
 #: applications/luci-app-nut/htdocs/luci-static/resources/view/nut/nut_server.js:161
 msgid "If this list is empty you need to %s"
-msgstr "如果此清單為空你需要%s"
+msgstr "如果此清單為空您需要%s"
 
 #: applications/luci-app-nut/htdocs/luci-static/resources/view/nut/nut_monitor.js:11
 #: applications/luci-app-nut/htdocs/luci-static/resources/view/nut/nut_monitor.js:16
@@ -343,7 +343,7 @@ msgstr "無通訊時通知"
 
 #: applications/luci-app-nut/htdocs/luci-static/resources/view/nut/nut_monitor.js:138
 msgid "Notify when no parent process"
-msgstr "無主處理程序時進行通知"
+msgstr "無主處理程式時進行通知"
 
 #: applications/luci-app-nut/htdocs/luci-static/resources/view/nut/nut_monitor.js:114
 msgid "Notify when on battery"
@@ -564,7 +564,7 @@ msgstr "無法執行 ldd: %s"
 #: applications/luci-app-nut/htdocs/luci-static/resources/view/nut/nut_server.js:55
 msgid ""
 "Use %s to see full list of commands your UPS supports (requires %s package)"
-msgstr "使用 %s 查看 UPS 支援的完整指令列表 (需要 %s 包)"
+msgstr "使用 %s 查看 UPS 支援的完整指令清單 (需要 %s 包)"
 
 #: applications/luci-app-nut/htdocs/luci-static/resources/view/nut/nut_server.js:139
 msgid ""

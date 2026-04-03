@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2026-03-13 14:10+0000\n"
+"PO-Revision-Date: 2026-03-27 06:10+0000\n"
 "Last-Translator: EESF-2 <eesf-2@users.noreply.hosted.weblate.org>\n"
 "Language-Team: Chinese (Traditional Han script) <https://hosted.weblate.org/"
 "projects/openwrt/luciapplicationssmartdns/zh_Hant/>\n"
@@ -389,7 +389,7 @@ msgstr "IP 集合名稱。"
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:1137
 msgid "If you like this software, please buy me a cup of coffee."
-msgstr "如果你喜歡此軟體，請買一杯咖啡給我。"
+msgstr "如果您喜歡此軟體，請買一杯咖啡給我。"
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:352
 msgid "Include Config Files<br>/etc/smartdns/conf.d"
@@ -603,7 +603,7 @@ msgstr "設定特定網域的規則清單。"
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:807
 msgid "Set Specific ip blacklist."
-msgstr "設定指定的 ip 黑名單列表。"
+msgstr "設定指定的 ip 黑名單清單。"
 
 #: applications/luci-app-smartdns/htdocs/luci-static/resources/view/smartdns/smartdns.js:708
 msgid "Set TLS hostname to verify."

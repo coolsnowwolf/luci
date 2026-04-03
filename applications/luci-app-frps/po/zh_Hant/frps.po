@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2026-03-11 18:10+0000\n"
+"PO-Revision-Date: 2026-03-27 06:10+0000\n"
 "Last-Translator: EESF-2 <eesf-2@users.noreply.hosted.weblate.org>\n"
 "Language-Team: Chinese (Traditional Han script) <https://hosted.weblate.org/"
 "projects/openwrt/luciapplicationsfrps/zh_Hant/>\n"
@@ -271,7 +271,7 @@ msgid ""
 "\"debug\", \"info\", \"warn\", and \"error\".<br />By default, this value is "
 "\"info\"."
 msgstr ""
-"LogLevel 指定最低紀錄級別。有效值為 \"trace\", \"debug\", \" info\", "
+"LogLevel 指定最低紀錄等級。有效值為 \"trace\", \"debug\", \" info\", "
 "\"warn\" 和 \"error\"。<br />預設情況下，此值為 \"info\"。"
 
 #: applications/luci-app-frps/htdocs/luci-static/resources/view/frps.js:38
@@ -373,7 +373,7 @@ msgstr ""
 msgid ""
 "This list can be used to specify some additional parameters which have not "
 "been included in this LuCI."
-msgstr "此列表用於指定此 LuCI 中未包含的某些其他額外參數。"
+msgstr "此清單用於指定此 LuCI 中未包含的某些其他額外參數。"
 
 #: applications/luci-app-frps/htdocs/luci-static/resources/view/frps.js:40
 msgid "Token"
