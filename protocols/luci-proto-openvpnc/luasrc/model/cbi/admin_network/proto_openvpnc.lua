@@ -1,5 +1,6 @@
 local fs = require "nixio.fs"
 local http = require "luci.http"
+local sys = require "luci.sys"
 local util = require "luci.util"
 
 local map, section, net = ...
@@ -11,6 +12,10 @@ local ovpn_file = ovpn_dir .. "/default-" .. sid .. ".ovpn"
 local auth_file = ovpn_dir .. "/default-" .. sid .. ".auth"
 local upload_tmp = "/tmp/openvpnc-upload-" .. sid
 local upload_fd, upload_source_name, upload_target, upload_notice
+
+function map.on_after_commit(self)
+	sys.call("/usr/bin/openvpnc-dnsmasq-sync >/dev/null 2>&1")
+end
 
 local function normalize_text(data)
 	return data and data:gsub("\r\n?", "\n") or data
@@ -150,6 +155,37 @@ username.rmempty = true
 password = section:taboption("general", Value, "password", translate("Password"))
 password.password = true
 password.rmempty = true
+
+custom_dns_enable = section:taboption("advanced", Flag, "custom_dns_enable", translate("Allow custom DNS servers"),
+	translate("When enabled, the DNS servers entered below will be added to this interface even if the OpenVPN server does not push any DNS settings."))
+custom_dns_enable.rmempty = false
+
+custom_dns = section:taboption("advanced", Value, "custom_dns", translate("Custom DNS servers"),
+	translate("Enter one or more DNS server addresses separated by spaces or commas, for example: 1.1.1.1,8.8.8.8"))
+custom_dns.placeholder = "1.1.1.1 8.8.8.8"
+custom_dns:depends("custom_dns_enable", "1")
+custom_dns.rmempty = true
+
+extra_routes_enable = section:taboption("advanced", Flag, "extra_routes_enable", translate("Allow extra route networks"),
+	translate("When enabled, the custom route networks entered below will be appended after the route networks pushed by the OpenVPN server."))
+extra_routes_enable.rmempty = false
+
+extra_routes = section:taboption("advanced", Value, "extra_routes", translate("Extra route networks"),
+	translate("Enter one or more IPv4 CIDR networks separated by spaces or commas, for example: 10.0.0.0/24,172.16.10.0/24"))
+extra_routes.placeholder = "10.0.0.0/24 172.16.10.0/24"
+extra_routes:depends("extra_routes_enable", "1")
+extra_routes.rmempty = true
+
+domain_dns_enable = section:taboption("advanced", Flag, "domain_dns_enable", translate("Resolve specific domains via custom DNS"),
+	translate("When enabled, dnsmasq will forward the domains entered below to the custom DNS servers through /tmp/dnsmasq.d/ovpnc.conf."))
+domain_dns_enable.rmempty = false
+domain_dns_enable:depends("custom_dns_enable", "1")
+
+dns_domains = section:taboption("advanced", Value, "dns_domains", translate("Domains resolved by custom DNS"),
+	translate("Enter one or more domains separated by spaces or commas, for example: corp.example.com"))
+dns_domains.placeholder = "corp.example.com"
+dns_domains:depends("domain_dns_enable", "1")
+dns_domains.rmempty = true
 
 auth_note = section:taboption("advanced", DummyValue, "_auth_note", translate("Authentication file"))
 

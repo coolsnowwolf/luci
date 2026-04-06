@@ -118,6 +118,11 @@ openvpnc_firewall_reload() {
 	/etc/init.d/firewall reload >/dev/null 2>&1
 }
 
+openvpnc_sync_dnsmasq() {
+	[ -x /usr/bin/openvpnc-dnsmasq-sync ] || return 0
+	/usr/bin/openvpnc-dnsmasq-sync >/dev/null 2>&1
+}
+
 openvpnc_ensure_firewall() {
 	local config="$1"
 	local zone_section forwarding_section zone_name changed=0
@@ -279,6 +284,7 @@ proto_openvpnc_setup() {
 	fi
 
 	openvpnc_ensure_firewall "$config"
+	openvpnc_sync_dnsmasq
 
 	set -- /usr/sbin/openvpn \
 		--syslog "openvpnc($config)" \
@@ -305,6 +311,7 @@ proto_openvpnc_teardown() {
 	local config="$1"
 
 	rm -f "/var/run/openvpnc-$config.status"
+	openvpnc_sync_dnsmasq
 	proto_kill_command "$config"
 }
 
