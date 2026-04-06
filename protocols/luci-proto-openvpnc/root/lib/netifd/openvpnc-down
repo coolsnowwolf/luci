@@ -1,0 +1,9 @@
+#!/bin/sh
+
+. /lib/netifd/netifd-proto.sh
+
+[ -n "$OPENVPNC_ID" ] || exit 0
+[ -n "$dev" ] || exit 0
+
+proto_init_update "$dev" 0
+proto_send_update "$OPENVPNC_ID"

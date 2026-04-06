@@ -1,0 +1,73 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Project-Id-Version: PACKAGE VERSION\n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: none\n"
+"Language: zh-cn\n"
+"MIME-Version: 1.0\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: luasrc/model/network/proto_openvpnc.lua:6
+msgid "OpenVPN Client"
+msgstr "OpenVPN 客户端"
+
+#: luasrc/model/cbi/admin_network/proto_openvpnc.lua:71
+msgid "File saved to"
+msgstr "文件已保存到"
+
+#: luasrc/model/cbi/admin_network/proto_openvpnc.lua:81
+msgid "OpenVPN configuration"
+msgstr "OpenVPN 配置"
+
+#: luasrc/model/cbi/admin_network/proto_openvpnc.lua:82
+msgid "Choose which imported .ovpn file should be used by this interface."
+msgstr "选择此接口要使用的已导入 .ovpn 配置文件。"
+
+#: luasrc/model/cbi/admin_network/proto_openvpnc.lua:84
+msgid "-- please choose --"
+msgstr "-- 请选择 --"
+
+#: luasrc/model/cbi/admin_network/proto_openvpnc.lua:110
+msgid "Please upload or choose an .ovpn file"
+msgstr "请上传或选择一个 .ovpn 文件"
+
+#: luasrc/model/cbi/admin_network/proto_openvpnc.lua:114
+msgid "Selected .ovpn file does not exist"
+msgstr "所选的 .ovpn 文件不存在"
+
+#: luasrc/model/cbi/admin_network/proto_openvpnc.lua:124
+msgid "Upload .ovpn file"
+msgstr "上传 .ovpn 文件"
+
+#: luasrc/model/cbi/admin_network/proto_openvpnc.lua:125
+msgid "Upload files into the dedicated profile directory, then choose one from the list above."
+msgstr "先将文件上传到专用配置目录，再从上方列表中选择一个配置文件。"
+
+#: luasrc/view/openvpnc/upload.htm:3
+msgid "Upload"
+msgstr "上传"
+
+#: luasrc/model/cbi/admin_network/proto_openvpnc.lua:130
+msgid "Username"
+msgstr "用户名"
+
+#: luasrc/model/cbi/admin_network/proto_openvpnc.lua:131
+msgid "If the selected profile uses auth-user-pass, a matching .auth file will be generated automatically from these credentials."
+msgstr "如果所选配置使用 auth-user-pass，将根据这里填写的凭据自动生成对应的 .auth 文件。"
+
+#: luasrc/model/cbi/admin_network/proto_openvpnc.lua:134
+msgid "Password"
+msgstr "密码"
+
+#: luasrc/model/cbi/admin_network/proto_openvpnc.lua:138
+msgid "Authentication file"
+msgstr "认证文件"
+
+#: luasrc/model/cbi/admin_network/proto_openvpnc.lua:148
+msgid "Override MTU"
+msgstr "覆盖 MTU"
+
+#: luasrc/model/cbi/admin_network/proto_openvpnc.lua:152
+msgid "Stored profile path"
+msgstr "已保存的配置文件路径"
