@@ -101,6 +101,109 @@ openvpnc_write_auth_file() {
 	} > "$file"
 }
 
+openvpnc_zone_name() {
+	printf 'ovpnc'
+}
+
+openvpnc_zone_section() {
+	openvpnc_zone_name "$1"
+}
+
+openvpnc_forwarding_section() {
+	printf '%s_fwd' "$(openvpnc_zone_name "$1")"
+}
+
+openvpnc_firewall_reload() {
+	/etc/init.d/firewall enabled >/dev/null 2>&1 || return 0
+	/etc/init.d/firewall reload >/dev/null 2>&1
+}
+
+openvpnc_ensure_firewall() {
+	local config="$1"
+	local zone_section forwarding_section zone_name changed=0
+	local legacy_zone_section legacy_forwarding_section
+
+	zone_section="$(openvpnc_zone_section "$config")"
+	forwarding_section="$(openvpnc_forwarding_section "$config")"
+	zone_name="$zone_section"
+	legacy_zone_section="$(printf 'openvpnc_%s' "$config" | tr -c 'A-Za-z0-9_' '_')"
+	legacy_forwarding_section="$(printf 'openvpnc_%s_lan_fwd' "$config" | tr -c 'A-Za-z0-9_' '_')"
+
+	for old_section in "$legacy_zone_section" "$legacy_forwarding_section" ovpn_ ovpn__fwd ovpnc_lan_fwd_; do
+		if uci -q get firewall.$old_section >/dev/null; then
+			uci -q delete firewall.$old_section
+			changed=1
+		fi
+	done
+
+	if [ "$(uci -q get firewall.$zone_section)" != "zone" ]; then
+		uci -q set firewall.$zone_section=zone
+		changed=1
+	fi
+
+	if [ "$(uci -q get firewall.$zone_section.name)" != "$zone_name" ]; then
+		uci -q set firewall.$zone_section.name="$zone_name"
+		changed=1
+	fi
+
+	if [ "$(uci -q get firewall.$zone_section.input)" != "REJECT" ]; then
+		uci -q set firewall.$zone_section.input='REJECT'
+		changed=1
+	fi
+
+	if [ "$(uci -q get firewall.$zone_section.output)" != "ACCEPT" ]; then
+		uci -q set firewall.$zone_section.output='ACCEPT'
+		changed=1
+	fi
+
+	if [ "$(uci -q get firewall.$zone_section.forward)" != "REJECT" ]; then
+		uci -q set firewall.$zone_section.forward='REJECT'
+		changed=1
+	fi
+
+	if [ "$(uci -q get firewall.$zone_section.masq)" != "1" ]; then
+		uci -q set firewall.$zone_section.masq='1'
+		changed=1
+	fi
+
+	if [ "$(uci -q get firewall.$zone_section.mtu_fix)" != "1" ]; then
+		uci -q set firewall.$zone_section.mtu_fix='1'
+		changed=1
+	fi
+
+	if [ "$(uci -q get firewall.$zone_section.family)" != "ipv4" ]; then
+		uci -q set firewall.$zone_section.family='ipv4'
+		changed=1
+	fi
+
+	if [ "$(uci -q get firewall.$zone_section.network)" != "$config" ]; then
+		uci -q delete firewall.$zone_section.network
+		uci add_list firewall.$zone_section.network="$config"
+		changed=1
+	fi
+
+	if [ "$(uci -q get firewall.$forwarding_section)" != "forwarding" ]; then
+		uci -q set firewall.$forwarding_section=forwarding
+		changed=1
+	fi
+
+	if [ "$(uci -q get firewall.$forwarding_section.src)" != "lan" ]; then
+		uci -q set firewall.$forwarding_section.src='lan'
+		changed=1
+	fi
+
+	if [ "$(uci -q get firewall.$forwarding_section.dest)" != "$zone_name" ]; then
+		uci -q set firewall.$forwarding_section.dest="$zone_name"
+		changed=1
+	fi
+
+	if [ "$changed" = "1" ]; then
+		uci commit firewall
+		logger -t openvpnc "updated firewall zone $zone_name for interface $config"
+		openvpnc_firewall_reload
+	fi
+}
+
 proto_openvpnc_init_config() {
 	proto_config_add_string "ovpn_file"
 	proto_config_add_string "username"
@@ -174,6 +277,8 @@ proto_openvpnc_setup() {
 		proto_block_restart "$config"
 		return 1
 	fi
+
+	openvpnc_ensure_firewall "$config"
 
 	set -- /usr/sbin/openvpn \
 		--syslog "openvpnc($config)" \
