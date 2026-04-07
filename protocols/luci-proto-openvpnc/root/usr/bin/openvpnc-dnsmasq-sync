@@ -2,9 +2,55 @@
 
 . /lib/functions.sh
 
-OPENVPNC_DNSMASQ_DIR="/tmp/dnsmasq.d"
-OPENVPNC_DNSMASQ_FILE="$OPENVPNC_DNSMASQ_DIR/ovpnc.conf"
-OPENVPNC_DNSMASQ_TMP="$OPENVPNC_DNSMASQ_FILE.tmp"
+OPENVPNC_DNSMASQ_DIRS=
+
+openvpnc_append_dnsmasq_dir() {
+	local section="$1"
+	local dnsmasq_conf="/tmp/etc/dnsmasq.conf.$section"
+	local dnsmasq_dir
+
+	[ -f "$dnsmasq_conf" ] || return 0
+
+	dnsmasq_dir="$(awk -F '=' '/^conf-dir=/ {print $2; exit}' "$dnsmasq_conf")"
+	dnsmasq_dir="${dnsmasq_dir%%,*}"
+	dnsmasq_dir="${dnsmasq_dir%/}"
+	[ -n "$dnsmasq_dir" ] || return 0
+
+	case " $OPENVPNC_DNSMASQ_DIRS " in
+		*" $dnsmasq_dir "*) return 0 ;;
+	esac
+
+	append OPENVPNC_DNSMASQ_DIRS "$dnsmasq_dir"
+}
+
+openvpnc_get_dnsmasq_dirs() {
+	local default_dir="/tmp/dnsmasq.d"
+
+	if [ -f /etc/openwrt_release ]; then
+		OPENVPNC_DNSMASQ_DIRS=
+		config_load dhcp
+		config_foreach openvpnc_append_dnsmasq_dir dnsmasq
+	fi
+
+	[ -n "$OPENVPNC_DNSMASQ_DIRS" ] || OPENVPNC_DNSMASQ_DIRS="$default_dir"
+	printf '%s\n' $OPENVPNC_DNSMASQ_DIRS
+}
+
+openvpnc_prepare_dnsmasq_file() {
+	OPENVPNC_DNSMASQ_DIR="$1"
+	OPENVPNC_DNSMASQ_FILE="$OPENVPNC_DNSMASQ_DIR/ovpnc.conf"
+	OPENVPNC_DNSMASQ_TMP="$OPENVPNC_DNSMASQ_FILE.tmp"
+
+	mkdir -p "$OPENVPNC_DNSMASQ_DIR" || return 1
+	: > "$OPENVPNC_DNSMASQ_TMP" || return 1
+	config_foreach openvpnc_append_dnsmasq_section interface
+
+	if [ -s "$OPENVPNC_DNSMASQ_TMP" ]; then
+		mv "$OPENVPNC_DNSMASQ_TMP" "$OPENVPNC_DNSMASQ_FILE"
+	else
+		rm -f "$OPENVPNC_DNSMASQ_TMP" "$OPENVPNC_DNSMASQ_FILE"
+	fi
+}
 
 openvpnc_enabled() {
 	case "$1" in
@@ -59,18 +105,12 @@ openvpnc_append_dnsmasq_section() {
 	done
 }
 
-mkdir -p "$OPENVPNC_DNSMASQ_DIR"
-: > "$OPENVPNC_DNSMASQ_TMP"
-
 config_load network
-config_foreach openvpnc_append_dnsmasq_section interface
 
-if [ -s "$OPENVPNC_DNSMASQ_TMP" ]; then
-	mv "$OPENVPNC_DNSMASQ_TMP" "$OPENVPNC_DNSMASQ_FILE"
-else
-	rm -f "$OPENVPNC_DNSMASQ_TMP" "$OPENVPNC_DNSMASQ_FILE"
-fi
+for OPENVPNC_DNSMASQ_DIR in $(openvpnc_get_dnsmasq_dirs); do
+	openvpnc_prepare_dnsmasq_file "$OPENVPNC_DNSMASQ_DIR"
+done
 
 if /etc/init.d/dnsmasq enabled >/dev/null 2>&1; then
-	/etc/init.d/dnsmasq reload >/dev/null 2>&1 || /etc/init.d/dnsmasq restart >/dev/null 2>&1
+	/etc/init.d/dnsmasq restart >/dev/null 2>&1
 fi

@@ -177,7 +177,7 @@ extra_routes:depends("extra_routes_enable", "1")
 extra_routes.rmempty = true
 
 domain_dns_enable = section:taboption("advanced", Flag, "domain_dns_enable", translate("Resolve specific domains via custom DNS"),
-	translate("When enabled, dnsmasq will forward the domains entered below to the custom DNS servers through /tmp/dnsmasq.d/ovpnc.conf."))
+	translate("When enabled, dnsmasq will forward the domains entered below to the custom DNS servers through the generated ovpnc.conf file in its active conf-dir directory."))
 domain_dns_enable.rmempty = false
 domain_dns_enable:depends("custom_dns_enable", "1")
 
