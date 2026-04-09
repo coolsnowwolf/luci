@@ -1,45 +1,32 @@
 <%#
-	Argon is a clean HTML5 theme for LuCI. It is based on luci-theme-material Argon Template
+	Material is a clean HTML5 theme for LuCI. It is based on luci-theme-bootstrap and MUI
 
-	luci-theme-design
-	Copyright 2020 Jerrykuku <jerrykuku@qq.com>
+	luci-theme-material
+	Copyright 2015 Lutty Yang <lutty@wcan.in>
 
 	Have a bug? Please create an issue here on GitHub!
-	https://github.com/jerrykuku/luci-theme-design/issues
+	https://github.com/LuttyYang/luci-theme-material/issues
 
-	luci-theme-material: 
-	Copyright 2015 Lutty Yang <lutty@wcan.in>
-	
-	Agron Theme
-	https://demos.creative-tim.com/design-dashboard/index.html 
+	luci-theme-bootstrap:
+	Copyright 2008 Steven Barth <steven@midlink.org>
+	Copyright 2008 Jo-Philipp Wich <jow@openwrt.org>
+	Copyright 2012 David Menting <david@nut-bolt.nl>
 
-	Licensed to the public under the Apache License 2.0 
+	MUI:
+	https://github.com/muicss/mui
+
+	Licensed to the public under the Apache License 2.0
 -%>
 
 <% local ver = require "luci.version" %>
-</div>
-<footer>
-	<div class="mobile-hide">
-		<a class="luci-link" href="https://github.com/openwrt/luci">Powered by <%= ver.luciname %> (<%= ver.luciversion %>)</a> /
-						<%= ver.distversion %>
-		<ul class="breadcrumb pull-right" id="modemenu" style="display:none"></ul>
 	</div>
-</footer>
+	<footer class="mobile-hide">
+	<a href="https://github.com/openwrt/luci">Powered by <%= ver.luciname %> (<%= ver.luciversion %>)</a> / <%= ver.distversion %>
+	</footer>
+	</div>
 </div>
-</div>
-<script>
-	// thanks for Jo-Philipp Wich <jow@openwrt.org>
-	var luciLocation = <%= luci.http.write_json(luci.dispatcher.context.path) %>;
-	var winHeight = $(window).height();
-	$(window).resize(function () {
-		var winWidth = $(window).width()
-		if(winWidth < 600){
-			var newHeight = $(this).height();
-			var keyboradHeight = newHeight - winHeight;
-			$(".ftc").css("bottom", keyboradHeight + 30);
-		}
-	})
-</script>
+
 <script type="text/javascript">L.require('menu-design')</script>
+
 </body>
 </html>
