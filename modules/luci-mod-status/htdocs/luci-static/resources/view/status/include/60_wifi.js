@@ -30,7 +30,9 @@ return baseclass.extend({
 			mhz = rt.mhz, nss = rt.nss,
 			mcs = rt.mcs, sgi = rt.short_gi,
 			he = rt.he, he_gi = rt.he_gi,
-			he_dcm = rt.he_dcm;
+			he_dcm = rt.he_dcm,
+			eht = rt.eht, eht_gi = rt.eht_gi,
+			eht_dcm = rt.eht_dcm;
 
 		if (ht || vht) {
 			if (vht) s += ', VHT-MCS\xa0%d'.format(mcs);
@@ -44,6 +46,13 @@ return baseclass.extend({
 			if (nss) s += ', HE-NSS\xa0%d'.format(nss);
 			if (he_gi) s += ', HE-GI\xa0%d'.format(he_gi);
 			if (he_dcm) s += ', HE-DCM\xa0%d'.format(he_dcm);
+		}
+
+		if (eht) {
+			s += ', EHT-MCS\xa0%d'.format(mcs);
+			if (nss) s += ', EHT-NSS\xa0%d'.format(nss);
+			if (eht_gi) s += ', EHT-GI\xa0%d'.format(eht_gi);
+			if (eht_dcm) s += ', EHT-DCM\xa0%d'.format(eht_dcm);
 		}
 
 		return s;

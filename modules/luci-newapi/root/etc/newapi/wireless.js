@@ -215,7 +215,9 @@ function format_wifirate(rate) {
 	    mhz = rate.mhz, nss = rate.nss,
 	    mcs = rate.mcs, sgi = rate.short_gi,
 	    he = rate.he, he_gi = rate.he_gi,
-	    he_dcm = rate.he_dcm;
+	    he_dcm = rate.he_dcm,
+	    eht = rate.eht, eht_gi = rate.eht_gi,
+	    eht_dcm = rate.eht_dcm;
 
 	if (ht || vht) {
 		if (vht) s += ', VHT-MCS\xa0%d'.format(mcs);
@@ -229,6 +231,13 @@ function format_wifirate(rate) {
 		if (nss) s += ', HE-NSS\xa0%d'.format(nss);
 		if (he_gi) s += ', HE-GI\xa0%d'.format(he_gi);
 		if (he_dcm) s += ', HE-DCM\xa0%d'.format(he_dcm);
+	}
+
+	if (eht) {
+		s += ', EHT-MCS\xa0%d'.format(mcs);
+		if (nss) s += ', EHT-NSS\xa0%d'.format(nss);
+		if (eht_gi) s += ', EHT-GI\xa0%d'.format(eht_gi);
+		if (eht_dcm) s += ', EHT-DCM\xa0%d'.format(eht_dcm);
 	}
 
 	return s;
@@ -328,7 +337,7 @@ var CBIWifiFrequencyValue = form.Value.extend({
 			this.channels = {
 				'2g': [ 'auto', 'auto', true ],
 				'5g': [ 'auto', 'auto', true ],
-				'6g': [],
+				'6g': [ 'auto', 'auto', true ],
 				'60g': []
 			};
 
@@ -360,7 +369,8 @@ var CBIWifiFrequencyValue = form.Value.extend({
 				'', 'Legacy', hwmodelist.a || hwmodelist.b || hwmodelist.g,
 				'n', 'N', hwmodelist.n,
 				'ac', 'AC', hwmodelist.ac,
-				'ax', 'AX', hwmodelist.ax
+				'ax', 'AX', hwmodelist.ax,
+				'be', 'BE', hwmodelist.be
 			];
 
 			var htmodelist = L.toArray(data[0] ? data[0].getHTModes() : null)
@@ -383,6 +393,13 @@ var CBIWifiFrequencyValue = form.Value.extend({
 					'HE80', '80 MHz', htmodelist.HE80,
 					'HE40', '40 MHz', htmodelist.HE40,
 					'HE20', '20 MHz', htmodelist.HE20
+				],
+				'be': [
+					'EHT320', '320 MHz', htmodelist.EHT320,
+					'EHT160', '160 MHz', htmodelist.EHT160,
+					'EHT80', '80 MHz', htmodelist.EHT80,
+					'EHT40', '40 MHz', htmodelist.EHT40,
+					'EHT20', '20 MHz', htmodelist.EHT20
 				]
 			};
 
@@ -401,7 +418,13 @@ var CBIWifiFrequencyValue = form.Value.extend({
 				],
 				'ax': [
 					'2g', '2.4 GHz', this.channels['2g'].length > 3,
-					'5g', '5 GHz', this.channels['5g'].length > 3
+					'5g', '5 GHz', this.channels['5g'].length > 3,
+					'6g', '6 GHz', this.channels['6g'].length > 3
+				],
+				'be': [
+					'2g', '2.4 GHz', this.channels['2g'].length > 3,
+					'5g', '5 GHz', this.channels['5g'].length > 3,
+					'6g', '6 GHz', this.channels['6g'].length > 3
 				]
 			};
 		}, this));
@@ -466,7 +489,9 @@ var CBIWifiFrequencyValue = form.Value.extend({
 
 		this.setValues(mode, this.modes);
 
-		if (/HE20|HE40|HE80|HE160/.test(htval))
+		if (/EHT20|EHT40|EHT80|EHT160|EHT320/.test(htval))
+			mode.value = 'be';
+		else if (/HE20|HE40|HE80|HE160/.test(htval))
 			mode.value = 'ax';
 		else if (/VHT20|VHT40|VHT80|VHT160/.test(htval))
 			mode.value = 'ac';
@@ -973,6 +998,10 @@ return view.extend({
 
 					o = ss.taboption('advanced', CBIWifiCountryValue, 'country', _('Country Code'));
 					o.wifiNetwork = radioNet;
+
+					o = ss.taboption('advanced', form.Value, 'radio', _('Radio Index'), _('Bind this wireless device to a specific radio inside a multi-radio PHY.'));
+					o.datatype = 'uinteger';
+					o.rmempty = true;
 
 					o = ss.taboption('advanced', form.ListValue, 'cell_density', _('Coverage cell density'), _('Configures data rates based on the coverage cell density. Normal configures basic rates to 6, 12, 24 Mbps if legacy 802.11b rates are not used else to 5.5, 11 Mbps. High configures basic rates to 12, 24 Mbps if legacy 802.11b rates are not used else to the 11 Mbps rate. Very High configures 24 Mbps as the basic rate. Supported rates lower than the minimum basic rate are not offered.'));
 					o.value('0', _('Disabled'));
