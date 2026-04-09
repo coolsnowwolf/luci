@@ -115,6 +115,11 @@
   src: url('../fonts/Cocon-Regular-Font.otf') format('opentype');
 }
 
+@font-face {
+  font-family: 'genjyuugothic-medium';
+  src: url('../fonts/GenJyuuGothic-Medium.otf') format('opentype');
+}
+
 div{
     font-family: 'HYk2gj';
 }
@@ -502,7 +507,7 @@ header > .fill > .container > #logo > img {
 
 header > .fill > .container > .brand {
     font-size: 25px;
-    font-family:Tahoma;
+    font-family: 'genjyuugothic-medium', -apple-system, 'Microsoft Yahei', sans-serif, Helvetica, Arial, sans-serif;
     /*font-weight:bold;*/
     line-height:60px;
     /*color: white;*/
@@ -515,15 +520,15 @@ header > .fill > .container > .brand {
     height:60px;
     text-align:center;
     float:left;
-    font-weight:900;
-    letter-spacing:1px;
+    font-weight:700;
+    letter-spacing:.04em;
     margin-left: 10px;
 }
 
 header > .fill > .container > a[class="brand"]:after {
     content:"";
     font-size:14px;
-    font-family:Tahoma;
+    font-family: inherit;
     position: absolute;
     top:-10px;
     font-weight:normal !important;
@@ -547,20 +552,90 @@ header > .fill > .container > .brand-hostname {
 
 header > .fill > .container > .status {
 	position: absolute;
-	top: 25%;
+	top: 50%;
 	right: 1em;
+	display: flex;
+	align-items: center;
+	gap: 0.2rem;
 	float: right;
 	font-size: 1.5rem;
     font-family: 'design';
-	line-height: unset !important;
+	line-height: 1 !important;
+	transform: translateY(-50%);
 }
 
 header > .fill > .container > .status > * {
 	position: relative;
-	top: .2rem;
-	float: left;
-	margin-left: .3rem;
+	top: auto;
+	float: none;
+	margin-left: 0.3rem;
 	cursor: pointer;
+}
+
+#indicators > [data-indicator] {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 1.6rem;
+	min-height: 1.6rem;
+	padding: 0;
+	border-radius: 999px;
+	background: transparent;
+	box-shadow: none;
+	text-transform: none;
+	text-shadow: none;
+}
+
+#indicators > [data-indicator="poll-status"],
+#indicators > [data-indicator="uci-changes"] {
+	font-size: 0;
+}
+
+#indicators > [data-indicator="poll-status"]::before,
+#indicators > [data-indicator="uci-changes"]::before {
+	font-family: "design" !important;
+	font-style: normal;
+	font-weight: normal;
+	line-height: 1;
+	text-transform: none;
+	-webkit-font-smoothing: antialiased;
+}
+
+#indicators > [data-indicator="poll-status"]::before {
+	content: "\e6b9";
+	font-size: 1.5rem;
+}
+
+#indicators > [data-indicator="poll-status"][data-style="inactive"]::before {
+	color: var(--progressbar_color);
+}
+
+#indicators > [data-indicator="poll-status"]:not([data-style="inactive"])::before {
+	color: var(--active_color);
+}
+
+#indicators > [data-indicator="uci-changes"]::before {
+	content: "\e739";
+	font-size: 1.45rem;
+	color: var(--active_color);
+}
+
+#indicators > [data-indicator="uci-changes"][data-count]:not([data-count=""])::after {
+	content: attr(data-count);
+	position: absolute;
+	top: -0.18rem;
+	right: -0.08rem;
+	min-width: 0.95rem;
+	height: 0.95rem;
+	padding: 0 0.14rem;
+	border-radius: 999px;
+	background: var(--active_color);
+	color: var(--bgwhite);
+	font-family: Tahoma, sans-serif;
+	font-size: 0.62rem;
+	font-weight: normal;
+	line-height: 0.95rem;
+	text-align: center;
 }
 
 /* .modemenu-buttons {
@@ -809,11 +884,13 @@ span[data-indicator="uci-changes"] {
     content: "\e676";
 }
 
-.main > .main-left > .nav > li > a[data-title="Logout"] {
+.main > .main-left > .nav > li > a[data-title="Logout"],
+.main > .main-left > .nav > li > a[data-title="Log_out"] {
     padding: 0.675rem 0 0.675rem 2.5rem;
 }
 
-.main > .main-left > .nav > li > a[data-title="Logout"]:before {
+.main > .main-left > .nav > li > a[data-title="Logout"]:before,
+.main > .main-left > .nav > li > a[data-title="Log_out"]:before {
     content: "\e641";
 }
 
@@ -1064,8 +1141,12 @@ fieldset > fieldset,
     width: 100%;
     display: block;
     padding: 10px;
-    font-weight: bold;
+    font-weight: 700;
     font-size: 1rem;
+}
+
+[data-tab-title] > h3:first-child {
+	font-weight: 700;
 }
 
 .cbi-section > h4:first-child,
@@ -1281,6 +1362,7 @@ form.inline + form.inline,
 .cbi-button-edit {
     color: #fff !important;
     background-color: var(--active_color);
+    border-color: var(--active_color);
 }
 
 [data-page="admin-status-iptables"] .right {
@@ -1358,6 +1440,7 @@ form.inline + form.inline,
     height: 2.5rem;
     line-height: 2.5rem;
     font-size: 0.92rem;
+    font-weight: 700;
     margin: 0 10px;
 }
 
@@ -2059,8 +2142,51 @@ body.modal-overlay-active #modal_overlay {
 .cbi-page-actions {
     text-align: center;
 }
+
 .cbi-page-actions > form[method="post"] {
 	display: inline-block;
+}
+
+[data-page="admin-network-network"] .cbi-button.cbi-button-neutral.reconnect {
+	color: #fff !important;
+	background-color: #337ab7 !important;
+	border-color: #337ab7 !important;
+}
+
+[data-page="admin-network-network"] .cbi-button.cbi-button-neutral.reconnect:hover {
+	background-color: #286090 !important;
+	border-color: #286090 !important;
+}
+
+[data-page="admin-network-network"] .cbi-button.cbi-button-edit {
+	color: #fff !important;
+	background-color: #5ea69b !important;
+	border-color: #5ea69b !important;
+}
+
+[data-page="admin-network-network"] .cbi-button.cbi-button-edit:hover {
+	background-color: #4a8a80 !important;
+	border-color: #4a8a80 !important;
+}
+
+[data-page="admin-network-network"] .cbi-button.cbi-button-add {
+	color: #fff !important;
+	background-color: #337ab7 !important;
+	border-color: #337ab7 !important;
+}
+
+[data-page="admin-network-network"] .cbi-button.cbi-button-add:hover {
+	background-color: #286090 !important;
+	border-color: #286090 !important;
+}
+
+[data-page="admin-network-network"] td > .ifacebadge,
+[data-page="admin-network-network"] .td > .ifacebadge,
+[data-page="admin-network-network"] .cbi-section-table .ifacebadge {
+	background-color: #eef2f3 !important;
+	color: #5f6b72 !important;
+	border: 1px solid #d8e0e3 !important;
+	box-shadow: inset 0 1px 0 rgb(255 255 255 / 70%), 0 1px 2px rgb(0 0 0 / 4%) !important;
 }
 
 .th[data-type="button"],
@@ -2090,6 +2216,23 @@ td > .ifacebadge,
 .ifacebadge > img {
 	display: inline-block;
 	align-self: flex-start;
+}
+
+[data-page="admin-network-network"] .theme-network-icon,
+[data-page="admin-network-network"] .ifacebadge > img,
+[data-page="admin-network-network"] .cbi-tooltip-container > img.middle {
+	width: 1.65rem;
+	height: 1.65rem;
+	min-width: 1.65rem;
+	object-fit: contain;
+	vertical-align: middle;
+	flex-shrink: 0;
+}
+
+[data-page="admin-network-network"] .cbi-tooltip.ifacebadge.large > img {
+	width: 1.95rem;
+	height: 1.95rem;
+	min-width: 1.95rem;
 }
 
 .network-status-table {
@@ -2291,6 +2434,122 @@ td > .ifacebadge,
 
 .ifacebox-body {
 	padding: .25em;
+}
+
+[data-page="admin-status-overview"] .port-status-grid,
+[data-page="admin-status-overview"] .cbi-section > div[style*="grid-template-columns:repeat(auto-fit, minmax(70px, 1fr))"] {
+	display: grid !important;
+	align-items: stretch;
+	justify-items: stretch;
+	width: 100%;
+	max-width: 100%;
+	padding: 0.2rem 0.6rem 0.35rem;
+	margin: 0 auto 1rem !important;
+}
+
+[data-page="admin-status-overview"] .port-status-slot {
+	display: flex;
+	justify-content: center;
+	align-items: stretch;
+	min-width: 0;
+	padding: 0.15rem 0.65rem 0.75rem;
+}
+
+[data-page="admin-status-overview"] .port-status-card,
+[data-page="admin-status-overview"] .cbi-section > div[style*="grid-template-columns:repeat(auto-fit, minmax(70px, 1fr))"] > .ifacebox {
+	margin: 0 !important;
+	width: fit-content;
+	min-width: 76px !important;
+	max-width: 108px !important;
+	border-radius: 10px;
+	overflow: hidden;
+	background: var(--sectionbg_color);
+	box-shadow: 3px 3px 3px rgb(0 0 0 / 5%);
+	text-align: center;
+}
+
+[data-page="admin-status-overview"] .port-status-card .ifacebox-head,
+[data-page="admin-status-overview"] .cbi-section > div[style*="grid-template-columns:repeat(auto-fit, minmax(70px, 1fr))"] > .ifacebox > .ifacebox-head {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 0.24rem 0.45rem 0.22rem;
+	background: #eef2f3;
+	border-radius: 4px 4px 0 0;
+	box-shadow: inset 0 -1px 0 rgb(0 0 0 / 6%);
+	font-size: 0.76rem;
+	font-weight: 700;
+	line-height: 1.2;
+	text-align: center;
+	color: #68757b;
+	letter-spacing: 0.01em;
+	text-transform: none;
+}
+
+[data-page="admin-status-overview"] .port-status-card .ifacebox-head strong,
+[data-page="admin-status-overview"] .cbi-section > div[style*="grid-template-columns:repeat(auto-fit, minmax(70px, 1fr))"] > .ifacebox > .ifacebox-head strong {
+	display: block;
+	width: 100%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	font-weight: inherit;
+}
+
+[data-page="admin-status-overview"] .port-status-card .ifacebox-body,
+[data-page="admin-status-overview"] .cbi-section > div[style*="grid-template-columns:repeat(auto-fit, minmax(70px, 1fr))"] > .ifacebox > .ifacebox-body {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	padding: 0.4rem 0.45rem;
+	gap: 0.14rem;
+	text-align: center;
+}
+
+[data-page="admin-status-overview"] .port-status-card .ifacebox-body img,
+[data-page="admin-status-overview"] .cbi-section > div[style*="grid-template-columns:repeat(auto-fit, minmax(70px, 1fr))"] > .ifacebox > .ifacebox-body img {
+	background-size: 24px 24px !important;
+	width: 24px !important;
+	height: 24px !important;
+	padding: 0 0 0 24px !important;
+	margin: 0.05rem auto;
+}
+
+[data-page="admin-status-overview"] .port-status-card .ifacebox-body img + br,
+[data-page="admin-status-overview"] .cbi-section > div[style*="grid-template-columns:repeat(auto-fit, minmax(70px, 1fr))"] > .ifacebox > .ifacebox-body img + br {
+	display: none;
+}
+
+[data-page="admin-status-overview"] .port-status-card .ifacebox-body > span,
+[data-page="admin-status-overview"] .cbi-section > div[style*="grid-template-columns:repeat(auto-fit, minmax(70px, 1fr))"] > .ifacebox > .ifacebox-body > span {
+	display: block;
+	width: 100%;
+	text-align: center;
+}
+
+[data-page="admin-status-overview"] .port-status-card .ifacebox-head.cbi-tooltip-container,
+[data-page="admin-status-overview"] .cbi-section > div[style*="grid-template-columns:repeat(auto-fit, minmax(70px, 1fr))"] > .ifacebox > .ifacebox-head.cbi-tooltip-container {
+	display: flex;
+	gap: 0.18rem;
+	padding: 0 0.45rem 0.2rem;
+	background: transparent;
+}
+
+[data-page="admin-status-overview"] .port-status-card .ifacebox-head.cbi-tooltip-container .zonebadge,
+[data-page="admin-status-overview"] .cbi-section > div[style*="grid-template-columns:repeat(auto-fit, minmax(70px, 1fr))"] > .ifacebox > .ifacebox-head.cbi-tooltip-container .zonebadge {
+	flex: 1;
+	height: 4px !important;
+	padding: 0 !important;
+	border-radius: 999px;
+}
+
+[data-page="admin-status-overview"] .port-status-card .ifacebox-body .cbi-tooltip-container,
+[data-page="admin-status-overview"] .cbi-section > div[style*="grid-template-columns:repeat(auto-fit, minmax(70px, 1fr))"] > .ifacebox > .ifacebox-body .cbi-tooltip-container {
+	width: 100%;
+	text-align: center !important;
+	font-size: 0.76rem !important;
+	line-height: 1.35;
 }
 
 .cbi-image-button {
@@ -2505,6 +2764,46 @@ label[data-index][data-depends] {
 
 [data-page="admin-network-diagnostics"] .table {
 	box-shadow: none;
+}
+
+[data-page="admin-network-diagnostics"] .td.left {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.65rem;
+}
+
+[data-page="admin-network-diagnostics"] .td.left > input[type="text"],
+[data-page="admin-network-diagnostics"] .td.left > select {
+	margin: 0 !important;
+	align-self: center;
+}
+
+[data-page="admin-network-diagnostics"] .td.left > .diag-action {
+	display: inline-flex;
+	align-items: center;
+	align-self: center;
+	margin: 0;
+}
+
+[data-page="admin-network-diagnostics"] .td.left > .diag-action > .cbi-button,
+[data-page="admin-network-diagnostics"] .td.left > .diag-action > .cbi-dropdown {
+	margin: 0 !important;
+	align-self: center;
+}
+
+.cbi-section > .table[width="100%"] {
+	border-collapse: separate;
+	border-spacing: 0 0.55rem;
+}
+
+.cbi-section > .table[width="100%"] tr > td {
+	padding-top: 0.45rem;
+	padding-bottom: 0.45rem;
+	line-height: 1.5;
+}
+
+.cbi-section > .table[width="100%"] tr > td:first-child {
+	padding-left: 0.9rem;
 }
 
 input[name="ping"],
@@ -3072,6 +3371,10 @@ input[name="nslookup"] {
 
     .node-network-diagnostics > .main .cbi-map div.cbi-section > div * {
         width: 100% !important;
+    }
+
+    [data-page="admin-network-diagnostics"] .td.left {
+        display: block;
     }
 
     .node-network-diagnostics > .main .cbi-map div.cbi-section > div input[type="text"] {

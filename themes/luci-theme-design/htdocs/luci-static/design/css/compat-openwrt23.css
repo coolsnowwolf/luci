@@ -1,15 +1,5 @@
-/**
- * OpenWrt 23/24 兼容性样式补�?
- * 
- * 这个文件包含针对 OpenWrt 23.x �?24.x 的样式修�?
- * 新版 LuCI 使用了一些新�?CSS 类名和结�?
- */
 
-/* ============================================
-   1. 新版 LuCI 视图容器兼容
-   ============================================ */
 
-/* 新版 LuCI 使用 #view 作为主要内容容器 */
 #view {
     padding: 0;
 }
@@ -18,16 +8,10 @@
     margin-bottom: 1rem;
 }
 
-/* 兼容新版 LuCI �?.cbi-map 结构 */
 .cbi-map {
     margin-top: 10px;
 }
 
-/* ============================================
-   2. 新版表单元素样式
-   ============================================ */
-
-/* 新版 LuCI �?input 样式兼容 */
 .cbi-input-text,
 .cbi-input-password,
 .cbi-input-select {
@@ -42,7 +26,6 @@
     max-width: 550px;
 }
 
-/* 新版 checkbox �?radio 样式 */
 .cbi-input-checkbox,
 .cbi-input-radio {
     width: 1.2rem;
@@ -52,11 +35,6 @@
     accent-color: var(--active_color);
 }
 
-/* ============================================
-   3. 新版按钮样式兼容
-   ============================================ */
-
-/* 新版 LuCI 按钮类名 */
 .btn.cbi-button,
 button.cbi-button {
     -webkit-appearance: none;
@@ -77,7 +55,6 @@ button.cbi-button {
     border-radius: 8px;
 }
 
-/* 新版 primary/positive 按钮 */
 .cbi-button-positive,
 .cbi-button-action {
     color: var(--bttext_color) !important;
@@ -89,7 +66,6 @@ button.cbi-button {
     background-color: #4a8a80 !important;
 }
 
-/* 新版 negative 按钮 */
 .cbi-button-negative {
     color: #fff !important;
     background-color: #d9534f !important;
@@ -99,17 +75,11 @@ button.cbi-button {
     background-color: #c9302c !important;
 }
 
-/* 新版 neutral 按钮 */
 .cbi-button-neutral {
     color: #fff !important;
     background-color: #617486 !important;
 }
 
-/* ============================================
-   4. 新版表格样式兼容
-   ============================================ */
-
-/* 新版 LuCI 表格结构 */
 .table.cbi-section-table {
     width: 100%;
     border-collapse: collapse;
@@ -126,17 +96,11 @@ button.cbi-button {
     vertical-align: middle;
 }
 
-/* 新版表格标题�?*/
 .tr.cbi-section-table-titles {
     background-color: var(--inputbg_color);
     font-weight: bold;
 }
 
-/* ============================================
-   5. 新版下拉菜单兼容
-   ============================================ */
-
-/* 新版 cbi-dropdown 样式 */
 .cbi-dropdown {
     position: relative;
     display: inline-flex;
@@ -184,11 +148,6 @@ button.cbi-button {
     color: #fff;
 }
 
-/* ============================================
-   6. 新版标签页样式兼�?
-   ============================================ */
-
-/* 新版 LuCI 标签�?*/
 .cbi-tabmenu {
     display: flex;
     flex-wrap: wrap;
@@ -216,11 +175,6 @@ button.cbi-button {
     border-bottom-color: var(--active_color);
 }
 
-/* ============================================
-   7. 新版模态框样式兼容
-   ============================================ */
-
-/* 新版 modal 样式 */
 .modal {
     display: flex;
     flex-wrap: wrap;
@@ -251,11 +205,6 @@ button.cbi-button {
     margin: 0.25em;
 }
 
-/* ============================================
-   8. 新版进度条样式兼�?
-   ============================================ */
-
-/* 新版进度�?*/
 .cbi-progressbar {
     position: relative;
     min-width: 11rem;
@@ -284,11 +233,6 @@ button.cbi-button {
     color: var(--progressbartxt_color);
 }
 
-/* ============================================
-   9. 新版状态指示器兼容
-   ============================================ */
-
-/* 新版状态徽�?*/
 .ifacebadge {
     display: inline-flex;
     align-items: center;
@@ -306,19 +250,14 @@ button.cbi-button {
     height: 16px;
 }
 
-/* 区域徽章 */
 .zonebadge {
     display: inline-block;
     padding: 0.2rem 0.5rem;
     border-radius: 4px;
 }
 
-/* ============================================
-   10. 新版响应式布局兼容
-   ============================================ */
-
 @media screen and (max-width: 992px) {
-    /* 新版移动端菜�?*/
+    
     .main-left {
         transform: translateX(-100%);
         transition: transform 0.3s ease;
@@ -331,28 +270,20 @@ button.cbi-button {
     }
 }
 
-/* ============================================
-   11. 新版 LuCI 特定页面修复
-   ============================================ */
-
-/* 系统概览页面 */
 [data-page="admin-status-overview"] .cbi-section {
     margin-bottom: 1rem;
 }
 
-/* 网络接口页面 */
 [data-page="admin-network-network"] .ifacebox {
     margin: 0.5rem;
     border-radius: 8px;
     overflow: hidden;
 }
 
-/* 无线页面 */
 [data-page="admin-network-wireless"] .cbi-section-table {
     overflow-x: auto;
 }
 
-/* 软件包页�?*/
 [data-page="admin-system-opkg"] .controls {
     display: flex;
     flex-wrap: wrap;
@@ -365,23 +296,19 @@ button.cbi-button {
     min-width: 200px;
 }
 
-/* ============================================
-   12. 深色模式增强
-   ============================================ */
-
 @media (prefers-color-scheme: dark) {
-    /* 新版深色模式下的代码�?*/
+    
     code, pre {
         background-color: #2d2d2d;
         color: #f8f8f2;
     }
     
-    /* 新版深色模式下的表格 */
+    
     .table.cbi-section-table .tr:nth-child(even) {
         background-color: rgba(255, 255, 255, 0.05);
     }
     
-    /* 新版深色模式下的输入�?*/
+    
     .cbi-input-text:focus,
     .cbi-input-password:focus,
     .cbi-input-select:focus {
@@ -389,10 +316,6 @@ button.cbi-button {
         box-shadow: 0 0 6px var(--active_color);
     }
 }
-
-/* ============================================
-   13. 打印样式
-   ============================================ */
 
 @media print {
     .main-left,
@@ -409,17 +332,11 @@ button.cbi-button {
     }
 }
 
-/* ============================================
-   14. 无障碍访问增�?
-   ============================================ */
-
-/* 焦点可见�?*/
 :focus-visible {
     outline: 2px solid var(--active_color);
     outline-offset: 2px;
 }
 
-/* 减少动画 (用户偏好) */
 @media (prefers-reduced-motion: reduce) {
     *,
     *::before,
