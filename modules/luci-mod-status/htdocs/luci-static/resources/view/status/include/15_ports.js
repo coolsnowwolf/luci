@@ -18,6 +18,43 @@ function isString(v)
 	return typeof(v) === 'string' && v !== '';
 }
 
+function parseBoardPortList(value)
+{
+	if (Array.isArray(value))
+		return value.filter(isString);
+
+	if (isString(value))
+		return value.trim().split(/[\s,]+/).filter(isString);
+
+	return [];
+}
+
+function addKnownPort(known_ports, seen_ports, role, device)
+{
+	if (!isString(device) || seen_ports[device])
+		return;
+
+	seen_ports[device] = true;
+
+	known_ports.push({
+		role: role,
+		device: device,
+		netdev: network.instantiateDevice(device)
+	});
+}
+
+function addBoardNetworkPorts(known_ports, seen_ports, role, entry)
+{
+	if (!L.isObject(entry))
+		return;
+
+	parseBoardPortList(entry.ports).forEach(L.bind(addKnownPort, null, known_ports, seen_ports, role));
+	parseBoardPortList(entry.ifname).forEach(L.bind(addKnownPort, null, known_ports, seen_ports, role));
+
+	if (isString(entry.device))
+		addKnownPort(known_ports, seen_ports, role, entry.device);
+}
+
 function resolveVLANChain(ifname, bridges, mapping)
 {
 	while (!mapping[ifname]) {
@@ -309,41 +346,25 @@ return baseclass.extend({
 	},
 
 	render: function(data) {
-		if (L.hasSystemFeature('swconfig'))
-			return null;
-
 		var board = JSON.parse(data[1]),
 		    known_ports = [],
+		    seen_ports = {},
 		    port_map = buildInterfaceMapping(data[2], data[3]);
 
 		if (Array.isArray(data[0]) && data[0].length > 0) {
-			known_ports = data[0].map(port => ({
-				...port,
-				netdev: network.instantiateDevice(port.device)
-			}));
+			known_ports = data[0].reduce(function(ports, port) {
+				addKnownPort(ports, seen_ports, port.role, port.device);
+				return ports;
+			}, []);
 		}
-		else {
-			if (L.isObject(board) && L.isObject(board.network)) {
-				for (var k = 'lan'; k != null; k = (k == 'lan') ? 'wan' : null) {
-					if (!L.isObject(board.network[k]))
-						continue;
 
-					if (Array.isArray(board.network[k].ports))
-						for (let i = 0; i < board.network[k].ports.length; i++)
-							known_ports.push({
-								role: k,
-								device: board.network[k].ports[i],
-								netdev: network.instantiateDevice(board.network[k].ports[i])
-							});
-					else if (typeof(board.network[k].device) == 'string')
-						known_ports.push({
-							role: k,
-							device: board.network[k].device,
-							netdev: network.instantiateDevice(board.network[k].device)
-						});
-				}
-			}
+		if (L.isObject(board) && L.isObject(board.network)) {
+			for (var k = 'lan'; k != null; k = (k == 'lan') ? 'wan' : null)
+				addBoardNetworkPorts(known_ports, seen_ports, k, board.network[k]);
 		}
+
+		if (!known_ports.length)
+			return null;
 
 		known_ports.sort(function(a, b) {
 			return L.naturalCompare(a.device, b.device);

@@ -7,7 +7,8 @@
 LUCI_NAME?=$(notdir ${CURDIR})
 LUCI_TYPE?=$(word 2,$(subst -, ,$(LUCI_NAME)))
 LUCI_BASENAME?=$(patsubst luci-$(LUCI_TYPE)-%,%,$(LUCI_NAME))
-LUCI_LANGUAGES:=$(sort $(filter-out templates,$(notdir $(wildcard ${CURDIR}/po/*))))
+LUCI_LANGUAGES_RAW:=$(filter-out templates,$(notdir $(wildcard ${CURDIR}/po/*)))
+LUCI_LANGUAGES:=$(sort $(foreach lang,$(LUCI_LANGUAGES_RAW),$(if $(filter zh-cn,$(lang)),zh_Hans,$(lang))))
 LUCI_DEFAULTS:=$(notdir $(wildcard ${CURDIR}/root/etc/uci-defaults/*))
 LUCI_PKGARCH?=$(if $(realpath src/Makefile),,all)
 LUCI_SECTION?=luci
@@ -69,12 +70,17 @@ LUCI_LC_ALIAS.nb_NO=no
 LUCI_LC_ALIAS.pt_BR=pt-br
 LUCI_LC_ALIAS.zh_Hans=zh-cn
 LUCI_LC_ALIAS.zh_Hant=zh-tw
+LUCI_PO_DIR_ALIAS.zh_Hans=zh-cn
 
 # Default locations
 HTDOCS = /www
 LUA_LIBRARYDIR = /usr/lib/lua
 LUCI_LIBRARYDIR = $(LUA_LIBRARYDIR)/luci
 UCODE_LIBRARYDIR = /usr/share/ucode/luci
+
+define LuciPoDir
+$(strip $(if $(wildcard ${CURDIR}/po/$(1)),$(1),$(firstword $(foreach alias,$(LUCI_PO_DIR_ALIAS.$(1)),$(if $(wildcard ${CURDIR}/po/$(alias)),$(alias))))))
+endef
 
 
 # 1: everything expect po subdir or only po subdir
@@ -336,7 +342,7 @@ define LuciTranslation
 	echo "uci set luci.languages.$(subst -,_,$(1))='$(LUCI_LANG.$(2))'; uci commit luci" \
 		> $$(1)/etc/uci-defaults/luci-i18n-$(LUCI_BASENAME)-$(1)
 	$$(INSTALL_DIR) $$(1)$(LUCI_LIBRARYDIR)/i18n
-	$(foreach po,$(wildcard ${CURDIR}/po/$(2)/*.po), \
+	$(foreach po,$(wildcard ${CURDIR}/po/$(call LuciPoDir,$(2))/*.po), \
 		po2lmo $(po) \
 			$$(1)$(LUCI_LIBRARYDIR)/i18n/$(basename $(notdir $(po))).$(1).lmo;)
   endef
