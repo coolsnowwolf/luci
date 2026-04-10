@@ -12,6 +12,12 @@
 'require tools.widgets as widgets';
 
 var isReadonlyView = !L.hasViewPermission();
+var callIwinfoAssoclistCompat = rpc.declare({
+	object: 'iwinfo',
+	method: 'assoclist',
+	params: [ 'device' ],
+	expect: { results: [] }
+});
 
 function count_changes(section_id) {
 	var changes = ui.changes.changes, n = 0;
@@ -26,9 +32,443 @@ function count_changes(section_id) {
 	return n;
 }
 
-function render_radio_badge(radioDev) {
+function isQcaWifiHwtype(hwtype) {
+	return (hwtype == 'qcawifi' || hwtype == 'qcawificfg80211');
+}
+
+function isNetworkDisabled(radioNet) {
+	return (radioNet.get('disabled') == '1' ||
+		uci.get('wireless', radioNet.getWifiDeviceName(), 'disabled') == '1');
+}
+
+function isRadioDisplayUp(radioDev, wifiNets) {
+	var hwtype = uci.get('wireless', radioDev.getName(), 'type');
+
+	if (radioDev.isUp())
+		return true;
+
+	if (!isQcaWifiHwtype(hwtype))
+		return false;
+
+	for (var i = 0; i < wifiNets.length; i++)
+		if (!isNetworkDisabled(wifiNets[i]))
+			return true;
+
+	return false;
+}
+
+function isNetworkDisplayUp(radioNet) {
+	var hwtype = uci.get('wireless', radioNet.getWifiDeviceName(), 'type');
+
+	if (radioNet.isUp())
+		return true;
+
+	if ((hwtype == 'mt_dbdc' || isQcaWifiHwtype(hwtype)) && radioNet.getMode() == 'ap')
+		return !isNetworkDisabled(radioNet);
+
+	return false;
+}
+
+function getRadioDisplayName(radioDev) {
+	var name = radioDev.getI18n().replace(/ Wireless Controller .+$/, ''),
+	    hwtype = uci.get('wireless', radioDev.getName(), 'type'),
+	    hwmode = uci.get('wireless', radioDev.getName(), 'hwmode') || '';
+
+	if (!/^Generic unknown$/.test(name) && !/^Generic 802\.11unknown$/.test(name))
+		return name;
+
+	if (!isQcaWifiHwtype(hwtype))
+		return name;
+
+	if (/^11be/.test(hwmode))
+		return 'Qualcomm Atheros Wi-Fi 7';
+
+	if (/^11ax/.test(hwmode))
+		return 'Qualcomm Atheros Wi-Fi 6';
+
+	if (/^11ac/.test(hwmode))
+		return 'Qualcomm Atheros Wi-Fi 5';
+
+	return 'Qualcomm Atheros Wireless';
+}
+
+function formatConfigEncryption(enc) {
+	enc = String(enc || '');
+
+	if (enc == '' || enc == 'none')
+		return _('None');
+
+	if (enc == 'psk2' || enc.indexOf('psk2+') == 0)
+		return 'WPA2-PSK';
+
+	if (enc == 'psk' || enc.indexOf('psk+') == 0)
+		return 'WPA-PSK';
+
+	if (enc == 'psk-mixed' || enc.indexOf('psk-mixed+') == 0)
+		return 'WPA-PSK/WPA2-PSK Mixed Mode';
+
+	if (enc == 'sae' || enc.indexOf('sae+') == 0)
+		return 'WPA3-SAE';
+
+	if (enc == 'sae-mixed' || enc.indexOf('sae-mixed+') == 0)
+		return 'WPA2-PSK/WPA3-SAE Mixed Mode';
+
+	if (enc == 'wpa3' || enc.indexOf('wpa3+') == 0)
+		return 'WPA3-EAP';
+
+	if (enc == 'wpa3-mixed' || enc.indexOf('wpa3-mixed+') == 0)
+		return 'WPA2-EAP/WPA3-EAP Mixed Mode';
+
+	if (enc == 'wpa2' || enc.indexOf('wpa2+') == 0)
+		return 'WPA2-EAP';
+
+	if (enc == 'wpa' || enc.indexOf('wpa+') == 0)
+		return 'WPA-EAP';
+
+	if (enc == 'wep-open')
+		return _('WEP Open System');
+
+	if (enc == 'wep-shared')
+		return _('WEP Shared Key');
+
+	return enc;
+}
+
+function getDisplayEncryption(radioNet) {
+	var encryption = radioNet.getActiveEncryption();
+
+	if (encryption && encryption != '-')
+		return encryption;
+
+	return formatConfigEncryption(uci.get('wireless', radioNet.getName(), 'encryption'));
+}
+
+function getDisplayTxPower(radioNet) {
+	var txpower = radioNet.getTXPower();
+
+	if (txpower != null && txpower > 0)
+		return txpower;
+
+	txpower = +uci.get('wireless', radioNet.getWifiDeviceName(), 'txpower');
+
+	return isNaN(txpower) ? null : txpower;
+}
+
+function getDisplayChannel(radioNet) {
+	var channel = radioNet.getChannel();
+
+	if (channel != null && channel !== '' && channel !== 'auto')
+		return +channel;
+
+	channel = uci.get('wireless', radioNet.getWifiDeviceName(), 'channel');
+
+	if (channel != null && channel !== '' && channel !== 'auto')
+		return +channel;
+
+	return null;
+}
+
+function getDisplayFrequency(radioNet, channel) {
+	var frequency = radioNet.getFrequency(),
+	    hwmode = uci.get('wireless', radioNet.getWifiDeviceName(), 'hwmode') || '';
+
+	if (frequency != null && frequency !== '')
+		return frequency;
+
+	return getDerivedFrequencyGHz(hwmode, channel);
+}
+
+function getDerivedFrequencyGHz(hwmode, channel) {
+	hwmode = String(hwmode || '');
+
+	if (channel == null || isNaN(channel))
+		return null;
+
+	if (channel == 14)
+		return '2.484';
+
+	if (channel >= 1 && channel <= 13)
+		return '%.03f'.format((2407 + channel * 5) / 1000);
+
+	if (/^11axg|^11ng|^11beg/.test(hwmode) && channel >= 1 && channel <= 13)
+		return '%.03f'.format((2407 + channel * 5) / 1000);
+
+	if (channel >= 36 && channel <= 196)
+		return '%.03f'.format((5000 + channel * 5) / 1000);
+
+	/* 6 GHz fallback for PSC and regular channels */
+	if (channel >= 1 && channel <= 233)
+		return '%.03f'.format((5950 + channel * 5) / 1000);
+
+	return null;
+}
+
+function getConfiguredBand(hwtype, hwmode, channel, bandval) {
+	hwmode = String(hwmode || '');
+	bandval = String(bandval || '');
+	channel = +channel;
+
+	if (bandval)
+		return bandval;
+
+	if (/^11bea/.test(hwmode))
+		return (!isNaN(channel) && channel > 0 && channel < 36) ? '6g' : '5g';
+
+	if (/^11beg|^11axg|^11ng|^11g|^11b/.test(hwmode))
+		return '2g';
+
+	if (/^11ac|^11axa|^11na|^11a/.test(hwmode))
+		return '5g';
+
+	if (/a/.test(hwmode))
+		return '5g';
+
+	if (/g|b/.test(hwmode))
+		return '2g';
+
+	return null;
+}
+
+function getConfiguredWirelessMode(hwtype, hwmode, htmode) {
+	hwmode = String(hwmode || '');
+	htmode = String(htmode || '');
+
+	if (/^11be/.test(hwmode) || /^EHT/.test(htmode))
+		return 'be';
+
+	if (/^11ax/.test(hwmode) || /^HE/.test(htmode))
+		return 'ax';
+
+	if (/^11ac/.test(hwmode) || /^VHT/.test(htmode))
+		return 'ac';
+
+	if (/^11n/.test(hwmode) || /^HT/.test(htmode))
+		return 'n';
+
+	return '';
+}
+
+function getFrequencyListBand(entry, hwmode) {
+	var mhz = +entry.mhz,
+	    channel = +entry.channel,
+	    band = +entry.band;
+
+	if (!isNaN(mhz)) {
+		if (mhz >= 58320)
+			return '60g';
+		if (mhz >= 5925)
+			return '6g';
+		if (mhz >= 5000)
+			return '5g';
+		if (mhz >= 2400)
+			return '2g';
+	}
+
+	if (!isNaN(channel)) {
+		if (channel == 14 || (channel >= 1 && channel <= 13))
+			return '2g';
+		if (channel >= 36 && channel <= 196)
+			return '5g';
+		if (channel >= 1 && channel <= 233 && /^11bea|^11beg/.test(String(hwmode || '')))
+			return (/^11beg/.test(String(hwmode || ''))) ? '2g' : '6g';
+		if (channel >= 1 && channel <= 233)
+			return '6g';
+	}
+
+	if (band == 2 || band == 5 || band == 6 || band == 60)
+		return '%dg'.format(band);
+
+	return null;
+}
+
+function getDisplayBitRate(radioNet) {
+	var rate = radioNet.getBitRate(),
+	    hwmode = uci.get('wireless', radioNet.getWifiDeviceName(), 'hwmode') || '',
+	    htmode = uci.get('wireless', radioNet.getWifiDeviceName(), 'htmode') || '';
+
+	if (rate != null && rate > 0)
+		return rate;
+
+	if (/^11be/.test(hwmode)) {
+		switch (htmode) {
+		case 'HT20':
+		case 'EHT20':
+			return 344.1;
+		case 'HT40':
+		case 'EHT40':
+			return 688.2;
+		case 'HT80':
+		case 'EHT80':
+			return 1441.2;
+		case 'HT160':
+		case 'EHT160':
+			return 2882.4;
+		case 'HT320':
+		case 'EHT320':
+			return 5764.7;
+		}
+	}
+
+	if (/^11ax/.test(hwmode)) {
+		switch (htmode) {
+		case 'HT20':
+		case 'HE20':
+			return 286.8;
+		case 'HT40':
+		case 'HE40':
+			return 573.5;
+		case 'HT80':
+		case 'HE80':
+			return 1201.0;
+		case 'HT160':
+		case 'HE160':
+			return 2402.0;
+		}
+	}
+
+	if (/^11ac/.test(hwmode)) {
+		switch (htmode) {
+		case 'HT20':
+		case 'VHT20':
+			return 173.3;
+		case 'HT40':
+		case 'VHT40':
+			return 400.0;
+		case 'HT80':
+		case 'VHT80':
+			return 866.7;
+		case 'HT160':
+		case 'VHT160':
+		case 'HT80_80':
+			return 1733.3;
+		}
+	}
+
+	if (/^11ng/.test(hwmode) || /^11na/.test(hwmode)) {
+		switch (htmode) {
+		case 'HT20':
+			return 144.4;
+		case 'HT40':
+			return 300.0;
+		}
+	}
+
+	return null;
+}
+
+function getAssocListCandidates(radioNet) {
+	var candidates = [],
+	    hwtype = uci.get('wireless', radioNet.getWifiDeviceName(), 'type'),
+	    ifname = radioNet.getIfname(),
+	    section = radioNet.getName();
+
+	if (ifname)
+		candidates.push(ifname);
+
+	if (section && candidates.indexOf(section) < 0)
+		candidates.push(section);
+
+	if (isQcaWifiHwtype(hwtype) && /^wifi\d+$/.test(radioNet.getWifiDeviceName())) {
+		var fallback = section;
+
+		if (!/^ath\d+$/.test(fallback))
+			fallback = 'ath' + radioNet.getWifiDeviceName().replace(/^wifi/, '');
+
+		if (candidates.indexOf(fallback) < 0)
+			candidates.push(fallback);
+	}
+
+	return candidates;
+}
+
+function getAssocListForNetwork(radioNet) {
+	return radioNet.getAssocList().then(function(entries) {
+		if (Array.isArray(entries) && entries.length)
+			return entries;
+
+		var candidates = getAssocListCandidates(radioNet),
+		    idx = 0;
+
+		function tryNext() {
+			if (idx >= candidates.length)
+				return [];
+
+			return callIwinfoAssoclistCompat(candidates[idx++]).then(function(entries) {
+				if (Array.isArray(entries) && entries.length)
+					return entries;
+
+				return tryNext();
+			}).catch(function() {
+				return tryNext();
+			});
+		}
+
+		return tryNext();
+	}).catch(function() {
+		var candidates = getAssocListCandidates(radioNet),
+		    idx = 0;
+
+		function tryNext() {
+			if (idx >= candidates.length)
+				return [];
+
+			return callIwinfoAssoclistCompat(candidates[idx++]).then(function(entries) {
+				if (Array.isArray(entries) && entries.length)
+					return entries;
+
+				return tryNext();
+			}).catch(function() {
+				return tryNext();
+			});
+		}
+
+		return tryNext();
+	});
+}
+
+function isDisplayAssociated(radioNet, hwtype, mode, bssid, channel, disabled) {
+	if (bssid && bssid != '00:00:00:00:00:00' && channel && mode != 'Unknown' && !disabled)
+		return true;
+
+	if (isQcaWifiHwtype(hwtype) && !disabled && radioNet.getMode() == 'ap' && channel)
+		return true;
+
+	return false;
+}
+
+function getDisplaySignalPercent(radioNet, hwtype, is_assoc, disabled) {
+	if (disabled)
+		return -1;
+
+	if (hwtype == 'mt_dbdc')
+		return (radioNet.isUp() || is_assoc) ? 100 : -1;
+
+	if (isQcaWifiHwtype(hwtype) && radioNet.getMode() == 'ap')
+		return is_assoc ? 100 : 0;
+
+	if (radioNet.isUp())
+		return radioNet.getSignalPercent();
+
+	return is_assoc ? 0 : -1;
+}
+
+function getDisplaySignalValue(radioNet, hwtype, is_assoc) {
+	if ((hwtype == 'mt_dbdc' || (isQcaWifiHwtype(hwtype) && radioNet.getMode() == 'ap')) && is_assoc)
+		return getDisplayTxPower(radioNet);
+
+	return radioNet.getSignal();
+}
+
+function getDisplayNoiseValue(radioNet, hwtype, is_assoc) {
+	if ((hwtype == 'mt_dbdc' || (isQcaWifiHwtype(hwtype) && radioNet.getMode() == 'ap')) && is_assoc)
+		return null;
+
+	return radioNet.getNoise();
+}
+
+function render_radio_badge(radioDev, wifiNets) {
 	return E('span', { 'class': 'ifacebadge' }, [
-		E('img', { 'src': L.resource('icons/wifi%s.png').format(radioDev.isUp() ? '' : '_disabled') }),
+		E('img', { 'src': L.resource('icons/wifi%s.png').format(isRadioDisplayUp(radioDev, wifiNets || []) ? '' : '_disabled') }),
 		' ',
 		radioDev.getName()
 	]);
@@ -107,30 +547,32 @@ function render_signal_badge(signalPercent, signalValue, noiseValue, wrap, mode)
 }
 
 function render_network_badge(radioNet) {
-	var hwtype = uci.get('wireless', radioNet.getWifiDeviceName(), 'type');
-
-	if (hwtype == 'mt_dbdc')
-		return render_signal_badge(
-			radioNet.isUp() ? 100 : -1,
-			radioNet.getTXPower(), null, false, radioNet.getMode());
+	var hwtype = uci.get('wireless', radioNet.getWifiDeviceName(), 'type'),
+	    mode = radioNet.getActiveMode(),
+	    bssid = radioNet.getActiveBSSID(),
+	    channel = getDisplayChannel(radioNet),
+	    disabled = isNetworkDisabled(radioNet),
+	    is_assoc = isDisplayAssociated(radioNet, hwtype, mode, bssid, channel, disabled);
 
 	return render_signal_badge(
-		radioNet.isUp() ? radioNet.getSignalPercent() : -1,
-		radioNet.getSignal(), radioNet.getNoise(), false, radioNet.getMode());
+		getDisplaySignalPercent(radioNet, hwtype, is_assoc, disabled),
+		getDisplaySignalValue(radioNet, hwtype, is_assoc),
+		getDisplayNoiseValue(radioNet, hwtype, is_assoc),
+		false, radioNet.getMode());
 }
 
 function render_radio_status(radioDev, wifiNets) {
-	var name = radioDev.getI18n().replace(/ Wireless Controller .+$/, ''),
+	var name = getRadioDisplayName(radioDev),
 	    node = E('div', [ E('big', {}, E('strong', {}, name)), E('div') ]),
 	    channel, frequency, bitrate;
 
 	for (var i = 0; i < wifiNets.length; i++) {
-		channel   = channel   || wifiNets[i].getChannel();
-		frequency = frequency || wifiNets[i].getFrequency();
-		bitrate   = bitrate   || wifiNets[i].getBitRate();
+		channel   = channel   || getDisplayChannel(wifiNets[i]);
+		frequency = frequency || getDisplayFrequency(wifiNets[i], channel);
+		bitrate   = bitrate   || getDisplayBitRate(wifiNets[i]);
 	}
 
-	if (radioDev.isUp())
+	if (isRadioDisplayUp(radioDev, wifiNets))
 		L.itemlist(node.lastElementChild, [
 			_('Channel'), '%s (%s %s)'.format(channel || '?', frequency || '?', _('GHz')),
 			_('Bitrate'), '%s %s'.format(bitrate || '?', _('Mbit/s'))
@@ -144,9 +586,10 @@ function render_radio_status(radioDev, wifiNets) {
 function render_network_status(radioNet) {
 	var mode = radioNet.getActiveMode(),
 	    bssid = radioNet.getActiveBSSID(),
-	    channel = radioNet.getChannel(),
-	    disabled = (radioNet.get('disabled') == '1' || uci.get('wireless', radioNet.getWifiDeviceName(), 'disabled') == '1'),
-	    is_assoc = (bssid && bssid != '00:00:00:00:00:00' && channel && mode != 'Unknown' && !disabled),
+	    channel = getDisplayChannel(radioNet),
+	    hwtype = uci.get('wireless', radioNet.getWifiDeviceName(), 'type'),
+	    disabled = isNetworkDisabled(radioNet),
+	    is_assoc = isDisplayAssociated(radioNet, hwtype, mode, bssid, channel, disabled),
 	    is_mesh = (radioNet.getMode() == 'mesh'),
 	    changecount = count_changes(radioNet.getName()),
 	    status_text = null;
@@ -163,45 +606,41 @@ function render_network_status(radioNet) {
 		is_mesh ? _('Mesh ID') : _('SSID'), (is_mesh ? radioNet.getMeshID() : radioNet.getSSID()) || '?',
 		_('Mode'),       mode,
 		_('BSSID'),      (!changecount && is_assoc) ? bssid : null,
-		_('Encryption'), (!changecount && is_assoc) ? radioNet.getActiveEncryption() || _('None') : null,
+		_('Encryption'), (!changecount && is_assoc) ? getDisplayEncryption(radioNet) : null,
 		null,            status_text
 	], [ ' | ', E('br') ]);
 }
 
 function render_modal_status(node, radioNet) {
 	var mode = radioNet.getActiveMode(),
-	    noise = radioNet.getNoise(),
 	    bssid = radioNet.getActiveBSSID(),
-	    channel = radioNet.getChannel(),
-	    disabled = (radioNet.get('disabled') == '1'),
-	    is_assoc = (bssid && bssid != '00:00:00:00:00:00' && channel && mode != 'Unknown' && !disabled),
-	    hwtype = uci.get('wireless', radioNet.getWifiDeviceName(), 'type');
+	    channel = getDisplayChannel(radioNet),
+	    frequency = getDisplayFrequency(radioNet, channel),
+	    bitrate = getDisplayBitRate(radioNet),
+	    hwtype = uci.get('wireless', radioNet.getWifiDeviceName(), 'type'),
+	    disabled = isNetworkDisabled(radioNet),
+	    is_assoc = isDisplayAssociated(radioNet, hwtype, mode, bssid, channel, disabled),
+	    noise = getDisplayNoiseValue(radioNet, hwtype, is_assoc),
+	    txpower = getDisplayTxPower(radioNet);
 
 	if (node == null)
 		node = E('span', { 'class': 'ifacebadge large', 'data-network': radioNet.getName() }, [ E('small'), E('span') ]);
 
-	if (hwtype == 'mt_dbdc') {
-		noise = null;
-		dom.content(node.firstElementChild, render_signal_badge(
-			disabled ? -1 : 100,
-			radioNet.getTXPower(), noise, true, radioNet.getMode()));
-	}
-	else {
-		dom.content(node.firstElementChild, render_signal_badge(
-			disabled ? -1 : radioNet.getSignalPercent(),
-			radioNet.getSignal(), noise, true, radioNet.getMode()));
-	}
+	dom.content(node.firstElementChild, render_signal_badge(
+		getDisplaySignalPercent(radioNet, hwtype, is_assoc, disabled),
+		getDisplaySignalValue(radioNet, hwtype, is_assoc),
+		noise, true, radioNet.getMode()));
 
 	L.itemlist(node.lastElementChild, [
 		_('Mode'),       mode,
 		_('SSID'),       radioNet.getSSID() || '?',
 		_('BSSID'),      is_assoc ? bssid : null,
-		_('Encryption'), is_assoc ? radioNet.getActiveEncryption() || _('None') : null,
-		_('Channel'),    is_assoc ? '%d (%.3f %s)'.format(radioNet.getChannel(), radioNet.getFrequency() || 0, _('GHz')) : null,
-		_('Tx-Power'),   is_assoc ? '%d %s'.format(radioNet.getTXPower(), _('dBm')) : null,
-		_('Signal'),     (is_assoc && hwtype != 'mt_dbdc') ? '%d %s'.format(radioNet.getSignal(), _('dBm')) : null,
+		_('Encryption'), is_assoc ? getDisplayEncryption(radioNet) : null,
+		_('Channel'),    is_assoc ? '%d (%s %s)'.format(channel, frequency || '?', _('GHz')) : null,
+		_('Tx-Power'),   (is_assoc && txpower != null) ? '%d %s'.format(txpower, _('dBm')) : null,
+		_('Signal'),     (is_assoc && noise != null) ? '%d %s'.format(radioNet.getSignal(), _('dBm')) : null,
 		_('Noise'),      (is_assoc && noise != null) ? '%d %s'.format(noise, _('dBm')) : null,
-		_('Bitrate'),    is_assoc ? '%.1f %s'.format(radioNet.getBitRate() || 0, _('Mbit/s')) : null,
+		_('Bitrate'),    (is_assoc && bitrate != null) ? '%.1f %s'.format(bitrate, _('Mbit/s')) : null,
 		_('Country'),    is_assoc ? radioNet.getCountryCode() : null
 	], [ ' | ', E('br'), E('br'), E('br'), E('br'), E('br'), ' | ', E('br'), ' | ' ]);
 
@@ -338,6 +777,9 @@ var CBIWifiFrequencyValue = form.Value.extend({
 	load: function(section_id) {
 		var device_section = this.getDeviceSection(section_id),
 		    hwtype = uci.get('wireless', device_section, 'type'),
+		    hwval = uci.get('wireless', device_section, 'hwmode'),
+		    htval = uci.get('wireless', device_section, 'htmode'),
+		    chval = +uci.get('wireless', device_section, 'channel'),
 		    allow_auto = (hwtype == 'mt_dbdc' ||
 			uci.get('wireless', device_section, 'channel') == 'auto' ||
 			L.hasSystemFeature('hostapd', 'acs'));
@@ -354,10 +796,10 @@ var CBIWifiFrequencyValue = form.Value.extend({
 			};
 
 			for (var i = 0; i < data[1].length; i++) {
-				if (!data[1][i].band)
-					continue;
+				var band = getFrequencyListBand(data[1][i], hwval);
 
-				var band = '%dg'.format(data[1][i].band);
+				if (!band || !Array.isArray(this.channels[band]))
+					continue;
 
 				this.channels[band].push(
 					data[1][i].channel,
@@ -384,76 +826,167 @@ var CBIWifiFrequencyValue = form.Value.extend({
 				htmodelist.HE80 || htmodelist.HE160
 			);
 
-			var has_be = hwmodelist.be && (
-				L.hasSystemFeature('hostapd', '11be') ||
-				htmodelist.EHT20 || htmodelist.EHT40 || htmodelist.EHT80 ||
-				htmodelist.EHT160 || htmodelist.EHT320
-			);
+				var has_be = hwmodelist.be && (
+					L.hasSystemFeature('hostapd', '11be') ||
+					htmodelist.EHT20 || htmodelist.EHT40 || htmodelist.EHT80 ||
+					htmodelist.EHT160 || htmodelist.EHT320
+				);
 
-			this.modes = [
-				'', 'Legacy', hwmodelist.a || hwmodelist.b || hwmodelist.g,
-				'n', 'N', hwmodelist.n,
-				'ac', 'AC', has_ac,
-				'ax', 'AX', has_ax,
-				'be', 'BE', has_be
-			];
+				if (isQcaWifiHwtype(hwtype)) {
+					has_ac = has_ac || /^11ac/.test(hwval);
+					has_ax = has_ax || /^11ax/.test(hwval);
+					has_be = has_be || /^11be/.test(hwval);
+					hwmodelist.n = hwmodelist.n || /^11n/.test(hwval);
 
-			this.htmodes = {
-				'': [ '', '-', true ],
-				'n': [
-					'HT20', '20 MHz', htmodelist.HT20,
-					'HT40', '40 MHz', htmodelist.HT40
-				],
-				'ac': [
-					'VHT20', '20 MHz', htmodelist.VHT20,
-					'VHT40', '40 MHz', htmodelist.VHT40,
-					'VHT80', '80 MHz', htmodelist.VHT80,
-					'VHT160', '160 MHz', htmodelist.VHT160
-				],
-				'ax': [
-					'HE20', '20 MHz', htmodelist.HE20,
-					'HE40', '40 MHz', htmodelist.HE40,
-					'HE80', '80 MHz', htmodelist.HE80,
-					'HE160', '160 MHz', htmodelist.HE160
-				],
-				'be': [
-					'EHT20', '20 MHz', htmodelist.EHT20,
-					'EHT40', '40 MHz', htmodelist.EHT40,
-					'EHT80', '80 MHz', htmodelist.EHT80,
-					'EHT160', '160 MHz', htmodelist.EHT160,
-					'EHT320', '320 MHz', htmodelist.EHT320
-				]
-			};
+					this.modes = [
+						'', 'Legacy', false,
+						'n', 'N', true,
+						'ac', 'AC', (hwtype == 'qcawifi' || hwtype == 'qcawificfg80211' || has_ac),
+						'ax', 'AX', (hwtype == 'qcawificfg80211' || has_ax),
+						'be', 'BE', (hwtype == 'qcawificfg80211' || has_be)
+					];
 
-			this.bands = {
-				'': [
-					'2g', '2.4 GHz', this.channels['2g'].length > 3,
-					'5g', '5 GHz', this.channels['5g'].length > 3,
-					'60g', '60 GHz', this.channels['60g'].length > 0
-				],
-				'n': [
-					'2g', '2.4 GHz', this.channels['2g'].length > 3,
-					'5g', '5 GHz', this.channels['5g'].length > 3
-				],
-				'ac': [
-					'5g', '5 GHz', true
-				],
-				'ax': [
-					'2g', '2.4 GHz', this.channels['2g'].length > 3,
-					'5g', '5 GHz', this.channels['5g'].length > 3,
-					'6g', '6 GHz', this.channels['6g'].length > 3
-				],
-				'be': [
-					'2g', '2.4 GHz', this.channels['2g'].length > 3,
-					'5g', '5 GHz', this.channels['5g'].length > 3,
-					'6g', '6 GHz', this.channels['6g'].length > 3
-				]
-			};
-		}, this));
-	},
+					this.htmodes = {
+						'': [ '', '-', true ],
+						'n': [
+							'HT20', '20 MHz', true,
+							'HT40', '40 MHz', true
+						],
+						'ac': [
+							'HT20', '20 MHz', true,
+							'HT40', '40 MHz', true,
+							'HT80', '80 MHz', true,
+							'HT160', '160 MHz', true,
+							'HT80_80', '80+80 MHz', true
+						],
+						'ax': [
+							'HT20', '20 MHz', true,
+							'HT40', '40 MHz', true,
+							'HT80', '80 MHz', true,
+							'HT160', '160 MHz', true
+						],
+						'be': [
+							'HT20', '20 MHz', true,
+							'HT40', '40 MHz', true,
+							'HT80', '80 MHz', true,
+							'HT160', '160 MHz', true,
+							'HT320', '320 MHz', true
+						]
+					};
+
+					this.bands = {
+						'': [
+							'2g', '2.4 GHz', this.channels['2g'].length > 0,
+							'5g', '5 GHz', this.channels['5g'].length > 0,
+							'6g', '6 GHz', this.channels['6g'].length > 0
+						],
+						'n': [
+							'2g', '2.4 GHz', this.channels['2g'].length > 0
+						],
+						'ac': [
+							'5g', '5 GHz', this.channels['5g'].length > 0
+						],
+						'ax': [
+							'2g', '2.4 GHz', this.channels['2g'].length > 0,
+							'5g', '5 GHz', this.channels['5g'].length > 0
+						],
+						'be': [
+							'2g', '2.4 GHz', this.channels['2g'].length > 0,
+							'5g', '5 GHz', this.channels['5g'].length > 0,
+							'6g', '6 GHz', this.channels['6g'].length > 0
+						]
+					};
+				}
+				else {
+					this.modes = [
+						'', 'Legacy', hwmodelist.a || hwmodelist.b || hwmodelist.g,
+						'n', 'N', hwmodelist.n,
+						'ac', 'AC', has_ac,
+						'ax', 'AX', has_ax,
+						'be', 'BE', has_be
+					];
+
+					this.htmodes = {
+						'': [ '', '-', true ],
+						'n': [
+							'HT20', '20 MHz', htmodelist.HT20,
+							'HT40', '40 MHz', htmodelist.HT40
+						],
+						'ac': [
+							'VHT20', '20 MHz', htmodelist.VHT20,
+							'VHT40', '40 MHz', htmodelist.VHT40,
+							'VHT80', '80 MHz', htmodelist.VHT80,
+							'VHT160', '160 MHz', htmodelist.VHT160
+						],
+						'ax': [
+							'HE20', '20 MHz', htmodelist.HE20,
+							'HE40', '40 MHz', htmodelist.HE40,
+							'HE80', '80 MHz', htmodelist.HE80,
+							'HE160', '160 MHz', htmodelist.HE160
+						],
+						'be': [
+							'EHT20', '20 MHz', htmodelist.EHT20,
+							'EHT40', '40 MHz', htmodelist.EHT40,
+							'EHT80', '80 MHz', htmodelist.EHT80,
+							'EHT160', '160 MHz', htmodelist.EHT160,
+							'EHT320', '320 MHz', htmodelist.EHT320
+						]
+					};
+
+					this.bands = {
+						'': [
+							'2g', '2.4 GHz', this.channels['2g'].length > 3,
+							'5g', '5 GHz', this.channels['5g'].length > 3,
+							'60g', '60 GHz', this.channels['60g'].length > 0
+						],
+						'n': [
+							'2g', '2.4 GHz', this.channels['2g'].length > 3,
+							'5g', '5 GHz', this.channels['5g'].length > 3
+						],
+						'ac': [
+							'5g', '5 GHz', true
+						],
+						'ax': [
+							'2g', '2.4 GHz', this.channels['2g'].length > 3,
+							'5g', '5 GHz', this.channels['5g'].length > 3,
+							'6g', '6 GHz', this.channels['6g'].length > 3
+						],
+						'be': [
+							'2g', '2.4 GHz', this.channels['2g'].length > 3,
+							'5g', '5 GHz', this.channels['5g'].length > 3,
+							'6g', '6 GHz', this.channels['6g'].length > 3
+						]
+					};
+				}
+
+				if (isQcaWifiHwtype(hwtype) && !isNaN(chval)) {
+					var currentBand = getConfiguredBand(hwtype, hwval, chval, null),
+					    currentFreq = getDerivedFrequencyGHz(hwval, chval),
+					    currentMHz = currentFreq ? Math.round(parseFloat(currentFreq) * 1000) : null,
+					    currentMode = getConfiguredWirelessMode(hwtype, hwval, htval);
+
+					if (currentBand && Array.isArray(this.channels[currentBand]) &&
+					    this.channels[currentBand].indexOf(chval) < 0) {
+						this.channels[currentBand].push(
+							chval,
+							currentMHz != null ? '%d (%d Mhz)'.format(chval, currentMHz) : String(chval),
+							true
+						);
+					}
+
+					if (currentMode && this.bands[currentMode]) {
+						for (var j = 2; j < this.bands[currentMode].length; j += 3)
+							if (this.bands[currentMode][j - 2] == currentBand)
+								this.bands[currentMode][j] = true;
+					}
+				}
+			}, this));
+		},
 
 	setValues: function(sel, vals) {
-		var keep_visible = sel.classList.contains('mode') || sel.classList.contains('band');
+		var keep_visible = sel.classList.contains('mode') ||
+			sel.classList.contains('band') ||
+			sel.classList.contains('channel');
 
 		if (sel.vals)
 			sel.vals.selected = sel.selectedIndex;
@@ -508,6 +1041,7 @@ var CBIWifiFrequencyValue = form.Value.extend({
 		    band = elem.querySelector('.band'),
 		    chan = elem.querySelector('.channel'),
 		    bwdt = elem.querySelector('.htmode'),
+		    hwtype = uci.get('wireless', config_section, 'type'),
 		    htval = uci.get('wireless', config_section, 'htmode'),
 		    hwval = uci.get('wireless', config_section, 'hwmode'),
 		    chval = uci.get('wireless', config_section, 'channel'),
@@ -515,7 +1049,9 @@ var CBIWifiFrequencyValue = form.Value.extend({
 
 		this.setValues(mode, this.modes);
 
-		if (/EHT20|EHT40|EHT80|EHT160|EHT320/.test(htval))
+		if (isQcaWifiHwtype(hwtype))
+			mode.value = getConfiguredWirelessMode(hwtype, hwval, htval);
+		else if (/EHT20|EHT40|EHT80|EHT160|EHT320/.test(htval))
 			mode.value = 'be';
 		else if (/HE20|HE40|HE80|HE160/.test(htval))
 			mode.value = 'ax';
@@ -528,7 +1064,11 @@ var CBIWifiFrequencyValue = form.Value.extend({
 
 		this.toggleWifiMode(elem);
 
-		if (hwval != null) {
+		if (isQcaWifiHwtype(hwtype)) {
+			this.useBandOption = true;
+			band.value = getConfiguredBand(hwtype, hwval, chval, bandval);
+		}
+		else if (hwval != null) {
 			this.useBandOption = false;
 
 			if (/a/.test(hwval))
@@ -600,8 +1140,18 @@ var CBIWifiFrequencyValue = form.Value.extend({
 		var config_section = this.getDeviceSection(section_id);
 
 		return [
+		    getConfiguredWirelessMode(
+		    	uci.get('wireless', config_section, 'type'),
+		    	uci.get('wireless', config_section, 'hwmode'),
+		    	uci.get('wireless', config_section, 'htmode')
+		    ),
 		    uci.get('wireless', config_section, 'htmode'),
-		    uci.get('wireless', config_section, 'hwmode') || uci.get('wireless', config_section, 'band'),
+		    getConfiguredBand(
+		    	uci.get('wireless', config_section, 'type'),
+		    	uci.get('wireless', config_section, 'hwmode'),
+		    	uci.get('wireless', config_section, 'channel'),
+		    	uci.get('wireless', config_section, 'band')
+		    ),
 		    uci.get('wireless', config_section, 'channel')
 		];
 	},
@@ -610,6 +1160,7 @@ var CBIWifiFrequencyValue = form.Value.extend({
 		var node = this.map.findElement('data-field', this.cbid(section_id));
 
 		return [
+		    node.querySelector('.mode').value,
 		    node.querySelector('.htmode').value,
 		    node.querySelector('.band').value,
  			node.querySelector('.channel').value
@@ -617,16 +1168,55 @@ var CBIWifiFrequencyValue = form.Value.extend({
 	},
 
 	write: function(section_id, value) {
-		var config_section = this.getDeviceSection(section_id);
+		var config_section = this.getDeviceSection(section_id),
+		    hwtype = uci.get('wireless', config_section, 'type'),
+		    mode = value[0],
+		    htmode = value[1],
+		    band = value[2],
+		    channel = value[3];
 
-		uci.set('wireless', config_section, 'htmode', value[0] || null);
+		uci.set('wireless', config_section, 'htmode', htmode || null);
 
-		if (this.useBandOption)
-			uci.set('wireless', config_section, 'band', value[1]);
-		else
-			uci.set('wireless', config_section, 'hwmode', (value[1] == '2g') ? '11g' : '11a');
+		if (isQcaWifiHwtype(hwtype)) {
+			var hwmode = uci.get('wireless', config_section, 'hwmode');
 
-		uci.set('wireless', config_section, 'channel', value[2]);
+			if (hwtype == 'qcawifi') {
+				if (mode == 'ac')
+					hwmode = '11ac';
+				else if (mode == 'n')
+					hwmode = '11ng';
+			}
+			else if (hwtype == 'qcawificfg80211') {
+				switch (mode) {
+				case 'be':
+					hwmode = (band == '2g') ? '11beg' : '11bea';
+					break;
+
+				case 'ax':
+					hwmode = (band == '2g') ? '11axg' : '11axa';
+					break;
+
+				case 'ac':
+					hwmode = '11ac';
+					break;
+
+				case 'n':
+					hwmode = '11ng';
+					break;
+				}
+			}
+
+			uci.set('wireless', config_section, 'hwmode', hwmode);
+			uci.unset('wireless', config_section, 'band');
+		}
+		else if (this.useBandOption) {
+			uci.set('wireless', config_section, 'band', band);
+		}
+		else {
+			uci.set('wireless', config_section, 'hwmode', (band == '2g') ? '11g' : '11a');
+		}
+
+		uci.set('wireless', config_section, 'channel', channel);
 	}
 });
 
@@ -640,8 +1230,15 @@ var CBIWifiTxPowerValue = form.ListValue.extend({
 
 	load: function(section_id) {
 		return this.callTxPowerList(section_id).then(L.bind(function(pwrlist) {
-			this.powerval = this.wifiNetwork ? this.wifiNetwork.getTXPower() : null;
+			this.powerval = this.wifiNetwork ? getDisplayTxPower(this.wifiNetwork) : null;
 			this.poweroff = this.wifiNetwork ? this.wifiNetwork.getTXPowerOffset() : null;
+
+			if (this.powerval == null)
+				for (var i = 0; i < pwrlist.length; i++)
+					if (pwrlist[i].active) {
+						this.powerval = pwrlist[i].dbm;
+						break;
+					}
 
 			this.value('', _('driver default'));
 
@@ -714,7 +1311,7 @@ return view.extend({
 			    busy = btns[0].classList.contains('spinning') || btns[1].classList.contains('spinning') || btns[2].classList.contains('spinning');
 
 			if (radioDev) {
-				dom.content(badge, render_radio_badge(radioDev));
+				dom.content(badge, render_radio_badge(radioDev, data[2].filter(function(n) { return n.getWifiDeviceName() == radioDev.getName() })));
 				dom.content(stat, render_radio_status(radioDev, data[2].filter(function(n) { return n.getWifiDeviceName() == radioDev.getName() })));
 			}
 			else {
@@ -756,7 +1353,7 @@ return view.extend({
 					'data-ssid': bss.network.getSSID()
 				}, [
 					E('img', {
-						'src': L.resource('icons/wifi%s.png').format(bss.network.isUp() ? '' : '_disabled'),
+						'src': L.resource('icons/wifi%s.png').format(isNetworkDisplayUp(bss.network) ? '' : '_disabled'),
 						'title': bss.radio.getI18n()
 					}),
 					E('span', [
@@ -1013,12 +1610,14 @@ return view.extend({
 						o.ucisection = radioNet.getWifiDeviceName();
 					}
 
+				if (hwtype == 'mac80211' || isQcaWifiHwtype(hwtype)) {
+					o = ss.taboption('general', CBIWifiTxPowerValue, 'txpower', _('Maximum transmit power'), _('Specifies the maximum transmit power the wireless radio may use. Depending on regulatory requirements and wireless usage, the actual transmit power may be reduced by the driver.'));
+					o.wifiNetwork = radioNet;
+				}
+
 				if (hwtype == 'mac80211') {
 					o = ss.taboption('general', form.Flag, 'legacy_rates', _('Allow legacy 802.11b rates'), _('Legacy or badly behaving devices may require legacy 802.11b rates to interoperate. Airtime efficiency may be significantly reduced where these are used. It is recommended to not allow 802.11b rates where possible.'));
 					o.depends({'_freq': '2g', '!contains': true});
-
-					o = ss.taboption('general', CBIWifiTxPowerValue, 'txpower', _('Maximum transmit power'), _('Specifies the maximum transmit power the wireless radio may use. Depending on regulatory requirements and wireless usage, the actual transmit power may be reduced by the driver.'));
-					o.wifiNetwork = radioNet;
 
 					o = ss.taboption('advanced', CBIWifiCountryValue, 'country', _('Country Code'));
 					o.wifiNetwork = radioNet;
@@ -1148,6 +1747,9 @@ return view.extend({
 
 				o = ss.taboption('general', form.Value, 'bssid', _('<abbr title="Basic Service Set Identifier">BSSID</abbr>'));
 				o.datatype = 'macaddr';
+				o.depends('mode', 'adhoc');
+				o.depends('mode', 'sta');
+				o.depends('mode', 'sta-wds');
 
 				o = ss.taboption('general', widgets.NetworkSelect, 'network', _('Network'), _('Choose the network(s) you want to attach to this wireless interface or fill out the <em>custom</em> field to define a new network.'));
 				o.rmempty = true;
@@ -1622,6 +2224,19 @@ return view.extend({
 
 						return this.crypto_support[modeval][value];
 					};
+				}
+				else if (isQcaWifiHwtype(hwtype)) {
+					crypto_modes.push(['psk2', 'WPA2-PSK', 35]);
+					crypto_modes.push(['psk-mixed', 'WPA-PSK/WPA2-PSK Mixed Mode', 22]);
+					crypto_modes.push(['psk', 'WPA-PSK', 12]);
+					crypto_modes.push(['wep-open', _('WEP Open System'), 11]);
+					crypto_modes.push(['wep-shared', _('WEP Shared Key'), 10]);
+
+					if (hwtype == 'qcawificfg80211') {
+						crypto_modes.push(['sae', 'WPA3-SAE', 31]);
+						crypto_modes.push(['sae-mixed', 'WPA2-PSK/WPA3-SAE Mixed Mode', 30]);
+						crypto_modes.push(['owe', 'OWE', 1]);
+					}
 				}
 				else if (hwtype == 'broadcom') {
 					crypto_modes.push(['psk2',     'WPA2-PSK',                    33]);
@@ -2577,7 +3192,7 @@ return view.extend({
 						var tasks = [];
 
 						for (var i = 0; i < hosts_radios_wifis[2].length; i++)
-							tasks.push(hosts_radios_wifis[2][i].getAssocList());
+							tasks.push(getAssocListForNetwork(hosts_radios_wifis[2][i]));
 
 						return Promise.all(tasks).then(function(data) {
 							hosts_radios_wifis[3] = [];
