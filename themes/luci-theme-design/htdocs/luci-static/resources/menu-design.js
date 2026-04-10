@@ -11,6 +11,16 @@ var LuciCompat = {
 
 return baseclass.extend({
 	__init__: function() {
+		var params = new URLSearchParams(window.location.search);
+
+		if (params.get('menu') === 'flush') {
+			ui.menu.flushCache();
+			params.delete('menu');
+			window.history.replaceState(null, '', window.location.pathname +
+				(params.toString() ? '?' + params.toString() : '') +
+				window.location.hash);
+		}
+
 		ui.menu.load().then(L.bind(this.render, this));
 	},
 
@@ -243,4 +253,3 @@ return baseclass.extend({
 		}
 	},
 });
-

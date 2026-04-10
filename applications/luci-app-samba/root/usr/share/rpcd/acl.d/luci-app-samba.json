@@ -1,0 +1,18 @@
+{
+	"luci-app-samba": {
+		"description": "Grant access to LuCI app samba",
+		"read": {
+			"file": {
+				"/etc/samba/smb.conf.template": [ "read" ],
+				"/usr/sbin/smbd": [ "exec" ]
+			},
+			"uci": [ "samba" ]
+		},
+		"write": {
+			"file": {
+				"/etc/samba/smb.conf.template": [ "write" ]
+			},
+			"uci": [ "samba" ]
+		}
+	}
+}

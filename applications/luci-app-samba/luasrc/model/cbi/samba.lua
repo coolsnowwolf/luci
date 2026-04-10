@@ -10,6 +10,10 @@ s.anonymous = true
 s:tab("general",  translate("General Settings"))
 s:tab("template", translate("Edit Template"))
 
+smbd = s:taboption("general", Flag, "enabled", translate("Enabled"))
+smbd.rmempty = false
+smbd.default = "0"
+
 s:taboption("general", Value, "name", translate("Hostname"))
 s:taboption("general", Value, "description", translate("Description"))
 s:taboption("general", Value, "workgroup", translate("Workgroup"))
