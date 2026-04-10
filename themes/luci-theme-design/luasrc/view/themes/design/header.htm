@@ -24,6 +24,7 @@
 	local http = require "luci.http"
 	local disp = require "luci.dispatcher"
 	local ver  = require "luci.version"
+	local fs   = require "nixio.fs"
 
 	-- 兼容新旧版本的 ubus 调用
 	local boardinfo = {}
@@ -41,6 +42,7 @@
 
 	local node = disp.context.dispatched
 	local path = table.concat(disp.context.path, "-")
+	local show_proxy_icon = fs.access("/etc/config/google_fu_mode")
 
 	http.prepare_content("text/html; charset=UTF-8")
 -%>
@@ -100,7 +102,9 @@
 
 <div class="navbar">
   <a href="/cgi-bin/luci/admin/status/overview"><img src="<%=media%>/images/home.png" /></a>
+  <% if show_proxy_icon then %>
   <a href="/cgi-bin/luci/admin/services/openclash"><img src="<%=media%>/images/openclash.png" /></a>
+  <% end %>
   <a href="/cgi-bin/luci/admin/network/network"><img src="<%=media%>/images/link.png" /></a>
   <a href="/cgi-bin/luci/admin/status/realtime"><img src="<%=media%>/images/rank.png" /></a>
   <a href="/cgi-bin/luci/admin/system/admin"><img src="<%=media%>/images/user.png" /></a>

@@ -7,6 +7,106 @@
 'require form';
 'require tools.widgets as widgets';
 
+function parseRuntimeInfo(res) {
+	var data = null;
+
+	try {
+		data = JSON.parse(res || 'null');
+	}
+	catch (e) {
+		data = null;
+	}
+
+	if (data && typeof(data.data) == 'object' && data.data != null)
+		return data.data;
+
+	return (data && typeof(data) == 'object') ? data : null;
+}
+
+function splitNonEmptyLines(text) {
+	if (typeof(text) != 'string')
+		return [];
+
+	return text.split('\n').map(function(line) {
+		return line.trim();
+	}).filter(function(line) {
+		return line.length > 0;
+	});
+}
+
+function formatBlockedDomains(info) {
+	var value = info ? (info.blocked_domains || info.overall_domains) : null;
+
+	if (value == null || value === '')
+		return '-';
+
+	value = String(value);
+
+	if (/^\d+$/.test(value))
+		return parseInt(value, 10).toLocaleString();
+
+	return value;
+}
+
+function getActiveSourceNames(info) {
+	var list = [];
+
+	if (!info)
+		return list;
+
+	if (Array.isArray(info.active_sources)) {
+		list = info.active_sources.map(function(entry) {
+			if (entry == null)
+				return null;
+
+			if (typeof(entry) == 'string')
+				return entry;
+
+			if (typeof(entry.source) == 'string')
+				return entry.source;
+
+			return null;
+		}).filter(function(entry) {
+			return entry != null && entry !== '';
+		});
+	}
+	else if (typeof(info.active_sources) == 'string' && info.active_sources !== '') {
+		list = [ info.active_sources ];
+	}
+
+	return list;
+}
+
+function parseSourceListOutput(text) {
+	return splitNonEmptyLines(text).map(function(line) {
+		var match = line.match(/^\+\s+(\S+)\s+(?:\S+\s+)?(\S+)\s+(.+)$/);
+
+		if (!match)
+			return null;
+
+		return {
+			name: match[1],
+			size: match[2],
+			focus: match[3]
+		};
+	}).filter(function(entry) {
+		return entry != null;
+	});
+}
+
+function parseCategoryEntry(line) {
+	var fields = String(line || '').split(';');
+
+	if (fields.length < 2 || !fields[0])
+		return null;
+
+	return {
+		code: fields[0].trim(),
+		label: (fields[1] || '').trim(),
+		value: (fields[2] || '').trim()
+	};
+}
+
 /*
 	button handling
 */
@@ -141,7 +241,7 @@ return view.extend({
 		*/
 		pollData: poll.add(function() {
 			return L.resolveDefault(fs.read_direct('/tmp/adb_runtime.json'), 'null').then(function(res) {
-				var info = JSON.parse(res);
+				var info = parseRuntimeInfo(res);
 				var status = document.getElementById('status');
 				if (status && info) {
 					status.textContent = (info.adblock_status || '-') + ' / ' + (info.adblock_version || '-');
@@ -173,19 +273,12 @@ return view.extend({
 				}
 				var domains = document.getElementById('domains');
 				if (domains && info) {
-					domains.textContent = parseInt(info.blocked_domains, 10).toLocaleString() || '-';
+					domains.textContent = formatBlockedDomains(info);
 				}
 				var sources = document.getElementById('sources');
-				var src_array = [];
+				var src_array = getActiveSourceNames(info);
 				if (sources && info) {
-					for (var i = 0; i < info.active_sources.length; i++) {
-						if (i < info.active_sources.length-1) {
-							src_array += info.active_sources[i].source + ', ';
-						} else {
-							src_array += info.active_sources[i].source
-						}
-					}
-					sources.textContent = src_array || '-';
+					sources.textContent = src_array.join(', ') || '-';
 				}
 				var backend = document.getElementById('backend');
 				if (backend && info) {
@@ -193,7 +286,7 @@ return view.extend({
 				}
 				var utils = document.getElementById('utils');
 				if (utils && info) {
-					utils.textContent = info.run_utils || '-';
+					utils.textContent = info.run_utils || info.fetch_utility || '-';
 				}
 				var ifaces = document.getElementById('ifaces');
 				if (ifaces && info) {
@@ -209,7 +302,7 @@ return view.extend({
 				}
 				var run = document.getElementById('run');
 				if (run && info) {
-					run.textContent = info.last_run || '-';
+					run.textContent = info.last_run || info.last_rundate || '-';
 				}
 			});
 		}, 1);
@@ -541,30 +634,37 @@ return view.extend({
 			&#8226;&#xa0;<b>XXL</b> (200k-) needs more RAM and Multicore support, e.g. x86 or raspberry devices.<br /> \
 			&#8226;&#xa0;<b>VAR</b> (50k-500k) variable size depending on the selection.<br />';
 
-		var name, size, focus, sources = [];
-		if (result[0]) {
-			sources = result[0].trim().split('\n');
+		var name, size, focus,
+		    sourceDetails = parseSourceListOutput(result[0]),
+		    sourceSections = uci.sections('adblock', 'source') || [],
+		    sourceLabels = {};
+
+		for (var i = 0; i < sourceDetails.length; i++)
+			sourceLabels[sourceDetails[i].name] = '%s (%s, %s)'.format(sourceDetails[i].name, sourceDetails[i].size, sourceDetails[i].focus);
+
+		for (var i = 0; i < sourceSections.length; i++) {
+			name = sourceSections[i]['.name'];
+			if (!name || sourceLabels[name])
+				continue;
+
+			focus = sourceSections[i].adb_src_desc || _('Configured source');
+			sourceLabels[name] = '%s (%s)'.format(name, focus);
 		}
 
 		o = s.taboption('sources', form.MultiValue, 'adb_sources', _('Sources (Size, Focus)'));
-		for (var i = 0; i < sources.length; i++) {
-			if (sources[i].match(/^\s+\+/)) {
-				name  = sources[i].match(/^\s+\+\s(\w+)\s/)[1] || '-';
-				size  = sources[i].match(/^\s+\+\s\w+[\sx]+(\w+)/)[1] || '-';
-				focus = sources[i].match(/^\s+\+\s\w+[\sx]+\w+\s+([\w\+]+)/)[1] || '-';
-				o.value(name, name + ' (' + size + ', ' + focus + ')');
-			}
-		}
+		Object.keys(sourceLabels).sort(L.naturalCompare).forEach(function(source) {
+			o.value(source, sourceLabels[source]);
+		});
 		o.optional = true;
 		o.rmempty = true;
 
 		/*
 			prepare category data
 		*/
-		var code, category, list, path, categories = [];
-		if (result[1]) {
-			categories = result[1].trim().split('\n');
-		}
+		var code, category, list, path,
+		    categories = splitNonEmptyLines(result[1]).map(parseCategoryEntry).filter(function(entry) {
+			return entry != null;
+		});
 
 		o = s.taboption('sources', form.DummyValue, '_sub');
 		o.rawhtml = true;
@@ -572,9 +672,11 @@ return view.extend({
 
 		o = s.taboption('sources', form.DynamicList, 'adb_utc_sources', _('Categories'));
 		for (var i = 0; i < categories.length; i++) {
-			code = categories[i].match(/^(\w+);/)[1].trim();
+			code = categories[i].code;
 			if (code === 'utc') {
-				category = categories[i].match(/^\w+;(.*$)/)[1].trim();
+				category = categories[i].label;
+				if (!category)
+					continue;
 				o.value(category);
 			}
 		}
@@ -587,10 +689,12 @@ return view.extend({
 
 		o = s.taboption('sources', form.DynamicList, 'adb_stb_sources', _('Variants'));
 		for (var i = 0; i < categories.length; i++) {
-			code = categories[i].match(/^(\w+);/)[1].trim();
+			code = categories[i].code;
 			if (code === 'stb') {
-				list = categories[i].match(/^\w+;(.*);/)[1].trim();
-				path = categories[i].match(/^.*;(.*$)/)[1].trim();
+				list = categories[i].label;
+				path = categories[i].value;
+				if (!list || !path)
+					continue;
 				o.value(path, list);
 			}
 		}
