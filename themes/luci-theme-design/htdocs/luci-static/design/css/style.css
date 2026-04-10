@@ -403,7 +403,10 @@ small {
     width: 100%;
     height: 100%;
     z-index: 1000;
-    display: block;
+    display: none;
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
     background-color: var(--bgwhite);
     top: 0;
 }
@@ -3583,12 +3586,31 @@ input[name="nslookup"] {
         display: block;
         overflow: auto;
     }
-    .node-admin-status-routes #view table,
+.node-admin-status-routes #view table,
 	.node-admin-status-processes #view table,
 	.node-admin-status-realtime-connections #view table[id*=connections] {
 	    display: block;
         white-space: nowrap;
 	}
+
+    #view [data-table] > h3 {
+        margin-top: 1.75rem;
+        margin-bottom: 1.15rem;
+        padding: 12px 12px 12px 12px;
+        line-height: 1.35;
+    }
+
+    #view [data-chain] > h4 {
+        margin-top: 1.15rem;
+        margin-bottom: 0.85rem;
+        padding-top: 0.3rem;
+        padding-bottom: 0.2rem;
+        line-height: 1.35;
+    }
+
+    #view [data-chain] > table {
+        margin-bottom: 1.25rem;
+    }
 
 }
 

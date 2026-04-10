@@ -673,7 +673,7 @@ return view.extend({
 	},
 
 	checkLegacyRules: function(ipt4save, ipt6save) {
-		if (ipt4save.match(/\n-A /) || ipt6save.match(/\n-A /)) {
+		if (this.hasLegacyRules(ipt4save, ipt6save)) {
 			ui.addNotification(_('Legacy rules detected'), [
 				E('p', _('There are legacy iptables rules present on the system. Mixing iptables and nftables rules is discouraged and may lead to incomplete traffic filtering.')),
 				E('button', {
@@ -684,15 +684,35 @@ return view.extend({
 		}
 	},
 
+	hasLegacyRules: function(ipt4save, ipt6save) {
+		return /\n-A /.test(ipt4save || '') || /\n-A /.test(ipt6save || '');
+	},
+
+	hasRenderableRuleset: function(nft) {
+		if (!Array.isArray(nft && nft.nftables))
+			return false;
+
+		for (var i = 0; i < nft.nftables.length; i++)
+			if (nft.nftables[i] && nft.nftables[i].hasOwnProperty('table'))
+				return true;
+
+		return false;
+	},
+
 	render: function(data) {
 		var view = E('div'),
 		    nft = data[0],
 		    ipt = data[1],
 		    ipt6 = data[2];
 
+		if (!this.hasRenderableRuleset(nft) && this.hasLegacyRules(ipt, ipt6)) {
+			window.location.replace('nftables/iptables');
+			return E('em', _('Redirecting to iptables rules overview…'));
+		}
+
 		this.checkLegacyRules(ipt, ipt6);
 
-		if (!Array.isArray(nft.nftables))
+		if (!this.hasRenderableRuleset(nft))
 			return E('em', _('No nftables ruleset loaded.'));
 
 		for (var i = 0; i < nft.nftables.length; i++)
