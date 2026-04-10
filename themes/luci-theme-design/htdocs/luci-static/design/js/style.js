@@ -302,11 +302,71 @@
         });
     }
 
+    function syncWirelessIcons() {
+        var mediaPath = (L.env && L.env.media) ? L.env.media : '/luci-static/design';
+        var iconMap = {
+            'wifi': 'wifi_big',
+            'wifi_disabled': 'wifi_big_disabled',
+            'signal-none': 'signal-none',
+            'signal-0': 'signal-0',
+            'signal-0-25': 'signal-0-25',
+            'signal-25-50': 'signal-25-50',
+            'signal-50-75': 'signal-50-75',
+            'signal-75-100': 'signal-75-100'
+        };
+
+        if (document.body.getAttribute('data-page') !== 'admin-network-wireless') {
+            return;
+        }
+
+        Array.prototype.forEach.call(document.querySelectorAll('img[src*="/luci-static/resources/icons/"]'), function (img) {
+            var src = img.getAttribute('src') || '';
+            var match = src.match(/\/icons\/([^/?#]+)\.png(?:[?#].*)?$/);
+            var key = match ? match[1] : '';
+            var mapped = iconMap[key];
+            var badge = img.closest('.ifacebadge') || img.closest('.center');
+            var isDeviceIcon = (key === 'wifi' || key === 'wifi_disabled');
+            var size = isDeviceIcon ? '24px' : '18px';
+
+            if (!mapped || !badge) {
+                return;
+            }
+
+            img.setAttribute('src', mediaPath + '/images/' + mapped + '.png');
+            img.classList.add('theme-wireless-icon');
+            img.style.setProperty('background-image', 'none', 'important');
+            img.style.setProperty('visibility', 'visible', 'important');
+            img.style.setProperty('opacity', '1', 'important');
+            img.style.setProperty('display', 'inline-block', 'important');
+            img.style.setProperty('width', size, 'important');
+            img.style.setProperty('height', size, 'important');
+            img.style.setProperty('min-width', size, 'important');
+            img.style.setProperty('padding', '0', 'important');
+            img.style.setProperty('margin', isDeviceIcon ? '0 .3rem 0 0' : '0 .25rem 0 0', 'important');
+            img.style.setProperty('vertical-align', 'middle', 'important');
+            img.style.setProperty('object-fit', 'contain', 'important');
+        });
+    }
+
+    function initWirelessIcons() {
+        if (document.body.getAttribute('data-page') !== 'admin-network-wireless') {
+            return;
+        }
+
+        syncWirelessIcons();
+
+        new MutationObserver(syncWirelessIcons).observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+    }
+
     function init() {
         applySafeAreaFix();
         initIndicators();
         initOverviewPortStatus();
         initNetworkInterfaceIcons();
+        initWirelessIcons();
         setHeaderShadow();
         $(window).on('resize', setHeaderShadow);
     }

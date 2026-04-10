@@ -856,6 +856,21 @@ span[data-indicator="uci-changes"] {
     content: "\72";
 }
 
+.main > .main-left > .nav > .slide > a[data-title="Modem"]:before,
+.main > .main-left > .nav > li > a[data-title="Modem"]:before,
+.main > .main-left > .nav > .slide > a[data-title="Mobile"]:before,
+.main > .main-left > .nav > li > a[data-title="Mobile"]:before,
+.main > .main-left > .nav > .slide > a[data-title="Mobile_Service"]:before,
+.main > .main-left > .nav > li > a[data-title="Mobile_Service"]:before,
+.main > .main-left > .nav > .slide > a[data-title="Cellular"]:before,
+.main > .main-left > .nav > li > a[data-title="Cellular"]:before,
+.main > .main-left > .nav > .slide > a[data-title="WWAN"]:before,
+.main > .main-left > .nav > li > a[data-title="WWAN"]:before,
+.main > .main-left > .nav > .slide > a[data-title="ModemManager"]:before,
+.main > .main-left > .nav > li > a[data-title="ModemManager"]:before {
+    content: "\e67e";
+}
+
 .main > .main-left > .nav > .slide > a[data-title="Bandwidth Monitor"]:before {
     content: "\e764";
 }
@@ -2071,6 +2086,16 @@ form.inline + form.inline,
 	max-height: none;
 }
 
+[data-page="admin-network-wireless"] #modal_overlay > .modal.cbi-modal {
+	width: calc(100vw - 2.5rem);
+	max-width: 860px;
+	max-height: calc(100vh - 6.5rem);
+	margin: 2rem auto;
+	padding: .85rem 1rem;
+	align-items: flex-start;
+	overflow-y: auto;
+}
+
 body.modal-overlay-active {
 	overflow: hidden;
 	height: 100vh;
@@ -2207,9 +2232,11 @@ body.modal-overlay-active #modal_overlay {
 td > .ifacebadge,
 .td > .ifacebadge {
 	font-size: .8rem;
-	background-color: var(--active_color);
-	color: white;
-	border-radius: 8px;
+	background-color: #eef2f3;
+	color: #5f6b72;
+	border: 1px solid #d8e0e3;
+	border-radius: 10px;
+	box-shadow: inset 0 1px 0 rgb(255 255 255 / 70%), 0 1px 2px rgb(0 0 0 / 4%);
 }
 
 .ifacebadge > em,
