@@ -9,7 +9,8 @@ PKG_VERSION:=1.1.1-7
 
 LUCI_TITLE:=Policy Based Routing Service Web UI
 LUCI_DESCRIPTION:=Provides Web UI for Policy Based Routing Service.
-LUCI_DEPENDS:=+jsonfilter +PACKAGE_firewall4:pbr +PACKAGE_firewall3:pbr-iptables
+LUCI_DEPENDS:=+jsonfilter
+LUCI_EXTRA_DEPENDS:=pbr
 LUCI_PKGARCH:=all
 
 PKG_PROVIDES:=luci-app-vpnbypass luci-app-vpn-policy-routing
