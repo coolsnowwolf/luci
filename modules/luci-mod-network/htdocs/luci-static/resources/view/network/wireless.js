@@ -840,83 +840,90 @@ var CBIWifiFrequencyValue = form.Value.extend({
 				htmodelist.VHT80 || htmodelist.VHT160
 			);
 
-			var has_ax = hwmodelist.ax && (
+				var has_ax = hwmodelist.ax && (
 				L.hasSystemFeature('hostapd', '11ax') ||
 				htmodelist.HE20 || htmodelist.HE40 ||
 				htmodelist.HE80 || htmodelist.HE160
 			);
 
-				var has_be = hwmodelist.be && (
-					L.hasSystemFeature('hostapd', '11be') ||
-					htmodelist.EHT20 || htmodelist.EHT40 || htmodelist.EHT80 ||
-					htmodelist.EHT160 || htmodelist.EHT320
-				);
+			var has_be = hwmodelist.be && (
+				L.hasSystemFeature('hostapd', '11be') ||
+				htmodelist.EHT20 || htmodelist.EHT40 || htmodelist.EHT80 ||
+				htmodelist.EHT160 || htmodelist.EHT320
+			);
 
-				if (isQcaWifiHwtype(hwtype)) {
-					has_ac = has_ac || /^11ac/.test(hwval);
-					has_ax = has_ax || /^11ax/.test(hwval);
-					has_be = has_be || /^11be/.test(hwval);
-					hwmodelist.n = hwmodelist.n || /^11n/.test(hwval);
+			if (isQcaWifiHwtype(hwtype)) {
+				var qca_has_be = has_be || /^11be/.test(hwval),
+				    qca_has_ax = qca_has_be || has_ax || /^11ax/.test(hwval),
+				    qca_has_ac = qca_has_ax || has_ac || /^11ac/.test(hwval),
+				    qca_has_n = qca_has_ac || hwmodelist.n || /^11n/.test(hwval),
+				    qca_has_htinfo = (Object.keys(htmodelist).length > 0),
+				    qca_ht20 = !!(!qca_has_htinfo || htmodelist.HT20 || htmodelist.VHT20 || htmodelist.HE20 || htmodelist.EHT20 || /^HT20$/.test(htval)),
+				    qca_ht40 = !!(!qca_has_htinfo || htmodelist.HT40 || htmodelist.VHT40 || htmodelist.HE40 || htmodelist.EHT40 || /^HT40$/.test(htval)),
+				    qca_ht80 = !!(!qca_has_htinfo || htmodelist.VHT80 || htmodelist.HE80 || htmodelist.EHT80 || /^HT80$/.test(htval)),
+				    qca_ht160 = !!(htmodelist.VHT160 || htmodelist.HE160 || htmodelist.EHT160 || /^HT160$/.test(htval)),
+				    qca_ht320 = !!(htmodelist.EHT320 || /^HT320$/.test(htval)),
+				    qca_ht80p80 = !!(/^HT80_80$/.test(htval));
 
-					this.modes = [
-						'', 'Legacy', false,
-						'n', 'N', true,
-						'ac', 'AC', (hwtype == 'qcawifi' || hwtype == 'qcawificfg80211' || has_ac),
-						'ax', 'AX', (hwtype == 'qcawificfg80211' || has_ax),
-						'be', 'BE', (hwtype == 'qcawificfg80211' || has_be)
-					];
+				this.modes = [
+					'', 'Legacy', false,
+					'n', 'N', qca_has_n,
+					'ac', 'AC', qca_has_ac,
+					'ax', 'AX', qca_has_ax,
+					'be', 'BE', qca_has_be
+				];
 
-					this.htmodes = {
-						'': [ '', '-', true ],
-						'n': [
-							'HT20', '20 MHz', true,
-							'HT40', '40 MHz', true
-						],
-						'ac': [
-							'HT20', '20 MHz', true,
-							'HT40', '40 MHz', true,
-							'HT80', '80 MHz', true,
-							'HT160', '160 MHz', true,
-							'HT80_80', '80+80 MHz', true
-						],
-						'ax': [
-							'HT20', '20 MHz', true,
-							'HT40', '40 MHz', true,
-							'HT80', '80 MHz', true,
-							'HT160', '160 MHz', true
-						],
-						'be': [
-							'HT20', '20 MHz', true,
-							'HT40', '40 MHz', true,
-							'HT80', '80 MHz', true,
-							'HT160', '160 MHz', true,
-							'HT320', '320 MHz', true
-						]
-					};
+				this.htmodes = {
+					'': [ '', '-', true ],
+					'n': [
+						'HT20', '20 MHz', qca_ht20,
+						'HT40', '40 MHz', qca_ht40
+					],
+					'ac': [
+						'HT20', '20 MHz', qca_ht20,
+						'HT40', '40 MHz', qca_ht40,
+						'HT80', '80 MHz', qca_ht80,
+						'HT160', '160 MHz', qca_ht160,
+						'HT80_80', '80+80 MHz', qca_ht80p80
+					],
+					'ax': [
+						'HT20', '20 MHz', qca_ht20,
+						'HT40', '40 MHz', qca_ht40,
+						'HT80', '80 MHz', qca_ht80,
+						'HT160', '160 MHz', qca_ht160
+					],
+					'be': [
+						'HT20', '20 MHz', qca_ht20,
+						'HT40', '40 MHz', qca_ht40,
+						'HT80', '80 MHz', qca_ht80,
+						'HT160', '160 MHz', qca_ht160,
+						'HT320', '320 MHz', qca_ht320
+					]
+				};
 
-					this.bands = {
-						'': [
-							'2g', '2.4 GHz', this.channels['2g'].length > 0,
-							'5g', '5 GHz', this.channels['5g'].length > 0,
-							'6g', '6 GHz', this.channels['6g'].length > 0
-						],
-						'n': [
-							'2g', '2.4 GHz', this.channels['2g'].length > 0
-						],
-						'ac': [
-							'5g', '5 GHz', this.channels['5g'].length > 0
-						],
-						'ax': [
-							'2g', '2.4 GHz', this.channels['2g'].length > 0,
-							'5g', '5 GHz', this.channels['5g'].length > 0
-						],
-						'be': [
-							'2g', '2.4 GHz', this.channels['2g'].length > 0,
-							'5g', '5 GHz', this.channels['5g'].length > 0,
-							'6g', '6 GHz', this.channels['6g'].length > 0
-						]
-					};
-				}
+				this.bands = {
+					'': [
+						'2g', '2.4 GHz', this.channels['2g'].length > 0,
+						'5g', '5 GHz', this.channels['5g'].length > 0,
+						'6g', '6 GHz', this.channels['6g'].length > 0
+					],
+					'n': [
+						'2g', '2.4 GHz', this.channels['2g'].length > 0
+					],
+					'ac': [
+						'5g', '5 GHz', this.channels['5g'].length > 0
+					],
+					'ax': [
+						'2g', '2.4 GHz', this.channels['2g'].length > 0,
+						'5g', '5 GHz', this.channels['5g'].length > 0
+					],
+					'be': [
+						'2g', '2.4 GHz', this.channels['2g'].length > 0,
+						'5g', '5 GHz', this.channels['5g'].length > 0,
+						'6g', '6 GHz', this.channels['6g'].length > 0
+					]
+				};
+			}
 				else {
 					this.modes = [
 						'', 'Legacy', hwmodelist.a || hwmodelist.b || hwmodelist.g,
