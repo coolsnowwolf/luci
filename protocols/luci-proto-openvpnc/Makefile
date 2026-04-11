@@ -11,8 +11,14 @@ LUCI_DESCRIPTION:=This package provides support for OpenVPN client configuration
 LUCI_DEPENDS:=+openvpn +kmod-tun +firewall
 LUCI_PKGARCH:=all
 PKG_VERSION:=1
-PKG_RELEASE:=2
+PKG_RELEASE:=3
 
 include ../../luci.mk
+
+define Package/$(PKG_NAME)/postinst
+#!/bin/sh
+mkdir -p "$${IPKG_INSTROOT}/etc/openvpn/openvpnc"
+exit 0
+endef
 
 # call BuildPackage - OpenWrt buildroot signature

@@ -94,6 +94,7 @@ openvpnc_write_auth_file() {
 	local username="$2"
 	local password="$3"
 
+	mkdir -p "${file%/*}" || return 1
 	umask 077
 	{
 		printf '%s\n' "$username"
@@ -229,6 +230,7 @@ proto_openvpnc_setup() {
 	[ -n "$password" ] || password="$(uci -q get network.$config.password)"
 
 	ifname="vpn-$config"
+	mkdir -p /etc/openvpn/openvpnc
 
 	[ -n "$ovpn_file" ] && [ -f "$ovpn_file" ] || {
 		logger -t openvpnc "missing profile for $config"

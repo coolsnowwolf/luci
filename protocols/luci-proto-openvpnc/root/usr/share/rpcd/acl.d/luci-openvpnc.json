@@ -1,0 +1,22 @@
+{
+	"luci-proto-openvpnc": {
+		"description": "Grant access to LuCI OpenVPN Client procedures",
+		"read": {
+			"file": {
+				"/etc/openvpn/openvpnc": [ "list" ],
+				"/etc/openvpn/openvpnc/*.ovpn": [ "read" ]
+			},
+			"ubus": {
+				"file": [ "list", "stat" ]
+			},
+			"uci": [ "network" ]
+		},
+		"write": {
+			"cgi-io": [ "upload" ],
+			"file": {
+				"/etc/openvpn/openvpnc/*.ovpn": [ "write" ]
+			},
+			"uci": [ "network" ]
+		}
+	}
+}
