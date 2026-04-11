@@ -1523,7 +1523,7 @@ form.inline + form.inline,
 }
 
 [data-tab-active="true"] {
-    overflow: visible;
+    overflow: auto;
     height: auto;
     opacity: 1;
     transition: opacity .25s ease-in;
@@ -1940,9 +1940,11 @@ form.inline + form.inline,
 	top: calc(100% + 4px);
 	left: 0;
 	z-index: 1200;
+	display: block;
 	min-width: 100%;
 	padding: 0.25rem 0;
 	max-height: 200px;
+	overflow-x: hidden;
 	overflow-y: auto;
 	background: var(--sectionbg_color);
 	border: var(--input_border);
@@ -1961,6 +1963,7 @@ form.inline + form.inline,
 	position: relative;
 	z-index: 1;
 	display: flex;
+	width: 100%;
 	background: var(--sectionbg_color);
 	min-height: 2.5rem;
 	padding: 0 0.85rem;
@@ -2008,6 +2011,21 @@ td.cbi-value-field.cbi-dropdown-open,
 	position: relative;
 	overflow: visible !important;
 	z-index: 100;
+}
+
+/* Keep opened dropdowns inside modal flow so menus don't get clipped or spill
+ * outside the dialog frame. */
+body.modal-overlay-active #modal_overlay .modal.cbi-modal .cbi-value-field.cbi-dropdown-open {
+	position: relative;
+	overflow: visible !important;
+	margin-bottom: min(18rem, 50vh);
+	z-index: 120;
+}
+
+body.modal-overlay-active #modal_overlay .modal.cbi-modal [data-tab-active="true"],
+body.modal-overlay-active #modal_overlay .modal.cbi-modal .cbi-section-node,
+body.modal-overlay-active #modal_overlay .modal.cbi-modal .cbi-section-node-tabbed {
+	overflow: visible !important;
 }
 
 .cbi-section,

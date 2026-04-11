@@ -188,6 +188,8 @@ button.cbi-button {
     width: auto;
     max-width: none;
     max-height: 260px !important;
+    overflow-x: hidden;
+    overflow-y: auto;
     background: var(--sectionbg_color);
     border: var(--input_border);
     border-radius: 0 0 8px 8px;
@@ -196,6 +198,7 @@ button.cbi-button {
 }
 
 .cbi-dropdown:not(.btn):not(.cbi-button)[open] > ul.dropdown > li {
+    width: 100%;
     padding: 0.55em 0.85em;
     cursor: pointer;
     color: var(--inputtext_color);
@@ -294,6 +297,13 @@ button.cbi-button {
     padding: 0.85rem 1rem;
     align-items: flex-start;
     overflow-y: auto;
+}
+
+body.modal-overlay-active #modal_overlay .modal.cbi-modal [data-tab-active="true"],
+body.modal-overlay-active #modal_overlay .modal.cbi-modal .cbi-section-node,
+body.modal-overlay-active #modal_overlay .modal.cbi-modal .cbi-section-node-tabbed,
+body.modal-overlay-active #modal_overlay .modal.cbi-modal .cbi-value-field.cbi-dropdown-open {
+    overflow: visible !important;
 }
 
 .cbi-progressbar {
