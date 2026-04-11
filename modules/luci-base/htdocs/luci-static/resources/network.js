@@ -40,6 +40,8 @@ var iface_patterns_ignore = [
 var iface_patterns_wireless = [
 	/^wlan\d+/,
 	/^wl\d+/,
+	/^ra[xiyez]?\d+/,
+	/^apcli[xiyez]?\d+/,
 	/^ath\d+/,
 	/^\w+\.network\d+/
 ];
