@@ -306,6 +306,68 @@ body.modal-overlay-active #modal_overlay .modal.cbi-modal .cbi-value-field.cbi-d
     overflow: visible !important;
 }
 
+/* Undo generic modal list styling for LuCI dropdown widgets inside wireless edit dialogs. */
+[data-page="admin-network-wireless"] #modal_overlay .modal.cbi-modal .cbi-dropdown > ul,
+[data-page="admin-network-wireless"] #modal_overlay .modal.cbi-modal .cbi-dropdown > ul.preview,
+[data-page="admin-network-wireless"] #modal_overlay .modal.cbi-modal .cbi-dropdown[open] > ul.dropdown {
+    margin-left: 0 !important;
+    padding-left: 0 !important;
+    list-style: none !important;
+}
+
+[data-page="admin-network-wireless"] #modal_overlay .modal.cbi-modal .cbi-dropdown > ul > li,
+[data-page="admin-network-wireless"] #modal_overlay .modal.cbi-modal .cbi-dropdown[open] > ul.dropdown > li {
+    list-style: none !important;
+    margin-left: 0 !important;
+}
+
+/* Keep NetworkSelect choices readable in wireless modal dropdowns. */
+[data-page="admin-network-wireless"] #modal_overlay .modal.cbi-modal .cbi-dropdown[open] > ul.dropdown > li {
+    display: flex !important;
+    align-items: center;
+    color: var(--inputtext_color);
+}
+
+/* Fallback text rendering for NetworkSelect choices when badge markup is hidden by theme rules. */
+[data-page="admin-network-wireless"] #modal_overlay .modal.cbi-modal .cbi-dropdown > ul > li[data-value]:not([data-value=""])::before {
+    content: attr(data-value);
+    display: inline-block;
+    color: inherit;
+    font-size: 0.92rem;
+    line-height: 1.4;
+    white-space: nowrap;
+    margin-right: 0.5rem;
+    flex: 0 0 auto;
+}
+
+[data-page="admin-network-wireless"] #modal_overlay .modal.cbi-modal .cbi-dropdown[open] > ul.dropdown > li[selected]::before {
+    color: #fff;
+}
+
+[data-page="admin-network-wireless"] #modal_overlay .modal.cbi-modal .cbi-dropdown[open] > ul.dropdown > li .ifacebadge,
+[data-page="admin-network-wireless"] #modal_overlay .modal.cbi-modal .cbi-dropdown[open] > ul.dropdown > li .zonebadge {
+    display: inline-flex !important;
+    align-items: center;
+    gap: 0.2rem;
+    max-width: 100%;
+    padding: 0.3rem 0.6rem;
+    color: #5f6b72 !important;
+    background-color: #eef2f3 !important;
+    border: 1px solid #d8e0e3 !important;
+    border-radius: 10px;
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 70%), 0 1px 2px rgb(0 0 0 / 4%);
+    font-size: 0.85rem;
+    line-height: 1.4;
+    white-space: nowrap;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+[data-page="admin-network-wireless"] #modal_overlay .modal.cbi-modal .cbi-dropdown[open] > ul.dropdown > li .ifacebadge > em,
+[data-page="admin-network-wireless"] #modal_overlay .modal.cbi-modal .cbi-dropdown[open] > ul.dropdown > li .ifacebadge > img {
+    align-self: center;
+}
+
 .cbi-progressbar {
     position: relative;
     min-width: 11rem;

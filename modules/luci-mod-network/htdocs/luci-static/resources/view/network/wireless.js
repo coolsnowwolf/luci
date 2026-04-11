@@ -2002,6 +2002,7 @@ return view.extend({
 						return mode;
 					};
 
+					bssid.deps = [];
 					bssid.depends('mode', 'wds');
 
 					o = ss.taboption('general', form.Flag, 'hidden', _('Hide <abbr title="Extended Service Set Identifier">ESSID</abbr>'), _('Where the ESSID is hidden, clients may fail to roam and airtime efficiency may be significantly reduced.'));
