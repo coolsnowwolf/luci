@@ -143,6 +143,17 @@ function getDisplayEncryption(radioNet) {
 	return formatConfigEncryption(uci.get('wireless', radioNet.getName(), 'encryption'));
 }
 
+function getDisplayBSSID(radioNet) {
+	var bssid = uci.get('wireless', radioNet.getName(), 'macaddr') ||
+		uci.get('wireless', radioNet.getWifiDeviceName(), 'macaddr') ||
+		radioNet.getBSSID() || radioNet.getActiveBSSID();
+
+	if (bssid && bssid != '00:00:00:00:00:00')
+		return String(bssid).toUpperCase();
+
+	return bssid || null;
+}
+
 function getDisplayTxPower(radioNet) {
 	var txpower = radioNet.getTXPower();
 
@@ -549,7 +560,7 @@ function render_signal_badge(signalPercent, signalValue, noiseValue, wrap, mode)
 function render_network_badge(radioNet) {
 	var hwtype = uci.get('wireless', radioNet.getWifiDeviceName(), 'type'),
 	    mode = radioNet.getActiveMode(),
-	    bssid = radioNet.getActiveBSSID(),
+	    bssid = getDisplayBSSID(radioNet),
 	    channel = getDisplayChannel(radioNet),
 	    disabled = isNetworkDisabled(radioNet),
 	    is_assoc = isDisplayAssociated(radioNet, hwtype, mode, bssid, channel, disabled);
@@ -585,7 +596,7 @@ function render_radio_status(radioDev, wifiNets) {
 
 function render_network_status(radioNet) {
 	var mode = radioNet.getActiveMode(),
-	    bssid = radioNet.getActiveBSSID(),
+	    bssid = getDisplayBSSID(radioNet),
 	    channel = getDisplayChannel(radioNet),
 	    hwtype = uci.get('wireless', radioNet.getWifiDeviceName(), 'type'),
 	    disabled = isNetworkDisabled(radioNet),
@@ -613,7 +624,7 @@ function render_network_status(radioNet) {
 
 function render_modal_status(node, radioNet) {
 	var mode = radioNet.getActiveMode(),
-	    bssid = radioNet.getActiveBSSID(),
+	    bssid = getDisplayBSSID(radioNet),
 	    channel = getDisplayChannel(radioNet),
 	    frequency = getDisplayFrequency(radioNet, channel),
 	    bitrate = getDisplayBitRate(radioNet),
