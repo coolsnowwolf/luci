@@ -1156,6 +1156,12 @@ fieldset > fieldset,
 	box-shadow: none;
 }
 
+/* Avoid clipping LuCI dropdown popups inside nested form sections. */
+fieldset,
+fieldset.cbi-section {
+	overflow-y: visible;
+}
+
 .cbi-section > h3:first-child,
 .panel-title {
     width: 100%;
@@ -1517,7 +1523,7 @@ form.inline + form.inline,
 }
 
 [data-tab-active="true"] {
-    overflow: auto;
+    overflow: visible;
     height: auto;
     opacity: 1;
     transition: opacity .25s ease-in;
