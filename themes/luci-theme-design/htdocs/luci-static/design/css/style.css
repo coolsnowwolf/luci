@@ -3282,6 +3282,38 @@ input[name="nslookup"] {
 	width: 23rem;
 }
 
+[data-page="admin-network-wireless"] #wifi_assoclist_table .ifacebadge,
+.node-admin-network-wireless #wifi_assoclist_table .ifacebadge {
+	padding: .22rem .5rem;
+	gap: .18rem;
+	border-radius: 8px;
+	align-items: center;
+	line-height: 1.25;
+}
+
+[data-page="admin-network-wireless"] #wifi_assoclist_table .ifacebadge > img,
+.node-admin-network-wireless #wifi_assoclist_table .ifacebadge > img {
+	width: 16px !important;
+	height: 16px !important;
+	min-width: 16px !important;
+	margin-right: .2rem !important;
+	align-self: center;
+}
+
+[data-page="admin-network-wireless"] #wifi_assoclist_table .ifacebadge > span,
+.node-admin-network-wireless #wifi_assoclist_table .ifacebadge > span {
+	display: inline-flex;
+	align-items: baseline;
+	flex-wrap: wrap;
+	gap: .15rem;
+}
+
+[data-page="admin-network-wireless"] #wifi_assoclist_table > .tr > .td,
+.node-admin-network-wireless #wifi_assoclist_table > .tr > .td {
+	padding-top: .45rem;
+	padding-bottom: .45rem;
+}
+
 /* firewall */
 #iptables {
 	margin: 0;

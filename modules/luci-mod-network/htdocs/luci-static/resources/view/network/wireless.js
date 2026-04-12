@@ -18,131 +18,58 @@ var callIwinfoAssoclistCompat = rpc.declare({
 	params: [ 'device' ],
 	expect: { results: [] }
 });
-var callIwinfoTxPowerListCompat = rpc.declare({
+var callIwinfoInfoCompat = rpc.declare({
 	object: 'iwinfo',
-	method: 'txpowerlist',
+	method: 'info',
 	params: [ 'device' ],
-	expect: { results: [] }
+	expect: { }
 });
-var cachedRuntimeTxPowerMap = null;
-var cachedRuntimeTxPowerPromise = null;
-var cachedTxPowerListMaxMap = null;
-var cachedTxPowerListMaxPromise = null;
+var cachedIwinfoInfoMap = null;
+var cachedIwinfoInfoPromise = null;
 
-function parseRuntimeTxPowerMap(stdout) {
-	var lines = String(stdout || '').split(/\n/),
-	    ifaces = {},
-	    iface = null,
-	    m, name;
+function loadIwinfoInfoMap(force) {
+	if (force)
+		cachedIwinfoInfoPromise = null;
 
-	for (var i = 0; i < lines.length; i++) {
-		if ((m = lines[i].match(/^\s*Interface\s+(\S+)/))) {
-			iface = { name: m[1] };
-			ifaces[iface.name] = iface;
-			continue;
-		}
+	if (!force && cachedIwinfoInfoMap != null)
+		return Promise.resolve(cachedIwinfoInfoMap);
 
-		if (!iface)
-			continue;
-
-		if ((m = lines[i].match(/^\s*wiphy\s+(\d+)/)))
-			iface.wiphy = +m[1];
-		else if ((m = lines[i].match(/^\s*addr\s+([0-9a-f:]+)/i)))
-			iface.addr = m[1].toUpperCase();
-		else if ((m = lines[i].match(/^\s*txpower\s+([0-9]+(?:\.[0-9]+)?)/i)))
-			iface.txpower = Math.round(parseFloat(m[1]));
-	}
-
-	var txpowerMap = {};
-
-	for (name in ifaces) {
-		iface = ifaces[name];
-
-		if (iface.txpower != null) {
-			txpowerMap[name] = iface.txpower;
-			continue;
-		}
-
-		var fallback = null;
-
-		for (var peerName in ifaces) {
-			var peer = ifaces[peerName];
-
-			if (peerName == name || peer.txpower == null)
-				continue;
-
-			if (iface.wiphy != null && peer.wiphy === iface.wiphy) {
-				if (iface.addr && peer.addr && iface.addr === peer.addr) {
-					fallback = peer.txpower;
-					break;
-				}
-
-				if (fallback == null)
-					fallback = peer.txpower;
-			}
-			else if (fallback == null && iface.addr && peer.addr && iface.addr === peer.addr) {
-				fallback = peer.txpower;
-			}
-		}
-
-		if (fallback != null)
-			txpowerMap[name] = fallback;
-	}
-
-	return txpowerMap;
-}
-
-function loadRuntimeTxPowerMap() {
-	if (cachedRuntimeTxPowerMap != null)
-		return Promise.resolve(cachedRuntimeTxPowerMap);
-
-	if (cachedRuntimeTxPowerPromise != null)
-		return cachedRuntimeTxPowerPromise;
-
-	cachedRuntimeTxPowerPromise = L.resolveDefault(fs.exec_direct('/usr/sbin/iw', [ 'dev' ]), '').then(function(stdout) {
-		cachedRuntimeTxPowerMap = parseRuntimeTxPowerMap(stdout);
-		return cachedRuntimeTxPowerMap;
-	}).catch(function() {
-		cachedRuntimeTxPowerMap = {};
-		return cachedRuntimeTxPowerMap;
-	});
-
-	return cachedRuntimeTxPowerPromise;
-}
-
-function loadTxPowerListMaxMap() {
-	if (cachedTxPowerListMaxMap != null)
-		return Promise.resolve(cachedTxPowerListMaxMap);
-
-	if (cachedTxPowerListMaxPromise != null)
-		return cachedTxPowerListMaxPromise;
+	if (cachedIwinfoInfoPromise != null)
+		return cachedIwinfoInfoPromise;
 
 	var radios = uci.sections('wireless', 'wifi-device').map(function(s) { return s['.name']; });
 
-	cachedTxPowerListMaxPromise = Promise.all(radios.map(function(name) {
-		return L.resolveDefault(callIwinfoTxPowerListCompat(name), []).then(function(list) {
-			var max = null;
-
-			for (var i = 0; i < list.length; i++)
-				if (list[i] && typeof(list[i].dbm) == 'number')
-					max = (max == null) ? list[i].dbm : Math.max(max, list[i].dbm);
-
-			return [ name, max ];
+	cachedIwinfoInfoPromise = Promise.all(radios.map(function(name) {
+		return L.resolveDefault(callIwinfoInfoCompat(name), null).then(function(info) {
+			return [ name, info ];
 		});
 	})).then(function(entries) {
-		cachedTxPowerListMaxMap = {};
+		var nextMap = {};
 
 		for (var i = 0; i < entries.length; i++)
 			if (entries[i][1] != null)
-				cachedTxPowerListMaxMap[entries[i][0]] = entries[i][1];
+				nextMap[entries[i][0]] = entries[i][1];
 
-		return cachedTxPowerListMaxMap;
+		if (Object.keys(nextMap).length > 0 || cachedIwinfoInfoMap == null)
+			cachedIwinfoInfoMap = nextMap;
+
+		cachedIwinfoInfoPromise = null;
+		return cachedIwinfoInfoMap || nextMap;
 	}).catch(function() {
-		cachedTxPowerListMaxMap = {};
-		return cachedTxPowerListMaxMap;
+		cachedIwinfoInfoPromise = null;
+
+		if (cachedIwinfoInfoMap != null)
+			return cachedIwinfoInfoMap;
+
+		cachedIwinfoInfoMap = {};
+		return cachedIwinfoInfoMap;
 	});
 
-	return cachedTxPowerListMaxPromise;
+	return cachedIwinfoInfoPromise;
+}
+
+function refreshIwinfoInfoMap() {
+	return loadIwinfoInfoMap(true);
 }
 
 function count_changes(section_id) {
@@ -338,45 +265,50 @@ function getConfiguredTxPower(radioNet) {
 	return (!isNaN(cfgvalue) && cfgvalue > 0) ? cfgvalue : null;
 }
 
+function isPlausibleTxPowerValue(txpower, hwtype) {
+	if (txpower == null || isNaN(txpower) || txpower <= 0)
+		return false;
+
+	/* QCA radios may transiently report bogus 50 dBm values while reloading. */
+	if (isQcaWifiHwtype(hwtype) && txpower > 40)
+		return false;
+
+	return true;
+}
+
 function getDisplayTxPower(radioNet) {
 	var hwtype = uci.get('wireless', radioNet.getWifiDeviceName(), 'type'),
 	    txpower = radioNet.getTXPower(),
 	    cfgvalue = getConfiguredTxPower(radioNet),
-	    maxpower = cachedTxPowerListMaxMap ? cachedTxPowerListMaxMap[radioNet.getWifiDeviceName()] : null;
+	    iwinfo = cachedIwinfoInfoMap ? cachedIwinfoInfoMap[radioNet.getWifiDeviceName()] : null;
 
 	if (isQcaWifiHwtype(hwtype)) {
-		if (cfgvalue != null)
-			return (maxpower != null) ? Math.min(cfgvalue, maxpower) : cfgvalue;
+		if (isPlausibleTxPowerValue(iwinfo != null ? iwinfo.txpower : null, hwtype))
+			return iwinfo.txpower;
 
-		if (maxpower != null && maxpower > 0)
-			return maxpower;
+		if (isPlausibleTxPowerValue(txpower, hwtype))
+			return txpower;
+
+		if (isPlausibleTxPowerValue(cfgvalue, hwtype))
+			return cfgvalue;
+
+		return null;
 	}
 
-	if (txpower != null && txpower > 0)
+	if (isPlausibleTxPowerValue(txpower, hwtype))
 		return txpower;
 
-	if (!isNaN(cfgvalue))
+	if (isPlausibleTxPowerValue(iwinfo != null ? iwinfo.txpower : null, hwtype))
+		return iwinfo.txpower;
+
+	if (isPlausibleTxPowerValue(cfgvalue, hwtype))
 		return cfgvalue;
 
-	txpower = cachedRuntimeTxPowerMap ? cachedRuntimeTxPowerMap[radioNet.getWifiDeviceName()] : null;
-
-	return (txpower != null && txpower > 0) ? txpower : null;
-}
-
-function getDisplayTxPowerLimit(radioNet) {
-	var hwtype = uci.get('wireless', radioNet.getWifiDeviceName(), 'type'),
-	    maxpower = cachedTxPowerListMaxMap ? cachedTxPowerListMaxMap[radioNet.getWifiDeviceName()] : null;
-
-	if (isQcaWifiHwtype(hwtype))
-		return (maxpower != null && maxpower > 0) ? maxpower : null;
-
-	return getDisplayTxPower(radioNet);
+	return null;
 }
 
 function getDisplayTxPowerLabel(radioNet) {
-	var hwtype = uci.get('wireless', radioNet.getWifiDeviceName(), 'type');
-
-	return isQcaWifiHwtype(hwtype) ? _('Power limit') : _('Tx-Power');
+	return _('Tx-Power');
 }
 
 function getDisplayChannel(radioNet) {
@@ -606,48 +538,167 @@ function getAssocListCandidates(radioNet) {
 	return candidates;
 }
 
+function parseWlanconfigRate(rate) {
+	var m = String(rate || '').trim().match(/^([0-9]+(?:\.[0-9]+)?)([KMG])$/i),
+	    value = m ? parseFloat(m[1]) : NaN,
+	    unit = m ? m[2].toUpperCase() : null;
+
+	if (isNaN(value) || unit == null)
+		return null;
+
+	switch (unit) {
+	case 'G':
+		value *= 1000;
+		break;
+
+	case 'K':
+		value /= 1000;
+		break;
+	}
+
+	return Math.round(value * 1000);
+}
+
+function parseWlanconfigMode(mode) {
+	var meta = { mhz: 20 },
+	    m = String(mode || '').match(/_(EHT|HE|VHT|HT)(20|40|80|160|320|80_80)$/);
+
+	if (!m)
+		return meta;
+
+	switch (m[1]) {
+	case 'HT':
+		meta.ht = true;
+		break;
+
+	case 'VHT':
+		meta.vht = true;
+		break;
+
+	case 'HE':
+		meta.he = true;
+		break;
+
+	case 'EHT':
+		meta.eht = true;
+		break;
+	}
+
+	meta.mhz = (m[2] == '80_80') ? 160 : +m[2];
+
+	return meta;
+}
+
+function parseWlanconfigAssoclist(stdout) {
+	var lines = String(stdout || '').split(/\n/),
+	    entries = [],
+	    current = null,
+	    line, tokens, mode, signal, snr, rxnss, txnss, rateMeta, rx, tx, i;
+
+	for (i = 0; i < lines.length; i++) {
+		line = lines[i].trim();
+
+		if (!line)
+			continue;
+
+		if (/^[0-9a-f]{2}(?::[0-9a-f]{2}){5}\b/i.test(line)) {
+			tokens = line.split(/\s+/);
+
+			if (tokens.length < 9)
+				continue;
+
+			mode = (tokens.length >= 4) ? tokens[tokens.length - 4] : '';
+			signal = parseInt(tokens[5], 10);
+			rxnss = parseInt(tokens[tokens.length - 3], 10);
+			txnss = parseInt(tokens[tokens.length - 2], 10);
+			rateMeta = parseWlanconfigMode(mode);
+			rx = Object.assign({ rate: parseWlanconfigRate(tokens[4]), mhz: rateMeta.mhz }, rateMeta);
+			tx = Object.assign({ rate: parseWlanconfigRate(tokens[3]), mhz: rateMeta.mhz }, rateMeta);
+
+			if (!isNaN(rxnss))
+				rx.nss = rxnss;
+
+			if (!isNaN(txnss))
+				tx.nss = txnss;
+
+			current = {
+				mac: tokens[0].toUpperCase(),
+				signal: isNaN(signal) ? null : signal,
+				noise: null,
+				rx: rx,
+				tx: tx
+			};
+
+			if (current.rx.rate != null && current.tx.rate != null)
+				entries.push(current);
+
+			continue;
+		}
+
+		if (!current)
+			continue;
+
+		if ((snr = line.match(/^SNR\s*:\s*(-?\d+)/i)) != null && current.signal != null)
+			current.noise = current.signal - parseInt(snr[1], 10);
+	}
+
+	return entries;
+}
+
+function callWlanconfigAssoclistCompat(device) {
+	return L.resolveDefault(fs.exec_direct('/usr/sbin/wlanconfig', [ device, 'list', 'sta' ]), '').then(function(stdout) {
+		return parseWlanconfigAssoclist(stdout);
+	});
+}
+
+function probeAssocListCandidates(candidates, probeFn) {
+	var idx = 0;
+
+	function tryNext() {
+		if (idx >= candidates.length)
+			return [];
+
+		return probeFn(candidates[idx++]).then(function(entries) {
+			if (Array.isArray(entries) && entries.length)
+				return entries;
+
+			return tryNext();
+		}).catch(function() {
+			return tryNext();
+		});
+	}
+
+	return tryNext();
+}
+
 function getAssocListForNetwork(radioNet) {
+	var candidates = getAssocListCandidates(radioNet),
+	    hwtype = uci.get('wireless', radioNet.getWifiDeviceName(), 'type');
+
+	function tryFallbackAssoclist() {
+		if (!isQcaWifiHwtype(hwtype) || radioNet.getMode() != 'ap')
+			return [];
+
+		return probeAssocListCandidates(candidates, callWlanconfigAssoclistCompat);
+	}
+
 	return radioNet.getAssocList().then(function(entries) {
 		if (Array.isArray(entries) && entries.length)
 			return entries;
 
-		var candidates = getAssocListCandidates(radioNet),
-		    idx = 0;
+		return probeAssocListCandidates(candidates, callIwinfoAssoclistCompat).then(function(entries) {
+			if (Array.isArray(entries) && entries.length)
+				return entries;
 
-		function tryNext() {
-			if (idx >= candidates.length)
-				return [];
-
-			return callIwinfoAssoclistCompat(candidates[idx++]).then(function(entries) {
-				if (Array.isArray(entries) && entries.length)
-					return entries;
-
-				return tryNext();
-			}).catch(function() {
-				return tryNext();
-			});
-		}
-
-		return tryNext();
+			return tryFallbackAssoclist();
+		});
 	}).catch(function() {
-		var candidates = getAssocListCandidates(radioNet),
-		    idx = 0;
+		return probeAssocListCandidates(candidates, callIwinfoAssoclistCompat).then(function(entries) {
+			if (Array.isArray(entries) && entries.length)
+				return entries;
 
-		function tryNext() {
-			if (idx >= candidates.length)
-				return [];
-
-			return callIwinfoAssoclistCompat(candidates[idx++]).then(function(entries) {
-				if (Array.isArray(entries) && entries.length)
-					return entries;
-
-				return tryNext();
-			}).catch(function() {
-				return tryNext();
-			});
-		}
-
-		return tryNext();
+			return tryFallbackAssoclist();
+		});
 	});
 }
 
@@ -1269,16 +1320,35 @@ var CBIWifiFrequencyValue = form.Value.extend({
 		sel.vals = vals;
 	},
 
+	getBandFilteredHTModes: function(mode, band) {
+		var vals = this.htmodes[mode] || [];
+
+		if (band != '2g')
+			return vals;
+
+		var filtered = [];
+
+		for (var i = 0; i < vals.length; i += 3) {
+			if (/80|160|320/.test(String(vals[i + 0] || '')))
+				continue;
+
+			filtered.push(vals[i + 0], vals[i + 1], vals[i + 2]);
+		}
+
+		return filtered;
+	},
+
 	toggleWifiMode: function(elem) {
-		this.toggleWifiHTMode(elem);
 		this.toggleWifiBand(elem);
+		this.toggleWifiHTMode(elem);
 	},
 
 	toggleWifiHTMode: function(elem) {
-		var mode = elem.querySelector('.mode');
-		var bwdt = elem.querySelector('.htmode');
+		var mode = elem.querySelector('.mode'),
+		    band = elem.querySelector('.band'),
+		    bwdt = elem.querySelector('.htmode');
 
-		this.setValues(bwdt, this.htmodes[mode.value]);
+		this.setValues(bwdt, this.getBandFilteredHTModes(mode.value, band ? band.value : null));
 	},
 
 	toggleWifiBand: function(elem) {
@@ -1286,6 +1356,7 @@ var CBIWifiFrequencyValue = form.Value.extend({
 		var band = elem.querySelector('.band');
 
 		this.setValues(band, this.bands[mode.value]);
+		this.toggleWifiHTMode(elem);
 		this.toggleWifiChannel(elem);
 
 		this.map.checkDepends();
@@ -1494,15 +1565,13 @@ var CBIWifiTxPowerValue = form.ListValue.extend({
 
 	load: function(section_id) {
 		return Promise.all([
-			this.callTxPowerList(section_id),
-			loadRuntimeTxPowerMap()
+			this.callTxPowerList(section_id)
 		]).then(L.bind(function(res) {
-			var pwrlist = res[0],
-			    hwtype = this.wifiNetwork ? uci.get('wireless', this.wifiNetwork.getWifiDeviceName(), 'type') : null;
+			var pwrlist = res[0];
 
-			this.powerval = this.wifiNetwork ? getDisplayTxPowerLimit(this.wifiNetwork) : null;
+			this.powerval = this.wifiNetwork ? getDisplayTxPower(this.wifiNetwork) : null;
 			this.poweroff = this.wifiNetwork ? this.wifiNetwork.getTXPowerOffset() : null;
-			this.powerlabel = isQcaWifiHwtype(hwtype) ? _('Current limit') : _('Current power');
+			this.powerlabel = _('Current power');
 
 			if (this.powerval == null)
 				for (var i = 0; i < pwrlist.length; i++)
@@ -1682,10 +1751,7 @@ return view.extend({
 			uci.load('wireless'),
 			uci.load('system')
 		]).then(function() {
-			return Promise.all([
-				loadRuntimeTxPowerMap(),
-				loadTxPowerListMaxMap()
-			]);
+			return loadIwinfoInfoMap();
 		});
 	},
 
@@ -3723,6 +3789,11 @@ return view.extend({
 							return hosts_radios_wifis;
 						});
 					}, network))
+					.then(function(hosts_radios_wifis) {
+						return refreshIwinfoInfoMap().then(function() {
+							return hosts_radios_wifis;
+						});
+					})
 					.then(L.bind(this.poll_status, this, nodes));
 			}, this), 5);
 
