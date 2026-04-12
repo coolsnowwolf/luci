@@ -2506,14 +2506,14 @@ td > .ifacebadge,
 #syslog {
     width: 100%;
     min-height: 15rem;
-    padding: 16px 18px;
+    padding: 12px 14px;
     margin-bottom: 20px;
     border-radius: 0;
     background-color: var(--sectionbg_color);
     border: none;
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-    font-size: 16px !important;
-    line-height: 1.85 !important;
+    font-size: 13px !important;
+    line-height: 1.55 !important;
 }
 
 #syslog:focus {
