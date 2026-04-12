@@ -18,6 +18,89 @@ var callIwinfoAssoclistCompat = rpc.declare({
 	params: [ 'device' ],
 	expect: { results: [] }
 });
+var cachedRuntimeTxPowerMap = null;
+var cachedRuntimeTxPowerPromise = null;
+
+function parseRuntimeTxPowerMap(stdout) {
+	var lines = String(stdout || '').split(/\n/),
+	    ifaces = {},
+	    iface = null,
+	    m, name;
+
+	for (var i = 0; i < lines.length; i++) {
+		if ((m = lines[i].match(/^\s*Interface\s+(\S+)/))) {
+			iface = { name: m[1] };
+			ifaces[iface.name] = iface;
+			continue;
+		}
+
+		if (!iface)
+			continue;
+
+		if ((m = lines[i].match(/^\s*wiphy\s+(\d+)/)))
+			iface.wiphy = +m[1];
+		else if ((m = lines[i].match(/^\s*addr\s+([0-9a-f:]+)/i)))
+			iface.addr = m[1].toUpperCase();
+		else if ((m = lines[i].match(/^\s*txpower\s+([0-9]+(?:\.[0-9]+)?)/i)))
+			iface.txpower = Math.round(parseFloat(m[1]));
+	}
+
+	var txpowerMap = {};
+
+	for (name in ifaces) {
+		iface = ifaces[name];
+
+		if (iface.txpower != null) {
+			txpowerMap[name] = iface.txpower;
+			continue;
+		}
+
+		var fallback = null;
+
+		for (var peerName in ifaces) {
+			var peer = ifaces[peerName];
+
+			if (peerName == name || peer.txpower == null)
+				continue;
+
+			if (iface.wiphy != null && peer.wiphy === iface.wiphy) {
+				if (iface.addr && peer.addr && iface.addr === peer.addr) {
+					fallback = peer.txpower;
+					break;
+				}
+
+				if (fallback == null)
+					fallback = peer.txpower;
+			}
+			else if (fallback == null && iface.addr && peer.addr && iface.addr === peer.addr) {
+				fallback = peer.txpower;
+			}
+		}
+
+		if (fallback != null)
+			txpowerMap[name] = fallback;
+	}
+
+	return txpowerMap;
+}
+
+function loadRuntimeTxPowerMap() {
+	if (cachedRuntimeTxPowerMap != null)
+		return Promise.resolve(cachedRuntimeTxPowerMap);
+
+	if (cachedRuntimeTxPowerPromise != null)
+		return cachedRuntimeTxPowerPromise;
+
+	cachedRuntimeTxPowerPromise = L.resolveDefault(fs.exec_direct('/usr/sbin/iw', [ 'dev' ]), '').then(function(stdout) {
+		cachedRuntimeTxPowerMap = parseRuntimeTxPowerMap(stdout);
+		return cachedRuntimeTxPowerMap;
+	}).catch(function() {
+		cachedRuntimeTxPowerMap = {};
+		return cachedRuntimeTxPowerMap;
+	});
+
+	return cachedRuntimeTxPowerPromise;
+}
 
 function count_changes(section_id) {
 	var changes = ui.changes.changes, n = 0;
@@ -171,7 +254,12 @@ function getDisplayTxPower(radioNet) {
 
 	txpower = +uci.get('wireless', radioNet.getWifiDeviceName(), 'txpower');
 
-	return isNaN(txpower) ? null : txpower;
+	if (!isNaN(txpower))
+		return txpower;
+
+	txpower = cachedRuntimeTxPowerMap ? cachedRuntimeTxPowerMap[radioNet.getWifiDeviceName()] : null;
+
+	return (txpower != null && txpower > 0) ? txpower : null;
 }
 
 function getDisplayChannel(radioNet) {
@@ -1256,7 +1344,12 @@ var CBIWifiTxPowerValue = form.ListValue.extend({
 	}),
 
 	load: function(section_id) {
-		return this.callTxPowerList(section_id).then(L.bind(function(pwrlist) {
+		return Promise.all([
+			this.callTxPowerList(section_id),
+			loadRuntimeTxPowerMap()
+		]).then(L.bind(function(res) {
+			var pwrlist = res[0];
+
 			this.powerval = this.wifiNetwork ? getDisplayTxPower(this.wifiNetwork) : null;
 			this.poweroff = this.wifiNetwork ? this.wifiNetwork.getTXPowerOffset() : null;
 
@@ -1436,7 +1529,8 @@ return view.extend({
 		return Promise.all([
 			uci.changes(),
 			uci.load('wireless'),
-			uci.load('system')
+			uci.load('system'),
+			loadRuntimeTxPowerMap()
 		]);
 	},
 
