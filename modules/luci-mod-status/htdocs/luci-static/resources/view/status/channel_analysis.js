@@ -2,12 +2,16 @@
 'require view';
 'require poll';
 'require request';
+'require fs';
 'require network';
 'require ui';
 'require rpc';
 'require tools.prng as random';
 
 return view.extend({
+	cachedNetworkDevices: null,
+	cachedNetworkDevicesPromise: null,
+
 	callFrequencyList : rpc.declare({
 		object: 'iwinfo',
 		method: 'freqlist',
@@ -15,12 +19,246 @@ return view.extend({
 		expect: { results: [] }
 	}),
 
-	callInfo : rpc.declare({
-		object: 'iwinfo',
-		method: 'info',
-		params: [ 'device' ],
-		expect: { }
+	callNetworkDevices : rpc.declare({
+		object: 'luci-rpc',
+		method: 'getNetworkDevices',
+		expect: { '': {} }
 	}),
+
+	callScan : rpc.declare({
+		object: 'iwinfo',
+		method: 'scan',
+		params: [ 'device' ],
+		nobatch: true,
+		expect: { results: [] }
+	}),
+
+	isQcaRadio: function(radio) {
+		var hwtype = radio.dev.get('type');
+		return (hwtype == 'qcawifi' || hwtype == 'qcawificfg80211');
+	},
+
+	freqToChannel: function(freq) {
+		freq = +freq;
+
+		if (freq == 2484)
+			return 14;
+		else if (freq >= 2412 && freq < 2484)
+			return Math.round((freq - 2407) / 5);
+		else if (freq >= 5000 && freq < 5950)
+			return Math.round((freq - 5000) / 5);
+		else if (freq >= 5955)
+			return Math.round((freq - 5950) / 5);
+
+		return null;
+	},
+
+	decodeQcaSSID: function(ssid) {
+		var value = String(ssid || ''),
+		    bytes = [],
+		    i, m;
+
+		if (value == '')
+			return '';
+
+		for (i = 0; i < value.length; i++) {
+			if (value.charAt(i) == '\\' && value.charAt(i + 1) == 'x' &&
+			    (m = value.substring(i + 2, i + 4).match(/^[0-9a-fA-F]{2}$/))) {
+				bytes.push(parseInt(m[0], 16));
+				i += 3;
+			}
+			else {
+				var code = value.charCodeAt(i);
+				if (code >= 0 && code <= 0xFF)
+					bytes.push(code);
+			}
+		}
+
+		while (bytes.length && bytes[bytes.length - 1] === 0)
+			bytes.pop();
+
+		if (!bytes.length)
+			return '';
+
+		try {
+			return new TextDecoder('utf-8', { fatal: false }).decode(new Uint8Array(bytes));
+		}
+		catch (e) {
+			try {
+				return decodeURIComponent(escape(String.fromCharCode.apply(null, bytes)));
+			}
+			catch (e2) {
+				return value;
+			}
+		}
+	},
+
+	parseQcaScanDump: function(stdout) {
+		var blocks = String(stdout || '').split(/\n(?=BSS\s+)/),
+		    results = [];
+
+		for (var i = 0; i < blocks.length; i++) {
+			var block = blocks[i],
+			    lines = block.split(/\n/),
+			    entry = null,
+			    in_ht = false,
+			    in_vht = false,
+			    m;
+
+			if (!(m = lines[0].match(/^BSS\s+([0-9a-f:]{17})/i)))
+				continue;
+
+			entry = {
+				bssid: m[1].toUpperCase(),
+				mode: 'Master',
+				quality_max: 100
+			};
+
+			for (var j = 1; j < lines.length; j++) {
+				var line = lines[j];
+
+				if ((m = line.match(/^\s*SSID:\s*(.*)$/))) {
+					entry.ssid = this.decodeQcaSSID(m[1] || '');
+					in_ht = false;
+					in_vht = false;
+				}
+				else if ((m = line.match(/^\s*signal:\s*(-?[0-9]+(?:\.[0-9]+)?)\s*dBm/i))) {
+					entry.signal = Math.round(parseFloat(m[1]));
+					entry.quality = Math.max(0, Math.min(100, entry.signal + 100));
+					in_ht = false;
+					in_vht = false;
+				}
+				else if ((m = line.match(/^\s*freq:\s*([0-9]+)/i))) {
+					entry.mhz = +m[1];
+					entry.channel = this.freqToChannel(entry.mhz);
+					in_ht = false;
+					in_vht = false;
+				}
+				else if ((m = line.match(/^\s*\*\s*primary channel:\s*([0-9]+)/i))) {
+					entry.channel = +m[1];
+				}
+				else if (/^\s*HT operation:/i.test(line)) {
+					in_ht = true;
+					in_vht = false;
+				}
+				else if (/^\s*VHT operation:/i.test(line)) {
+					in_vht = true;
+					in_ht = false;
+					if (entry.vht_operation == null)
+						entry.vht_operation = {};
+				}
+				else if (in_ht && (m = line.match(/^\s*\*\s*secondary channel offset:\s*(above|below)/i))) {
+					entry.ht_operation = {
+						channel_width: 2040,
+						secondary_channel_offset: m[1].toLowerCase()
+					};
+				}
+				else if (in_vht && (m = line.match(/^\s*\*\s*channel width:\s*[0-9]+\s*\(([^)]+)\)/i))) {
+					var width = m[1];
+
+					if (/80\+80/i.test(width))
+						entry.vht_operation.channel_width = 8080;
+					else if (/160/i.test(width))
+						entry.vht_operation.channel_width = 160;
+					else if (/80/i.test(width))
+						entry.vht_operation.channel_width = 80;
+				}
+				else if (in_vht && (m = line.match(/^\s*\*\s*center freq segment 1:\s*([0-9]+)/i))) {
+					entry.vht_operation = entry.vht_operation || {};
+					entry.vht_operation.center_freq_1 = +m[1];
+				}
+				else if (in_vht && (m = line.match(/^\s*\*\s*center freq segment 2:\s*([0-9]+)/i))) {
+					entry.vht_operation = entry.vht_operation || {};
+					entry.vht_operation.center_freq_2 = +m[1];
+				}
+				else if (/^\S/.test(line)) {
+					in_ht = false;
+					in_vht = false;
+				}
+			}
+
+			if (entry.channel != null && entry.signal != null)
+				results.push(entry);
+		}
+
+		return results;
+	},
+
+	runQcaScanCommand: function(scanDevice, args) {
+		return L.resolveDefault(fs.exec_direct('/usr/sbin/iw', args), '').then(L.bind(function(stdout) {
+			return this.parseQcaScanDump(stdout);
+		}, this));
+	},
+
+	getQcaScanList: function(scanDevice) {
+		var commands = [
+			[ 'dev', scanDevice, 'scan' ],
+			[ 'dev', scanDevice, 'scan', 'ap-force' ],
+			[ 'dev', scanDevice, 'scan', 'dump' ]
+		],
+		    best = [];
+
+		return commands.reduce(L.bind(function(promise, args) {
+			return promise.then(L.bind(function(results) {
+				if (results.length > 1)
+					return results;
+
+				return this.runQcaScanCommand(scanDevice, args).then(function(scanResults) {
+					if (scanResults.length > results.length)
+						best = scanResults;
+
+					return scanResults.length > 1 ? scanResults : best;
+				});
+			}, this));
+		}, this), Promise.resolve(best));
+	},
+
+	loadNetworkDevices: function(force) {
+		if (!force && this.cachedNetworkDevices != null)
+			return Promise.resolve(this.cachedNetworkDevices);
+
+		if (!force && this.cachedNetworkDevicesPromise != null)
+			return this.cachedNetworkDevicesPromise;
+
+		this.cachedNetworkDevicesPromise = this.callNetworkDevices().then(L.bind(function(devices) {
+			this.cachedNetworkDevices = devices || {};
+			this.cachedNetworkDevicesPromise = null;
+			return this.cachedNetworkDevices;
+		}, this)).catch(L.bind(function() {
+			this.cachedNetworkDevices = {};
+			this.cachedNetworkDevicesPromise = null;
+			return this.cachedNetworkDevices;
+		}, this));
+
+		return this.cachedNetworkDevicesPromise;
+	},
+
+	resolveScanDevice: function(radio) {
+		return this.loadNetworkDevices(radio.forceRefreshDeviceMap).then(function(ifaces) {
+			var radioName = radio.dev.getName(),
+			    radioMac = String(radio.dev.get('macaddr') || '').toUpperCase();
+
+			radio.forceRefreshDeviceMap = false;
+
+			for (var name in ifaces) {
+				var peer = ifaces[name],
+				    peerMac = String(peer.mac || '').toUpperCase();
+
+				if (name == radioName || /^(wifi|radio)\d+/.test(name))
+					continue;
+
+				if (!peer || peer.wireless !== true)
+					continue;
+
+				if (!peerMac || !radioMac || peerMac !== radioMac)
+					continue;
+
+				return name;
+			}
+
+			return radioName;
+		});
+	},
 
 	render_signal_badge: function(signalPercent, signalValue) {
 		var icon, title, value;
@@ -191,8 +429,9 @@ return view.extend({
 
 		chan_analysis.tab.addEventListener('cbi-tab-active', L.bind(function(ev) {
 			this.active_tab = ev.detail.tab;
-			if (!this.radios[this.active_tab].loadedOnce)
-				poll.start();
+
+			if (this.radios[this.active_tab] && !this.radios[this.active_tab].loadedOnce)
+				this.handleScanRefresh();
 		}, this));
 	},
 
@@ -202,12 +441,18 @@ return view.extend({
 
 		var radio = this.radios[this.active_tab];
 
-		return Promise.all([
-			radio.dev.getScanList(),
-			this.callInfo(radio.dev.getName())
-		]).then(L.bind(function(data) {
-			var results = data[0],
-			    local_wifi = data[1],
+		if (radio.scanPromise)
+			return radio.scanPromise;
+
+		radio.scanPromise = this.resolveScanDevice(radio).then(L.bind(function(scanDevice) {
+			radio.scanDevice = scanDevice;
+
+			if (this.isQcaRadio(radio))
+				return this.getQcaScanList(scanDevice);
+
+			return this.callScan(scanDevice);
+		}, this)).then(L.bind(function(data) {
+			var results = data,
 			    table = radio.table,
 			    chan_analysis = radio.graph,
 			    scanCache = radio.scanCache;
@@ -220,38 +465,6 @@ return view.extend({
 
 				scanCache[results[i].bssid].data = results[i];
 				scanCache[results[i].bssid].data.stale = false;
-			}
-
-			if (scanCache[local_wifi.bssid] == null)
-				scanCache[local_wifi.bssid] = {};
-
-			scanCache[local_wifi.bssid].data = local_wifi;
-
-			if (chan_analysis.offset_tbl[local_wifi.channel] != null && local_wifi.center_chan1) {
-				var center_channels = [local_wifi.center_chan1],
-				    chan_width_text = local_wifi.htmode.replace(/EHT|VHT|HE|HT/, ''),
-				    chan_width = parseInt(chan_width_text)/10;
-
-				if (local_wifi.center_chan2) {
-					center_channels.push(local_wifi.center_chan2);
-					chan_width = 8;
-				}
-
-				local_wifi.signal = -10;
-				local_wifi.ssid = 'Local Interface';
-
-				this.add_wifi_to_graph(chan_analysis, local_wifi, scanCache, center_channels, chan_width);
-				rows.push([
-					this.render_signal_badge(q, local_wifi.signal),
-					[
-						E('span', { 'style': 'color:'+scanCache[local_wifi.bssid].color }, '⬤ '),
-						local_wifi.ssid
-					],
-					'%d'.format(local_wifi.channel),
-					'%h MHz'.format(chan_width_text),
-					'%h'.format(local_wifi.mode),
-					'%h'.format(local_wifi.bssid)
-				]);
 			}
 
 			for (var k in scanCache)
@@ -323,7 +536,7 @@ return view.extend({
 					E('span', { 'style': s }, this.render_signal_badge(q, res.signal)),
 					E('span', { 'style': s }, [
 						E('span', { 'style': 'color:'+scanCache[results[i].bssid].color }, '⬤ '),
-						(res.ssid != null) ? '%h'.format(res.ssid) : E('em', _('hidden'))
+						(res.ssid != null && res.ssid !== '') ? '%h'.format(res.ssid) : E('em', _('hidden'))
 					]),
 					E('span', { 'style': s }, '%d'.format(res.channel)),
 					E('span', { 'style': s }, '%h'.format(res.channel_width)),
@@ -336,11 +549,17 @@ return view.extend({
 
 			cbi_update_table(table, rows);
 
-			if (!radio.loadedOnce) {
+			if (!radio.loadedOnce)
 				radio.loadedOnce = true;
-				poll.stop();
-			}
-		}, this))
+		}, this)).catch(function(err) {
+			radio.forceRefreshDeviceMap = true;
+			ui.addNotification(null, E('p', _('Wireless channel scan failed.')), 'danger');
+			throw err;
+		}).finally(function() {
+			radio.scanPromise = null;
+		});
+
+		return radio.scanPromise;
 	},
 
 	radios : {},
@@ -382,13 +601,8 @@ return view.extend({
 		    wifiDevs = data[1];
 
 		var h2 = E('div', {'class' : 'cbi-title-section'}, [
-			E('h2', {'class': 'cbi-title-field'}, [ _('Channel Analysis') ]),
-			E('div', {'class': 'cbi-title-buttons'  }, [
-				E('button', {
-					'class': 'cbi-button cbi-button-edit',
-					'click': ui.createHandlerFn(this, 'handleScanRefresh')
-				}, [ _('Refresh Channels') ])])
-			]);
+			E('h2', {'class': 'cbi-title-field'}, [ _('Channel Analysis') ])
+		]);
 
 		var tabs = E('div', {}, E('div'));
 
@@ -435,9 +649,12 @@ return view.extend({
 					dev: wifiDevs[ifname].dev,
 					graph: graph_data,
 					table: table,
-					scanCache: {},
-					loadedOnce: false,
-				};
+						scanCache: {},
+						loadedOnce: false,
+						scanPromise: null,
+						scanDevice: ifname,
+						forceRefreshDeviceMap: true,
+					};
 
 				cbi_update_table(table, [], E('em', { class: 'spinning' }, _('Starting wireless scan...')));
 
@@ -451,6 +668,11 @@ return view.extend({
 
 		this.pollFn = L.bind(this.handleScanRefresh, this);
 		poll.add(this.pollFn);
+		poll.start();
+
+		this.active_tab = Object.keys(this.radios)[0] || null;
+		if (this.active_tab != null)
+			requestAnimationFrame(L.bind(this.handleScanRefresh, this));
 
 		return E('div', {}, [h2, tabs]);
 	},
