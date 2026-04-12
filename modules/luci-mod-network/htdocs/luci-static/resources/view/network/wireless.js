@@ -217,13 +217,56 @@ function formatConfigEncryption(enc) {
 	return enc;
 }
 
+function getConfigEncryptionValue(section_id, hwtype) {
+	var enc = String(uci.get('wireless', section_id, 'encryption') || ''),
+	    sae = uci.get('wireless', section_id, 'sae');
+
+	if (enc == 'wep')
+		return 'wep-open';
+
+	if (isQcaWifiHwtype(hwtype) && sae == '1') {
+		if (enc == 'psk2' || enc.indexOf('psk2+') == 0)
+			return 'sae-mixed';
+
+		if (enc == 'sae' || enc.indexOf('sae+') == 0)
+			return 'sae';
+	}
+
+	if (enc.match(/\+/))
+		return enc.replace(/\+.+$/, '');
+
+	return enc;
+}
+
+function getConfigCipherValue(section_id, hwtype) {
+	var enc = String(uci.get('wireless', section_id, 'encryption') || ''),
+	    sae = uci.get('wireless', section_id, 'sae'),
+	    value = enc;
+
+	if (!enc.match(/\+/))
+		return ((isQcaWifiHwtype(hwtype) && sae == '1' && (enc == 'psk2' || enc == 'sae')) ||
+			enc == 'sae' || enc == 'sae-mixed') ? 'ccmp' : enc;
+
+	value = enc.replace(/^[^+]+\+/, '');
+
+	if (value == 'aes')
+		value = 'ccmp';
+	else if (value == 'tkip+aes' || value == 'aes+tkip' || value == 'ccmp+tkip')
+		value = 'tkip+ccmp';
+
+	return value;
+}
+
 function getDisplayEncryption(radioNet) {
 	var encryption = radioNet.getActiveEncryption();
 
 	if (encryption && encryption != '-')
 		return encryption;
 
-	return formatConfigEncryption(uci.get('wireless', radioNet.getName(), 'encryption'));
+	return formatConfigEncryption(getConfigEncryptionValue(
+		radioNet.getName(),
+		uci.get('wireless', radioNet.getWifiDeviceName(), 'type')
+	));
 }
 
 function getDisplayBSSID(radioNet) {
@@ -2276,25 +2319,38 @@ return view.extend({
 				o.depends('mode', 'mesh');
 
 				o.cfgvalue = function(section_id) {
-					var v = String(uci.get('wireless', section_id, 'encryption'));
-					if (v == 'wep')
-						return 'wep-open';
-					else if (v.match(/\+/))
-						return v.replace(/\+.+$/, '');
-					return v;
+					return getConfigEncryptionValue(section_id, hwtype);
 				};
 
 				o.write = function(section_id, value) {
 					var e = this.section.children.filter(function(o) { return o.option == 'encryption' })[0].formvalue(section_id),
-					    co = this.section.children.filter(function(o) { return o.option == 'cipher' })[0], c = co.formvalue(section_id);
+					    co = this.section.children.filter(function(o) { return o.option == 'cipher' })[0],
+					    c = co.formvalue(section_id),
+					    stored_e = e;
 
 					if (value == 'wpa' || value == 'wpa2' || value == 'wpa3' || value == 'wpa3-mixed')
 						uci.unset('wireless', section_id, 'key');
 
-					if (co.isActive(section_id) && e && (c == 'tkip' || c == 'ccmp' || c == 'tkip+ccmp'))
-						e += '+' + c;
+					if ((e == 'sae' || e == 'sae-mixed') && (!c || c == 'auto'))
+						c = 'ccmp';
 
-					uci.set('wireless', section_id, 'encryption', e);
+					if (isQcaWifiHwtype(hwtype)) {
+						if (e == 'sae-mixed') {
+							stored_e = 'psk2';
+							uci.set('wireless', section_id, 'sae', '1');
+						}
+						else if (e == 'sae') {
+							uci.set('wireless', section_id, 'sae', '1');
+						}
+						else {
+							uci.unset('wireless', section_id, 'sae');
+						}
+					}
+
+					if (co.isActive(section_id) && stored_e && (c == 'tkip' || c == 'ccmp' || c == 'tkip+ccmp' || c == 'gcmp'))
+						stored_e += '+' + c;
+
+					uci.set('wireless', section_id, 'encryption', stored_e);
 				};
 
 				o = ss.taboption('encryption', form.ListValue, 'cipher', _('Cipher'));
@@ -2302,6 +2358,8 @@ return view.extend({
 				o.depends('encryption', 'wpa2');
 				o.depends('encryption', 'wpa3');
 				o.depends('encryption', 'wpa3-mixed');
+				o.depends('encryption', 'sae');
+				o.depends('encryption', 'sae-mixed');
 				o.depends('encryption', 'psk2');
 				o.depends('encryption', 'wpa-mixed');
 				o.depends('encryption', 'psk-mixed');
@@ -2309,20 +2367,14 @@ return view.extend({
 					o.depends('encryption', 'psk');
 				o.value('auto', _('auto'));
 				o.value('ccmp', _('Force CCMP (AES)'));
+				if (isQcaWifiHwtype(hwtype))
+					o.value('gcmp', _('Force GCMP'));
 				o.value('tkip', _('Force TKIP'));
 				o.value('tkip+ccmp', _('Force TKIP and CCMP (AES)'));
 				o.write = ss.children.filter(function(o) { return o.option == 'encryption' })[0].write;
 
 				o.cfgvalue = function(section_id) {
-					var v = String(uci.get('wireless', section_id, 'encryption'));
-					if (v.match(/\+/)) {
-						v = v.replace(/^[^+]+\+/, '');
-						if (v == 'aes')
-							v = 'ccmp';
-						else if (v == 'tkip+aes' || v == 'aes+tkip' || v == 'ccmp+tkip')
-							v = 'tkip+ccmp';
-					}
-					return v;
+					return getConfigCipherValue(section_id, hwtype);
 				};
 
 
