@@ -18,8 +18,16 @@ var callIwinfoAssoclistCompat = rpc.declare({
 	params: [ 'device' ],
 	expect: { results: [] }
 });
+var callIwinfoTxPowerListCompat = rpc.declare({
+	object: 'iwinfo',
+	method: 'txpowerlist',
+	params: [ 'device' ],
+	expect: { results: [] }
+});
 var cachedRuntimeTxPowerMap = null;
 var cachedRuntimeTxPowerPromise = null;
+var cachedTxPowerListMaxMap = null;
+var cachedTxPowerListMaxPromise = null;
 
 function parseRuntimeTxPowerMap(stdout) {
 	var lines = String(stdout || '').split(/\n/),
@@ -100,6 +108,41 @@ function loadRuntimeTxPowerMap() {
 	});
 
 	return cachedRuntimeTxPowerPromise;
+}
+
+function loadTxPowerListMaxMap() {
+	if (cachedTxPowerListMaxMap != null)
+		return Promise.resolve(cachedTxPowerListMaxMap);
+
+	if (cachedTxPowerListMaxPromise != null)
+		return cachedTxPowerListMaxPromise;
+
+	var radios = uci.sections('wireless', 'wifi-device').map(function(s) { return s['.name']; });
+
+	cachedTxPowerListMaxPromise = Promise.all(radios.map(function(name) {
+		return L.resolveDefault(callIwinfoTxPowerListCompat(name), []).then(function(list) {
+			var max = null;
+
+			for (var i = 0; i < list.length; i++)
+				if (list[i] && typeof(list[i].dbm) == 'number')
+					max = (max == null) ? list[i].dbm : Math.max(max, list[i].dbm);
+
+			return [ name, max ];
+		});
+	})).then(function(entries) {
+		cachedTxPowerListMaxMap = {};
+
+		for (var i = 0; i < entries.length; i++)
+			if (entries[i][1] != null)
+				cachedTxPowerListMaxMap[entries[i][0]] = entries[i][1];
+
+		return cachedTxPowerListMaxMap;
+	}).catch(function() {
+		cachedTxPowerListMaxMap = {};
+		return cachedTxPowerListMaxMap;
+	});
+
+	return cachedTxPowerListMaxPromise;
 }
 
 function count_changes(section_id) {
@@ -289,20 +332,51 @@ function getFtIdentifier(radioNet) {
 	return String(bssid).replace(/:/g, '').toUpperCase();
 }
 
+function getConfiguredTxPower(radioNet) {
+	var cfgvalue = +uci.get('wireless', radioNet.getWifiDeviceName(), 'txpower');
+
+	return (!isNaN(cfgvalue) && cfgvalue > 0) ? cfgvalue : null;
+}
+
 function getDisplayTxPower(radioNet) {
-	var txpower = radioNet.getTXPower();
+	var hwtype = uci.get('wireless', radioNet.getWifiDeviceName(), 'type'),
+	    txpower = radioNet.getTXPower(),
+	    cfgvalue = getConfiguredTxPower(radioNet),
+	    maxpower = cachedTxPowerListMaxMap ? cachedTxPowerListMaxMap[radioNet.getWifiDeviceName()] : null;
+
+	if (isQcaWifiHwtype(hwtype)) {
+		if (cfgvalue != null)
+			return (maxpower != null) ? Math.min(cfgvalue, maxpower) : cfgvalue;
+
+		if (maxpower != null && maxpower > 0)
+			return maxpower;
+	}
 
 	if (txpower != null && txpower > 0)
 		return txpower;
 
-	txpower = +uci.get('wireless', radioNet.getWifiDeviceName(), 'txpower');
-
-	if (!isNaN(txpower))
-		return txpower;
+	if (!isNaN(cfgvalue))
+		return cfgvalue;
 
 	txpower = cachedRuntimeTxPowerMap ? cachedRuntimeTxPowerMap[radioNet.getWifiDeviceName()] : null;
 
 	return (txpower != null && txpower > 0) ? txpower : null;
+}
+
+function getDisplayTxPowerLimit(radioNet) {
+	var hwtype = uci.get('wireless', radioNet.getWifiDeviceName(), 'type'),
+	    maxpower = cachedTxPowerListMaxMap ? cachedTxPowerListMaxMap[radioNet.getWifiDeviceName()] : null;
+
+	if (isQcaWifiHwtype(hwtype))
+		return (maxpower != null && maxpower > 0) ? maxpower : null;
+
+	return getDisplayTxPower(radioNet);
+}
+
+function getDisplayTxPowerLabel(radioNet) {
+	var hwtype = uci.get('wireless', radioNet.getWifiDeviceName(), 'type');
+
+	return isQcaWifiHwtype(hwtype) ? _('Power limit') : _('Tx-Power');
 }
 
 function getDisplayChannel(radioNet) {
@@ -788,7 +862,7 @@ function render_modal_status(node, radioNet) {
 		_('BSSID'),      is_assoc ? bssid : null,
 		_('Encryption'), is_assoc ? getDisplayEncryption(radioNet) : null,
 		_('Channel'),    is_assoc ? '%d (%s %s)'.format(channel, frequency || '?', _('GHz')) : null,
-		_('Tx-Power'),   (is_assoc && txpower != null) ? '%d %s'.format(txpower, _('dBm')) : null,
+		getDisplayTxPowerLabel(radioNet), (is_assoc && txpower != null) ? '%d %s'.format(txpower, _('dBm')) : null,
 		_('Signal'),     (is_assoc && noise != null) ? '%d %s'.format(radioNet.getSignal(), _('dBm')) : null,
 		_('Noise'),      (is_assoc && noise != null) ? '%d %s'.format(noise, _('dBm')) : null,
 		_('Bitrate'),    (is_assoc && bitrate != null) ? '%.1f %s'.format(bitrate, _('Mbit/s')) : null,
@@ -1391,10 +1465,12 @@ var CBIWifiTxPowerValue = form.ListValue.extend({
 			this.callTxPowerList(section_id),
 			loadRuntimeTxPowerMap()
 		]).then(L.bind(function(res) {
-			var pwrlist = res[0];
+			var pwrlist = res[0],
+			    hwtype = this.wifiNetwork ? uci.get('wireless', this.wifiNetwork.getWifiDeviceName(), 'type') : null;
 
-			this.powerval = this.wifiNetwork ? getDisplayTxPower(this.wifiNetwork) : null;
+			this.powerval = this.wifiNetwork ? getDisplayTxPowerLimit(this.wifiNetwork) : null;
 			this.poweroff = this.wifiNetwork ? this.wifiNetwork.getTXPowerOffset() : null;
+			this.powerlabel = isQcaWifiHwtype(hwtype) ? _('Current limit') : _('Current power');
 
 			if (this.powerval == null)
 				for (var i = 0; i < pwrlist.length; i++)
@@ -1417,7 +1493,7 @@ var CBIWifiTxPowerValue = form.ListValue.extend({
 		    widget.firstElementChild.style.width = 'auto';
 
 		dom.append(widget, E('span', [
-			' - ', _('Current power'), ': ',
+			' - ', this.powerlabel || _('Current power'), ': ',
 			E('span', [ this.powerval != null ? '%d dBm'.format(this.powerval) : E('em', _('unknown')) ]),
 			this.poweroff ? ' + %d dB offset = %s dBm'.format(this.poweroff, this.powerval != null ? this.powerval + this.poweroff : '?') : ''
 		]));
@@ -1572,9 +1648,13 @@ return view.extend({
 		return Promise.all([
 			uci.changes(),
 			uci.load('wireless'),
-			uci.load('system'),
-			loadRuntimeTxPowerMap()
-		]);
+			uci.load('system')
+		]).then(function() {
+			return Promise.all([
+				loadRuntimeTxPowerMap(),
+				loadTxPowerListMaxMap()
+			]);
+		});
 	},
 
 	checkAnonymousSections: function() {
