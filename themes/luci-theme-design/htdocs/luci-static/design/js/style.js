@@ -326,7 +326,7 @@
             var mapped = iconMap[key];
             var badge = img.closest('.ifacebadge') || img.closest('.center');
             var isDeviceIcon = (key === 'wifi' || key === 'wifi_disabled');
-            var size = isDeviceIcon ? '24px' : '18px';
+            var size = isDeviceIcon ? '64px' : '18px';
 
             if (!mapped || !badge) {
                 return;

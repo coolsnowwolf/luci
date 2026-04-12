@@ -2377,6 +2377,99 @@ td > .ifacebadge,
 	padding: .5em;
 }
 
+/* wireless overview */
+[data-page="admin-network-wireless"] #maincontent h3:first-of-type,
+.node-admin-network-wireless #maincontent h3:first-of-type {
+	font-size: 1.5em !important;
+	font-weight: 800;
+	padding: 0 12px 12px 12px;
+	line-height: 1.2;
+}
+
+[data-page="admin-network-wireless"] #cbi-wireless .cbi-section-table-row > .td[data-name="_stat"],
+.node-admin-network-wireless #cbi-wireless .cbi-section-table-row > .td[data-name="_stat"] {
+	text-align: left !important;
+}
+
+[data-page="admin-network-wireless"] #cbi-wireless > .table,
+.node-admin-network-wireless #cbi-wireless > .table {
+	table-layout: fixed;
+	width: 100%;
+}
+
+[data-page="admin-network-wireless"] #cbi-wireless .cbi-section-table-row > .td[data-name="_badge"],
+.node-admin-network-wireless #cbi-wireless .cbi-section-table-row > .td[data-name="_badge"] {
+	width: 17rem !important;
+	min-width: 17rem;
+	max-width: 17rem;
+}
+
+[data-page="admin-network-wireless"] #cbi-wireless .wireless-radio-badge,
+.node-admin-network-wireless #cbi-wireless .wireless-radio-badge {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+[data-page="admin-network-wireless"] #cbi-wireless .wireless-radio-badge > img,
+.node-admin-network-wireless #cbi-wireless .wireless-radio-badge > img {
+	width: 88px !important;
+	height: 88px !important;
+	min-width: 88px !important;
+}
+
+[data-page="admin-network-wireless"] #cbi-wireless .wireless-radio-status,
+.node-admin-network-wireless #cbi-wireless .wireless-radio-status,
+[data-page="admin-network-wireless"] #cbi-wireless .wireless-network-status,
+.node-admin-network-wireless #cbi-wireless .wireless-network-status {
+	text-align: left;
+	max-width: 100%;
+}
+
+[data-page="admin-network-wireless"] #cbi-wireless .wireless-radio-title,
+.node-admin-network-wireless #cbi-wireless .wireless-radio-title {
+	font-size: 1.08rem;
+	font-weight: 700;
+	line-height: 1.4;
+	color: var(--text_color);
+}
+
+[data-page="admin-network-wireless"] #cbi-wireless .wireless-radio-meta,
+.node-admin-network-wireless #cbi-wireless .wireless-radio-meta,
+[data-page="admin-network-wireless"] #cbi-wireless .wireless-network-status-row,
+.node-admin-network-wireless #cbi-wireless .wireless-network-status-row {
+	margin-top: .3rem;
+	line-height: 1.7;
+	color: var(--text_color);
+	text-align: left;
+}
+
+[data-page="admin-network-wireless"] #cbi-wireless .wireless-network-status-note,
+.node-admin-network-wireless #cbi-wireless .wireless-network-status-note {
+	margin-top: .4rem;
+}
+
+[data-page="admin-network-wireless"] #cbi-wireless .wireless-status-sep,
+.node-admin-network-wireless #cbi-wireless .wireless-status-sep {
+	display: inline-block;
+	padding: 0 .35rem;
+	color: var(--text_color);
+	opacity: .7;
+}
+
+[data-page="admin-network-wireless"] #cbi-wireless .cbi-section-table-row > .td.cbi-section-actions,
+.node-admin-network-wireless #cbi-wireless .cbi-section-table-row > .td.cbi-section-actions {
+	width: 18.5rem !important;
+	min-width: 18.5rem;
+	max-width: 18.5rem;
+}
+
+[data-page="admin-network-wireless"] #cbi-wireless .cbi-section-table-row > .td[data-name="_stat"],
+.node-admin-network-wireless #cbi-wireless .cbi-section-table-row > .td[data-name="_stat"] {
+	width: auto !important;
+}
+
+
 /* textarea */
 #content_syslog {
     padding: 5px;

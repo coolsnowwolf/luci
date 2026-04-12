@@ -691,11 +691,32 @@ function getDisplayNoiseValue(radioNet, hwtype, is_assoc) {
 	return radioNet.getNoise();
 }
 
+function renderStatusRow(pairs, className) {
+	var row = E('div', { 'class': className }),
+	    added = 0;
+
+	for (var i = 0; i < pairs.length; i++) {
+		var label = pairs[i][0],
+		    value = pairs[i][1];
+
+		if (value == null)
+			continue;
+
+		if (added++)
+			row.appendChild(E('span', { 'class': 'wireless-status-sep' }, ' | '));
+
+		row.appendChild(E('span', { 'class': 'nowrap' }, [
+			E('strong', '%s: '.format(label)),
+			value
+		]));
+	}
+
+	return added ? row : null;
+}
+
 function render_radio_badge(radioDev, wifiNets) {
-	return E('span', { 'class': 'ifacebadge' }, [
-		E('img', { 'src': L.resource('icons/wifi%s.png').format(isRadioDisplayUp(radioDev, wifiNets || []) ? '' : '_disabled') }),
-		' ',
-		radioDev.getName()
+	return E('div', { 'class': 'wireless-radio-badge' }, [
+		E('img', { 'src': L.resource('icons/wifi%s.png').format(isRadioDisplayUp(radioDev, wifiNets || []) ? '' : '_disabled') })
 	]);
 }
 
@@ -788,8 +809,8 @@ function render_network_badge(radioNet) {
 
 function render_radio_status(radioDev, wifiNets) {
 	var name = getRadioDisplayName(radioDev),
-	    node = E('div', [ E('big', {}, E('strong', {}, name)), E('div') ]),
-	    channel, frequency, bitrate;
+	    channel, frequency, bitrate,
+	    meta;
 
 	for (var i = 0; i < wifiNets.length; i++) {
 		channel   = channel   || getDisplayChannel(wifiNets[i]);
@@ -798,14 +819,17 @@ function render_radio_status(radioDev, wifiNets) {
 	}
 
 	if (isRadioDisplayUp(radioDev, wifiNets))
-		L.itemlist(node.lastElementChild, [
-			_('Channel'), '%s (%s %s)'.format(channel || '?', frequency || '?', _('GHz')),
-			_('Bitrate'), '%s %s'.format(bitrate || '?', _('Mbit/s'))
-		], ' | ');
+		meta = renderStatusRow([
+			[ _('Channel'), '%s (%s %s)'.format(channel || '?', frequency || '?', _('GHz')) ],
+			[ _('Bitrate'), '%s %s'.format(bitrate || '?', _('Mbit/s')) ]
+		], 'wireless-radio-meta');
 	else
-		node.lastElementChild.appendChild(E('em', _('Device is not active')));
+		meta = E('div', { 'class': 'wireless-radio-meta' }, E('em', _('Device is not active')));
 
-	return node;
+	return E('div', { 'class': 'wireless-radio-status' }, [
+		E('div', { 'class': 'wireless-radio-title' }, name),
+		meta
+	]);
 }
 
 function render_network_status(radioNet) {
@@ -827,13 +851,21 @@ function render_network_status(radioNet) {
 	else if (!is_assoc)
 		status_text = E('em', disabled ? _('Wireless is disabled') : _('Wireless is not associated'));
 
-	return L.itemlist(E('div'), [
-		is_mesh ? _('Mesh ID') : _('SSID'), (is_mesh ? radioNet.getMeshID() : radioNet.getSSID()) || '?',
-		_('Mode'),       mode,
-		_('BSSID'),      (!changecount && is_assoc) ? bssid : null,
-		_('Encryption'), (!changecount && is_assoc) ? getDisplayEncryption(radioNet) : null,
-		null,            status_text
-	], [ ' | ', E('br') ]);
+	var rows = [
+		renderStatusRow([
+			[ is_mesh ? _('Mesh ID') : _('SSID'), (is_mesh ? radioNet.getMeshID() : radioNet.getSSID()) || '?' ],
+			[ _('Mode'), mode ]
+		], 'wireless-network-status-row'),
+		renderStatusRow([
+			[ _('BSSID'), (!changecount && is_assoc) ? bssid : null ],
+			[ _('Encryption'), (!changecount && is_assoc) ? getDisplayEncryption(radioNet) : null ]
+		], 'wireless-network-status-row')
+	];
+
+	if (status_text)
+		rows.push(E('div', { 'class': 'wireless-network-status-row wireless-network-status-note' }, status_text));
+
+	return E('div', { 'class': 'wireless-network-status' }, rows.filter(function(row) { return row != null; }));
 }
 
 function render_modal_status(node, radioNet) {
