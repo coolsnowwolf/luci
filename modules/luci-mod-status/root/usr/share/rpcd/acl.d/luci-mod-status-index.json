@@ -51,7 +51,7 @@
 		"description": "Grant access to port status display",
 		"read": {
 			"ubus": {
-				"luci": [ "getBuiltinEthernetPorts" ]
+				"luci": [ "getBuiltinEthernetPorts", "getSwconfigPortState" ]
 			}
 		}
 	},

@@ -344,7 +344,11 @@ const methods = {
 							link: false,
 							auto: false,
 							rxflow: false,
-							txflow: false
+							txflow: false,
+							rx_bytes: 0,
+							tx_bytes: 0,
+							rx_packets: 0,
+							tx_packets: 0
 						};
 
 						push(ports, port);
@@ -376,6 +380,18 @@ const methods = {
 
 						if (match(line, /link:.*txflow/))
 							port.txflow = true;
+
+						if ((m = match(line, /^\s*RxGoodByte\s*:\s*([0-9]+)/)) != null)
+							port.rx_bytes = +m[1];
+
+						if ((m = match(line, /^\s*TxByte\s*:\s*([0-9]+)/)) != null)
+							port.tx_bytes = +m[1];
+
+						if ((m = match(line, /^\s*Rx(UniCast|Multi|Broad)\s*:\s*([0-9]+)/)) != null)
+							port.rx_packets += +m[2];
+
+						if ((m = match(line, /^\s*Tx(UniCast|Multi|Broad)\s*:\s*([0-9]+)/)) != null)
+							port.tx_packets += +m[2];
 					}
 				}
 

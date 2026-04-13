@@ -13,6 +13,13 @@ var callGetBuiltinEthernetPorts = rpc.declare({
 	expect: { result: [] }
 });
 
+var callSwconfigPortState = rpc.declare({
+	object: 'luci',
+	method: 'getSwconfigPortState',
+	params: [ 'switch' ],
+	expect: { result: [] }
+});
+
 function isString(v)
 {
 	return typeof(v) === 'string' && v !== '';
@@ -29,30 +36,197 @@ function parseBoardPortList(value)
 	return [];
 }
 
-function addKnownPort(known_ports, seen_ports, role, device)
+function addKnownPort(known_ports, seen_ports, role, device, extra)
 {
 	if (!isString(device) || seen_ports[device])
 		return;
 
 	seen_ports[device] = true;
 
-	known_ports.push({
+	var port = Object.assign({
 		role: role,
 		device: device,
-		netdev: network.instantiateDevice(device)
-	});
+		label: device
+	}, extra || {});
+
+	if (!port.netdev && !port.swstate)
+		port.netdev = network.instantiateDevice(device);
+
+	known_ports.push(port);
 }
 
-function addBoardNetworkPorts(known_ports, seen_ports, role, entry)
+function parseSwitchPortToken(token)
+{
+	if (!isString(token))
+		return null;
+
+	var m = token.match(/^(\d+)([a-z*]+)?$/i);
+
+	return m ? { port: +m[1], flags: (m[2] || '').toLowerCase() } : null;
+}
+
+function appendSwitchMemberPorts(sw, ports, cpu_ports, member_ports)
+{
+	for (var j = 0; j < ports.length; j++) {
+		var token = parseSwitchPortToken(ports[j]);
+
+		if (!token)
+			continue;
+
+		for (var k = 0; k < sw.ports.length; k++) {
+			if (sw.ports[k].num != token.port)
+				continue;
+
+			if (isString(sw.ports[k].device))
+				cpu_ports[sw.ports[k].device] = true;
+			else
+				member_ports.push('%s:%d'.format(sw['.name'] || sw.name || '', token.port));
+
+			break;
+		}
+	}
+}
+
+function buildLegacySwitchMappings(mapping, board)
+{
+	var switch_vlans = uci.sections('network', 'switch_vlan');
+
+	if (!L.isObject(board) || !L.isObject(board.switch))
+		return;
+
+	for (var i = 0, s; (s = switch_vlans[i]) != null; i++) {
+		var swname = s.device,
+		    sw = board.switch[swname],
+		    vid = s.vid || s.vlan;
+
+		if (!L.isObject(sw) || !/^[0-9]{1,4}$/.test(vid) || +vid > 4095)
+			continue;
+
+		var ports = L.toArray(s.ports),
+		    cpu_ports = {},
+		    member_ports = [];
+
+		sw['.name'] = swname;
+		appendSwitchMemberPorts(sw, ports, cpu_ports, member_ports);
+
+		member_ports = member_ports.filter(function(port, index) {
+			return member_ports.indexOf(port) === index;
+		});
+
+		for (var cpudev in cpu_ports)
+			mapping['%s.%s'.format(cpudev, vid)] = member_ports;
+	}
+
+	for (var swname in board.switch) {
+		var sw = board.switch[swname];
+
+		if (!L.isObject(sw) || !Array.isArray(sw.roles) || !Array.isArray(sw.ports))
+			continue;
+
+		sw['.name'] = swname;
+
+		for (var i = 0; i < sw.roles.length; i++) {
+			var role = sw.roles[i];
+
+			if (!L.isObject(role) || !isString(role.device))
+				continue;
+
+			var cpu_ports = {},
+			    member_ports = [];
+
+			appendSwitchMemberPorts(sw, parseBoardPortList(role.ports), cpu_ports, member_ports);
+
+			if (!cpu_ports[role.device])
+				cpu_ports[role.device] = true;
+
+			member_ports = member_ports.filter(function(port, index) {
+				return member_ports.indexOf(port) === index;
+			});
+
+			if (!mapping[role.device])
+				mapping[role.device] = [];
+
+			for (var j = 0; j < member_ports.length; j++)
+				if (mapping[role.device].indexOf(member_ports[j]) === -1)
+					mapping[role.device].push(member_ports[j]);
+		}
+	}
+}
+
+function getSwitchPortLabel(board, switch_name, port_num)
+{
+	var sw = L.isObject(board) && L.isObject(board.switch) ? board.switch[switch_name] : null;
+
+	if (!L.isObject(sw) || !Array.isArray(sw.ports))
+		return '%s:%d'.format(switch_name, port_num);
+
+	for (var i = 0; i < sw.ports.length; i++) {
+		if (sw.ports[i].num != port_num)
+			continue;
+
+		if (isString(sw.ports[i].label))
+			return sw.ports[i].label;
+
+		if (isString(sw.ports[i].role)) {
+			var index = 1;
+
+			for (var j = 0; j < i; j++)
+				if (sw.ports[j].role == sw.ports[i].role)
+					index++;
+
+			return sw.ports[i].role + index;
+		}
+
+		break;
+	}
+
+	return '%s:%d'.format(switch_name, port_num);
+}
+
+function addResolvedPort(known_ports, seen_ports, role, device, mapping, board, swstate)
+{
+	var resolved = resolveVLANPorts(device, mapping);
+
+	for (var i = 0; i < resolved.length; i++) {
+		var m = resolved[i].match(/^([^:]+):(\d+)$/);
+
+		if (m) {
+			var switch_name = m[1],
+			    port_num = +m[2],
+			    switch_ports = swstate[switch_name] || {};
+
+			addKnownPort(known_ports, seen_ports, role, resolved[i], {
+				label: getSwitchPortLabel(board, switch_name, port_num),
+				swstate: switch_ports[port_num] || {
+					port: port_num,
+					link: false,
+					speed: 0,
+					duplex: false,
+					rx_bytes: 0,
+					tx_bytes: 0,
+					rx_packets: 0,
+					tx_packets: 0
+				}
+			});
+		}
+		else {
+			addKnownPort(known_ports, seen_ports, role, resolved[i]);
+		}
+	}
+}
+
+function addBoardNetworkPorts(known_ports, seen_ports, role, entry, mapping, board, swstate)
 {
 	if (!L.isObject(entry))
 		return;
 
-	parseBoardPortList(entry.ports).forEach(L.bind(addKnownPort, null, known_ports, seen_ports, role));
-	parseBoardPortList(entry.ifname).forEach(L.bind(addKnownPort, null, known_ports, seen_ports, role));
+	var values = parseBoardPortList(entry.ports).concat(parseBoardPortList(entry.ifname));
 
 	if (isString(entry.device))
-		addKnownPort(known_ports, seen_ports, role, entry.device);
+		values.push(entry.device);
+
+	for (var i = 0; i < values.length; i++)
+		addResolvedPort(known_ports, seen_ports, role, values[i], mapping, board, swstate);
 }
 
 function resolveVLANChain(ifname, bridges, mapping)
@@ -80,7 +254,7 @@ function resolveVLANChain(ifname, bridges, mapping)
 	}
 }
 
-function buildVLANMappings(mapping)
+function buildVLANMappings(mapping, board)
 {
 	var bridge_vlans = uci.sections('network', 'bridge-vlan'),
 	    vlan_devices = uci.sections('network', 'device'),
@@ -166,6 +340,8 @@ function buildVLANMappings(mapping)
 				resolveVLANChain(bridges[brname].vlans[vid][i], bridges, mapping);
 	}
 
+	buildLegacySwitchMappings(mapping, board);
+
 	/* find implicit VLAN devices */
 	for (var i = 0, s; (s = interfaces[i]) != null; i++) {
 		if (!isString(s.device))
@@ -197,12 +373,12 @@ function resolveVLANPorts(ifname, mapping, seen)
 	return ports.sort(L.naturalCompare);
 }
 
-function buildInterfaceMapping(zones, networks) {
+function buildInterfaceMapping(zones, networks, board) {
 	var vlanmap = {},
 	    portmap = {},
 	    netmap = {};
 
-	buildVLANMappings(vlanmap);
+	buildVLANMappings(vlanmap, board);
 
 	for (var i = 0; i < networks.length; i++) {
 		var l3dev = networks[i].getDevice();
@@ -269,8 +445,21 @@ function formatSpeed(carrier, speed, duplex) {
 	return carrier ? _('Connected') : _('no link');
 }
 
-function formatStats(portdev) {
-	var stats = portdev._devstate('stats') || {};
+function formatStats(port) {
+	var stats = port.netdev
+		? (port.netdev._devstate('stats') || {})
+		: {
+			rx_bytes: port.swstate ? port.swstate.rx_bytes : null,
+			rx_packets: port.swstate ? port.swstate.rx_packets : null,
+			multicast: null,
+			rx_errors: null,
+			rx_dropped: null,
+			tx_bytes: port.swstate ? port.swstate.tx_bytes : null,
+			tx_packets: port.swstate ? port.swstate.tx_packets : null,
+			tx_errors: null,
+			tx_dropped: null,
+			collisions: null
+		};
 
 	return ui.itemlist(E('span'), [
 		_('Received bytes'), '%1024mB'.format(stats.rx_bytes),
@@ -332,6 +521,34 @@ function renderNetworksTooltip(pmap) {
 	return E([], res);
 }
 
+function getPortSpeed(port)
+{
+	return port.netdev ? port.netdev.getSpeed() : (port.swstate ? port.swstate.speed : null);
+}
+
+function getPortDuplex(port)
+{
+	if (port.netdev)
+		return port.netdev.getDuplex();
+
+	return (port.swstate && port.swstate.link) ? (port.swstate.duplex ? 'full' : 'half') : null;
+}
+
+function getPortCarrier(port)
+{
+	return port.netdev ? port.netdev.getCarrier() : !!(port.swstate && port.swstate.link);
+}
+
+function getPortTXBytes(port)
+{
+	return port.netdev ? port.netdev.getTXBytes() : (port.swstate ? port.swstate.tx_bytes : null);
+}
+
+function getPortRXBytes(port)
+{
+	return port.netdev ? port.netdev.getRXBytes() : (port.swstate ? port.swstate.rx_bytes : null);
+}
+
 return baseclass.extend({
 	title: _('Port status'),
 
@@ -342,43 +559,67 @@ return baseclass.extend({
 			firewall.getZones(),
 			network.getNetworks(),
 			uci.load('network')
-		]);
+		]).then(function(data) {
+			var board = JSON.parse(data[1]),
+			    swstate = {},
+			    tasks = [];
+
+			if (L.isObject(board) && L.isObject(board.switch)) {
+				for (var switch_name in board.switch) {
+					tasks.push(L.resolveDefault(callSwconfigPortState(switch_name), []).then(function(ports) {
+						swstate[this] = ports.reduce(function(map, port) {
+							map[port.port] = port;
+							return map;
+						}, {});
+					}.bind(switch_name)));
+				}
+			}
+
+			return Promise.all(tasks).then(function() {
+				data.push(swstate);
+				return data;
+			});
+		});
 	},
 
 	render: function(data) {
 		var board = JSON.parse(data[1]),
 		    known_ports = [],
 		    seen_ports = {},
-		    port_map = buildInterfaceMapping(data[2], data[3]);
+		    vlan_map = {},
+		    swstate = data[5] || {},
+		    port_map = buildInterfaceMapping(data[2], data[3], board);
+
+		buildVLANMappings(vlan_map, board);
 
 		if (Array.isArray(data[0]) && data[0].length > 0) {
 			known_ports = data[0].reduce(function(ports, port) {
-				addKnownPort(ports, seen_ports, port.role, port.device);
+				addResolvedPort(ports, seen_ports, port.role, port.device, vlan_map, board, swstate);
 				return ports;
 			}, []);
 		}
 
 		if (L.isObject(board) && L.isObject(board.network)) {
 			for (var k = 'lan'; k != null; k = (k == 'lan') ? 'wan' : null)
-				addBoardNetworkPorts(known_ports, seen_ports, k, board.network[k]);
+				addBoardNetworkPorts(known_ports, seen_ports, k, board.network[k], vlan_map, board, swstate);
 		}
 
 		if (!known_ports.length)
 			return null;
 
 		known_ports.sort(function(a, b) {
-			return L.naturalCompare(a.device, b.device);
+			return L.naturalCompare(a.label || a.device, b.label || b.device);
 		});
 
 		return E('div', { 'style': 'display:grid;grid-template-columns:repeat(auto-fit, minmax(70px, 1fr));margin-bottom:1em' }, known_ports.map(function(port) {
-			var speed = port.netdev.getSpeed(),
-			    duplex = port.netdev.getDuplex(),
-			    carrier = port.netdev.getCarrier(),
-			    pmap = port_map[port.netdev.getName()],
+			var speed = getPortSpeed(port),
+			    duplex = getPortDuplex(port),
+			    carrier = getPortCarrier(port),
+			    pmap = port_map[port.device],
 			    pzones = (pmap && pmap.zones.length) ? pmap.zones.sort(function(a, b) { return L.naturalCompare(a.getName(), b.getName()) }) : [ null ];
 
 			return E('div', { 'class': 'ifacebox', 'style': 'margin:.25em;min-width:70px;max-width:100px' }, [
-				E('div', { 'class': 'ifacebox-head', 'style': 'font-weight:bold' }, [ port.netdev.getName() ]),
+				E('div', { 'class': 'ifacebox-head', 'style': 'font-weight:bold' }, [ port.label || port.device ]),
 				E('div', { 'class': 'ifacebox-body' }, [
 					E('img', { 'src': L.resource('icons/port_%s.png').format(carrier ? 'up' : 'down') }),
 					E('br'),
@@ -395,10 +636,10 @@ return baseclass.extend({
 				]),
 				E('div', { 'class': 'ifacebox-body' }, [
 					E('div', { 'class': 'cbi-tooltip-container', 'style': 'text-align:left;font-size:80%' }, [
-						'\u25b2\u202f%1024.1mB'.format(port.netdev.getTXBytes()),
+						'\u25b2\u202f%1024.1mB'.format(getPortTXBytes(port)),
 						E('br'),
-						'\u25bc\u202f%1024.1mB'.format(port.netdev.getRXBytes()),
-						E('span', { 'class': 'cbi-tooltip' }, formatStats(port.netdev))
+						'\u25bc\u202f%1024.1mB'.format(getPortRXBytes(port)),
+						E('span', { 'class': 'cbi-tooltip' }, formatStats(port))
 					]),
 				])
 			]);
