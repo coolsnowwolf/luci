@@ -37,9 +37,21 @@ function loadIwinfoInfoMap(force) {
 	if (cachedIwinfoInfoPromise != null)
 		return cachedIwinfoInfoPromise;
 
-	var radios = uci.sections('wireless', 'wifi-device').map(function(s) { return s['.name']; });
+	var radios = uci.sections('wireless', 'wifi-device').map(function(s) { return s['.name']; }),
+	    networks = uci.sections('wireless', 'wifi-iface').reduce(function(names, s) {
+	    	var candidates = [ s['.name'], s.ifname ];
 
-	cachedIwinfoInfoPromise = Promise.all(radios.map(function(name) {
+	    	for (var i = 0; i < candidates.length; i++)
+	    		if (candidates[i] && names.indexOf(candidates[i]) < 0)
+	    			names.push(candidates[i]);
+
+	    	return names;
+	    }, []),
+	    devices = radios.concat(networks).filter(function(name, idx, list) {
+	    	return !!name && list.indexOf(name) == idx;
+	    });
+
+	cachedIwinfoInfoPromise = Promise.all(devices.map(function(name) {
 		return L.resolveDefault(callIwinfoInfoCompat(name), null).then(function(info) {
 			return [ name, info ];
 		});
@@ -438,12 +450,70 @@ function getFrequencyListBand(entry, hwmode) {
 	return null;
 }
 
+function normalizeIwinfoBitRate(rate) {
+	rate = +rate;
+
+	if (isNaN(rate) || rate <= 0)
+		return null;
+
+	return (rate > 100000) ? (rate / 1000) : rate;
+}
+
+function getIwinfoInfoCandidates(radioNet) {
+	var candidates = [],
+	    hwtype = uci.get('wireless', radioNet.getWifiDeviceName(), 'type'),
+	    ifname = radioNet.getIfname(),
+	    section = radioNet.getName(),
+	    device = radioNet.getWifiDeviceName();
+
+	if (ifname)
+		candidates.push(ifname);
+
+	if (section && candidates.indexOf(section) < 0)
+		candidates.push(section);
+
+	if (isQcaWifiHwtype(hwtype) && /^wifi\d+$/.test(device)) {
+		var fallback = section;
+
+		if (!/^ath\d+$/.test(fallback))
+			fallback = 'ath' + device.replace(/^wifi/, '');
+
+		if (candidates.indexOf(fallback) < 0)
+			candidates.push(fallback);
+	}
+
+	if (device && candidates.indexOf(device) < 0)
+		candidates.push(device);
+
+	return candidates;
+}
+
+function getDisplayIwinfoBitRate(radioNet) {
+	var candidates = getIwinfoInfoCandidates(radioNet);
+
+	for (var i = 0; i < candidates.length; i++) {
+		var info = cachedIwinfoInfoMap ? cachedIwinfoInfoMap[candidates[i]] : null,
+		    rate = normalizeIwinfoBitRate(info != null ? info.bitrate : null);
+
+		if (rate != null)
+			return rate;
+	}
+
+	return null;
+}
+
 function getDisplayBitRate(radioNet) {
 	var rate = radioNet.getBitRate(),
+	    hwtype = uci.get('wireless', radioNet.getWifiDeviceName(), 'type') || '',
 	    hwmode = uci.get('wireless', radioNet.getWifiDeviceName(), 'hwmode') || '',
 	    htmode = uci.get('wireless', radioNet.getWifiDeviceName(), 'htmode') || '';
 
 	if (rate != null && rate > 0)
+		return rate;
+
+	rate = getDisplayIwinfoBitRate(radioNet);
+
+	if (rate != null)
 		return rate;
 
 	if (/^11be/.test(hwmode)) {
