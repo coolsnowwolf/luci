@@ -31,6 +31,16 @@ return baseclass.extend({
 		expect: { results: [] }
 	}),
 
+	callIwinfoInfoCompat: rpc.declare({
+		object: 'iwinfo',
+		method: 'info',
+		params: [ 'device' ],
+		expect: { }
+	}),
+
+	cachedIwinfoInfoMap: null,
+	cachedIwinfoInfoPromise: null,
+
 	isQcaWifiHwtype: function(hwtype) {
 		return (hwtype == 'qcawifi' || hwtype == 'qcawificfg80211');
 	},
@@ -163,6 +173,97 @@ return baseclass.extend({
 		return this.getDerivedFrequencyGHz(hwmode, channel);
 	},
 
+	normalizeIwinfoBitRate: function(rate) {
+		rate = +rate;
+
+		if (isNaN(rate) || rate <= 0)
+			return null;
+
+		return (rate > 100000) ? (rate / 1000) : rate;
+	},
+
+	getIwinfoInfoCandidates: function(net) {
+		var candidates = [],
+		    hwtype = uci.get('wireless', net.getWifiDeviceName(), 'type'),
+		    ifname = net.getIfname(),
+		    section = net.getName(),
+		    device = net.getWifiDeviceName();
+
+		if (ifname)
+			candidates.push(ifname);
+
+		if (section && candidates.indexOf(section) < 0)
+			candidates.push(section);
+
+		if (this.isQcaWifiHwtype(hwtype) && /^wifi\d+$/.test(device)) {
+			var fallback = section;
+
+			if (!/^ath\d+$/.test(fallback))
+				fallback = 'ath' + device.replace(/^wifi/, '');
+
+			if (candidates.indexOf(fallback) < 0)
+				candidates.push(fallback);
+		}
+
+		if (device && candidates.indexOf(device) < 0)
+			candidates.push(device);
+
+		return candidates;
+	},
+
+	loadIwinfoInfoMap: function(force) {
+		if (force)
+			this.cachedIwinfoInfoPromise = null;
+
+		if (!force && this.cachedIwinfoInfoMap != null)
+			return Promise.resolve(this.cachedIwinfoInfoMap);
+
+		if (this.cachedIwinfoInfoPromise != null)
+			return this.cachedIwinfoInfoPromise;
+
+		var radios = uci.sections('wireless', 'wifi-device').map(function(s) { return s['.name']; }),
+		    networks = uci.sections('wireless', 'wifi-iface').reduce(function(names, s) {
+		    	var candidates = [ s['.name'], s.ifname ];
+
+		    	for (var i = 0; i < candidates.length; i++)
+		    		if (candidates[i] && names.indexOf(candidates[i]) < 0)
+		    			names.push(candidates[i]);
+
+		    	return names;
+		    }, []),
+		    devices = radios.concat(networks).filter(function(name, idx, list) {
+		    	return !!name && list.indexOf(name) == idx;
+		    });
+
+		this.cachedIwinfoInfoPromise = Promise.all(devices.map(L.bind(function(name) {
+			return L.resolveDefault(this.callIwinfoInfoCompat(name), null).then(function(info) {
+				return [ name, info ];
+			});
+		}, this))).then(L.bind(function(entries) {
+			var nextMap = {};
+
+			for (var i = 0; i < entries.length; i++)
+				if (entries[i][1] != null)
+					nextMap[entries[i][0]] = entries[i][1];
+
+			if (Object.keys(nextMap).length > 0 || this.cachedIwinfoInfoMap == null)
+				this.cachedIwinfoInfoMap = nextMap;
+
+			this.cachedIwinfoInfoPromise = null;
+			return this.cachedIwinfoInfoMap || nextMap;
+		}, this)).catch(L.bind(function() {
+			this.cachedIwinfoInfoPromise = null;
+
+			if (this.cachedIwinfoInfoMap != null)
+				return this.cachedIwinfoInfoMap;
+
+			this.cachedIwinfoInfoMap = {};
+			return this.cachedIwinfoInfoMap;
+		}, this));
+
+		return this.cachedIwinfoInfoPromise;
+	},
+
 	getDisplayBitRate: function(net) {
 		var rate = net.getBitRate(),
 		    hwmode = uci.get('wireless', net.getWifiDeviceName(), 'hwmode') || '',
@@ -170,6 +271,17 @@ return baseclass.extend({
 
 		if (rate != null && rate > 0)
 			return rate;
+
+		var candidates = this.getIwinfoInfoCandidates(net);
+
+		for (var i = 0; i < candidates.length; i++) {
+			var info = this.cachedIwinfoInfoMap ? this.cachedIwinfoInfoMap[candidates[i]] : null;
+
+			rate = this.normalizeIwinfoBitRate(info != null ? info.bitrate : null);
+
+			if (rate != null)
+				return rate;
+		}
 
 		if (/^11be/.test(hwmode)) {
 			switch (htmode) {
@@ -516,6 +628,10 @@ return baseclass.extend({
 			var tasks = [],
 			    radios_networks_hints = data[1],
 			    hasWPS = L.hasSystemFeature('hostapd', 'wps');
+
+			tasks.push(this.loadIwinfoInfoMap().then(L.bind(function(map) {
+				this.cachedIwinfoInfoMap = map || {};
+			}, this)));
 
 			for (var i = 0; i < radios_networks_hints.length; i++) {
 				tasks.push(this.getAssocListForNetwork(radios_networks_hints[i]).then(L.bind(function(net, list) {
