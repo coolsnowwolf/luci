@@ -7,6 +7,7 @@
 				"/etc/iproute2/rt_tables": [ "read" ],
 				"/proc/sys/net/ipv6/conf/*/mtu": [ "read" ],
 				"/proc/sys/net/ipv6/conf/*/hop_limit": [ "read" ],
+				"/usr/sbin/iw": [ "exec" ],
 				"/usr/libexec/luci-peeraddr": [ "exec" ],
 				"/usr/sbin/wlanconfig": [ "exec" ],
 				"/proc/sys/net/ipv[46]/conf/*": [ "read" ],

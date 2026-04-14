@@ -60,8 +60,13 @@
 	"luci-mod-status-index-wifi": {
 		"description": "Grant access to wireless status display",
 		"read": {
+			"file": {
+				"/usr/sbin/iw": [ "exec" ],
+				"/usr/sbin/wlanconfig": [ "exec" ]
+			},
 			"ubus": {
-				"iwinfo": [ "assoclist" ]
+				"file": [ "exec" ],
+				"iwinfo": [ "assoclist", "info" ]
 			}
 		},
 		"write": {

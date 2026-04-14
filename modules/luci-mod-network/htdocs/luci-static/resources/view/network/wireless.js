@@ -28,6 +28,9 @@ const callIwinfoInfoCompat = rpc.declare({
 
 let cachedIwinfoInfoMap = null;
 let cachedIwinfoInfoPromise = null;
+let cachedIwRegCountryMap = null;
+let cachedIwRegCountryPromise = null;
+let cachedIwDevPhyMap = null;
 
 function loadIwinfoInfoMap(force) {
 	if (force)
@@ -79,6 +82,48 @@ function loadIwinfoInfoMap(force) {
 
 function refreshIwinfoInfoMap() {
 	return loadIwinfoInfoMap(true);
+}
+
+function loadIwRegCountryMap(force) {
+	if (force)
+		cachedIwRegCountryPromise = null;
+
+	if (!force && cachedIwRegCountryMap != null && cachedIwDevPhyMap != null)
+		return Promise.resolve({
+			regCountryMap: cachedIwRegCountryMap,
+			devPhyMap: cachedIwDevPhyMap
+		});
+
+	if (cachedIwRegCountryPromise != null)
+		return cachedIwRegCountryPromise;
+
+	cachedIwRegCountryPromise = Promise.all([
+		L.resolveDefault(fs.exec_direct('/usr/sbin/iw', [ 'dev' ]), ''),
+		L.resolveDefault(fs.exec_direct('/usr/sbin/iw', [ 'reg', 'get' ]), '')
+	]).then((outputs) => {
+		cachedIwDevPhyMap = parseIwDevPhyMap(outputs[0]);
+		cachedIwRegCountryMap = parseIwRegCountryMap(outputs[1]);
+		cachedIwRegCountryPromise = null;
+
+		return {
+			regCountryMap: cachedIwRegCountryMap || {},
+			devPhyMap: cachedIwDevPhyMap || {}
+		};
+	}).catch(() => {
+		cachedIwRegCountryPromise = null;
+
+		if (cachedIwRegCountryMap == null)
+			cachedIwRegCountryMap = {};
+		if (cachedIwDevPhyMap == null)
+			cachedIwDevPhyMap = {};
+
+		return {
+			regCountryMap: cachedIwRegCountryMap,
+			devPhyMap: cachedIwDevPhyMap
+		};
+	});
+
+	return cachedIwRegCountryPromise;
 }
 
 function count_changes(section_id) {
@@ -349,6 +394,47 @@ function getDisplayFrequency(radioNet, channel) {
 		return frequency;
 
 	return getDerivedFrequencyGHz(hwmode, channel);
+}
+
+function getNonDefaultCountryCode(candidates) {
+	for (const candidate of candidates) {
+		const country = String(candidate || '').toUpperCase();
+
+		if (country && country != '00')
+			return country;
+	}
+
+	return null;
+}
+
+function getDisplayCountryCode(radioNet) {
+	const infoCountry = getNonDefaultCountryCode(getIwinfoInfoCandidates(radioNet).map((candidate) => {
+		const info = cachedIwinfoInfoMap ? cachedIwinfoInfoMap[candidate] : null;
+		return info ? info.country : null;
+	}));
+
+	if (infoCountry)
+		return infoCountry;
+
+	const runtimeCountry = getNonDefaultCountryCode([ radioNet.getCountryCode() ]);
+
+	if (runtimeCountry)
+		return runtimeCountry;
+
+	const configCountry = getNonDefaultCountryCode([ uci.get('wireless', radioNet.getWifiDeviceName(), 'country') ]);
+
+	if (configCountry)
+		return configCountry;
+
+	const phyCountry = getNonDefaultCountryCode(getIwinfoInfoCandidates(radioNet).map((candidate) => {
+		const phy = cachedIwDevPhyMap ? cachedIwDevPhyMap[candidate] : null;
+		return phy && cachedIwRegCountryMap ? cachedIwRegCountryMap[phy] : null;
+	}));
+
+	if (phyCountry)
+		return phyCountry;
+
+	return radioNet.getCountryCode() || uci.get('wireless', radioNet.getWifiDeviceName(), 'country') || '00';
 }
 
 function getConfiguredBand(hwtype, hwmode, channel, bandval) {
@@ -649,6 +735,86 @@ function parseWlanconfigAssoclist(stdout) {
 	return entries;
 }
 
+function parseIwDevPhyMap(stdout) {
+	const mapping = {};
+	let currentPhy = null;
+
+	for (const rawLine of String(stdout || '').split(/\n/)) {
+		const phyMatch = rawLine.match(/^\s*phy#(\d+)\s*$/);
+		const ifMatch = rawLine.match(/^\s*Interface\s+(\S+)\s*$/);
+
+		if (phyMatch) {
+			currentPhy = 'phy' + phyMatch[1];
+			continue;
+		}
+
+		if (currentPhy && ifMatch)
+			mapping[ifMatch[1]] = currentPhy;
+	}
+
+	return mapping;
+}
+
+function parseIwRegCountryMap(stdout) {
+	const mapping = {};
+	let currentScope = null;
+
+	for (const rawLine of String(stdout || '').split(/\n/)) {
+		const globalMatch = rawLine.match(/^\s*global\s*$/i);
+		const phyMatch = rawLine.match(/^\s*phy#(\d+)\b/);
+		const countryMatch = rawLine.match(/^\s*country\s+([A-Z0-9]{2})\s*:/i);
+
+		if (globalMatch) {
+			currentScope = 'global';
+			continue;
+		}
+
+		if (phyMatch) {
+			currentScope = 'phy' + phyMatch[1];
+			continue;
+		}
+
+		if (currentScope && countryMatch)
+			mapping[currentScope] = countryMatch[1].toUpperCase();
+	}
+
+	return mapping;
+}
+
+function parseIwPhyMaxWidthMap(stdout) {
+	const mapping = {};
+	let currentPhy = null;
+
+	for (const rawLine of String(stdout || '').split(/\n/)) {
+		const phyMatch = rawLine.match(/^Wiphy\s+(phy\d+)\s*$/);
+
+		if (phyMatch) {
+			currentPhy = phyMatch[1];
+			if (mapping[currentPhy] == null)
+				mapping[currentPhy] = null;
+			continue;
+		}
+
+		if (!currentPhy)
+			continue;
+
+		const radarMatch = rawLine.match(/radar detect widths:\s*\{([^}]*)\}/);
+		if (!radarMatch)
+			continue;
+
+		const widths = [];
+
+		radarMatch[1].replace(/\b(20|40|80|160|320)\s*MHz\b/g, function(_, mhz) {
+			widths.push(+mhz);
+		});
+
+		if (widths.length)
+			mapping[currentPhy] = Math.max.apply(Math, widths);
+	}
+
+	return mapping;
+}
+
 function callWlanconfigAssoclistCompat(device) {
 	return L.resolveDefault(fs.exec_direct('/usr/sbin/wlanconfig', [ device, 'list', 'sta' ]), '').then(parseWlanconfigAssoclist);
 }
@@ -919,7 +1085,7 @@ function render_modal_status(node, radioNet) {
 		_('Signal'),     (is_assoc && noise != null) ? `${radioNet.getSignal()} ${_('dBm')}` : null,
 		_('Noise'),      (is_assoc && noise != null) ? `${noise} ${_('dBm')}` : null,
 		_('Bitrate'),    is_assoc ? `${bitrate ?? 0} ${_('Mbit/s')}` : null,
-		_('Country'),    is_assoc ? radioNet.getCountryCode() : null
+		_('Country'),    is_assoc ? getDisplayCountryCode(radioNet) : null
 	], [ ' | ', E('br'), E('br'), E('br'), E('br'), E('br'), ' | ', E('br'), ' | ' ]);
 
 	if (!is_assoc)
@@ -1057,12 +1223,17 @@ var CBIWifiFrequencyValue = form.Value.extend({
 			network.getWifiDevice(device_section),
 			this.callFrequencyList(device_section),
 			this.callDeviceInfo(device_section),
-			L.resolveDefault(this.callWirelessStatus(), {})
+			L.resolveDefault(this.callWirelessStatus(), {}),
+			isQcaWifiHwtype(hwtype) ? L.resolveDefault(fs.exec_direct('/usr/sbin/iw', [ 'dev' ]), '') : '',
+			isQcaWifiHwtype(hwtype) ? L.resolveDefault(fs.exec_direct('/usr/sbin/iw', [ 'phy' ]), '') : ''
 		]).then(L.bind(function(data) {
 			const wifidevs = data[0];
 			const freqlist = data[1];
 			const devinfo = L.isObject(data[2]) ? data[2] : {};
 			const wstatus = L.isObject(data[3]) ? data[3] : {};
+			const iwDevMap = parseIwDevPhyMap(data[4]);
+			const iwPhyWidthMap = parseIwPhyMaxWidthMap(data[5]);
+			const iwPhyName = iwDevMap[device_section];
 			const statuscfg = L.isObject(wstatus[device_section]?.config) ? wstatus[device_section].config : {};
 			const devcfg = {
 				channel: statuscfg.channel ?? (wifidevs ? wifidevs.ubus('dev', 'config', 'channel') : null),
@@ -1071,6 +1242,7 @@ var CBIWifiFrequencyValue = form.Value.extend({
 
 			this.devinfo = devinfo;
 			this.devcfg = devcfg;
+			this.iwPhyMaxWidth = iwPhyName ? iwPhyWidthMap[iwPhyName] : null;
 
 			this.channels = {
 				'2g': allow_auto ? [ 'auto', 'auto', { available: true } ] : [],
@@ -1148,11 +1320,12 @@ var CBIWifiFrequencyValue = form.Value.extend({
 				const qca_has_ac = qca_has_ax || has_ac || /^11ac/.test(hwval);
 				const qca_has_n = qca_has_ac || hwmodelist.n || /^11n/.test(hwval);
 				const qca_has_htinfo = (Object.keys(htmodelist).length > 0);
+				const qca_max_width = this.iwPhyMaxWidth || Infinity;
 				const qca_ht20 = !!(!qca_has_htinfo || htmodelist.HT20 || htmodelist.VHT20 || htmodelist.HE20 || htmodelist.EHT20 || /^HT20$/.test(htval));
 				const qca_ht40 = !!(!qca_has_htinfo || htmodelist.HT40 || htmodelist.VHT40 || htmodelist.HE40 || htmodelist.EHT40 || /^HT40$/.test(htval));
-				const qca_ht80 = !!(!qca_has_htinfo || htmodelist.VHT80 || htmodelist.HE80 || htmodelist.EHT80 || /^HT80$/.test(htval));
-				const qca_ht160 = !!(htmodelist.VHT160 || htmodelist.HE160 || htmodelist.EHT160 || /^HT160$/.test(htval));
-				const qca_ht320 = !!(htmodelist.EHT320 || /^HT320$/.test(htval));
+				const qca_ht80 = (!!(!qca_has_htinfo || htmodelist.VHT80 || htmodelist.HE80 || htmodelist.EHT80 || /^HT80$/.test(htval)) && qca_max_width >= 80);
+				const qca_ht160 = (!!(htmodelist.VHT160 || htmodelist.HE160 || htmodelist.EHT160 || /^HT160$/.test(htval)) && qca_max_width >= 160);
+				const qca_ht320 = (!!(htmodelist.EHT320 || /^HT320$/.test(htval)) && qca_max_width >= 320);
 
 				this.modes = [
 					'', 'Legacy', { available: false },
@@ -1347,8 +1520,8 @@ var CBIWifiFrequencyValue = form.Value.extend({
 		const cfg_hwval = uci.get('wireless', config_section, 'hwmode');
 		const cfg_chval = devcfg.channel || (cfgvals ? cfgvals[2] : uci.get('wireless', config_section, 'channel'));
 		const cfg_bandval = devcfg.band || uci.get('wireless', config_section, 'band');
-		const htval = devinfo.htmode || cfg_htval;
-		const hwval = devinfo.hwmode || cfg_hwval;
+		const htval = isQcaWifiHwtype(hwtype) ? (cfg_htval || devinfo.htmode) : (devinfo.htmode || cfg_htval);
+		const hwval = isQcaWifiHwtype(hwtype) ? (cfg_hwval || devinfo.hwmode) : (devinfo.hwmode || cfg_hwval);
 		const chval = cfg_chval || devinfo.channel;
 		const bandval = cfg_bandval || getConfiguredBand(hwtype, hwval, chval, null);
 		const setSelectValue = function(sel, value) {
@@ -1760,7 +1933,10 @@ return view.extend({
 			uci.load('wireless'),
 			uci.load('system'),
 			firewall.getZones(),
-		]);
+		]).then((data) => Promise.all([
+			refreshIwinfoInfoMap(),
+			loadIwRegCountryMap(true)
+		]).then(() => data));
 	},
 
 	checkAnonymousSections: function() {
@@ -1953,7 +2129,13 @@ return view.extend({
 				o.onclick = ui.createHandlerFn(s, network_updown, s.section, s.map);
 
 				o = ss.taboption('general', CBIWifiFrequencyValue, '_freq', '<br />' + _('Operating frequency'), _('Some channels may be restricted to Indoor Only use by your Regulatory Domain. Make sure to follow this advice if a channel is reported as such.'));
-				o.ucisection = s.section;
+				/*
+				 * Operating frequency edits the backing wifi-device section, not the
+				 * current wifi-iface section. Pointing it at the iface causes QCA
+				 * radios to lose hwmode/htmode/freqlist context and hides the
+				 * Mode/Band/Channel/Width controls in the modal.
+				 */
+				o.ucisection = radioNet.getWifiDeviceName();
 
 				if (hwtype == 'mac80211' || isQcaWifiHwtype(hwtype)) {
 					o = ss.taboption('general', CBIWifiTxPowerValue, 'txpower', _('Maximum transmit power'), _('Specifies the maximum transmit power the wireless radio may use. Depending on regulatory requirements and wireless usage, the actual transmit power may be reduced by the driver.'));
@@ -2143,11 +2325,11 @@ return view.extend({
 					}, this));
 				};
 
-				if (hwtype == 'mac80211' || hwtype == 'mt_dbdc') {
+				if (hwtype == 'mac80211' || hwtype == 'mt_dbdc' || isQcaWifiHwtype(hwtype)) {
 					o = ss.taboption('general', form.Flag, 'hidden', _('Hide <abbr title="Extended Service Set Identifier">ESSID</abbr>'), _('Where the ESSID is hidden, clients may fail to roam and airtime efficiency may be significantly reduced.'));
 					o.depends('mode', 'ap');
 
-					if (hwtype == 'mac80211')
+					if (hwtype == 'mac80211' || isQcaWifiHwtype(hwtype))
 						o.depends('mode', 'ap-wds');
 				}
 

@@ -7,6 +7,549 @@
 'require rpc';
 'require firewall';
 
+const callIwinfoAssoclistCompat = rpc.declare({
+	object: 'iwinfo',
+	method: 'assoclist',
+	params: [ 'device' ],
+	expect: { results: [] }
+});
+
+const callIwinfoInfoCompat = rpc.declare({
+	object: 'iwinfo',
+	method: 'info',
+	params: [ 'device' ],
+	expect: {}
+});
+
+function isQcaWifiHwtype(hwtype) {
+	return (hwtype == 'qcawifi' || hwtype == 'qcawificfg80211');
+}
+
+function isNetworkDisabled(net) {
+	return (net.get('disabled') == '1' || uci.get('wireless', net.getWifiDeviceName(), 'disabled') == '1');
+}
+
+function getRadioDisplayType(radio, iwinfoInfoMap) {
+	const hwtype = uci.get('wireless', radio.getName(), 'type');
+	const hwmode = uci.get('wireless', radio.getName(), 'hwmode') || '';
+	const info = iwinfoInfoMap?.[radio.getName()];
+	const hwname = info?.hardware?.name;
+	let name = radio.getI18n().replace(/^Generic | Wireless Controller .+$/g, '');
+
+	if (hwname && hwname != 'Generic Atheros')
+		name = hwname;
+
+	if (name && !/^unknown$/i.test(name) && !/^802\.11unknown$/i.test(name))
+		return name;
+
+	if (isQcaWifiHwtype(hwtype)) {
+		if (/^11be/.test(hwmode))
+			return 'Qualcomm Atheros Wi-Fi 7';
+		if (/^11ax/.test(hwmode))
+			return 'Qualcomm Atheros Wi-Fi 6';
+		if (/^11ac/.test(hwmode))
+			return 'Qualcomm Atheros Wi-Fi 5';
+		return 'Qualcomm Atheros Wireless';
+	}
+
+	return name || _('Unknown');
+}
+
+function formatConfigEncryption(enc) {
+	enc = String(enc || '');
+
+	if (enc == '' || enc == 'none')
+		return _('None');
+	if (enc == 'psk2' || enc.indexOf('psk2+') == 0)
+		return 'WPA2-PSK';
+	if (enc == 'psk' || enc.indexOf('psk+') == 0)
+		return 'WPA-PSK';
+	if (enc == 'psk-mixed' || enc.indexOf('psk-mixed+') == 0)
+		return 'WPA-PSK/WPA2-PSK Mixed Mode';
+	if (enc == 'sae' || enc.indexOf('sae+') == 0)
+		return 'WPA3-SAE';
+	if (enc == 'sae-mixed' || enc.indexOf('sae-mixed+') == 0)
+		return 'WPA2-PSK/WPA3-SAE Mixed Mode';
+	if (enc == 'wpa3' || enc.indexOf('wpa3+') == 0)
+		return 'WPA3-EAP';
+	if (enc == 'wpa3-mixed' || enc.indexOf('wpa3-mixed+') == 0)
+		return 'WPA2-EAP/WPA3-EAP Mixed Mode';
+	if (enc == 'wpa2' || enc.indexOf('wpa2+') == 0)
+		return 'WPA2-EAP';
+	if (enc == 'wpa' || enc.indexOf('wpa+') == 0)
+		return 'WPA-EAP';
+	if (enc == 'wep-open')
+		return _('WEP Open System');
+	if (enc == 'wep-shared')
+		return _('WEP Shared Key');
+
+	return enc;
+}
+
+function getConfigEncryptionValue(section_id, hwtype) {
+	const enc = String(uci.get('wireless', section_id, 'encryption') || '');
+	const sae = uci.get('wireless', section_id, 'sae');
+
+	if (enc == 'wep')
+		return 'wep-open';
+
+	if (isQcaWifiHwtype(hwtype) && sae == '1') {
+		if (enc == 'psk2' || enc.indexOf('psk2+') == 0)
+			return 'sae-mixed';
+		if (enc == 'sae' || enc.indexOf('sae+') == 0)
+			return 'sae';
+	}
+
+	if (enc.match(/\+/))
+		return enc.replace(/\+.+$/, '');
+
+	return enc;
+}
+
+function getDisplayEncryption(net) {
+	const encryption = net.getActiveEncryption();
+
+	if (encryption && encryption != '-')
+		return encryption;
+
+	return formatConfigEncryption(getConfigEncryptionValue(net.getName(), uci.get('wireless', net.getWifiDeviceName(), 'type')));
+}
+
+function getDisplayBSSID(net) {
+	const bssid = uci.get('wireless', net.getName(), 'macaddr') ||
+		uci.get('wireless', net.getWifiDeviceName(), 'macaddr') ||
+		net.getBSSID() || net.getActiveBSSID();
+
+	if (bssid && bssid != '00:00:00:00:00:00')
+		return String(bssid).toUpperCase();
+
+	return bssid || null;
+}
+
+function getDisplayChannel(net) {
+	let channel = net.getChannel();
+
+	if (channel != null && channel !== '' && channel !== 'auto')
+		return +channel;
+
+	channel = uci.get('wireless', net.getWifiDeviceName(), 'channel');
+
+	if (channel != null && channel !== '' && channel !== 'auto')
+		return +channel;
+
+	return null;
+}
+
+function getDerivedFrequencyGHz(hwmode, channel) {
+	hwmode = String(hwmode || '');
+
+	if (channel == null || isNaN(channel))
+		return null;
+	if (channel == 14)
+		return '2.484';
+	if (channel >= 1 && channel <= 13)
+		return '%.03f'.format((2407 + channel * 5) / 1000);
+	if (/^11axg|^11ng|^11beg/.test(hwmode) && channel >= 1 && channel <= 13)
+		return '%.03f'.format((2407 + channel * 5) / 1000);
+	if (channel >= 36 && channel <= 196)
+		return '%.03f'.format((5000 + channel * 5) / 1000);
+	if (channel >= 1 && channel <= 233)
+		return '%.03f'.format((5950 + channel * 5) / 1000);
+
+	return null;
+}
+
+function getDisplayFrequency(net, channel, iwinfoInfoMap) {
+	const candidates = getIwinfoInfoCandidates(net);
+
+	for (const candidate of candidates) {
+		const info = iwinfoInfoMap?.[candidate];
+		const mhz = +(info?.channel || 0) > 0 ? +(info?.frequency || 0) : +(info?.frequency || 0);
+
+		if (!isNaN(mhz) && mhz > 0)
+			return '%.03f'.format(mhz / 1000);
+	}
+
+	const frequency = net.getFrequency();
+	const hwmode = uci.get('wireless', net.getWifiDeviceName(), 'hwmode') || '';
+
+	if (frequency != null && frequency !== '')
+		return frequency;
+
+	return getDerivedFrequencyGHz(hwmode, channel);
+}
+
+function normalizeIwinfoBitRate(rate) {
+	rate = +rate;
+
+	if (isNaN(rate) || rate <= 0)
+		return null;
+
+	return (rate > 100000) ? (rate / 1000) : rate;
+}
+
+function getIwinfoInfoCandidates(net) {
+	const candidates = [];
+	const hwtype = uci.get('wireless', net.getWifiDeviceName(), 'type');
+	const ifname = net.getIfname();
+	const section = net.getName();
+	const device = net.getWifiDeviceName();
+
+	for (const candidate of [ ifname, section ]) {
+		if (candidate && candidates.indexOf(candidate) < 0)
+			candidates.push(candidate);
+	}
+
+	if (isQcaWifiHwtype(hwtype) && /^wifi\d+$/.test(device)) {
+		let fallback = section;
+
+		if (!/^ath\d+$/.test(fallback))
+			fallback = 'ath' + device.replace(/^wifi/, '');
+
+		if (candidates.indexOf(fallback) < 0)
+			candidates.push(fallback);
+	}
+
+	if (device && candidates.indexOf(device) < 0)
+		candidates.push(device);
+
+	return candidates;
+}
+
+function getDisplayBitRate(net, iwinfoInfoMap) {
+	let rate = net.getBitRate();
+
+	if (rate != null && rate > 0)
+		return rate;
+
+	for (const candidate of getIwinfoInfoCandidates(net)) {
+		rate = normalizeIwinfoBitRate(iwinfoInfoMap?.[candidate]?.bitrate);
+
+		if (rate != null)
+			return rate;
+	}
+
+	return null;
+}
+
+function parseIwDevPhyMap(stdout) {
+	const lines = String(stdout || '').split(/\n/);
+	const map = {};
+	let currentPhy = null;
+
+	for (const rawLine of lines) {
+		const line = rawLine.trim();
+		const phyMatch = line.match(/^phy#(\d+)$/);
+		const ifaceMatch = line.match(/^Interface\s+(\S+)$/);
+
+		if (phyMatch) {
+			currentPhy = `phy#${phyMatch[1]}`;
+			continue;
+		}
+
+		if (currentPhy && ifaceMatch)
+			map[ifaceMatch[1]] = currentPhy;
+	}
+
+	return map;
+}
+
+function parseIwRegCountryMap(stdout) {
+	const lines = String(stdout || '').split(/\n/);
+	const map = {};
+	let currentScope = null;
+
+	for (const rawLine of lines) {
+		const line = rawLine.trim();
+		const globalMatch = line.match(/^global$/i);
+		const phyMatch = line.match(/^(phy#\d+)\b/);
+		const countryMatch = line.match(/^country\s+([A-Z0-9]{2})\s*:/i);
+
+		if (globalMatch) {
+			currentScope = 'global';
+			continue;
+		}
+
+		if (phyMatch) {
+			currentScope = phyMatch[1];
+			continue;
+		}
+
+		if (currentScope && countryMatch)
+			map[currentScope] = countryMatch[1].toUpperCase();
+	}
+
+	return map;
+}
+
+function getNonDefaultCountryCode(candidates) {
+	for (const candidate of candidates) {
+		const country = String(candidate || '').toUpperCase();
+
+		if (country && country != '00')
+			return country;
+	}
+
+	return null;
+}
+
+function getDisplayCountryCode(net, iwinfoInfoMap, phyCountryMap, ifacePhyMap) {
+	const candidates = getIwinfoInfoCandidates(net);
+
+	const infoCountry = getNonDefaultCountryCode(candidates.map((candidate) => iwinfoInfoMap?.[candidate]?.country));
+
+	if (infoCountry)
+		return infoCountry;
+
+	const runtimeCountry = getNonDefaultCountryCode([ net.getCountryCode() ]);
+
+	if (runtimeCountry)
+		return runtimeCountry;
+
+	const configCountry = getNonDefaultCountryCode([ uci.get('wireless', net.getWifiDeviceName(), 'country') ]);
+
+	if (configCountry)
+		return configCountry;
+
+	const phyCountry = getNonDefaultCountryCode(candidates.map((candidate) => {
+		const phy = ifacePhyMap?.[candidate];
+
+		return phy ? phyCountryMap?.[phy] : null;
+	}));
+
+	if (phyCountry)
+		return phyCountry;
+
+	for (const candidate of getIwinfoInfoCandidates(net)) {
+		const country = iwinfoInfoMap?.[candidate]?.country;
+
+		if (country)
+			return country;
+	}
+
+	return net.getCountryCode() || uci.get('wireless', net.getWifiDeviceName(), 'country') || '00';
+}
+
+function getDisplayNoise(net, iwinfoInfoMap) {
+	let noise = net.getNoise();
+
+	if (noise != null && noise !== 0)
+		return noise;
+
+	for (const candidate of getIwinfoInfoCandidates(net)) {
+		noise = iwinfoInfoMap?.[candidate]?.noise;
+
+		if (noise != null && noise !== 0)
+			return noise;
+	}
+
+	return null;
+}
+
+function getDisplayTXPower(net, iwinfoInfoMap) {
+	let txpower = net.getTXPower();
+
+	if (txpower != null && txpower > 0)
+		return txpower;
+
+	for (const candidate of getIwinfoInfoCandidates(net)) {
+		txpower = iwinfoInfoMap?.[candidate]?.txpower;
+
+		if (txpower != null && txpower > 0)
+			return txpower;
+	}
+
+	txpower = +uci.get('wireless', net.getWifiDeviceName(), 'txpower');
+	return (!isNaN(txpower) && txpower > 0) ? txpower : null;
+}
+
+function getDisplaySignalPercent(net, is_assoc) {
+	const hwtype = uci.get('wireless', net.getWifiDeviceName(), 'type');
+	const disabled = isNetworkDisabled(net);
+
+	if (disabled)
+		return -1;
+	if (isQcaWifiHwtype(hwtype) && net.getMode() == 'ap')
+		return is_assoc ? 100 : 0;
+	if (net.isUp())
+		return net.getSignalPercent();
+
+	return is_assoc ? 0 : -1;
+}
+
+function getDisplaySignalValue(net, is_assoc, iwinfoInfoMap) {
+	const hwtype = uci.get('wireless', net.getWifiDeviceName(), 'type');
+
+	if (isQcaWifiHwtype(hwtype) && net.getMode() == 'ap' && is_assoc)
+		return getDisplayTXPower(net, iwinfoInfoMap);
+
+	return net.getSignal();
+}
+
+function getDisplayNoiseValue(net, is_assoc, iwinfoInfoMap) {
+	const hwtype = uci.get('wireless', net.getWifiDeviceName(), 'type');
+
+	if (isQcaWifiHwtype(hwtype) && net.getMode() == 'ap' && is_assoc)
+		return null;
+
+	return getDisplayNoise(net, iwinfoInfoMap);
+}
+
+function isDisplayAssociated(net, assocCount) {
+	const hwtype = uci.get('wireless', net.getWifiDeviceName(), 'type');
+	const mode = net.getMode();
+	const bssid = getDisplayBSSID(net);
+	const channel = getDisplayChannel(net);
+	const disabled = isNetworkDisabled(net);
+
+	if (bssid && bssid != '00:00:00:00:00:00' && channel && net.getActiveMode() != 'Unknown' && !disabled)
+		return true;
+	if (isQcaWifiHwtype(hwtype) && !disabled && mode == 'ap' && channel)
+		return true;
+	if (assocCount > 0)
+		return true;
+
+	return false;
+}
+
+function parseWlanconfigRate(rate) {
+	const match = String(rate || '').trim().match(/^([0-9]+(?:\.[0-9]+)?)([KMG])$/i);
+	let value = match ? parseFloat(match[1]) : NaN;
+	const unit = match ? match[2].toUpperCase() : null;
+
+	if (isNaN(value) || unit == null)
+		return null;
+
+	if (unit == 'G')
+		value *= 1000;
+	else if (unit == 'K')
+		value /= 1000;
+
+	return Math.round(value * 1000);
+}
+
+function parseWlanconfigMode(mode) {
+	const meta = { mhz: 20 };
+	const match = String(mode || '').match(/_(EHT|HE|VHT|HT)(20|40|80|160|320|80_80)$/);
+
+	if (!match)
+		return meta;
+
+	if (match[1] == 'HT')
+		meta.ht = true;
+	else if (match[1] == 'VHT')
+		meta.vht = true;
+	else if (match[1] == 'HE')
+		meta.he = true;
+	else if (match[1] == 'EHT')
+		meta.eht = true;
+
+	meta.mhz = (match[2] == '80_80') ? 160 : +match[2];
+	return meta;
+}
+
+function parseWlanconfigAssoclist(stdout) {
+	const lines = String(stdout || '').split(/\n/);
+	const entries = [];
+	let current = null;
+
+	for (const rawLine of lines) {
+		const line = rawLine.trim();
+
+		if (!line)
+			continue;
+
+		if (/^[0-9a-f]{2}(?::[0-9a-f]{2}){5}\b/i.test(line)) {
+			const tokens = line.split(/\s+/);
+
+			if (tokens.length < 9)
+				continue;
+
+			const mode = (tokens.length >= 4) ? tokens[tokens.length - 4] : '';
+			const signal = parseInt(tokens[5], 10);
+			const rxnss = parseInt(tokens[tokens.length - 3], 10);
+			const txnss = parseInt(tokens[tokens.length - 2], 10);
+			const rateMeta = parseWlanconfigMode(mode);
+			const rx = Object.assign({ rate: parseWlanconfigRate(tokens[4]), mhz: rateMeta.mhz }, rateMeta);
+			const tx = Object.assign({ rate: parseWlanconfigRate(tokens[3]), mhz: rateMeta.mhz }, rateMeta);
+
+			if (!isNaN(rxnss))
+				rx.nss = rxnss;
+			if (!isNaN(txnss))
+				tx.nss = txnss;
+
+			current = {
+				mac: tokens[0].toUpperCase(),
+				signal: isNaN(signal) ? null : signal,
+				noise: null,
+				rx,
+				tx
+			};
+
+			if (current.rx.rate != null && current.tx.rate != null)
+				entries.push(current);
+
+			continue;
+		}
+
+		if (!current)
+			continue;
+
+		const snr = line.match(/^SNR\s*:\s*(-?\d+)/i);
+		if (snr != null && current.signal != null)
+			current.noise = current.signal - parseInt(snr[1], 10);
+	}
+
+	return entries;
+}
+
+function callWlanconfigAssoclistCompat(device) {
+	return L.resolveDefault(fs.exec_direct('/usr/sbin/wlanconfig', [ device, 'list', 'sta' ]), '').then(parseWlanconfigAssoclist);
+}
+
+function probeAssocListCandidates(candidates, probeFn) {
+	let index = 0;
+
+	function tryNext() {
+		if (index >= candidates.length)
+			return [];
+
+		return probeFn(candidates[index++]).then((entries) => {
+			if (Array.isArray(entries) && entries.length)
+				return entries;
+
+			return tryNext();
+		}).catch(() => tryNext());
+	}
+
+	return tryNext();
+}
+
+function getAssocListCandidates(net) {
+	const candidates = [];
+	const hwtype = uci.get('wireless', net.getWifiDeviceName(), 'type');
+	const ifname = net.getIfname();
+	const section = net.getName();
+	const device = net.getWifiDeviceName();
+
+	for (const candidate of [ ifname, section ]) {
+		if (candidate && candidates.indexOf(candidate) < 0)
+			candidates.push(candidate);
+	}
+
+	if (isQcaWifiHwtype(hwtype) && /^wifi\d+$/.test(device)) {
+		let fallback = section;
+
+		if (!/^ath\d+$/.test(fallback))
+			fallback = 'ath' + device.replace(/^wifi/, '');
+
+		if (candidates.indexOf(fallback) < 0)
+			candidates.push(fallback);
+	}
+
+	return candidates;
+}
+
 return baseclass.extend({
 	title: _('Wireless'),
 
@@ -24,6 +567,66 @@ return baseclass.extend({
 		params: [ 'scope', 'object', 'function' ],
 		expect: { 'access': false }
 	}),
+
+	loadIwinfoInfoMap(radios, networks) {
+		const devices = [];
+
+		radios.forEach((radio) => {
+			const name = radio.getName();
+
+			if (name && devices.indexOf(name) < 0)
+				devices.push(name);
+		});
+
+		networks.forEach((net) => {
+			getIwinfoInfoCandidates(net).forEach((candidate) => {
+				if (candidate && devices.indexOf(candidate) < 0)
+					devices.push(candidate);
+			});
+		});
+
+		return Promise.all(devices.map((name) =>
+			L.resolveDefault(callIwinfoInfoCompat(name), null).then((info) => [ name, info ])
+		)).then((entries) => {
+			const map = {};
+
+			for (const [ name, info ] of entries)
+				if (info != null)
+					map[name] = info;
+
+			return map;
+		});
+	},
+
+	loadIwRuntimeMaps() {
+		return Promise.all([
+			L.resolveDefault(fs.exec_direct('/usr/sbin/iw', [ 'dev' ]), ''),
+			L.resolveDefault(fs.exec_direct('/usr/sbin/iw', [ 'reg', 'get' ]), '')
+		]).then((outputs) => ({
+			ifacePhyMap: parseIwDevPhyMap(outputs[0]),
+			phyCountryMap: parseIwRegCountryMap(outputs[1])
+		}));
+	},
+
+	getAssocListForNetwork(net) {
+		const candidates = getAssocListCandidates(net);
+		const hwtype = uci.get('wireless', net.getWifiDeviceName(), 'type');
+
+		return L.resolveDefault(net.getAssocList(), []).then((entries) => {
+			if (Array.isArray(entries) && entries.length)
+				return entries;
+
+			return probeAssocListCandidates(candidates, callIwinfoAssoclistCompat).then((compatEntries) => {
+				if (Array.isArray(compatEntries) && compatEntries.length)
+					return compatEntries;
+
+				if (!isQcaWifiHwtype(hwtype) || net.getMode() != 'ap')
+					return [];
+
+				return probeAssocListCandidates(candidates, callWlanconfigAssoclistCompat);
+			});
+		});
+	},
 
 	wifirate(rate) {
 		let s = `${rate.rate / 1000}\xa0${_('Mbit/s')}, ${rate.mhz}\xa0${_('MHz')}`;
@@ -114,8 +717,13 @@ return baseclass.extend({
 
 		for (let i = 0; i < networks.length; i++) {
 			const net = networks[i];
-			const is_assoc = (net.getBSSID() != '00:00:00:00:00:00' && net.getChannel() && !net.isDisabled());
-			const quality = net.getSignalPercent();
+			const assocCount = net.assoclist?.length || 0;
+			const is_assoc = isDisplayAssociated(net, assocCount);
+			const quality = getDisplaySignalPercent(net, is_assoc);
+			const signalValue = getDisplaySignalValue(net, is_assoc, this.iwinfoInfoMap);
+			const noiseValue = getDisplayNoiseValue(net, is_assoc, this.iwinfoInfoMap);
+			const bssid = getDisplayBSSID(net);
+			const encryption = getDisplayEncryption(net);
 
 			let icon;
 			if (net.isDisabled())
@@ -149,12 +757,16 @@ return baseclass.extend({
 
 			const badge = renderBadge(
 				icon,
-				'%s: %d dBm / %s: %d%%'.format(_('Signal'), net.getSignal(), _('Quality'), quality),
+				(signalValue != null && noiseValue != null)
+					? '%s: %d dBm / %s: %d dBm / %s: %d%%'.format(_('Signal'), signalValue, _('Noise'), noiseValue, _('Quality'), quality)
+					: (signalValue != null)
+						? '%s: %d dBm / %s: %d%%'.format(_('Signal'), signalValue, _('Quality'), quality)
+						: '%s: %d%%'.format(_('Quality'), quality),
 				_('SSID'), net.getActiveSSID() || '?',
 				_('Mode'), net.getActiveMode(),
-				_('BSSID'), is_assoc ? (net.getActiveBSSID() || '-') : null,
-				_('Encryption'), is_assoc ? net.getActiveEncryption() : null,
-				_('Associations'), is_assoc ? (net.assoclist.length || '-') : null,
+				_('BSSID'), is_assoc ? (bssid || '-') : null,
+				_('Encryption'), is_assoc ? encryption : null,
+				_('Associations'), is_assoc ? (assocCount || '-') : null,
 				null, is_assoc ? null : E('em', net.isDisabled() ? _('Wireless is disabled') : _('Wireless is not associated')),
 				_('WPS status'), this.WPSTranslateTbl[net.wps_status],
 				'', WPS_button
@@ -162,12 +774,12 @@ return baseclass.extend({
 
 			badges.push(badge);
 
-			chan = (chan != null) ? chan : net.getChannel();
-			coco = (coco != null) ? coco : net.getCountryCode();
-			freq = (freq != null) ? freq : net.getFrequency();
-			rate = (rate != null) ? rate : net.getBitRate();
-			noise = (noise != null) ? noise : net.getNoise();
-			tx_power = (tx_power != null) ? tx_power : net.getTXPower();
+			chan = (chan != null) ? chan : getDisplayChannel(net);
+			coco = (coco != null) ? coco : getDisplayCountryCode(net, this.iwinfoInfoMap, this.phyCountryMap, this.ifacePhyMap);
+			freq = (freq != null) ? freq : getDisplayFrequency(net, chan, this.iwinfoInfoMap);
+			rate = (rate != null) ? rate : getDisplayBitRate(net, this.iwinfoInfoMap);
+			noise = (noise != null) ? noise : getDisplayNoise(net, this.iwinfoInfoMap);
+			tx_power = (tx_power != null) ? tx_power : getDisplayTXPower(net, this.iwinfoInfoMap);
 		}
 
 		return E('div', { class: 'ifacebox' }, [
@@ -175,7 +787,7 @@ return baseclass.extend({
 				E('strong', radio.getName())),
 			E('div', { class: 'ifacebox-body left' }, [
 				L.itemlist(E('span'), [
-					_('Type'), radio.getI18n().replace(/^Generic | Wireless Controller .+$/g, ''),
+					_('Type'), getRadioDisplayType(radio, this.iwinfoInfoMap),
 					_('Bitrate'), rate ? '%d %s'.format(rate, _('Mbit/s')) : null,
 					_('Channel'), chan ? '%d (%.3f %s)'.format(chan, freq, _('GHz')) : null,
 					_('Country Code'), coco ? '%s'.format(coco) : null,
@@ -204,7 +816,7 @@ return baseclass.extend({
 			const hasWPS = L.hasSystemFeature('hostapd', 'wps');
 
 			for (let i = 0; i < radios_networks_hints.length; i++) {
-				tasks.push(L.resolveDefault(radios_networks_hints[i].getAssocList(), []).then(L.bind((net, list) => {
+				tasks.push(this.getAssocListForNetwork(radios_networks_hints[i]).then(L.bind((net, list) => {
 					net.assoclist = list.sort((a, b) => { return a.mac > b.mac });
 				}, this, radios_networks_hints[i])));
 
@@ -216,6 +828,15 @@ return baseclass.extend({
 					}, this, radios_networks_hints[i])));
 				}
 			}
+
+			tasks.push(this.loadIwinfoInfoMap(data[0], data[1]).then(L.bind((map) => {
+				this.iwinfoInfoMap = map;
+			}, this)));
+
+			tasks.push(this.loadIwRuntimeMaps().then(L.bind((maps) => {
+				this.ifacePhyMap = maps.ifacePhyMap || {};
+				this.phyCountryMap = maps.phyCountryMap || {};
+			}, this)));
 
 			return Promise.all(tasks).then(() => {
 				return data;
