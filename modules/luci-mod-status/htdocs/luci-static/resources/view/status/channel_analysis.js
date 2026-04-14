@@ -3,9 +3,331 @@
 'require poll';
 'require request';
 'require network';
+'require fs';
 'require ui';
 'require rpc';
 'require tools.prng as random';
+
+function parseIwDevMap(stdout) {
+	const byPhy = {};
+	let currentPhy = null;
+
+	for (const rawLine of String(stdout || '').split(/\n/)) {
+		const phyMatch = rawLine.match(/^\s*phy#(\d+)\s*$/);
+		const ifMatch = rawLine.match(/^\s*Interface\s+(\S+)\s*$/);
+
+		if (phyMatch) {
+			currentPhy = `phy${phyMatch[1]}`;
+			byPhy[currentPhy] ??= [];
+			continue;
+		}
+
+		if (currentPhy && ifMatch)
+			byPhy[currentPhy].push(ifMatch[1]);
+	}
+
+	return Object.entries(byPhy).reduce((map, entry) => {
+		const phy = entry[0];
+		const ifaces = entry[1];
+		const preferred = ifaces.find((ifname) => !/^wifi\d+$/.test(ifname)) || ifaces[0];
+		const temp = `tmpsta${phy.replace(/^phy/, '')}`;
+
+		ifaces.forEach((ifname) => {
+			map[ifname] = {
+				phy: phy,
+				preferred: preferred,
+				temp: temp
+			};
+		});
+
+		return map;
+	}, {});
+}
+
+function decodeIwSSID(raw) {
+	const value = String(raw || '');
+	const bytes = [];
+	let hasEscapes = false;
+	let hasWideChars = false;
+
+	if (value === '')
+		return null;
+
+	for (let i = 0; i < value.length;) {
+		if (value[i] == '\\' && value[i + 1] == 'x' && i + 3 < value.length) {
+			const hex = value.substr(i + 2, 2);
+			const byte = parseInt(hex, 16);
+
+			if (!isNaN(byte)) {
+				bytes.push(byte);
+				i += 4;
+				hasEscapes = true;
+				continue;
+			}
+		}
+
+		const code = value.charCodeAt(i++);
+
+		if (code > 0xff) {
+			hasWideChars = true;
+			continue;
+		}
+
+		if (code !== 0)
+			bytes.push(code & 0xff);
+	}
+
+	if (hasWideChars)
+		return value.replace(/\u0000+/g, '').trim() || null;
+
+	if (!bytes.length)
+		return null;
+
+	try {
+		if ((hasEscapes || bytes.some((byte) => byte >= 0x80)) && typeof(TextDecoder) == 'function')
+			return new TextDecoder('utf-8', { fatal: false }).decode(new Uint8Array(bytes)).trim() || null;
+	}
+	catch (e) {
+	}
+
+	return String.fromCharCode.apply(null, bytes).replace(/\u0000+/g, '').trim() || null;
+}
+
+function frequencyToChannel(freq) {
+	freq = +freq;
+
+	if (isNaN(freq) || freq <= 0)
+		return null;
+	if (freq == 2484)
+		return 14;
+	if (freq >= 2412 && freq <= 2472)
+		return Math.round((freq - 2407) / 5);
+	if (freq >= 5000 && freq <= 5895)
+		return Math.round((freq - 5000) / 5);
+	if (freq >= 5955 && freq <= 7115)
+		return Math.round((freq - 5950) / 5);
+
+	return null;
+}
+
+function deriveBand(res) {
+	const freq = +res.mhz;
+	const channel = +res.channel;
+
+	if (!isNaN(freq) && freq >= 5955)
+		return 6;
+	if (!isNaN(freq) && freq >= 5000)
+		return 5;
+	if (!isNaN(freq) && freq >= 2400)
+		return 2;
+	if (!isNaN(channel) && channel >= 36)
+		return 5;
+	if (!isNaN(channel) && channel >= 1 && channel <= 14)
+		return 2;
+
+	return null;
+}
+
+function normalizeScanResult(res) {
+	const out = Object.assign({}, res);
+
+	out.ssid = decodeIwSSID(out.ssid);
+	out.channel = +out.channel || frequencyToChannel(out.mhz);
+	out.mhz = +out.mhz || null;
+	out.band = deriveBand(out);
+	out.mode = out.mode || 'Master';
+
+	return out;
+}
+
+function parseChannelWidth(widthText) {
+	const value = String(widthText || '');
+
+	if (/80\+80/i.test(value))
+		return 8080;
+	if (/160/i.test(value))
+		return 160;
+	if (/80/i.test(value))
+		return 80;
+	if (/20 or 40/i.test(value))
+		return 40;
+
+	return 20;
+}
+
+function parseIwScan(stdout) {
+	const results = [];
+	const lines = String(stdout || '').split(/\n/);
+	let current = null;
+	let section = null;
+
+	function finishCurrent() {
+		if (!current?.bssid || current.signal == null)
+			return;
+
+		results.push(normalizeScanResult(current));
+	}
+
+	for (const rawLine of lines) {
+		const line = rawLine.trim();
+		const bssMatch = line.match(/^BSS\s+([0-9a-f:]{17})\b/i);
+
+		if (bssMatch) {
+			finishCurrent();
+			current = {
+				bssid: bssMatch[1].toUpperCase(),
+				mode: 'Master'
+			};
+			section = null;
+			continue;
+		}
+
+		if (!current || line === '')
+			continue;
+
+		const freqMatch = line.match(/^freq:\s*(\d+)/i);
+		if (freqMatch) {
+			current.mhz = +freqMatch[1];
+			if (current.channel == null)
+				current.channel = frequencyToChannel(current.mhz);
+			continue;
+		}
+
+		const signalMatch = line.match(/^signal:\s*(-?\d+(?:\.\d+)?)\s*dBm/i);
+		if (signalMatch) {
+			current.signal = Math.round(parseFloat(signalMatch[1]));
+			continue;
+		}
+
+		const ssidMatch = line.match(/^SSID:\s*(.*)$/);
+		if (ssidMatch) {
+			current.ssid = decodeIwSSID(ssidMatch[1]);
+			continue;
+		}
+
+		const capabilityMatch = line.match(/^capability:\s*([A-Z-]+)/i);
+		if (capabilityMatch) {
+			if (/IBSS/i.test(capabilityMatch[1]))
+				current.mode = 'Ad-Hoc';
+			else if (/ESS/i.test(capabilityMatch[1]))
+				current.mode = 'Master';
+			continue;
+		}
+
+		if (/^HT operation:/i.test(line)) {
+			current.ht_operation ??= {};
+			section = 'ht';
+			continue;
+		}
+
+		if (/^VHT operation:/i.test(line)) {
+			current.vht_operation ??= {};
+			section = 'vht';
+			continue;
+		}
+
+		if (/^HE operation:/i.test(line)) {
+			current.he_operation ??= {};
+			section = 'he';
+			continue;
+		}
+
+		if (/^EHT operation:/i.test(line)) {
+			current.eht_operation ??= {};
+			section = 'eht';
+			continue;
+		}
+
+		if (section == 'ht') {
+			const primaryMatch = line.match(/primary channel:\s*(\d+)/i);
+			const offsetMatch = line.match(/secondary channel offset:\s*(below|above|no secondary)/i);
+			const widthMatch = line.match(/STA channel width:\s*(20 MHz|any)/i);
+
+			if (primaryMatch) {
+				current.channel = +primaryMatch[1];
+				continue;
+			}
+
+			if (offsetMatch) {
+				current.ht_operation.secondary_channel_offset = offsetMatch[1] == 'no secondary' ? 'none' : offsetMatch[1];
+				if (offsetMatch[1] == 'above' || offsetMatch[1] == 'below')
+					current.ht_operation.channel_width = 2040;
+				continue;
+			}
+
+			if (widthMatch && widthMatch[1] == '20 MHz')
+				current.ht_operation.channel_width = 20;
+		}
+		else if (section == 'vht') {
+			const widthMatch = line.match(/channel width:\s*([0-9]+)\s*\(([^)]+)\)/i);
+			const center1Match = line.match(/center freq segment 1:\s*(\d+)/i);
+			const center2Match = line.match(/center freq segment 2:\s*(\d+)/i);
+
+			if (widthMatch) {
+				current.vht_operation.channel_width = parseChannelWidth(widthMatch[2]);
+				continue;
+			}
+
+			if (center1Match) {
+				current.vht_operation.center_freq_1 = +center1Match[1];
+				continue;
+			}
+
+			if (center2Match) {
+				current.vht_operation.center_freq_2 = +center2Match[1];
+				continue;
+			}
+		}
+		else if (section == 'he') {
+			const widthMatch = line.match(/channel width:\s*(20|40|80|160|320)\s*MHz/i);
+			const center1Match = line.match(/center freq segment 1:\s*(\d+)/i);
+			const center2Match = line.match(/center freq segment 2:\s*(\d+)/i);
+
+			if (widthMatch) {
+				current.he_operation.channel_width = +widthMatch[1];
+				continue;
+			}
+
+			if (center1Match) {
+				current.he_operation.center_freq_1 = +center1Match[1];
+				continue;
+			}
+
+			if (center2Match) {
+				current.he_operation.center_freq_2 = +center2Match[1];
+				continue;
+			}
+		}
+		else if (section == 'eht') {
+			const widthMatch = line.match(/channel width:\s*(320)\s*MHz/i);
+			const center2Match = line.match(/center freq segment 2:\s*(\d+)/i);
+
+			if (widthMatch) {
+				current.eht_operation.channel_width = +widthMatch[1];
+				continue;
+			}
+
+			if (center2Match)
+				current.eht_operation.center_freq_2 = +center2Match[1];
+		}
+	}
+
+	finishCurrent();
+
+	return results;
+}
+
+function getSignalPercent(res) {
+	const qv = +res.quality;
+	const qm = +res.quality_max;
+
+	if (qv > 0 && qm > 0)
+		return Math.floor((100 / qm) * qv);
+	if (res.signal != null)
+		return Math.max(0, Math.min(100, Math.round(((+res.signal) + 110) / 70 * 100)));
+
+	return 0;
+}
 
 return view.extend({
 	callFrequencyList: rpc.declare({
@@ -15,12 +337,114 @@ return view.extend({
 		expect: { results: [] }
 	}),
 
-	callInfo: rpc.declare({
-		object: 'iwinfo',
-		method: 'info',
-		params: [ 'device' ],
-		expect: { }
+	callNetworkDevices: rpc.declare({
+		object: 'luci-rpc',
+		method: 'getNetworkDevices',
+		expect: { devices: [] }
 	}),
+
+	cachedNetworkDevices: null,
+	cachedNetworkDevicesPromise: null,
+
+	scanViaIw(scanIfname) {
+		const attempts = [
+			[ 'dev', scanIfname, 'scan' ],
+			[ 'dev', scanIfname, 'scan', 'ap-force' ],
+			[ 'dev', scanIfname, 'scan', 'dump' ]
+		];
+		let index = 0;
+
+		const tryNext = () => {
+			if (index >= attempts.length)
+				return [];
+
+			return L.resolveDefault(fs.exec('/usr/sbin/iw', attempts[index++]), null).then((res) => {
+				const parsed = parseIwScan(res?.stdout);
+
+				if (parsed.length)
+					return parsed;
+
+				return tryNext();
+			}).catch(() => tryNext());
+		};
+
+		return tryNext();
+	},
+
+	cleanupTemporaryScanIface(tempIfname) {
+		return L.resolveDefault(fs.exec('/usr/sbin/ip', [ 'link', 'set', tempIfname, 'down' ]), null)
+			.then(() => L.resolveDefault(fs.exec('/usr/sbin/iw', [ 'dev', tempIfname, 'del' ]), null));
+	},
+
+	scanViaTemporaryIface(phy, tempIfname) {
+		return this.cleanupTemporaryScanIface(tempIfname)
+			.then(() => fs.exec('/usr/sbin/iw', [ 'phy', phy, 'interface', 'add', tempIfname, 'type', 'station' ]))
+			.then(() => fs.exec('/usr/sbin/ip', [ 'link', 'set', tempIfname, 'up' ]))
+			.then(() => this.scanViaIw(tempIfname))
+			.finally(L.bind(this.cleanupTemporaryScanIface, this, tempIfname));
+	},
+
+	loadNetworkDevices(forceReload) {
+		if (forceReload) {
+			this.cachedNetworkDevices = null;
+			this.cachedNetworkDevicesPromise = null;
+		}
+
+		if (this.cachedNetworkDevices)
+			return Promise.resolve(this.cachedNetworkDevices);
+
+		if (this.cachedNetworkDevicesPromise)
+			return this.cachedNetworkDevicesPromise;
+
+		this.cachedNetworkDevicesPromise = this.callNetworkDevices().then((devices) => {
+			this.cachedNetworkDevices = devices || [];
+			this.cachedNetworkDevicesPromise = null;
+
+			return this.cachedNetworkDevices;
+		}).catch((err) => {
+			this.cachedNetworkDevicesPromise = null;
+			throw err;
+		});
+
+		return this.cachedNetworkDevicesPromise;
+	},
+
+	resolveScanDevice(radioDev, forceReload) {
+		return this.loadNetworkDevices(forceReload).then((devices) => {
+			const apDevice = devices.find((dev) => dev.wireless &&
+				dev.wireless.radio == radioDev.getName() &&
+				dev.type !== 'wifi' &&
+				dev.type !== 'radio');
+
+			return apDevice?.device || radioDev.getName();
+		});
+	},
+
+	getScanResultsForRadio(radioDev) {
+		return this.resolveScanDevice(radioDev).then((scanIfname) => {
+			const iwDev = this.iwDevMap?.[scanIfname] || this.iwDevMap?.[radioDev.getName()];
+			const scanTasks = [];
+
+			if (iwDev?.phy)
+				scanTasks.push(() => this.scanViaTemporaryIface(iwDev.phy, iwDev.temp));
+
+			scanTasks.push(() => this.scanViaIw(scanIfname));
+
+			const tryNext = (index) => {
+				if (index >= scanTasks.length)
+					return [];
+
+				return Promise.resolve(scanTasks[index]()).then((results) => {
+					if (Array.isArray(results) && results.length)
+						return results;
+
+					return tryNext(index + 1);
+				}).catch(() => tryNext(index + 1));
+			};
+
+			return tryNext(0);
+		});
+	},
 
 	render_signal_badge(signalPercent, signalValue) {
 		let icon, title, value;
@@ -189,7 +613,7 @@ return view.extend({
 		chan_analysis.tab.addEventListener('cbi-tab-active', L.bind(function(ev) {
 			this.active_tab = ev.detail.tab;
 			if (!this.radios[this.active_tab].loadedOnce)
-				poll.start();
+				this.handleScanRefresh();
 		}, this));
 	},
 
@@ -200,10 +624,7 @@ return view.extend({
 		const radio = this.radios[this.active_tab];
 		let q;
 
-		return Promise.all([
-			radio.dev.getScanList(),
-			this.callInfo(radio.dev.getName())
-		]).then(L.bind(function([results, local_wifi]) {
+		return this.getScanResultsForRadio(radio.dev).then(L.bind(function(results) {
 			const table = radio.table;
 			const chan_analysis = radio.graph;
 			const scanCache = radio.scanCache;
@@ -219,63 +640,33 @@ return view.extend({
 				scanCache[res.bssid].data.stale = false;
 			}
 
-			if (band + 'g' == radio.dev.get('band')) {
-				if (scanCache[local_wifi.bssid] == null)
-					scanCache[local_wifi.bssid] = {};
-
-				scanCache[local_wifi.bssid].data = local_wifi;
-
-				if (chan_analysis.offset_tbl[local_wifi.channel] != null && local_wifi.center_chan1) {
-					const center_channels = [local_wifi.center_chan1];
-					const chan_width_text = local_wifi.htmode.replace(/[EV]*H[TE]/,''); /* Handle HT VHT HE EHT */
-					let chan_width = parseInt(chan_width_text)/10;
-
-					if (local_wifi.center_chan2) {
-						center_channels.push(local_wifi.center_chan2);
-						chan_width = 8;
-					}
-
-					local_wifi.signal = -10;
-					local_wifi.ssid = 'Local Interface';
-
-					this.add_wifi_to_graph(chan_analysis, local_wifi, scanCache, center_channels, chan_width);
-					rows.push([
-						this.render_signal_badge(q, local_wifi.signal),
-						[
-							E('span', { 'style': 'color:'+scanCache[local_wifi.bssid].color }, '⬤ '),
-							local_wifi.ssid
-						],
-						'%d'.format(local_wifi.channel),
-						'%h MHz'.format(chan_width_text),
-						'%h'.format(local_wifi.mode),
-						'%h'.format(local_wifi.bssid)
-					]);
-				}
-			}
-
 			for (let k in scanCache)
 				if (scanCache[k].data.stale)
 					results.push(scanCache[k].data);
 
 			results.sort(function(a, b) {
-				if (a.channel - b.channel)
+				const channelDiff = (+a.channel || 0) - (+b.channel || 0);
+				const ssidA = a.ssid || '';
+				const ssidB = b.ssid || '';
+				const bssidA = a.bssid || '';
+				const bssidB = b.bssid || '';
+
+				if (channelDiff)
+					return channelDiff;
+				if (ssidA < ssidB)
+					return -1;
+				if (ssidA > ssidB)
+					return 1;
+				if (bssidA < bssidB)
+					return -1;
+				if (bssidA > bssidB)
 					return 1;
 
-				if (a.ssid < b.ssid)
-					return -1;
-				else if (a.ssid > b.ssid)
-					return 1;
-
-				if (a.bssid < b.bssid)
-					return -1;
-				else if (a.bssid > b.bssid)
-					return 1;
+				return 0;
 			});
 
 			for (let res of results) {
-				const qv = res.quality || 0;
-				const qm = res.quality_max || 0;
-				q = (qv > 0 && qm > 0) ? Math.floor((100 / qm) * qv) : 0;
+				q = getSignalPercent(res);
 				const s = res.stale ? 'opacity:0.5' : '';
 				const center_channels = [res.channel];
 				let chan_width = 2;
@@ -406,6 +797,7 @@ return view.extend({
 	load() {
 		return Promise.all([
 			this.loadSVG(L.resource('svg/channel_analysis.svg')),
+			L.resolveDefault(fs.exec('/usr/sbin/iw', [ 'dev' ]), null),
 			network.getWifiDevices().then(L.bind(function(data) {
 				const tasks = [], ret = [];
 
@@ -420,7 +812,11 @@ return view.extend({
 
 				return Promise.all(tasks).then(function() { return ret; })
 			}, this))
-		]);
+		]).then((data) => {
+			this.iwDevMap = parseIwDevMap(data[1]?.stdout);
+
+			return [ data[0], data[2] ];
+		});
 	},
 
 	render([svg, wifiDevs]) {
@@ -444,8 +840,10 @@ return view.extend({
 
 			/* Split FrequencyList in Bands */
 			wifiDevs[ifname].freq.forEach(function(freq) {
-				if (bands[freq.band])
-					bands[freq.band].channels.push(freq.channel);
+				const band = deriveBand(freq);
+
+				if (bands[band])
+					bands[band].channels.push(freq.channel);
 			});
 
 			for (let band in bands) {
@@ -491,8 +889,14 @@ return view.extend({
 
 		ui.tabs.initTabGroup(tabs.firstElementChild.childNodes);
 
+		const activePane = Array.from(tabs.firstElementChild.childNodes).find((pane) => pane.getAttribute('data-tab-active') == 'true');
+		this.active_tab = activePane?.getAttribute('data-tab') || null;
+
 		this.pollFn = L.bind(this.handleScanRefresh, this);
 		poll.add(this.pollFn);
+
+		if (this.active_tab)
+			poll.start();
 
 		return E('div', {}, [h2, tabs]);
 	},

@@ -2134,15 +2134,35 @@ body.modal-overlay-active #modal_overlay .modal.cbi-modal .cbi-section-node-tabb
 	color: var(--model_text_color);
 }
 
-.modal ul {
+.modal > ul,
+.modal > ol {
 	margin-left: 2.2em;
 	word-break: break-word;
 	color: var(--model_text_color);
 }
 
-.modal li {
+.modal > ul > li,
+.modal > ol > li {
 	list-style-type: square;
 	color: var(--model_text_color);
+}
+
+/* Keep LuCI widget lists in modals under JS control instead of generic modal list styling. */
+.modal .cbi-tabmenu,
+.modal .cbi-dropdown > ul,
+.modal .cbi-dropdown > ul.preview,
+.modal .cbi-dropdown[open] > ul.dropdown {
+	margin-left: 0 !important;
+	padding-left: 0 !important;
+	list-style: none !important;
+	color: inherit;
+}
+
+.modal .cbi-tabmenu > li,
+.modal .cbi-dropdown > ul > li,
+.modal .cbi-dropdown[open] > ul.dropdown > li {
+	list-style: none !important;
+	color: inherit;
 }
 
 .modal p {
