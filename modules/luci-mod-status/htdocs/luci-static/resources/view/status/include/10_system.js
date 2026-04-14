@@ -1,8 +1,6 @@
 'use strict';
 'require baseclass';
-'require fs';
 'require rpc';
-'require uci';
 
 var callGetUnixtime = rpc.declare({
 	object: 'luci',
@@ -40,11 +38,6 @@ var callCPUUsage = rpc.declare({
 	method: 'getCPUUsage'
 });
 
-var callTempInfo = rpc.declare({
-	object: 'luci',
-	method: 'getTempInfo'
-});
-
 return baseclass.extend({
 	title: _('System'),
 
@@ -55,10 +48,8 @@ return baseclass.extend({
 			L.resolveDefault(callCPUBench(), {}),
 			L.resolveDefault(callCPUInfo(), {}),
 			L.resolveDefault(callCPUUsage(), {}),
-			L.resolveDefault(callTempInfo(), {}),
 			L.resolveDefault(callLuciVersion(), { revision: _('unknown version'), branch: 'LuCI' }),
-			L.resolveDefault(callGetUnixtime(), 0),
-			uci.load('system')
+			L.resolveDefault(callGetUnixtime(), 0)
 		]);
 	},
 
@@ -68,25 +59,19 @@ return baseclass.extend({
 		    cpubench    = data[2],
 		    cpuinfo     = data[3],
 		    cpuusage    = data[4],
-		    tempinfo    = data[5],
-		    luciversion = data[6],
-		    unixtime    = data[7];
+		    luciversion = data[5],
+		    unixtime    = data[6];
 
 		luciversion = luciversion.branch + ' ' + luciversion.revision;
 
 		var datestr = null;
 
 		if (unixtime) {
-			var date = new Date(unixtime * 1000),
-				zn = uci.get('system', '@system[0]', 'zonename')?.replaceAll(' ', '_') || 'UTC',
-				ts = uci.get('system', '@system[0]', 'clock_timestyle') || 0,
-				hc = uci.get('system', '@system[0]', 'clock_hourcycle') || 0;
+			var date = new Date(unixtime * 1000);
 
 			datestr = new Intl.DateTimeFormat(undefined, {
 				dateStyle: 'medium',
-				timeStyle: (ts == 0) ? 'long' : 'full',
-				hourCycle: (hc == 0) ? undefined : hc,
-				timeZone: zn
+				timeStyle: 'long'
 			}).format(date);
 		}
 
@@ -106,11 +91,6 @@ return baseclass.extend({
 			) : null,
 			_('CPU usage (%)'),    cpuusage.cpuusage
 		];
-
-		if (tempinfo.tempinfo) {
-			fields.splice(6, 0, _('Temperature'));
-			fields.splice(7, 0, tempinfo.tempinfo);
-		}
 
 		var table = E('table', { 'class': 'table' });
 

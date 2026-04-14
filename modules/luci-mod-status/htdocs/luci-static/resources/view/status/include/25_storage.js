@@ -2,24 +2,11 @@
 'require baseclass';
 'require rpc';
 
-var callSystemInfo = rpc.declare({
-	object: 'system',
-	method: 'info'
-});
-
 var callMountPoints = rpc.declare({
 	object: 'luci',
 	method: 'getMountPoints',
 	expect: { result: [] }
 });
-
-var MountSkipList = [
-	"/rom",
-	"/tmp",
-	"/dev",
-	"/overlay",
-	"/",
-]
 
 function progressbar(value, max, byte) {
 	var vn = parseInt(value) || 0,
@@ -39,48 +26,40 @@ return baseclass.extend({
 
 	load: function() {
 		return Promise.all([
-			L.resolveDefault(callSystemInfo(), {}),
 			L.resolveDefault(callMountPoints(), {}),
 		]);
 	},
 
 	render: function(data) {
-		var systeminfo = data[0],
-		    mounts = data[1],
-		    root = L.isObject(systeminfo.root) ? systeminfo.root : {},
-		    tmp = L.isObject(systeminfo.tmp) ? systeminfo.tmp : {};
-
-		const existenceChk = function(fields, name, values) {
-			if (!fields.hasOwnProperty(name))
-				fields[name] = values;
-		};
-
-		var fields = {};
-		existenceChk(fields, _('Disk space'), { used: root.used * 1024, size: root.total * 1024 });
-		existenceChk(fields, _('Temp space'), { used: tmp.used * 1024, size: tmp.total * 1024 });
+		var mounts = data[0],
+		    overlay = null;
 
 		for (var i = 0; i < mounts.length; i++) {
-			var entry = mounts[i];
+			if (mounts[i].mount == '/overlay') {
+				overlay = mounts[i];
+				break;
+			}
+		}
 
-			if (MountSkipList.includes(entry.mount))
-				continue;
-
-			var name = entry.device + ' (' + entry.mount +')',
-			    used = entry.size - entry.free;
-
-			existenceChk(fields, name, { used: used, size: entry.size });
+		if (!overlay) {
+			for (var j = 0; j < mounts.length; j++) {
+				if (mounts[j].mount == '/') {
+					overlay = mounts[j];
+					break;
+				}
+			}
 		}
 
 		var table = E('table', { 'class': 'table' });
 
-		Object.keys(fields).forEach(function(key) {
+		if (overlay) {
 			table.appendChild(E('tr', { 'class': 'tr' }, [
-				E('td', { 'class': 'td left', 'width': '33%' }, [ key ]),
+				E('td', { 'class': 'td left', 'width': '33%' }, [ overlay.mount ]),
 				E('td', { 'class': 'td left' }, [
-					(fields[key].used != null) ? progressbar(fields[key].used, fields[key].size, true) : '?'
+					progressbar(overlay.size - overlay.free, overlay.size, true)
 				])
 			]));
-		});
+		}
 
 		return table;
 	}

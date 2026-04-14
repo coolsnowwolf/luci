@@ -725,17 +725,25 @@ const methods = {
 
 	getCPUUsage: {
 		call: function() {
-			const fd = popen('top -n1 | awk \'/^CPU/ {printf("%d%", 100 - $8)}\'');
-			if (fd) {
-				let cpuusage = fd.read('all');
-				if (!cpuusage)
-					cpuusage = '?';
-				fd.close();
+			if (access('/sbin/usage')) {
+				const fd = popen('/sbin/usage');
+				if (fd) {
+					let cpuusage = trim(fd.read('all'));
+					fd.close();
 
-				return { cpuusage: cpuusage };
-			} else {
-				return { cpuusage: error() };
+					if (length(cpuusage))
+						return { cpuusage };
+				}
 			}
+
+			const fd = popen('top -n1 | awk \'/^CPU/ {printf("%d%", 100 - $8)}\'');
+			if (!fd)
+				return { cpuusage: error() };
+
+			let cpuusage = trim(fd.read('all')) || '?';
+			fd.close();
+
+			return { cpuusage };
 		}
 	},
 

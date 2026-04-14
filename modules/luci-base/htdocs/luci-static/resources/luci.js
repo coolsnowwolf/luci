@@ -2618,29 +2618,8 @@
 				preloadClasses = Session.getLocalData('preload');
 
 			if (!Array.isArray(preloadClasses)) {
-				preloadClasses = this.resolveDefault(classes.rpc.declare({
-					object: 'file',
-					method: 'list',
-					params: [ 'path' ],
-					expect: { 'entries': [] }
-				})(this.fspath(this.resource('preload'))), []).then(entries => {
-					const classes = [];
-
-					for (let i = 0; i < entries.length; i++) {
-						if (entries[i].type != 'file')
-							continue;
-
-						const m = entries[i].name.match(/(.+)\.js$/);
-
-						if (m)
-							classes.push('preload.%s'.format(m[1]));
-					}
-
-					Session.setLocalData('preload', classes);
-					preloadClasses = classes;
-
-					return classes;
-				});
+				preloadClasses = [];
+				Session.setLocalData('preload', preloadClasses);
 			}
 
 			return Promise.resolve(preloadClasses);

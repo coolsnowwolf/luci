@@ -1031,20 +1031,46 @@ var CBIWifiFrequencyValue = form.Value.extend({
 		expect: { results: [] }
 	}),
 
+	callDeviceInfo: rpc.declare({
+		object: 'iwinfo',
+		method: 'info',
+		params: [ 'device' ],
+		expect: { }
+	}),
+
+	callWirelessStatus: rpc.declare({
+		object: 'network.wireless',
+		method: 'status',
+		expect: { }
+	}),
+
 	load: function(section_id) {
 		const device_section = this.getDeviceSection(section_id);
 		const hwtype = uci.get('wireless', device_section, 'type');
 		const hwval = uci.get('wireless', device_section, 'hwmode');
 		const htval = uci.get('wireless', device_section, 'htmode');
-		const chval = +uci.get('wireless', device_section, 'channel');
-		const allow_auto = (hwtype == 'mt_dbdc' || uci.get('wireless', device_section, 'channel') == 'auto' || L.hasSystemFeature('hostapd', 'acs'));
+		const cfg_channel = uci.get('wireless', device_section, 'channel');
+		const chval = +cfg_channel;
+		const allow_auto = (hwtype == 'mt_dbdc' || cfg_channel == 'auto' || L.hasSystemFeature('hostapd', 'acs'));
 
 		return Promise.all([
 			network.getWifiDevice(device_section),
-			this.callFrequencyList(device_section)
+			this.callFrequencyList(device_section),
+			this.callDeviceInfo(device_section),
+			L.resolveDefault(this.callWirelessStatus(), {})
 		]).then(L.bind(function(data) {
 			const wifidevs = data[0];
 			const freqlist = data[1];
+			const devinfo = L.isObject(data[2]) ? data[2] : {};
+			const wstatus = L.isObject(data[3]) ? data[3] : {};
+			const statuscfg = L.isObject(wstatus[device_section]?.config) ? wstatus[device_section].config : {};
+			const devcfg = {
+				channel: statuscfg.channel ?? (wifidevs ? wifidevs.ubus('dev', 'config', 'channel') : null),
+				band: statuscfg.band ?? (wifidevs ? wifidevs.ubus('dev', 'config', 'band') : null)
+			};
+
+			this.devinfo = devinfo;
+			this.devcfg = devcfg;
 
 			this.channels = {
 				'2g': allow_auto ? [ 'auto', 'auto', { available: true } ] : [],
@@ -1066,12 +1092,53 @@ var CBIWifiFrequencyValue = form.Value.extend({
 				);
 			}
 
-			const hwmodelist = L.toArray(wifidevs ? wifidevs.getHWModes() : null)
+			if (cfg_channel == 'auto' || devcfg.channel == 'auto') {
+				for (const band of Object.keys(this.channels)) {
+					if (!Array.isArray(this.channels[band]))
+						continue;
+
+					if (this.channels[band][0] != 'auto')
+						this.channels[band].unshift('auto', 'auto', { available: true });
+				}
+			}
+
+			let hwmode_values = L.toArray(wifidevs ? wifidevs.getHWModes() : null);
+			let htmode_values = L.toArray(wifidevs ? wifidevs.getHTModes() : null);
+
+			if (!hwmode_values.length)
+				hwmode_values = L.toArray(devinfo.hwmodes);
+
+			if (!htmode_values.length)
+				htmode_values = L.toArray(devinfo.htmodes);
+
+			if (!hwmode_values.length) {
+				if (/^11be/.test(hwval) || /^EHT/.test(htval))
+					hwmode_values = [ 'be' ];
+				else if (/^11ax/.test(hwval) || /^HE/.test(htval))
+					hwmode_values = [ 'ax' ];
+				else if (/^11ac/.test(hwval) || /^VHT/.test(htval))
+					hwmode_values = [ 'ac' ];
+				else if (/^11n/.test(hwval) || /^HT/.test(htval))
+					hwmode_values = [ 'n' ];
+				else if (/^11a/.test(hwval))
+					hwmode_values = [ 'a' ];
+				else if (/^11b/.test(hwval))
+					hwmode_values = [ 'b' ];
+				else if (/^11g/.test(hwval))
+					hwmode_values = [ 'g' ];
+			}
+
+			if (!htmode_values.length && htval)
+				htmode_values = [ htval ];
+
+			const hwmodelist = hwmode_values
 				.reduce((obj, value) => { obj[value] = true; return obj; }, {});
-			const htmodelist = L.toArray(wifidevs ? wifidevs.getHTModes() : null)
+			const htmodelist = htmode_values
 				.reduce((obj, value) => { obj[value] = true; return obj; }, {});
 
-			const has_ac = hwmodelist.ac && (L.hasSystemFeature('hostapd', '11ac') || htmodelist.VHT20 || htmodelist.VHT40 || htmodelist.VHT80 || htmodelist.VHT160);
+			const has_5g_channels = this.channels['5g'].length > (allow_auto ? 3 : 0);
+			const has_ac = (hwmodelist.ac || ((hwmodelist.ax || hwmodelist.be || /^11ax|^11be/.test(hwval)) && has_5g_channels)) &&
+				(L.hasSystemFeature('hostapd', '11ac') || htmodelist.VHT20 || htmodelist.VHT40 || htmodelist.VHT80 || htmodelist.VHT160);
 			const has_ax = hwmodelist.ax && (L.hasSystemFeature('hostapd', '11ax') || htmodelist.HE20 || htmodelist.HE40 || htmodelist.HE80 || htmodelist.HE160);
 			const has_be = hwmodelist.be && (L.hasSystemFeature('hostapd', '11be') || htmodelist.EHT20 || htmodelist.EHT40 || htmodelist.EHT80 || htmodelist.EHT160 || htmodelist.EHT320);
 
@@ -1217,7 +1284,7 @@ var CBIWifiFrequencyValue = form.Value.extend({
 
 		if (Number.isInteger(vals?.selected)) sel.selectedIndex = vals.selected;
 
-		sel.parentNode.style.display = (sel.options.length <= 1) ? 'none' : '';
+		sel.parentNode.style.display = (sel.options.length <= (sel.classList.contains('band') ? 0 : 1)) ? 'none' : '';
 		sel.vals = vals;
 	},
 
@@ -1266,52 +1333,102 @@ var CBIWifiFrequencyValue = form.Value.extend({
 		this.checkWifiChannelRestriction(elem);
 	},
 
-	setInitialValues: function(section_id, elem) {
+	setInitialValues: function(section_id, elem, cfgvalue) {
 		const mode = elem.querySelector('.mode');
 		const band = elem.querySelector('.band');
 		const chan = elem.querySelector('.channel');
 		const bwdt = elem.querySelector('.htmode');
 		const config_section = this.getDeviceSection(section_id);
 		const hwtype = uci.get('wireless', config_section, 'type');
-		const htval = uci.get('wireless', config_section, 'htmode');
-		const hwval = uci.get('wireless', config_section, 'hwmode');
-		const chval = uci.get('wireless', config_section, 'channel');
-		const bandval = uci.get('wireless', config_section, 'band');
+		const devinfo = L.isObject(this.devinfo) ? this.devinfo : {};
+		const devcfg = L.isObject(this.devcfg) ? this.devcfg : {};
+		const cfgvals = Array.isArray(cfgvalue) ? cfgvalue : null;
+		const cfg_htval = cfgvals ? cfgvals[0] : uci.get('wireless', config_section, 'htmode');
+		const cfg_hwval = uci.get('wireless', config_section, 'hwmode');
+		const cfg_chval = devcfg.channel || (cfgvals ? cfgvals[2] : uci.get('wireless', config_section, 'channel'));
+		const cfg_bandval = devcfg.band || uci.get('wireless', config_section, 'band');
+		const htval = devinfo.htmode || cfg_htval;
+		const hwval = devinfo.hwmode || cfg_hwval;
+		const chval = cfg_chval || devinfo.channel;
+		const bandval = cfg_bandval || getConfiguredBand(hwtype, hwval, chval, null);
+		const setSelectValue = function(sel, value) {
+			if (value == null)
+				return false;
+
+			for (let i = 0; i < sel.options.length; i++) {
+				if (sel.options[i].value == value) {
+					sel.options[i].selected = true;
+					sel.selectedIndex = i;
+					return true;
+				}
+			}
+
+			return false;
+		};
+		const forceSelectValue = function(sel, value) {
+			if (value == null)
+				return false;
+
+			for (let i = 0; i < sel.options.length; i++) {
+				const selected = (sel.options[i].value == value);
+				sel.options[i].selected = selected;
+
+				if (selected) {
+					sel.selectedIndex = i;
+					return true;
+				}
+			}
+
+			return false;
+		};
+		let modeval = '';
 
 		this.setValues(mode, this.modes);
 
 		if (isQcaWifiHwtype(hwtype))
-			mode.value = getConfiguredWirelessMode(hwtype, hwval, htval);
+			modeval = getConfiguredWirelessMode(hwtype, hwval, htval);
 		else if (/EHT20|EHT40|EHT80|EHT160|EHT320/.test(htval))
-			mode.value = 'be';
+			modeval = 'be';
 		else if (/HE20|HE40|HE80|HE160/.test(htval))
-			mode.value = 'ax';
+			modeval = 'ax';
 		else if (/VHT20|VHT40|VHT80|VHT160/.test(htval))
-			mode.value = 'ac';
+			modeval = 'ac';
 		else if (/HT20|HT40/.test(htval))
-			mode.value = 'n';
-		else
-			mode.value = '';
+			modeval = 'n';
 
-		this.toggleWifiMode(elem);
+		if (!setSelectValue(mode, modeval) && !forceSelectValue(mode, modeval) && mode.options.length)
+			mode.selectedIndex = Math.max(0, mode.options.length - 1);
+
+		const active_mode = modeval || mode.value || (mode.selectedIndex >= 0 ? mode.options[mode.selectedIndex].value : '');
+
+		this.setValues(bwdt, this.htmodes[active_mode]);
+		this.setValues(band, this.bands[active_mode]);
 
 		if (isQcaWifiHwtype(hwtype)) {
 			this.useBandOption = true;
-			band.value = getConfiguredBand(hwtype, hwval, chval, bandval);
+			setSelectValue(band, getConfiguredBand(hwtype, hwval, chval, bandval));
 		}
 		else if (hwval != null) {
 			this.useBandOption = false;
-			band.value = /a/.test(hwval) ? '5g': '2g';
+			setSelectValue(band, /a/.test(hwval) ? '5g': '2g');
 		}
 		else {
 			this.useBandOption = true;
-			band.value = bandval;
+			setSelectValue(band, bandval);
 		}
 
 		this.toggleWifiBand(elem);
 
-		bwdt.value = htval;
-		chan.value = chval ?? (chan.options[0] ? chan.options[0].value : 'auto');
+		if (!setSelectValue(bwdt, htval) && bwdt.options.length)
+			bwdt.selectedIndex = Math.max(0, bwdt.options.length - 1);
+
+		const effective_chval = (cfg_chval == 'auto' || devcfg.channel == 'auto') ? 'auto' : chval;
+
+		if (effective_chval == 'auto' && !Array.from(chan.options).some(o => o.value == 'auto'))
+			chan.insertBefore(E('option', { value: 'auto' }, [ 'auto' ]), chan.firstChild);
+
+		if (!setSelectValue(chan, effective_chval) && chan.options.length)
+			chan.selectedIndex = 0;
 
 		this.checkWifiChannelRestriction(elem);
 
@@ -1364,7 +1481,7 @@ var CBIWifiFrequencyValue = form.Value.extend({
 			E('br', { 'style': 'clear:left' })
 		]);
 
-		return this.setInitialValues(section_id, elem);
+		return this.setInitialValues(section_id, elem, cfgvalue);
 	},
 
 	cfgvalue: function(section_id) {
@@ -1933,13 +2050,12 @@ return view.extend({
 				ss.tab('advanced', _('Advanced Settings'));
 				ss.tab('roaming', _('WLAN roaming'), _('Settings for assisting wireless clients in roaming between multiple APs: 802.11r, 802.11k and 802.11v'));
 
-				o = ss.taboption('general', form.ListValue, 'mode', _('Mode') , !have_mesh ? '<a id="installmesh" href="%s" target="_blank" rel="noreferrer">%s</a>'
+				o = ss.taboption('general', form.ListValue, 'mode', _('Mode'),
+					(hwtype == 'mac80211' && !have_mesh) ? '<a id="installmesh" href="%s" target="_blank" rel="noreferrer">%s</a>'
 						.format(L.url('admin/system/package-manager') + '?query=wpad-mesh', _('802.11s? Install mesh wpad') ) : '');
 				if (hwtype == 'mt_dbdc') {
-					if (ifmode == 'ap')
-						o.value('ap', _('Access Point'));
-					else if (ifmode == 'sta')
-						o.value('sta', _('Client'));
+					o.value('ap', _('Access Point'));
+					o.value('sta', _('Client'));
 				}
 				else {
 					o.value('ap', _('Access Point'));
@@ -1973,8 +2089,10 @@ return view.extend({
 				o.depends('mode', 'sta-wds');
 				o.depends('mode', 'wds');
 
-				o = ss.taboption('general', form.Value, 'bssid', _('<abbr title="Basic Service Set Identifier">BSSID</abbr>'));
-				o.datatype = 'macaddr';
+				if (!(hwtype == 'mt_dbdc' && ifmode == 'ap')) {
+					o = ss.taboption('general', form.Value, 'bssid', _('<abbr title="Basic Service Set Identifier">BSSID</abbr>'));
+					o.datatype = 'macaddr';
+				}
 
 				o = ss.taboption('general', widgets.NetworkSelect, 'network', _('Network'), _('Choose the network(s) you want to attach to this wireless interface or fill out the <em>custom</em> field to define a new network.'));
 				o.rmempty = true;
@@ -2024,6 +2142,14 @@ return view.extend({
 						return Promise.all(tasks);
 					}, this));
 				};
+
+				if (hwtype == 'mac80211' || hwtype == 'mt_dbdc') {
+					o = ss.taboption('general', form.Flag, 'hidden', _('Hide <abbr title="Extended Service Set Identifier">ESSID</abbr>'), _('Where the ESSID is hidden, clients may fail to roam and airtime efficiency may be significantly reduced.'));
+					o.depends('mode', 'ap');
+
+					if (hwtype == 'mac80211')
+						o.depends('mode', 'ap-wds');
+				}
 
 				let encr;
 				if (hwtype == 'mac80211') {
@@ -2093,10 +2219,6 @@ return view.extend({
 
 						return mode;
 					};
-
-					o = ss.taboption('general', form.Flag, 'hidden', _('Hide <abbr title="Extended Service Set Identifier">ESSID</abbr>'), _('Where the ESSID is hidden, clients may fail to roam and airtime efficiency may be significantly reduced.'));
-					o.depends('mode', 'ap');
-					o.depends('mode', 'ap-wds');
 
 					o = ss.taboption('general', form.Flag, 'wmm', _('WMM Mode'), _('Where Wi-Fi Multimedia (WMM) Mode QoS is disabled, clients may be limited to 802.11a/802.11g rates.'));
 					o.depends('mode', 'ap');
@@ -3066,6 +3188,51 @@ return view.extend({
 
 					o = ss.taboption('roaming', form.DynamicList, 'r1kh', _('External R1 Key Holder List'), _('List of R1KHs in the same Mobility Domain. <br />Format: MAC-address,R1KH-ID as 6 octets with colons,128-bit key as hex string. <br />This list is used to map R1KH-ID to a destination MAC address when sending PMK-R1 key from the R0KH. This is also the list of authorized R1KHs in the MD that can request PMK-R1 keys.'));
 					o.depends({ ieee80211r: '1', ft_psk_generate_local: '' });
+					o.rmempty = true;
+				}
+				else if (hwtype == 'mt_dbdc') {
+					const ft_identifier = getFtIdentifier(radioNet);
+
+					o = ss.taboption('advanced', form.Value, 'rssikick', _('Weak signal kick threshold'), _('Disconnect clients when the RSSI falls below this threshold. Units: dBm.'));
+					o.depends('mode', 'ap');
+					o.placeholder = '0';
+					o.datatype = 'range(-100,0)';
+					o.rmempty = true;
+
+					o = ss.taboption('advanced', form.Value, 'rssiassoc', _('Association RSSI threshold'), _('Reject association requests below this threshold. Units: dBm.'));
+					o.depends('mode', 'ap');
+					o.placeholder = '0';
+					o.datatype = 'range(-100,0)';
+					o.rmempty = true;
+
+					o = ss.taboption('roaming', form.Value, 'rssiroaming', _('802.11k/v/r roaming RSSI threshold'), _('Roaming assistance threshold used together with weak signal kick. Units: dBm.'));
+					o.depends('mode', 'ap');
+					o.placeholder = '0';
+					o.datatype = 'range(-100,0)';
+					o.rmempty = true;
+
+					o = ss.taboption('roaming', form.Flag, 'ieee80211k', _('802.11k RRM'), _('Enable radio resource measurements for roaming assistance.'));
+					o.depends('mode', 'ap');
+					o.rmempty = true;
+
+					o = ss.taboption('roaming', form.Flag, 'ieee80211v', _('802.11v BSS Transition'), _('Enable BSS transition management for assisted roaming.'));
+					o.depends('mode', 'ap');
+					o.rmempty = true;
+
+					o = ss.taboption('roaming', form.Flag, 'ieee80211r', _('802.11r Fast Transition'), _('Enable fast roaming among access points that belong to the same mobility domain.'));
+					o.depends('mode', 'ap');
+					o.rmempty = true;
+
+					o = ss.taboption('roaming', form.Value, 'ftmdid', _('Mobility Domain'), _('2-character hexadecimal mobility domain ID used by MTK fast transition.'));
+					o.depends({ mode: 'ap', ieee80211r: '1' });
+					o.placeholder = 'A1';
+					o.datatype = 'and(hexstring,length(2))';
+					o.rmempty = true;
+
+					o = ss.taboption('roaming', form.Value, 'nasid', _('NAS ID'), _('Used for RADIUS NAS ID and 802.11r R0KH-ID.'));
+					o.depends({ mode: 'ap', ieee80211r: '1' });
+					if (ft_identifier)
+						o.placeholder = ft_identifier;
 					o.rmempty = true;
 				}
 

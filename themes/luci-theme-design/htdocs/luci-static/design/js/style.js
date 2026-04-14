@@ -84,6 +84,17 @@
             'vlan_disabled': 'vlan_disabled',
             'wifi': 'wifi',
             'wifi_disabled': 'wifi_disabled',
+            'signal-none': 'signal-none',
+            'signal-0': 'signal-0',
+            'signal-0-25': 'signal-0-25',
+            'signal-25-50': 'signal-25-50',
+            'signal-50-75': 'signal-50-75',
+            'signal-75-100': 'signal-75-100',
+            'signal-000-000': 'signal-0',
+            'signal-000-025': 'signal-0-25',
+            'signal-025-050': 'signal-25-50',
+            'signal-050-075': 'signal-50-75',
+            'signal-075-100': 'signal-75-100',
             'port_up': 'port_up',
             'port_down': 'port_down'
         };
@@ -94,7 +105,7 @@
 
         Array.prototype.forEach.call(view.querySelectorAll('img[src*="/luci-static/resources/icons/"]'), function (img) {
             var src = img.getAttribute('src') || '';
-            var match = src.match(/\/icons\/([^/?#]+)\.png(?:[?#].*)?$/);
+            var match = src.match(/\/icons\/([^/?#]+)\.(?:png|svg)(?:[?#].*)?$/);
             var key = match ? match[1] : '';
             var mapped = iconMap[key];
             var badge = img.closest('.ifacebadge');
@@ -103,14 +114,17 @@
                 return;
             }
 
+            var size = key.indexOf('port_') === 0 ? '18px' :
+                key.indexOf('signal-') === 0 ? '16px' : '20px';
+
             img.setAttribute('src', mediaPath + '/images/' + mapped + '.png');
             img.style.setProperty('background-image', 'none', 'important');
             img.style.setProperty('visibility', 'visible', 'important');
             img.style.setProperty('opacity', '1', 'important');
             img.style.setProperty('display', 'inline-block', 'important');
-            img.style.setProperty('width', key.indexOf('port_') === 0 ? '18px' : '20px', 'important');
-            img.style.setProperty('height', key.indexOf('port_') === 0 ? '18px' : '20px', 'important');
-            img.style.setProperty('min-width', key.indexOf('port_') === 0 ? '18px' : '20px', 'important');
+            img.style.setProperty('width', size, 'important');
+            img.style.setProperty('height', size, 'important');
+            img.style.setProperty('min-width', size, 'important');
             img.style.setProperty('padding', '0', 'important');
             img.style.setProperty('margin', '0 .25rem 0 0', 'important');
             img.style.setProperty('vertical-align', 'middle', 'important');
@@ -272,7 +286,7 @@
 
         Array.prototype.forEach.call(view.querySelectorAll('img[src*="/luci-static/resources/icons/"]'), function (img) {
             var src = img.getAttribute('src') || '';
-            var match = src.match(/\/icons\/([^/?#]+)\.png(?:[?#].*)?$/);
+            var match = src.match(/\/icons\/([^/?#]+)\.(?:png|svg)(?:[?#].*)?$/);
             var key = match ? match[1] : '';
             var mapped = iconMap[key];
 
@@ -312,7 +326,12 @@
             'signal-0-25': 'signal-0-25',
             'signal-25-50': 'signal-25-50',
             'signal-50-75': 'signal-50-75',
-            'signal-75-100': 'signal-75-100'
+            'signal-75-100': 'signal-75-100',
+            'signal-000-000': 'signal-0',
+            'signal-000-025': 'signal-0-25',
+            'signal-025-050': 'signal-25-50',
+            'signal-050-075': 'signal-50-75',
+            'signal-075-100': 'signal-75-100'
         };
 
         if (document.body.getAttribute('data-page') !== 'admin-network-wireless') {
@@ -321,7 +340,7 @@
 
         Array.prototype.forEach.call(document.querySelectorAll('img[src*="/luci-static/resources/icons/"]'), function (img) {
             var src = img.getAttribute('src') || '';
-            var match = src.match(/\/icons\/([^/?#]+)\.png(?:[?#].*)?$/);
+            var match = src.match(/\/icons\/([^/?#]+)\.(?:png|svg)(?:[?#].*)?$/);
             var key = match ? match[1] : '';
             var inAssocList = !!img.closest('#wifi_assoclist_table');
             var mapped = iconMap[key];

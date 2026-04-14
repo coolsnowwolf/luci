@@ -2,7 +2,6 @@
 'require view';
 'require dom';
 'require poll';
-'require fs';
 'require network';
 'require ui';
 
@@ -97,14 +96,23 @@ return view.extend({
 	},
 
 	load: function() {
-		return L.resolveDefault(fs.list('/www' + L.resource('view/status/include')), []).then(function(entries) {
-			return Promise.all(entries.filter(function(e) {
-				return (e.type == 'file' && e.name.match(/\.js$/));
-			}).map(function(e) {
-				return 'view.status.include.' + e.name.replace(/\.js$/, '');
-			}).sort().map(function(n) {
-				return L.require(n);
-			}));
+		var includeModules = [
+			'view.status.include.10_system',
+			'view.status.include.15_ports',
+			'view.status.include.20_memory',
+			'view.status.include.25_storage',
+			'view.status.include.30_network',
+			'view.status.include.40_dhcp',
+			'view.status.include.50_dsl',
+			'view.status.include.60_wifi'
+		];
+
+		return Promise.all(includeModules.map(function(name) {
+			return L.resolveDefault(L.require(name), null);
+		})).then(function(includes) {
+			return includes.filter(function(include) {
+				return include != null;
+			});
 		});
 	},
 

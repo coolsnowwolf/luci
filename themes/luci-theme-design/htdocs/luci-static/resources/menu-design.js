@@ -1,15 +1,7 @@
 'use strict';
 'require baseclass';
-'require fs';
 'require request';
 'require ui';
-
-// 兼容新旧版本 LuCI
-var LuciCompat = {
-	isNewVersion: function() {
-		return L.env.luci_version && parseFloat(L.env.luci_version.split('.')[0]) >= 23;
-	}
-};
 
 return baseclass.extend({
 	__init__: function() {
@@ -40,15 +32,11 @@ return baseclass.extend({
 	},
 
 	getConditionalMenuStamp: function() {
-		return L.resolveDefault(fs.list('/etc/config'), []).then(function(entries) {
-			var googleFuMode = entries.some(function(entry) {
-				return entry && entry.name === 'google_fu_mode';
-			});
+		var googleFuMode = !!document.querySelector('.navbar a[href*="/admin/services/openclash"]');
 
-			return JSON.stringify({
-				google_fu_mode: googleFuMode
-			});
-		});
+		return Promise.resolve(JSON.stringify({
+			google_fu_mode: googleFuMode
+		}));
 	},
 
 	flushBackendMenuCache: function() {

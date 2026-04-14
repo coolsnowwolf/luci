@@ -7,7 +7,8 @@
 
 const scope = this;
 
-uci.loadPackage('luci').catch();
+if (L.env.sessionid)
+	uci.loadPackage('luci').catch();
 
 const callSessionAccess = rpc.declare({
 	object: 'session',
