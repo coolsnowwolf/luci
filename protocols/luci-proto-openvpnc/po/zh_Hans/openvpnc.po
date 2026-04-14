@@ -1,0 +1,105 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Project-Id-Version: PACKAGE VERSION\n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: none\n"
+"Language: zh_Hans\n"
+"MIME-Version: 1.0\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: htdocs/luci-static/resources/protocol/openvpnc.js:22
+msgid "OpenVPN Client"
+msgstr "OpenVPN 客户端"
+
+#: htdocs/luci-static/resources/protocol/openvpnc.js:49
+msgid "OpenVPN configuration"
+msgstr "OpenVPN 配置文件"
+
+#: htdocs/luci-static/resources/protocol/openvpnc.js:50
+msgid "Upload or choose the client profile stored under %s. Only .ovpn files are accepted."
+msgstr "上传或选择保存在 %s 下的客户端配置文件，仅接受 .ovpn 文件。"
+
+#: htdocs/luci-static/resources/protocol/openvpnc.js:80
+msgid "Please upload or choose an .ovpn file"
+msgstr "请上传或选择一个 .ovpn 文件"
+
+#: htdocs/luci-static/resources/protocol/openvpnc.js:83
+msgid "Selected file must be stored in %s"
+msgstr "所选文件必须保存在 %s 下"
+
+#: htdocs/luci-static/resources/protocol/openvpnc.js:86
+msgid "Selected file must use the .ovpn extension"
+msgstr "所选文件必须使用 .ovpn 扩展名"
+
+#: htdocs/luci-static/resources/protocol/openvpnc.js:91
+msgid "Username"
+msgstr "用户名"
+
+#: htdocs/luci-static/resources/protocol/openvpnc.js:92
+msgid "If the selected profile uses auth-user-pass, a matching .auth file will be generated automatically from these credentials."
+msgstr "如果所选配置使用 auth-user-pass，将根据这里填写的凭据自动生成对应的 .auth 文件。"
+
+#: htdocs/luci-static/resources/protocol/openvpnc.js:96
+msgid "Password"
+msgstr "密码"
+
+#: htdocs/luci-static/resources/protocol/openvpnc.js:100
+msgid "Allow custom DNS servers"
+msgstr "启用自定义 DNS 服务器"
+
+#: htdocs/luci-static/resources/protocol/openvpnc.js:101
+msgid "When enabled, the DNS servers entered below will be added to this interface even if the OpenVPN server does not push any DNS settings."
+msgstr "启用后，即使 OpenVPN 服务端没有下发 DNS 设置，下方填写的 DNS 服务器也会被加入到此接口中。"
+
+#: htdocs/luci-static/resources/protocol/openvpnc.js:106
+msgid "Custom DNS servers"
+msgstr "自定义 DNS 服务器"
+
+#: htdocs/luci-static/resources/protocol/openvpnc.js:107
+msgid "Enter one or more DNS server addresses separated by spaces or commas, for example: 1.1.1.1,8.8.8.8"
+msgstr "输入一个或多个 DNS 服务器地址，使用空格或逗号分隔，例如：1.1.1.1,8.8.8.8"
+
+#: htdocs/luci-static/resources/protocol/openvpnc.js:112
+msgid "Allow extra route networks"
+msgstr "启用附加路由网段"
+
+#: htdocs/luci-static/resources/protocol/openvpnc.js:113
+msgid "When enabled, the custom route networks entered below will be appended after the route networks pushed by the OpenVPN server."
+msgstr "启用后，下方填写的自定义路由网段会追加到 OpenVPN 服务端下发的路由网段之后。"
+
+#: htdocs/luci-static/resources/protocol/openvpnc.js:118
+msgid "Extra route networks"
+msgstr "附加路由网段"
+
+#: htdocs/luci-static/resources/protocol/openvpnc.js:119
+msgid "Enter one or more IPv4 CIDR networks separated by spaces or commas, for example: 10.0.0.0/24,172.16.10.0/24"
+msgstr "输入一个或多个 IPv4 CIDR 网段，使用空格或逗号分隔，例如：10.0.0.0/24,172.16.10.0/24"
+
+#: htdocs/luci-static/resources/protocol/openvpnc.js:124
+msgid "Resolve specific domains via custom DNS"
+msgstr "使用自定义 DNS 解析特定域名"
+
+#: htdocs/luci-static/resources/protocol/openvpnc.js:125
+msgid "When enabled, dnsmasq will forward the domains entered below to the custom DNS servers through the generated ovpnc.conf file in its active conf-dir directory."
+msgstr "启用后，dnsmasq 会在当前生效的 conf-dir 目录中生成 ovpnc.conf，并将下方填写的域名转发到自定义 DNS 服务器。"
+
+#: htdocs/luci-static/resources/protocol/openvpnc.js:131
+msgid "Domains resolved by custom DNS"
+msgstr "由自定义 DNS 解析的域名"
+
+#: htdocs/luci-static/resources/protocol/openvpnc.js:132
+msgid "Enter one or more domains separated by spaces or commas, for example: corp.example.com"
+msgstr "输入一个或多个域名，使用空格或逗号分隔，例如：corp.example.com"
+
+#: htdocs/luci-static/resources/protocol/openvpnc.js:137
+msgid "Authentication file"
+msgstr "认证文件路径"
+
+#: htdocs/luci-static/resources/protocol/openvpnc.js:142
+msgid "Override MTU"
+msgstr "自定义 MTU"
+
+#: htdocs/luci-static/resources/protocol/openvpnc.js:147
+msgid "Stored profile path"
+msgstr "配置文件保存路径"

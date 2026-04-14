@@ -1,0 +1,189 @@
+#!/bin/sh
+
+. /lib/netifd/netifd-proto.sh
+
+[ -n "$OPENVPNC_ID" ] || exit 0
+[ -n "$dev" ] || exit 0
+
+openvpnc_prefix() {
+	case "$1" in
+		255.255.255.255) echo 32 ;;
+		255.255.255.254) echo 31 ;;
+		255.255.255.252) echo 30 ;;
+		255.255.255.248) echo 29 ;;
+		255.255.255.240) echo 28 ;;
+		255.255.255.224) echo 27 ;;
+		255.255.255.192) echo 26 ;;
+		255.255.255.128) echo 25 ;;
+		255.255.255.0) echo 24 ;;
+		255.255.254.0) echo 23 ;;
+		255.255.252.0) echo 22 ;;
+		255.255.248.0) echo 21 ;;
+		255.255.240.0) echo 20 ;;
+		255.255.224.0) echo 19 ;;
+		255.255.192.0) echo 18 ;;
+		255.255.128.0) echo 17 ;;
+		255.255.0.0) echo 16 ;;
+		255.254.0.0) echo 15 ;;
+		255.252.0.0) echo 14 ;;
+		255.248.0.0) echo 13 ;;
+		255.240.0.0) echo 12 ;;
+		255.224.0.0) echo 11 ;;
+		255.192.0.0) echo 10 ;;
+		255.128.0.0) echo 9 ;;
+		255.0.0.0) echo 8 ;;
+		254.0.0.0) echo 7 ;;
+		252.0.0.0) echo 6 ;;
+		248.0.0.0) echo 5 ;;
+		240.0.0.0) echo 4 ;;
+		224.0.0.0) echo 3 ;;
+		192.0.0.0) echo 2 ;;
+		128.0.0.0) echo 1 ;;
+		0.0.0.0) echo 0 ;;
+		*) echo "" ;;
+	esac
+}
+
+openvpnc_getvar() {
+	local name="$1"
+	eval "printf '%s' \"\${$name}\""
+}
+
+openvpnc_ucivalue() {
+	uci -q get "network.${OPENVPNC_ID}.$1"
+}
+
+openvpnc_enabled() {
+	case "$1" in
+		1|on|true|yes|enabled) return 0 ;;
+		*) return 1 ;;
+	esac
+}
+
+openvpnc_words() {
+	printf '%s' "$1" | tr ',\n\t' '   '
+}
+
+openvpnc_cidr_split() {
+	local cidr="$1"
+	local address prefix
+
+	case "$cidr" in
+		*/*)
+			address="${cidr%/*}"
+			prefix="${cidr#*/}"
+			case "$prefix" in
+				''|*[!0-9]*) return 1 ;;
+				*) ;;
+			esac
+			[ "$prefix" -ge 0 ] && [ "$prefix" -le 32 ] || return 1
+			printf '%s %s\n' "$address" "$prefix"
+			return 0
+			;;
+		*)
+			return 1
+			;;
+	esac
+}
+
+openvpnc_add_dns_data() {
+	local index=1
+	local option
+	local value
+	local rest
+
+	while :; do
+		option="$(openvpnc_getvar "foreign_option_$index")"
+		[ -n "$option" ] || break
+
+		case "$option" in
+			"dhcp-option DNS "*)
+				value="${option#dhcp-option DNS }"
+				[ -n "$value" ] && proto_add_dns_server "$value"
+				;;
+			"dhcp-option DOMAIN "*)
+				value="${option#dhcp-option DOMAIN }"
+				[ -n "$value" ] && proto_add_dns_search "$value"
+				;;
+			"dhcp-option DOMAIN-SEARCH "*)
+				rest="${option#dhcp-option DOMAIN-SEARCH }"
+				for value in $rest; do
+					[ -n "$value" ] && proto_add_dns_search "$value"
+				done
+				;;
+		esac
+
+		index=$((index + 1))
+	done
+}
+
+openvpnc_add_custom_dns_data() {
+	local enabled dns_list dns
+
+	enabled="$(openvpnc_ucivalue custom_dns_enable)"
+	openvpnc_enabled "$enabled" || return 0
+
+	dns_list="$(openvpnc_ucivalue custom_dns)"
+	for dns in $(openvpnc_words "$dns_list"); do
+		[ -n "$dns" ] && proto_add_dns_server "$dns"
+	done
+}
+
+openvpnc_add_route_data() {
+	local source_ip="$1"
+	local fallback_gw="$2"
+	local index=1
+	local network
+	local netmask
+	local gateway
+	local prefix
+
+	while :; do
+		network="$(openvpnc_getvar "route_network_$index")"
+		[ -n "$network" ] || break
+
+		netmask="$(openvpnc_getvar "route_netmask_$index")"
+		gateway="$(openvpnc_getvar "route_gateway_$index")"
+		[ -n "$gateway" ] || gateway="$fallback_gw"
+
+		prefix="$(openvpnc_prefix "$netmask")"
+		[ -n "$prefix" ] || prefix=32
+
+		proto_add_ipv4_route "$network" "$prefix" "$gateway" "$source_ip"
+		index=$((index + 1))
+	done
+}
+
+openvpnc_add_custom_route_data() {
+	local source_ip="$1"
+	local fallback_gw="$2"
+	local enabled route_list route_entry parsed network prefix
+
+	enabled="$(openvpnc_ucivalue extra_routes_enable)"
+	openvpnc_enabled "$enabled" || return 0
+
+	route_list="$(openvpnc_ucivalue extra_routes)"
+	for route_entry in $(openvpnc_words "$route_list"); do
+		parsed="$(openvpnc_cidr_split "$route_entry")" || continue
+		network="${parsed% *}"
+		prefix="${parsed#* }"
+		[ -n "$network" ] && [ -n "$prefix" ] && proto_add_ipv4_route "$network" "$prefix" "$fallback_gw" "$source_ip"
+	done
+}
+
+local_ip="${ifconfig_local:-$4}"
+remote_ip="${ifconfig_remote:-$5}"
+prefix="$(openvpnc_prefix "$ifconfig_netmask")"
+
+[ -n "$local_ip" ] || local_ip="$route_vpn_gateway"
+[ -n "$prefix" ] || [ -n "$remote_ip" ] && prefix=30
+[ -n "$prefix" ] || prefix=32
+
+proto_init_update "$dev" 1 1
+proto_set_keep 1
+[ -n "$local_ip" ] && proto_add_ipv4_address "$local_ip" "$prefix" "" "$remote_ip"
+openvpnc_add_dns_data
+openvpnc_add_custom_dns_data
+openvpnc_add_route_data "$local_ip" "$route_vpn_gateway"
+openvpnc_add_custom_route_data "$local_ip" "$route_vpn_gateway"
+proto_send_update "$OPENVPNC_ID"

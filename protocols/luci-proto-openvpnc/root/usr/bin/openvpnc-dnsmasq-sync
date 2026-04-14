@@ -1,0 +1,116 @@
+#!/bin/sh
+
+. /lib/functions.sh
+
+OPENVPNC_DNSMASQ_DIRS=
+
+openvpnc_append_dnsmasq_dir() {
+	local section="$1"
+	local dnsmasq_conf="/tmp/etc/dnsmasq.conf.$section"
+	local dnsmasq_dir
+
+	[ -f "$dnsmasq_conf" ] || return 0
+
+	dnsmasq_dir="$(awk -F '=' '/^conf-dir=/ {print $2; exit}' "$dnsmasq_conf")"
+	dnsmasq_dir="${dnsmasq_dir%%,*}"
+	dnsmasq_dir="${dnsmasq_dir%/}"
+	[ -n "$dnsmasq_dir" ] || return 0
+
+	case " $OPENVPNC_DNSMASQ_DIRS " in
+		*" $dnsmasq_dir "*) return 0 ;;
+	esac
+
+	append OPENVPNC_DNSMASQ_DIRS "$dnsmasq_dir"
+}
+
+openvpnc_get_dnsmasq_dirs() {
+	local default_dir="/tmp/dnsmasq.d"
+
+	if [ -f /etc/openwrt_release ]; then
+		OPENVPNC_DNSMASQ_DIRS=
+		config_load dhcp
+		config_foreach openvpnc_append_dnsmasq_dir dnsmasq
+	fi
+
+	[ -n "$OPENVPNC_DNSMASQ_DIRS" ] || OPENVPNC_DNSMASQ_DIRS="$default_dir"
+	printf '%s\n' $OPENVPNC_DNSMASQ_DIRS
+}
+
+openvpnc_prepare_dnsmasq_file() {
+	OPENVPNC_DNSMASQ_DIR="$1"
+	OPENVPNC_DNSMASQ_FILE="$OPENVPNC_DNSMASQ_DIR/ovpnc.conf"
+	OPENVPNC_DNSMASQ_TMP="$OPENVPNC_DNSMASQ_FILE.tmp"
+
+	mkdir -p "$OPENVPNC_DNSMASQ_DIR" || return 1
+	: > "$OPENVPNC_DNSMASQ_TMP" || return 1
+	config_foreach openvpnc_append_dnsmasq_section interface
+
+	if [ -s "$OPENVPNC_DNSMASQ_TMP" ]; then
+		mv "$OPENVPNC_DNSMASQ_TMP" "$OPENVPNC_DNSMASQ_FILE"
+	else
+		rm -f "$OPENVPNC_DNSMASQ_TMP" "$OPENVPNC_DNSMASQ_FILE"
+	fi
+}
+
+openvpnc_enabled() {
+	case "$1" in
+		1|on|true|yes|enabled) return 0 ;;
+		*) return 1 ;;
+	esac
+}
+
+openvpnc_words() {
+	printf '%s' "$1" | tr ',\n\t' '   '
+}
+
+openvpnc_clean_domain() {
+	local domain="$1"
+
+	domain="${domain#/}"
+	domain="${domain#/}"
+	domain="${domain#.}"
+	domain="${domain%.}"
+	domain="${domain%/}"
+	printf '%s' "$domain"
+}
+
+openvpnc_append_dnsmasq_section() {
+	local section="$1"
+	local proto enabled dns_servers domains dns_server domain
+
+	config_get proto "$section" proto
+	[ "$proto" = "openvpnc" ] || return 0
+
+	config_get enabled "$section" custom_dns_enable
+	openvpnc_enabled "$enabled" || return 0
+
+	config_get dns_servers "$section" custom_dns
+	[ -n "$dns_servers" ] || return 0
+
+	config_get enabled "$section" domain_dns_enable
+	openvpnc_enabled "$enabled" || return 0
+
+	config_get domains "$section" dns_domains
+	[ -n "$domains" ] || return 0
+
+	for domain in $(openvpnc_words "$domains"); do
+		domain="$(openvpnc_clean_domain "$domain")"
+		[ -n "$domain" ] || continue
+		echo "rebind-domain-ok=/$domain/" >> "$OPENVPNC_DNSMASQ_TMP"
+
+		for dns_server in $(openvpnc_words "$dns_servers"); do
+			[ -n "$dns_server" ] || continue
+			echo "server=/$domain/$dns_server" >> "$OPENVPNC_DNSMASQ_TMP"
+		done
+	done
+}
+
+config_load network
+
+for OPENVPNC_DNSMASQ_DIR in $(openvpnc_get_dnsmasq_dirs); do
+	openvpnc_prepare_dnsmasq_file "$OPENVPNC_DNSMASQ_DIR"
+done
+
+if /etc/init.d/dnsmasq enabled >/dev/null 2>&1; then
+	/etc/init.d/dnsmasq restart >/dev/null 2>&1
+fi
