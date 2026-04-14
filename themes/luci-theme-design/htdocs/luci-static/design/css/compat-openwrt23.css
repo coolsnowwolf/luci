@@ -1,0 +1,513 @@
+
+
+#view {
+    padding: 0;
+}
+
+#view > * {
+    margin-bottom: 1rem;
+}
+
+.cbi-map {
+    margin-top: 10px;
+}
+
+.cbi-input-text,
+.cbi-input-password,
+.cbi-input-select {
+    color: var(--inputtext_color);
+    padding: 5px 10px;
+    font-size: 0.92rem;
+    border: var(--input_border);
+    background-color: var(--inputbg_color);
+    border-radius: 8px;
+    height: 2.8rem;
+    line-height: 2.8rem;
+    max-width: 550px;
+}
+
+.cbi-input-checkbox,
+.cbi-input-radio {
+    width: 1.2rem;
+    height: 1.2rem;
+    margin-right: 0.5rem;
+    vertical-align: middle;
+    accent-color: var(--active_color);
+}
+
+.btn.cbi-button,
+button.cbi-button {
+    -webkit-appearance: none;
+    appearance: none;
+    text-transform: uppercase;
+    color: #fff;
+    background-color: #337ab7;
+    transition: all 0.2s ease-in-out;
+    display: inline-block;
+    border: none;
+    cursor: pointer;
+    text-align: center;
+    white-space: nowrap;
+    min-width: 80px;
+    padding: 0 8px;
+    height: 35px;
+    line-height: 35px;
+    border-radius: 8px;
+}
+
+.cbi-button-positive,
+.cbi-button-action {
+    color: var(--bttext_color) !important;
+    background-color: var(--active_color) !important;
+}
+
+.cbi-button-positive:hover,
+.cbi-button-action:hover {
+    background-color: #4a8a80 !important;
+}
+
+.cbi-button-negative {
+    color: #fff !important;
+    background-color: #d9534f !important;
+}
+
+.cbi-button-negative:hover {
+    background-color: #c9302c !important;
+}
+
+.cbi-button-neutral {
+    color: #fff !important;
+    background-color: #617486 !important;
+}
+
+.table.cbi-section-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table.cbi-section-table .tr {
+    display: table-row;
+}
+
+.table.cbi-section-table .th,
+.table.cbi-section-table .td {
+    display: table-cell;
+    padding: 12px;
+    vertical-align: middle;
+}
+
+.tr.cbi-section-table-titles {
+    background-color: var(--inputbg_color);
+    font-weight: bold;
+}
+
+.cbi-dropdown {
+    position: relative;
+    display: inline-flex;
+    min-height: 2.8rem;
+    border: var(--input_border);
+    background-color: var(--inputbg_color);
+    border-radius: 8px;
+}
+
+.cbi-dropdown:not(.btn):not(.cbi-button) {
+    cursor: pointer;
+    color: var(--inputtext_color);
+}
+
+.cbi-dropdown > ul {
+    display: flex;
+    overflow-x: hidden;
+    overflow-y: auto;
+    width: 100%;
+    margin: 0 !important;
+    padding: 0;
+    list-style: none;
+}
+
+.cbi-dropdown:not(.btn):not(.cbi-button) > ul > li {
+    display: none;
+    overflow: hidden;
+    align-items: center;
+    align-self: center;
+    flex-grow: 1;
+    flex-shrink: 1;
+    min-height: 2.8rem;
+    padding: 0.5em 0.75em;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    color: var(--inputtext_color);
+}
+
+.cbi-dropdown:not(.btn):not(.cbi-button) > ul > li[display],
+.cbi-dropdown:not(.btn):not(.cbi-button)[open] > ul.preview,
+.cbi-dropdown:not(.btn):not(.cbi-button)[open] > ul.dropdown > li,
+.cbi-dropdown[multiple] > ul > li > label,
+.cbi-dropdown[multiple][open] > ul.dropdown > li,
+.cbi-dropdown[multiple][more] > .more,
+.cbi-dropdown[multiple][empty] > .more {
+    display: flex;
+    align-items: center;
+    flex-grow: 1;
+}
+
+.cbi-dropdown[empty] > ul > li,
+.cbi-dropdown[optional][open] > ul.dropdown > li[placeholder],
+.cbi-dropdown[multiple][open] > ul.dropdown > li > form {
+    display: block;
+}
+
+.cbi-dropdown:not(.btn):not(.cbi-button) > ul > li[display]:not([display="0"]) {
+    border-left: 1px solid #d9e3e6;
+}
+
+.cbi-dropdown:not(.btn):not(.cbi-button) > ul > li[data-value] {
+    padding-left: 0.75em !important;
+}
+
+.cbi-dropdown:not(.btn):not(.cbi-button) > .open,
+.cbi-dropdown:not(.btn):not(.cbi-button) > .more {
+    color: var(--inputtext_color);
+    line-height: 1;
+}
+
+.cbi-dropdown:not(.btn):not(.cbi-button) > .more,
+.cbi-dropdown:not(.btn):not(.cbi-button) > ul > li[placeholder] {
+    color: #87929a;
+    text-shadow: none;
+}
+
+.cbi-dropdown:not(.btn):not(.cbi-button)[open] > ul.dropdown {
+    position: absolute;
+    z-index: 1100;
+    top: 100%;
+    left: 0;
+    right: auto;
+    display: block;
+    min-width: 100%;
+    width: auto;
+    max-width: none;
+    max-height: 260px !important;
+    overflow-x: hidden;
+    overflow-y: auto;
+    background: var(--sectionbg_color);
+    border: var(--input_border);
+    border-radius: 0 0 8px 8px;
+    box-shadow: 0 8px 18px rgb(0 0 0 / 10%);
+    text-align: left;
+}
+
+.cbi-dropdown:not(.btn):not(.cbi-button)[open] > ul.dropdown > li {
+    width: 100%;
+    padding: 0.55em 0.85em;
+    cursor: pointer;
+    color: var(--inputtext_color);
+    border-bottom: 1px solid #e9eef0;
+    background: transparent;
+}
+
+.cbi-dropdown:not(.btn):not(.cbi-button)[open] > ul.dropdown > li[selected] {
+    background: rgb(94 166 155 / 16%);
+    color: var(--active_color);
+}
+
+.cbi-dropdown:not(.btn):not(.cbi-button)[open] > ul.dropdown > li.focus,
+.cbi-dropdown:not(.btn):not(.cbi-button)[open] > ul.dropdown > li:hover {
+    background: rgb(94 166 155 / 10%);
+    color: var(--inputtext_color);
+}
+
+.cbi-dropdown:not(.btn):not(.cbi-button)[open] > ul.dropdown > li:last-child {
+    margin-bottom: 0;
+    border-bottom: 0;
+    background: transparent;
+}
+
+.cbi-dropdown:not(.btn):not(.cbi-button)[open] > ul.dropdown > li > input.create-item-input:first-child:last-child {
+    width: 100%;
+    height: 2.1rem;
+    padding: 0 0.6em;
+    border: var(--input_border);
+    border-radius: 6px;
+    background: var(--inputbg_color);
+}
+
+.cbi-tabmenu {
+    display: flex;
+    flex-wrap: wrap;
+    border-bottom: var(--tabmenu_bottom);
+    margin-bottom: 1rem;
+}
+
+.cbi-tabmenu > li {
+    display: inline-block;
+    margin-right: 0.5rem;
+}
+
+.cbi-tabmenu > li > a {
+    display: block;
+    padding: 0.5rem 1rem;
+    text-decoration: none;
+    color: var(--text_color);
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+}
+
+.cbi-tabmenu > li.cbi-tab > a,
+.cbi-tabmenu > li > a:hover {
+    color: var(--active_color);
+    border-bottom-color: var(--active_color);
+}
+
+.modal {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    width: 90%;
+    max-width: 600px;
+    min-height: 32px;
+    margin: 5em auto;
+    padding: 1em;
+    border-radius: 8px;
+    background: var(--model_background);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.modal > * {
+    flex-basis: 100%;
+    margin-bottom: 0.5em;
+}
+
+.modal > h4 {
+    color: var(--text_color);
+    margin-bottom: 1em;
+}
+
+.modal > .btn,
+.modal > .cbi-button {
+    flex-basis: auto;
+    margin: 0.25em;
+}
+
+[data-page="admin-network-wireless"] #modal_overlay > .modal.cbi-modal {
+    width: calc(100vw - 2.5rem);
+    max-width: 860px;
+    max-height: calc(100vh - 6.5rem);
+    margin: 2rem auto;
+    padding: 0.85rem 1rem;
+    align-items: flex-start;
+    overflow-y: auto;
+}
+
+body.modal-overlay-active #modal_overlay .modal.cbi-modal [data-tab-active="true"],
+body.modal-overlay-active #modal_overlay .modal.cbi-modal .cbi-section-node,
+body.modal-overlay-active #modal_overlay .modal.cbi-modal .cbi-section-node-tabbed,
+body.modal-overlay-active #modal_overlay .modal.cbi-modal .cbi-value-field.cbi-dropdown-open {
+    overflow: visible !important;
+}
+
+/* Undo generic modal list styling for LuCI dropdown widgets inside wireless edit dialogs. */
+[data-page="admin-network-wireless"] #modal_overlay .modal.cbi-modal .cbi-dropdown > ul,
+[data-page="admin-network-wireless"] #modal_overlay .modal.cbi-modal .cbi-dropdown > ul.preview,
+[data-page="admin-network-wireless"] #modal_overlay .modal.cbi-modal .cbi-dropdown[open] > ul.dropdown {
+    margin-left: 0 !important;
+    padding-left: 0 !important;
+    list-style: none !important;
+}
+
+[data-page="admin-network-wireless"] #modal_overlay .modal.cbi-modal .cbi-dropdown > ul > li,
+[data-page="admin-network-wireless"] #modal_overlay .modal.cbi-modal .cbi-dropdown[open] > ul.dropdown > li {
+    list-style: none !important;
+    margin-left: 0 !important;
+}
+
+/* Keep NetworkSelect choices readable in wireless modal dropdowns. */
+[data-page="admin-network-wireless"] #modal_overlay .modal.cbi-modal .cbi-dropdown[open] > ul.dropdown > li {
+    display: flex !important;
+    align-items: center;
+    color: var(--inputtext_color);
+}
+
+/* Fallback text rendering for NetworkSelect choices when badge markup is hidden by theme rules. */
+[data-page="admin-network-wireless"] #modal_overlay .modal.cbi-modal .cbi-dropdown > ul > li[data-value]:not([data-value=""])::before {
+    content: attr(data-value);
+    display: inline-block;
+    color: inherit;
+    font-size: 0.92rem;
+    line-height: 1.4;
+    white-space: nowrap;
+    margin-right: 0.5rem;
+    flex: 0 0 auto;
+}
+
+[data-page="admin-network-wireless"] #modal_overlay .modal.cbi-modal .cbi-dropdown[open] > ul.dropdown > li[selected]::before {
+    color: #fff;
+}
+
+[data-page="admin-network-wireless"] #modal_overlay .modal.cbi-modal .cbi-dropdown[open] > ul.dropdown > li .ifacebadge,
+[data-page="admin-network-wireless"] #modal_overlay .modal.cbi-modal .cbi-dropdown[open] > ul.dropdown > li .zonebadge {
+    display: inline-flex !important;
+    align-items: center;
+    gap: 0.2rem;
+    max-width: 100%;
+    padding: 0.3rem 0.6rem;
+    color: #5f6b72 !important;
+    background-color: #eef2f3 !important;
+    border: 1px solid #d8e0e3 !important;
+    border-radius: 10px;
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 70%), 0 1px 2px rgb(0 0 0 / 4%);
+    font-size: 0.85rem;
+    line-height: 1.4;
+    white-space: nowrap;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+[data-page="admin-network-wireless"] #modal_overlay .modal.cbi-modal .cbi-dropdown[open] > ul.dropdown > li .ifacebadge > em,
+[data-page="admin-network-wireless"] #modal_overlay .modal.cbi-modal .cbi-dropdown[open] > ul.dropdown > li .ifacebadge > img {
+    align-self: center;
+}
+
+.cbi-progressbar {
+    position: relative;
+    min-width: 11rem;
+    height: 1.5rem;
+    background-color: var(--progressbar_color);
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.cbi-progressbar > div {
+    height: 100%;
+    background: var(--progressbar);
+    transition: width 0.25s ease-in;
+}
+
+.cbi-progressbar::after {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    content: attr(title);
+    text-align: center;
+    line-height: 1.5rem;
+    font-size: 0.75rem;
+    color: var(--progressbartxt_color);
+}
+
+.ifacebadge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.2rem;
+    padding: 0.3rem 0.6rem;
+    background-color: #eef2f3;
+    color: #5f6b72;
+    border: 1px solid #d8e0e3;
+    border-radius: 10px;
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 70%), 0 1px 2px rgb(0 0 0 / 4%);
+    font-size: 0.85rem;
+}
+
+.ifacebadge > img,
+.ifacebadge > em {
+    width: 16px;
+    height: 16px;
+}
+
+.zonebadge {
+    display: inline-block;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+}
+
+@media screen and (max-width: 992px) {
+    
+    .main-left {
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+    }
+    
+    .main-left.active,
+    .main-left[style*="width: 17rem"],
+    .main-left:not([style*="width: 0"]) {
+        transform: translateX(0);
+    }
+}
+
+[data-page="admin-status-overview"] .cbi-section {
+    margin-bottom: 1rem;
+}
+
+[data-page="admin-network-network"] .ifacebox {
+    margin: 0.5rem;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+[data-page="admin-network-wireless"] .cbi-section-table {
+    overflow-x: auto;
+}
+
+[data-page="admin-system-opkg"] .controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+[data-page="admin-system-opkg"] .controls input[type="text"] {
+    flex: 1;
+    min-width: 200px;
+}
+
+@media (prefers-color-scheme: dark) {
+    
+    code, pre {
+        background-color: #2d2d2d;
+        color: #f8f8f2;
+    }
+    
+    
+    .table.cbi-section-table .tr:nth-child(even) {
+        background-color: rgba(255, 255, 255, 0.05);
+    }
+    
+    
+    .cbi-input-text:focus,
+    .cbi-input-password:focus,
+    .cbi-input-select:focus {
+        border-color: var(--active_color);
+        box-shadow: 0 0 6px var(--active_color);
+    }
+}
+
+@media print {
+    .main-left,
+    .navbar,
+    header,
+    .showSide,
+    .darkMask {
+        display: none !important;
+    }
+    
+    .main-right {
+        width: 100% !important;
+        margin: 0 !important;
+    }
+}
+
+:focus-visible {
+    outline: 2px solid var(--active_color);
+    outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
