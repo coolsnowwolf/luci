@@ -46,9 +46,7 @@ uci -q batch <<-EOF >/dev/null
 	commit firewall
 EOF
 
-if [ ! -f "/etc/openvpn/pki/ca.crt" ]; then
-	sh /etc/openvpn/renewcert.sh 2>&1 >/dev/null
-fi
+mkdir -p /etc/openvpn/pki
 
 rm -f /tmp/luci-indexcache
 exit 0

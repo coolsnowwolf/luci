@@ -42,6 +42,7 @@ o.inputtitle = translate("Download .ovpn file")
 o.description = translate("If you are using IOS client, please download this .ovpn file and send it via QQ or Email to your IOS device")
 o.inputstyle = "reload"
 o.write = function()
+	luci.sys.call("sh /etc/openvpn/ensurecert.sh 2>&1 >/dev/null")
 	luci.sys.call("sh /etc/openvpn/genovpn.sh 2>&1 >/dev/null")
 	Download()
 end
@@ -102,6 +103,7 @@ end
 
 function mp.on_after_commit(self)
 	os.execute("uci set firewall.openvpn.dest_port=$(uci get openvpn.myvpn.port) && uci commit firewall && /etc/init.d/firewall restart")
+	os.execute("[ \"$(uci -q get openvpn.myvpn.enabled)\" = \"1\" ] && sh /etc/openvpn/ensurecert.sh >/dev/null 2>&1")
 	os.execute("/etc/init.d/openvpn restart")
 end
 
