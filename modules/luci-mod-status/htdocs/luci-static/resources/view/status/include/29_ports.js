@@ -13,6 +13,13 @@ const callGetBuiltinEthernetPorts = rpc.declare({
 	expect: { result: [] }
 });
 
+const callSwconfigPortState = rpc.declare({
+	object: 'luci',
+	method: 'getSwconfigPortState',
+	params: [ 'switch' ],
+	expect: { result: [] }
+});
+
 const callNetworkDeviceStatus = rpc.declare({
 	object: 'network.device',
 	method: 'status',
@@ -23,6 +30,204 @@ const callNetworkDeviceStatus = rpc.declare({
 function isString(v)
 {
 	return typeof(v) === 'string' && v !== '';
+}
+
+function parseBoardPortList(value)
+{
+	if (Array.isArray(value))
+		return value.filter(isString);
+
+	if (isString(value))
+		return value.trim().split(/[\s,]+/).filter(isString);
+
+	return [];
+}
+
+function addKnownPort(knownPorts, seenPorts, role, device, extra)
+{
+	if (!isString(device) || seenPorts[device])
+		return;
+
+	seenPorts[device] = true;
+
+	const port = Object.assign({
+		role,
+		device,
+		label: device
+	}, extra || {});
+
+	if (!port.netdev && !port.swstate)
+		port.netdev = network.instantiateDevice(device);
+
+	knownPorts.push(port);
+}
+
+function parseSwitchPortToken(token)
+{
+	if (!isString(token))
+		return null;
+
+	const match = token.match(/^(\d+)([a-z*]+)?$/i);
+
+	return match ? { port: +match[1], flags: (match[2] || '').toLowerCase() } : null;
+}
+
+function appendSwitchMemberPorts(sw, ports, cpuPorts, memberPorts)
+{
+	for (const value of ports) {
+		const token = parseSwitchPortToken(value);
+
+		if (!token)
+			continue;
+
+		for (const port of sw.ports) {
+			if (port.num != token.port)
+				continue;
+
+			if (isString(port.device))
+				cpuPorts[port.device] = true;
+			else
+				memberPorts.push('%s:%d'.format(sw['.name'] || sw.name || '', token.port));
+
+			break;
+		}
+	}
+}
+
+function buildLegacySwitchMappings(mapping, board)
+{
+	const switchVlans = uci.sections('network', 'switch_vlan');
+
+	if (!L.isObject(board) || !L.isObject(board.switch))
+		return;
+
+	for (const section of switchVlans) {
+		const swname = section.device;
+		const sw = board.switch[swname];
+		const vid = section.vid || section.vlan;
+
+		if (!L.isObject(sw) || !/^[0-9]{1,4}$/.test(vid) || +vid > 4095)
+			continue;
+
+		const ports = L.toArray(section.ports);
+		const cpuPorts = {};
+		let memberPorts = [];
+
+		sw['.name'] = swname;
+		appendSwitchMemberPorts(sw, ports, cpuPorts, memberPorts);
+
+		memberPorts = memberPorts.filter((port, index) => memberPorts.indexOf(port) === index);
+
+		for (const cpuDev in cpuPorts)
+			mapping['%s.%s'.format(cpuDev, vid)] = memberPorts;
+	}
+
+	for (const swname in board.switch) {
+		const sw = board.switch[swname];
+
+		if (!L.isObject(sw) || !Array.isArray(sw.roles) || !Array.isArray(sw.ports))
+			continue;
+
+		sw['.name'] = swname;
+
+		for (const role of sw.roles) {
+			if (!L.isObject(role) || !isString(role.device))
+				continue;
+
+			const cpuPorts = {};
+			let memberPorts = [];
+
+			appendSwitchMemberPorts(sw, parseBoardPortList(role.ports), cpuPorts, memberPorts);
+
+			if (!cpuPorts[role.device])
+				cpuPorts[role.device] = true;
+
+			memberPorts = memberPorts.filter((port, index) => memberPorts.indexOf(port) === index);
+
+			if (!mapping[role.device])
+				mapping[role.device] = [];
+
+			for (const port of memberPorts)
+				if (mapping[role.device].indexOf(port) === -1)
+					mapping[role.device].push(port);
+		}
+	}
+}
+
+function getSwitchPortLabel(board, switchName, portNum)
+{
+	const sw = L.isObject(board) && L.isObject(board.switch) ? board.switch[switchName] : null;
+
+	if (!L.isObject(sw) || !Array.isArray(sw.ports))
+		return '%s:%d'.format(switchName, portNum);
+
+	for (let i = 0; i < sw.ports.length; i++) {
+		if (sw.ports[i].num != portNum)
+			continue;
+
+		if (isString(sw.ports[i].label))
+			return sw.ports[i].label;
+
+		if (isString(sw.ports[i].role)) {
+			let index = 1;
+
+			for (let j = 0; j < i; j++)
+				if (sw.ports[j].role == sw.ports[i].role)
+					index++;
+
+			return sw.ports[i].role + index;
+		}
+
+		break;
+	}
+
+	return '%s:%d'.format(switchName, portNum);
+}
+
+function addResolvedPort(knownPorts, seenPorts, role, device, mapping, board, swstate)
+{
+	const resolved = resolveVLANPorts(device, mapping);
+
+	for (const value of resolved) {
+		const match = value.match(/^([^:]+):(\d+)$/);
+
+		if (match) {
+			const switchName = match[1];
+			const portNum = +match[2];
+			const switchPorts = swstate[switchName] || {};
+
+			addKnownPort(knownPorts, seenPorts, role, value, {
+				label: getSwitchPortLabel(board, switchName, portNum),
+				swstate: switchPorts[portNum] || {
+					port: portNum,
+					link: false,
+					speed: 0,
+					duplex: false,
+					rx_bytes: 0,
+					tx_bytes: 0,
+					rx_packets: 0,
+					tx_packets: 0
+				}
+			});
+		}
+		else {
+			addKnownPort(knownPorts, seenPorts, role, value);
+		}
+	}
+}
+
+function addBoardNetworkPorts(knownPorts, seenPorts, role, entry, mapping, board, swstate)
+{
+	if (!L.isObject(entry))
+		return;
+
+	const values = parseBoardPortList(entry.ports).concat(parseBoardPortList(entry.ifname));
+
+	if (isString(entry.device))
+		values.push(entry.device);
+
+	for (const value of values)
+		addResolvedPort(knownPorts, seenPorts, role, value, mapping, board, swstate);
 }
 
 function resolveVLANChain(ifname, bridges, mapping)
@@ -50,7 +255,7 @@ function resolveVLANChain(ifname, bridges, mapping)
 	}
 }
 
-function buildVLANMappings(mapping)
+function buildVLANMappings(mapping, board)
 {
 	const bridge_vlans = uci.sections('network', 'bridge-vlan');
 	const vlan_devices = uci.sections('network', 'device');
@@ -136,6 +341,8 @@ function buildVLANMappings(mapping)
 				resolveVLANChain(v, bridges, mapping);
 	}
 
+	buildLegacySwitchMappings(mapping, board);
+
 	/* find implicit VLAN devices */
 	for (let i = 0, s; (s = interfaces[i]) != null; i++) {
 		if (!isString(s.device))
@@ -167,12 +374,12 @@ function resolveVLANPorts(ifname, mapping, seen)
 	return ports.sort(L.naturalCompare);
 }
 
-function buildInterfaceMapping(zones, networks) {
+function buildInterfaceMapping(zones, networks, board) {
 	const vlanmap = {};
 	const portmap = {};
 	const netmap = {};
 
-	buildVLANMappings(vlanmap);
+	buildVLANMappings(vlanmap, board);
 
 	for (let net of networks) {
 		const l3dev = net.getDevice();
@@ -286,8 +493,21 @@ function formatPSEPower(pse) {
 	return null;
 }
 
-function formatStats(portdev, pse) {
-	const stats = portdev._devstate('stats') || {};
+function formatStats(port, pse) {
+	const stats = port.netdev
+		? (port.netdev._devstate('stats') || {})
+		: {
+			rx_bytes: port.swstate ? port.swstate.rx_bytes : null,
+			rx_packets: port.swstate ? port.swstate.rx_packets : null,
+			multicast: null,
+			rx_errors: null,
+			rx_dropped: null,
+			tx_bytes: port.swstate ? port.swstate.tx_bytes : null,
+			tx_packets: port.swstate ? port.swstate.tx_packets : null,
+			tx_errors: null,
+			tx_dropped: null,
+			collisions: null
+		};
 	const items = [
 		_('Received bytes'), '%1024mB'.format(stats.rx_bytes),
 		_('Received packets'), '%1000mPkts.'.format(stats.rx_packets),
@@ -322,6 +542,34 @@ function formatStats(portdev, pse) {
 	}
 
 	return ui.itemlist(E('span'), items);
+}
+
+function getPortSpeed(port)
+{
+	return port.netdev ? port.netdev.getSpeed() : (port.swstate ? port.swstate.speed : null);
+}
+
+function getPortDuplex(port)
+{
+	if (port.netdev)
+		return port.netdev.getDuplex();
+
+	return (port.swstate && port.swstate.link) ? (port.swstate.duplex ? 'full' : 'half') : null;
+}
+
+function getPortCarrier(port)
+{
+	return port.netdev ? port.netdev.getCarrier() : !!(port.swstate && port.swstate.link);
+}
+
+function getPortTXBytes(port)
+{
+	return port.netdev ? port.netdev.getTXBytes() : (port.swstate ? port.swstate.tx_bytes : null);
+}
+
+function getPortRXBytes(port)
+{
+	return port.netdev ? port.netdev.getRXBytes() : (port.swstate ? port.swstate.rx_bytes : null);
 }
 
 function renderNetworkBadge(network, zonename) {
@@ -382,18 +630,17 @@ return baseclass.extend({
 			network.getNetworks(),
 			uci.load('network')
 		]).then((data) => {
-			/* Get all known port names from builtin ports or board.json */
 			const builtinPorts = data[0] || [];
 			const board = JSON.parse(data[1] || '{}');
 			const allPorts = new Set();
+			const swstate = {};
+			const tasks = [];
 
-			/* Collect port names from builtin ethernet ports */
 			builtinPorts.forEach((port) => {
 				if (port.device)
 					allPorts.add(port.device);
 			});
 
-			/* Collect port names from board.json if no builtin ports */
 			if (allPorts.size === 0 && board.network) {
 				['lan', 'wan'].forEach((role) => {
 					if (board.network[role]) {
@@ -405,72 +652,78 @@ return baseclass.extend({
 				});
 			}
 
-			/* Query PSE status from netifd for all known ports */
+			if (L.isObject(board) && L.isObject(board.switch)) {
+				for (const switchName in board.switch) {
+					tasks.push(L.resolveDefault(callSwconfigPortState(switchName), []).then((ports) => {
+						swstate[switchName] = ports.reduce((map, port) => {
+							map[port.port] = port;
+							return map;
+						}, {});
+					}));
+				}
+			}
+
 			const psePromises = Array.from(allPorts).map((devname) => {
 				return L.resolveDefault(callNetworkDeviceStatus(devname), {}).then((status) => {
 					return { name: devname, pse: status.pse || null };
 				});
 			});
 
-			return Promise.all(psePromises).then((pseResults) => {
+			return Promise.all(tasks).then(() => Promise.all(psePromises)).then((pseResults) => {
 				const pseMap = {};
-				pseResults.forEach((r) => {
-					if (r.pse)
-						pseMap[r.name] = r.pse;
+
+				pseResults.forEach((result) => {
+					if (result.pse)
+						pseMap[result.name] = result.pse;
 				});
+
+				data.push(swstate);
 				data.push(pseMap);
+
 				return data;
 			});
 		});
 	},
 
 	render(data) {
-		if (L.hasSystemFeature('swconfig'))
-			return null;
-
 		const board = JSON.parse(data[1]),
-		      port_map = buildInterfaceMapping(data[2], data[3]),
-		      pseMap = data[5] || {};
+		      swstate = data[5] || {},
+		      port_map = buildInterfaceMapping(data[2], data[3], board),
+		      pseMap = data[6] || {};
 		let known_ports = [];
+		const seenPorts = {};
+		const vlanMap = {};
+
+		buildVLANMappings(vlanMap, board);
 
 		if (Array.isArray(data[0]) && data[0].length > 0) {
-			known_ports = data[0].map(port => ({
-				...port,
-				netdev: network.instantiateDevice(port.device)
-			}));
+			known_ports = data[0].reduce((ports, port) => {
+				addResolvedPort(ports, seenPorts, port.role, port.device, vlanMap, board, swstate);
+				return ports;
+			}, []);
 		}
-		else {
-			if (L.isObject(board) && L.isObject(board.network)) {
-				for (let k = 'lan'; k != null; k = (k == 'lan') ? 'wan' : null) {
-					if (!L.isObject(board.network[k]))
-						continue;
 
-					if (Array.isArray(board.network[k].ports))
-						for (let i = 0; i < board.network[k].ports.length; i++)
-							known_ports.push({
-								role: k,
-								device: board.network[k].ports[i],
-								netdev: network.instantiateDevice(board.network[k].ports[i])
-							});
-					else if (typeof(board.network[k].device) == 'string')
-						known_ports.push({
-							role: k,
-							device: board.network[k].device,
-							netdev: network.instantiateDevice(board.network[k].device)
-						});
-				}
+		if (L.isObject(board) && L.isObject(board.network)) {
+			for (let k = 'lan'; k != null; k = (k == 'lan') ? 'wan' : null) {
+				if (!L.isObject(board.network[k]))
+					continue;
+
+				addBoardNetworkPorts(known_ports, seenPorts, k, board.network[k], vlanMap, board, swstate);
 			}
 		}
 
+		if (!known_ports.length)
+			return null;
+
 		known_ports.sort(function(a, b) {
-			return L.naturalCompare(a.device, b.device);
+			return L.naturalCompare(a.label || a.device, b.label || b.device);
 		});
 
 		return E('div', { 'style': 'display:grid;grid-template-columns:repeat(auto-fit, minmax(100px, 1fr));margin-bottom:1em;align-items:center;justify-items:center;text-align:center' }, known_ports.map(function(port) {
-			const speed = port.netdev.getSpeed();
-			const duplex = port.netdev.getDuplex();
-			const carrier = port.netdev.getCarrier();
-			const pmap = port_map[port.netdev.getName()];
+			const speed = getPortSpeed(port);
+			const duplex = getPortDuplex(port);
+			const carrier = getPortCarrier(port);
+			const pmap = port_map[port.device];
 			const pzones = (pmap && pmap.zones.length) ? pmap.zones.sort((a, b) => L.naturalCompare(a.getName(), b.getName())) : [ null ];
 			const pse = pseMap[port.device];
 			const pseInfo = getPSEStatus(pse);
@@ -485,9 +738,9 @@ return baseclass.extend({
 			}
 
 			const statsContent = [
-				'\u25b2\u202f%1024.1mB'.format(port.netdev.getTXBytes()),
+				'\u25b2\u202f%1024.1mB'.format(getPortTXBytes(port)),
 				E('br'),
-				'\u25bc\u202f%1024.1mB'.format(port.netdev.getRXBytes())
+				'\u25bc\u202f%1024.1mB'.format(getPortRXBytes(port))
 			];
 
 			if (psePower) {
@@ -495,10 +748,10 @@ return baseclass.extend({
 				statsContent.push(psePower);
 			}
 
-			statsContent.push(E('span', { 'class': 'cbi-tooltip' }, formatStats(port.netdev, pse)));
+			statsContent.push(E('span', { 'class': 'cbi-tooltip' }, formatStats(port, pse)));
 
 			return E('div', { 'class': 'ifacebox', 'style': 'margin:.25em;width:100px' }, [
-				E('div', { 'class': 'ifacebox-head', 'style': 'font-weight:bold' }, [ port.netdev.getName() ]),
+				E('div', { 'class': 'ifacebox-head', 'style': 'font-weight:bold' }, [ port.label || port.device ]),
 				E('div', { 'class': 'ifacebox-body' }, [
 					E('img', { 'src': L.resource('icons/port_%s.svg').format(portIcon) }),
 					E('br'),
