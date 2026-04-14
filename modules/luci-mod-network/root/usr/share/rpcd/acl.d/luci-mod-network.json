@@ -8,12 +8,13 @@
 				"/proc/sys/net/ipv6/conf/*/mtu": [ "read" ],
 				"/proc/sys/net/ipv6/conf/*/hop_limit": [ "read" ],
 				"/usr/libexec/luci-peeraddr": [ "exec" ],
+				"/usr/sbin/wlanconfig": [ "exec" ],
 				"/proc/sys/net/ipv[46]/conf/*": [ "read" ],
 				"/sys/class/net/*/brport/*": [ "read" ]
 			},
 			"ubus": {
 				"file": [ "exec" ],
-				"iwinfo": [ "assoclist", "countrylist", "freqlist", "txpowerlist" ],
+				"iwinfo": [ "assoclist", "countrylist", "freqlist", "info", "txpowerlist" ],
 				"luci": [ "getSwconfigFeatures", "getSwconfigPortState" ]
 			},
 			"uci": [ "dhcp", "firewall", "network", "wireless", "system" ]
