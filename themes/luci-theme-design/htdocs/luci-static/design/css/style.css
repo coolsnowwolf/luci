@@ -1518,6 +1518,7 @@ form.inline + form.inline,
 	overflow: hidden;
 	height: 0;
 	opacity: 0;
+	pointer-events: none;
 	margin: 0;
 	padding: 0rem 1rem !important;
 }
@@ -1526,6 +1527,7 @@ form.inline + form.inline,
     overflow: auto;
     height: auto;
     opacity: 1;
+    pointer-events: auto;
     transition: opacity .25s ease-in;
     margin: inherit !important;
     display: block;
@@ -1937,7 +1939,8 @@ form.inline + form.inline,
 
 .cbi-dropdown[open] > ul.dropdown {
 	position: absolute;
-	top: calc(100% + 4px);
+	top: auto;
+	bottom: auto;
 	left: 0;
 	z-index: 1200;
 	display: block;
@@ -4343,7 +4346,8 @@ button.cbi-button {
 .cbi-dropdown:not(.btn):not(.cbi-button)[open] > ul.dropdown {
     position: absolute;
     z-index: 1100;
-    top: 100%;
+    top: auto;
+    bottom: auto;
     left: 0;
     right: auto;
     display: block;
