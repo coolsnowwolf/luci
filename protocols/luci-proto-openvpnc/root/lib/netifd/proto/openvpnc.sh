@@ -19,6 +19,69 @@ openvpnc_get_first_value() {
 	' "$file"
 }
 
+openvpnc_is_ipv4() {
+	local value="$1"
+	local octet
+
+	case "$value" in
+		''|*[!0-9.]*|*.*.*.*.*)
+			return 1
+			;;
+	esac
+
+	local old_ifs="$IFS"
+	IFS='.'
+	set -- $value
+	IFS="$old_ifs"
+	[ "$#" -eq 4 ] || return 1
+
+	for octet in "$@"; do
+		[ -n "$octet" ] || return 1
+		[ "$octet" -ge 0 ] 2>/dev/null || return 1
+		[ "$octet" -le 255 ] || return 1
+	done
+
+	return 0
+}
+
+openvpnc_get_upstream_dns_servers() {
+	local resolv_file
+
+	for resolv_file in /tmp/resolv.conf.d/resolv.conf.auto /tmp/resolv.conf.auto; do
+		[ -r "$resolv_file" ] || continue
+		awk '/^nameserver / { print $2 }' "$resolv_file"
+	done | awk '!seen[$0]++'
+}
+
+openvpnc_resolve_host() {
+	local host="$1"
+	local ip
+	local server
+
+	openvpnc_is_ipv4 "$host" && {
+		echo "$host"
+		return 0
+	}
+
+	if command -v nslookup >/dev/null 2>&1; then
+		for server in $(openvpnc_get_upstream_dns_servers); do
+			openvpnc_is_ipv4 "$server" || continue
+			ip="$({ nslookup "$host" "$server" 2>/dev/null || true; } | awk '/^Address [0-9]+: / { print $3; exit }')"
+			openvpnc_is_ipv4 "$ip" || continue
+			echo "$ip"
+			return 0
+		done
+	fi
+
+	for ip in $(resolveip -t 5 "$host" 2>/dev/null); do
+		openvpnc_is_ipv4 "$ip" || continue
+		echo "$ip"
+		return 0
+	done
+
+	return 1
+}
+
 openvpnc_get_dev_type() {
 	local file="$1"
 	local dev_type
@@ -78,15 +141,64 @@ openvpnc_add_host_dependencies() {
 	local host
 	local ip
 
-	awk '
+	for host in $(awk '
 		/^[[:space:]]*[#;]/ { next }
 		$1 == "remote" && NF >= 2 { print $2 }
-	' "$file" | while read -r host; do
+	' "$file" | awk '!seen[$0]++'); do
 		[ -n "$host" ] || continue
-		for ip in $(resolveip -t 5 "$host"); do
-			proto_add_host_dependency "$config" "$ip"
-		done
-		done
+		ip="$(openvpnc_resolve_host "$host")" || continue
+		proto_add_host_dependency "$config" "$ip"
+	done
+}
+
+openvpnc_prepare_profile() {
+	local config="$1"
+	local file="$2"
+	local tmp_file="/var/etc/openvpnc-$config.ovpn"
+	local host
+	local ip
+	local rewrites=''
+	local changed=0
+
+	for host in $(awk '
+		/^[[:space:]]*[#;]/ { next }
+		$1 == "remote" && NF >= 2 { print $2 }
+	' "$file" | awk '!seen[$0]++'); do
+		openvpnc_is_ipv4 "$host" && continue
+		ip="$(openvpnc_resolve_host "$host")" || continue
+		rewrites="${rewrites}${host}=${ip}|"
+		changed=1
+		logger -t openvpnc "resolved remote host $host to $ip for $config"
+	done
+
+	if [ "$changed" != "1" ]; then
+		echo "$file"
+		return 0
+	fi
+
+	awk -v rewrites="$rewrites" '
+		BEGIN {
+			n = split(rewrites, items, /\|/)
+			for (i = 1; i <= n; i++) {
+				if (items[i] == "")
+					continue
+				split(items[i], pair, /=/)
+				map[pair[1]] = pair[2]
+			}
+		}
+		/^[[:space:]]*[#;]/ {
+			print
+			next
+		}
+		$1 == "remote" && NF >= 2 && ($2 in map) {
+			$2 = map[$2]
+		}
+		{
+			print
+		}
+	' "$file" > "$tmp_file" || return 1
+
+	echo "$tmp_file"
 }
 
 openvpnc_write_auth_file() {
@@ -222,7 +334,7 @@ proto_openvpnc_init_config() {
 proto_openvpnc_setup() {
 	local config="$1"
 	local ovpn_file username password mtu
-	local ifname dev_type auth_file auth_state auth_required auth_inline
+	local ifname dev_type auth_file auth_state auth_required auth_inline ovpn_run_file
 
 	json_get_vars ovpn_file username password mtu
 
@@ -242,6 +354,13 @@ proto_openvpnc_setup() {
 	openvpnc_add_host_dependencies "$config" "$ovpn_file"
 
 	mkdir -p /var/run /var/etc
+	ovpn_run_file="$(openvpnc_prepare_profile "$config" "$ovpn_file")" || {
+		logger -t openvpnc "failed to prepare runtime profile for $config"
+		proto_setup_failed "$config"
+		proto_block_restart "$config"
+		return 1
+	}
+
 	dev_type="$(openvpnc_get_dev_type "$ovpn_file")"
 	auth_file="$(openvpnc_get_auth_file "$ovpn_file")"
 	auth_state="$?"
@@ -292,7 +411,7 @@ proto_openvpnc_setup() {
 		--syslog "openvpnc($config)" \
 		--status "/var/run/openvpnc-$config.status" \
 		--cd "${ovpn_file%/*}" \
-		--config "$ovpn_file" \
+		--config "$ovpn_run_file" \
 		--dev "$ifname" \
 		--dev-type "$dev_type" \
 		--script-security 2 \
@@ -313,6 +432,7 @@ proto_openvpnc_teardown() {
 	local config="$1"
 
 	rm -f "/var/run/openvpnc-$config.status"
+	rm -f "/var/etc/openvpnc-$config.ovpn"
 	openvpnc_sync_dnsmasq
 	proto_kill_command "$config"
 }
