@@ -4,8 +4,9 @@
 
 START=90
 STOP=10
+USE_PROCD=1
 
-start() {
+start_service() {
 	config_load "turboacc"
 
 	local fastpath
@@ -74,4 +75,13 @@ start() {
 
 	uci -q commit "firewall"
 	/etc/init.d/firewall restart >"/dev/null" 2>&1
+}
+
+reload_service() {
+	stop
+	start
+}
+
+service_triggers() {
+	procd_add_reload_trigger "turboacc"
 }

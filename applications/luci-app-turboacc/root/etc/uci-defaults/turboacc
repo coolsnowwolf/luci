@@ -47,11 +47,7 @@ fi
 
 uci -q commit "turboacc"
 
-uci -q batch <<-EOF >"/dev/null"
-	delete ucitrack.@turboacc[-1]
-	add ucitrack turboacc
-	set ucitrack.@turboacc[-1].init=turboacc
-	commit ucitrack
-EOF
+/etc/init.d/turboacc enable >/dev/null 2>&1
+/etc/init.d/turboacc start >/dev/null 2>&1
 
 exit 0
