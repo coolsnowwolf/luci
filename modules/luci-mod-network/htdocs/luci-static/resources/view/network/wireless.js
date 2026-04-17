@@ -2297,48 +2297,35 @@ return view.extend({
 				o.multiple = true;
 				o.novirtual = true;
 				o.write = function(section_id, value) {
-					return network.getDevice(section_id).then(L.bind(function(dev) {
-						const old_networks = dev.getNetworks().reduce(function(o, v) { o[v.getName()] = v; return o; }, {});
-						const new_networks = {};
-						const values = L.toArray(value);
-						const tasks = [];
+					const values = L.toArray(value).filter(v => !!v);
+					const tasks = [];
 
-						values.forEach(value => {
-
-							new_networks[value] = true;
-
-							if (old_networks[value])
+					values.forEach(name => {
+						tasks.push(network.getNetwork(name).then(L.bind(function(netname, net) {
+							return net || network.addNetwork(netname, { proto: 'none' });
+						}, this, name)).then(function(net) {
+							if (!net)
 								return;
 
-							tasks.push(network.getNetwork(value).then(L.bind(function(name, net) {
-								return net || network.addNetwork(name, { proto: 'none' });
-							}, this, value)).then(L.bind(function(dev, net) {
-								if (net) {
-									if (!net.isEmpty()) {
-										let target_dev = net.getDevice();
+							if (!net.isEmpty()) {
+								let target_dev = net.getDevice();
 
-										/* Resolve parent interface of vlan */
-										while (target_dev && target_dev.getType() == 'vlan')
-											target_dev = target_dev.getParent();
+								/* Resolve parent interface of vlan */
+								while (target_dev && target_dev.getType() == 'vlan')
+									target_dev = target_dev.getParent();
 
-										if (!target_dev || target_dev.getType() != 'bridge')
-											net.set('type', 'bridge');
-									}
+								if (!target_dev || target_dev.getType() != 'bridge')
+									net.set('type', 'bridge');
+							}
+						}));
+					});
 
-									net.addDevice(dev);
-								}
-							}, this, dev)));
-						});
-
-						for (let name in old_networks)
-							if (!new_networks[name])
-								tasks.push(network.getNetwork(name).then(L.bind(function(dev, net) {
-									if (net)
-										net.deleteDevice(dev);
-								}, this, dev)));
-
-						return Promise.all(tasks);
-					}, this));
+					return Promise.all(tasks).then(function() {
+						if (values.length > 0)
+							uci.set('wireless', section_id, 'network', values.join(' '));
+						else
+							uci.unset('wireless', section_id, 'network');
+					});
 				};
 
 				if (hwtype == 'mac80211' || hwtype == 'mt_dbdc' || isQcaWifiHwtype(hwtype)) {
