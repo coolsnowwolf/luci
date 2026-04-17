@@ -11,7 +11,7 @@ LUCI_DESCRIPTION:=This package provides support for OpenVPN client configuration
 LUCI_DEPENDS:=+openvpn +kmod-tun +firewall
 LUCI_PKGARCH:=all
 PKG_VERSION:=1
-PKG_RELEASE:=3
+PKG_RELEASE:=4
 
 include ../../luci.mk
 

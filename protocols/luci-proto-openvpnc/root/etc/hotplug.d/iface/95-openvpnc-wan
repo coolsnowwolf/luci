@@ -1,0 +1,44 @@
+#!/bin/sh
+
+[ "$ACTION" = "ifup" ] || exit 0
+[ "$INTERFACE" = "wan" ] || exit 0
+[ -x /sbin/ifup ] || exit 0
+[ -x /sbin/ifdown ] || exit 0
+
+. /lib/functions.sh
+
+openvpnc_restart_interface() {
+	local section="$1"
+	local proto auto
+
+	config_get proto "$section" proto
+	[ "$proto" = "openvpnc" ] || return 0
+
+	config_get auto "$section" auto 1
+	[ "$auto" = "0" ] && return 0
+
+	logger -t openvpnc-hotplug "restarting interface $section after wan ifup"
+	/sbin/ifdown "$section" >/dev/null 2>&1
+	/sbin/ifup "$section" >/dev/null 2>&1
+}
+
+LOCK_FILE="/var/lock/openvpnc-wan-ifup.lock"
+mkdir -p "${LOCK_FILE%/*}"
+
+if [ -s "$LOCK_FILE" ]; then
+	read -r pid < "$LOCK_FILE"
+	if [ -n "$pid" ] && [ -d "/proc/$pid" ]; then
+		exit 0
+	fi
+
+	rm -f "$LOCK_FILE"
+fi
+
+(
+	trap 'rm -f "$LOCK_FILE"' EXIT
+	echo $$ > "$LOCK_FILE"
+	logger -t openvpnc-hotplug "scheduled openvpnc restart 10 seconds after wan ifup"
+	sleep 10
+	config_load network
+	config_foreach openvpnc_restart_interface interface
+) >/dev/null 2>&1 &
