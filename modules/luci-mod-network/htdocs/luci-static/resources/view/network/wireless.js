@@ -1215,6 +1215,7 @@ var CBIWifiFrequencyValue = form.Value.extend({
 		const hwtype = uci.get('wireless', device_section, 'type');
 		const hwval = uci.get('wireless', device_section, 'hwmode');
 		const htval = uci.get('wireless', device_section, 'htmode');
+		const bandval = uci.get('wireless', device_section, 'band');
 		const cfg_channel = uci.get('wireless', device_section, 'channel');
 		const chval = +cfg_channel;
 		const allow_auto = (hwtype == 'mt_dbdc' || cfg_channel == 'auto' || L.hasSystemFeature('hostapd', 'acs'));
@@ -1273,6 +1274,14 @@ var CBIWifiFrequencyValue = form.Value.extend({
 						this.channels[band].unshift('auto', 'auto', { available: true });
 				}
 			}
+
+			const configured_band = getConfiguredBand(hwtype, statuscfg.hwmode ?? hwval, devcfg.channel ?? cfg_channel, devcfg.band ?? bandval);
+			const has_band_channels = (band) => {
+				const channels = this.channels[band];
+				const offset = (channels?.[0] == 'auto') ? 3 : 0;
+
+				return Array.isArray(channels) && (channels.length > offset || (configured_band == band && channels.length > 0));
+			};
 
 			let hwmode_values = L.toArray(wifidevs ? wifidevs.getHWModes() : null);
 			let htmode_values = L.toArray(wifidevs ? wifidevs.getHTModes() : null);
@@ -1365,20 +1374,20 @@ var CBIWifiFrequencyValue = form.Value.extend({
 
 				this.bands = {
 					'': [
-						'2g', '2.4 GHz', { available: this.channels['2g'].length > 0 },
-						'5g', '5 GHz', { available: this.channels['5g'].length > 0 },
-						'6g', '6 GHz', { available: this.channels['6g'].length > 0 }
+						'2g', '2.4 GHz', { available: has_band_channels('2g') },
+						'5g', '5 GHz', { available: has_band_channels('5g') },
+						'6g', '6 GHz', { available: has_band_channels('6g') }
 					],
-					'n': [ '2g', '2.4 GHz', { available: this.channels['2g'].length > 0 } ],
-					'ac': [ '5g', '5 GHz', { available: this.channels['5g'].length > 0 } ],
+					'n': [ '2g', '2.4 GHz', { available: has_band_channels('2g') } ],
+					'ac': [ '5g', '5 GHz', { available: has_band_channels('5g') } ],
 					'ax': [
-						'2g', '2.4 GHz', { available: this.channels['2g'].length > 0 },
-						'5g', '5 GHz', { available: this.channels['5g'].length > 0 }
+						'2g', '2.4 GHz', { available: has_band_channels('2g') },
+						'5g', '5 GHz', { available: has_band_channels('5g') }
 					],
 					'be': [
-						'2g', '2.4 GHz', { available: this.channels['2g'].length > 0 },
-						'5g', '5 GHz', { available: this.channels['5g'].length > 0 },
-						'6g', '6 GHz', { available: this.channels['6g'].length > 0 }
+						'2g', '2.4 GHz', { available: has_band_channels('2g') },
+						'5g', '5 GHz', { available: has_band_channels('5g') },
+						'6g', '6 GHz', { available: has_band_channels('6g') }
 					]
 				};
 			}
@@ -1420,24 +1429,24 @@ var CBIWifiFrequencyValue = form.Value.extend({
 
 				this.bands = {
 					'': [
-						'2g', '2.4 GHz', { available: this.channels['2g'].length > 0 },
-						'5g', '5 GHz', { available: this.channels['5g'].length > 0 },
-						'60g', '60 GHz', { available: this.channels['60g'].length > 0 }
+						'2g', '2.4 GHz', { available: has_band_channels('2g') },
+						'5g', '5 GHz', { available: has_band_channels('5g') },
+						'60g', '60 GHz', { available: has_band_channels('60g') }
 					],
 					'n': [
-						'2g', '2.4 GHz', { available: this.channels['2g'].length > 0 },
-						'5g', '5 GHz', { available: this.channels['5g'].length > 0 }
+						'2g', '2.4 GHz', { available: has_band_channels('2g') },
+						'5g', '5 GHz', { available: has_band_channels('5g') }
 					],
-					'ac': [ '5g', '5 GHz', { available: this.channels['5g'].length > 0 } ],
+					'ac': [ '5g', '5 GHz', { available: has_band_channels('5g') } ],
 					'ax': [
-						'2g', '2.4 GHz', { available: this.channels['2g'].length > 0 },
-						'5g', '5 GHz', { available: this.channels['5g'].length > 0 },
-						'6g', '6 GHz', { available: this.channels['6g'].length > 0 }
+						'2g', '2.4 GHz', { available: has_band_channels('2g') },
+						'5g', '5 GHz', { available: has_band_channels('5g') },
+						'6g', '6 GHz', { available: has_band_channels('6g') }
 					],
 					'be': [
-						'2g', '2.4 GHz', { available: this.channels['2g'].length > 0 },
-						'5g', '5 GHz', { available: this.channels['5g'].length > 0 },
-						'6g', '6 GHz', { available: this.channels['6g'].length > 0 }
+						'2g', '2.4 GHz', { available: has_band_channels('2g') },
+						'5g', '5 GHz', { available: has_band_channels('5g') },
+						'6g', '6 GHz', { available: has_band_channels('6g') }
 					]
 				};
 			}
@@ -1581,6 +1590,10 @@ var CBIWifiFrequencyValue = form.Value.extend({
 			this.useBandOption = true;
 			setSelectValue(band, getConfiguredBand(hwtype, hwval, chval, bandval));
 		}
+		else if (hwtype == 'mac80211') {
+			this.useBandOption = true;
+			setSelectValue(band, bandval);
+		}
 		else if (hwval != null) {
 			this.useBandOption = false;
 			setSelectValue(band, /a/.test(hwval) ? '5g': '2g');
@@ -1719,6 +1732,9 @@ var CBIWifiFrequencyValue = form.Value.extend({
 		}
 		else if (this.useBandOption) {
 			uci.set('wireless', config_section, 'band', band);
+
+			if (hwtype == 'mac80211')
+				uci.unset('wireless', config_section, 'hwmode');
 		}
 		else {
 			uci.set('wireless', config_section, 'hwmode', (band == '2g') ? '11g' : '11a');
