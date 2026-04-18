@@ -787,11 +787,19 @@ return view.extend({
 
 	render([nft, ipt, ipt6]) {
 		const view = E('div');
+		let has_tables = false;
 
 		this.checkLegacyRules(ipt, ipt6);
 
-		if (!Array.isArray(nft.nftables))
-			return E('em', _('No nftables ruleset loaded.'));
+		if (Array.isArray(nft.nftables))
+			for (let t of nft.nftables)
+				if (t.hasOwnProperty('table'))
+					has_tables = true;
+
+		if (!has_tables) {
+			window.location.replace(L.url('admin/status/nftables/iptables'));
+			return E('em', _('Redirecting to iptables rules overview...'));
+		}
 
 		for (let t of nft.nftables)
 			if (t.hasOwnProperty('table'))

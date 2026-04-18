@@ -74,6 +74,115 @@ function setSectionValues(config, sid, values) {
 		uci.set(config, sid, opt, values[opt]);
 }
 
+const CBIEditableList = form.Value.extend({
+	__name__: 'CBI.OpenVPNEditableList',
+
+	renderWidget(section_id, option_index, cfgvalue) {
+		const values = L.toArray((cfgvalue != null) ? cfgvalue : this.default)
+			.map(v => String(v).trim())
+			.filter(v => v !== '');
+		const root = E('div', {
+			'class': 'openvpn-editable-list',
+			'data-widget-id': this.cbid(section_id),
+			'style': 'display:flex; flex-direction:column; gap:.65rem; width:100%;'
+		});
+		const items = E('div', {
+			'class': 'openvpn-editable-list-items',
+			'style': 'display:flex; flex-direction:column; gap:.65rem; width:100%;'
+		});
+		const creator = E('div', {
+			'class': 'openvpn-editable-list-add',
+			'style': 'display:flex; align-items:center; gap:.65rem; width:100%;'
+		}, [
+			E('input', {
+				'type': 'text',
+				'class': 'cbi-input-text',
+				'placeholder': _('Add client setting'),
+				'style': 'flex:1 1 auto; width:100%;'
+			}),
+			E('button', {
+				'type': 'button',
+				'class': 'cbi-button cbi-button-add',
+				'style': 'flex:0 0 auto; min-width:3rem;'
+			}, [ '+' ])
+		]);
+		const dispatchChange = () => root.dispatchEvent(new CustomEvent('widget-change', { bubbles: true }));
+		const addInput = creator.firstChild;
+		const addButton = creator.lastChild;
+
+		const addItem = (value) => {
+			const row = E('div', {
+				'class': 'openvpn-editable-list-item',
+				'style': 'display:flex; align-items:center; gap:.65rem; width:100%;'
+			}, [
+				E('input', {
+					'type': 'text',
+					'class': 'cbi-input-text',
+					'value': value || '',
+					'placeholder': _('Client setting'),
+					'style': 'flex:1 1 auto; width:100%;'
+				}),
+				E('button', {
+					'type': 'button',
+					'class': 'cbi-button cbi-button-negative',
+					'style': 'flex:0 0 auto; min-width:3rem;'
+				}, [ '×' ])
+			]);
+			const input = row.firstChild;
+			const remove = row.lastChild;
+
+			input.addEventListener('input', dispatchChange);
+			remove.addEventListener('click', () => {
+				row.remove();
+				dispatchChange();
+			});
+
+			items.appendChild(row);
+		};
+
+		values.forEach(addItem);
+
+		addButton.addEventListener('click', () => {
+			const value = String(addInput.value || '').trim();
+
+			if (!value)
+				return;
+
+			addItem(value);
+			addInput.value = '';
+			dispatchChange();
+		});
+
+		addInput.addEventListener('keydown', (ev) => {
+			if (ev.key !== 'Enter')
+				return;
+
+			ev.preventDefault();
+			addButton.click();
+		});
+
+		root.appendChild(items);
+		root.appendChild(creator);
+
+		return root;
+	},
+
+	formvalue(section_id) {
+		const field = this.map.findElement('data-field', this.cbid(section_id));
+
+		if (!field)
+			return null;
+
+		return Array.from(field.querySelectorAll('.openvpn-editable-list-item input'))
+			.map(input => String(input.value || '').trim())
+			.filter(value => value !== '');
+	},
+
+	textvalue(section_id) {
+		return L.toArray(this.formvalue(section_id)).join(', ');
+	}
+});
+
 function normalizePKIPaths() {
 	const defaults = {
 		ca: '/etc/openvpn/pki/ca.crt',
@@ -158,9 +267,10 @@ return view.extend({
 		o.datatype = 'string';
 		o.placeholder = '10.8.0.0 255.255.255.0';
 
-		o = s.taboption('basic', form.DynamicList, 'push', _('Client Settings'),
+		o = s.taboption('basic', CBIEditableList, 'push', _('Client Settings'),
 			_('Set route 192.168.0.0 255.255.255.0 and dhcp-option DNS 192.168.0.1 base on your router'));
-		o.datatype = 'string';
+		o.optional = true;
+		o.rmempty = true;
 
 		o = s.taboption('basic', form.Button, '_download', _('OpenVPN Client config file'),
 			_('If you are using IOS client, please download this .ovpn file and send it via QQ or Email to your IOS device'));
