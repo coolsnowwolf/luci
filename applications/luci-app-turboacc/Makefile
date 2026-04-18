@@ -28,10 +28,10 @@ LUCI_PKGARCH:=all
 define Package/luci-app-turboacc/config
   choice
     prompt "FastPath Engine"
-    default PACKAGE_TURBOACC_INCLUDE_FLOW_OFFLOADING if !(TARGET_qualcommax)
+    default PACKAGE_TURBOACC_INCLUDE_FLOW_OFFLOADING if !(TARGET_qualcommax||TARGET_ipq50xx||TARGET_ipq53xx||TARGET_ipq60xx||TARGET_ipq807x||TARGET_ipq807x||TARGET_ipq95xx)
 
     config PACKAGE_TURBOACC_INCLUDE_NO_FASTPATH
-    bool "Disable" if (TARGET_qualcommax)
+    bool "Use NSS ECM" if (TARGET_qualcommax||TARGET_ipq50xx||TARGET_ipq53xx||TARGET_ipq60xx||TARGET_ipq807x||TARGET_ipq807x||TARGET_ipq95xx)
 
     config PACKAGE_TURBOACC_INCLUDE_FLOW_OFFLOADING
     bool "Use flow offloading"
