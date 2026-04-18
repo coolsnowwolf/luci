@@ -7,6 +7,7 @@ include $(TOPDIR)/rules.mk
 
 LUCI_TITLE:=Design Theme
 LUCI_DEPENDS:=
+PKG_LICENSE:=Apache-2.0
 PKG_VERSION:=7.1
 PKG_RELEASE:=20260411
 

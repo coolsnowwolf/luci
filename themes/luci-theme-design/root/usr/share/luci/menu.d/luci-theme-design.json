@@ -1,0 +1,10 @@
+{
+	"admin/services/theme_menu_flush": {
+		"leaf": true,
+		"action": {
+			"type": "function",
+			"module": "luci.controller.design_theme",
+			"function": "menu_flush"
+		}
+	}
+}

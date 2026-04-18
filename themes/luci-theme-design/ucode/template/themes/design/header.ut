@@ -1,0 +1,124 @@
+{#
+	Design is a clean HTML5 theme for LuCI. It is based on luci-theme-material
+	and luci-theme-neobird.
+
+	Copyright 2015 Lutty Yang <lutty@wcan.in>
+	Copyright 2021 2smile <thinktip@gmail.com>
+
+	Licensed to the public under the Apache License 2.0.
+-#}
+
+{%
+	import { access } from 'fs';
+	import { getuid, getspnam } from 'luci.core';
+
+	const boardinfo = ubus.call('system', 'board');
+	const hostname = striptags(boardinfo?.hostname ?? 'OpenWrt');
+	const dispatch_path = ctx.path ?? [];
+	const request_path = ctx.request_path ?? dispatch_path;
+	const current_path = length(dispatch_path) ? join('-', dispatch_path) : 'main-login';
+	const current_page = length(request_path) ? join('-', request_path) : current_path;
+	const show_proxy_icon = access('/etc/config/google_fu_mode');
+	const theme_rev = `${version?.luciversion ?? 'dev'}-designfix-20260418`;
+
+	http.prepare_content('text/html; charset=UTF-8');
+-%}
+
+<!DOCTYPE html>
+<html lang="{{ dispatcher.lang }}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, viewport-fit=cover">
+<link rel="manifest" href="{{ media }}/manifest.json">
+<title>{{ striptags(`${hostname}${dispatched?.title ? ` - ${_(dispatched.title)}` : ''}`) }} - LuCI</title>
+<meta name="format-detection" content="telephone=no, email=no">
+<meta name="x5-fullscreen" content="true">
+<meta name="full-screen" content="yes">
+<meta name="x5-page-mode" content="app">
+<meta name="browsermode" content="application">
+<meta name="msapplication-tap-highlight" content="no">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="white">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="black">
+<meta name="application-name" content="{{ hostname }} - LuCI">
+<meta name="apple-mobile-web-app-title" content="{{ hostname }} - LuCI">
+<meta name="msapplication-TileImage" content="{{ media }}/images/icon.png">
+<link rel="icon" href="{{ media }}/images/icon.png" sizes="192x192">
+<link rel="apple-touch-icon" sizes="192x192" href="{{ media }}/images/icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-touch-fullscreen" content="yes">
+<meta name="msapplication-TileColor" content="#09c">
+<link rel="stylesheet" href="{{ media }}/css/style.css?v={{ theme_rev }}">
+<script src="{{ media }}/js/jquery.min.js?v=3.5.1"></script>
+<script src="{{ media }}/js/compat.js?v={{ theme_rev }}"></script>
+<link rel="shortcut icon" href="{{ media }}/favicon.ico">
+{% if (node?.css): %}
+<link rel="stylesheet" href="{{ resource }}/{{ node.css }}">
+{% endif %}
+<script src="{{ dispatcher.build_url('admin/translations', dispatcher.lang) }}"></script>
+<script src="{{ resource }}/cbi.js?v={{ theme_rev }}"></script>
+{% if (css): %}
+<style title="text/css">{{ css }}</style>
+{% endif %}
+</head>
+<body class="lang_{{ dispatcher.lang }} {{ ctx.authsession ? 'logged-in' : '' }} {{ length(dispatch_path) ? `node-${join('-', dispatch_path)}` : 'node-main-login' }}" data-page="{{ entityencode(current_page, true) }}">
+<header>
+	<div class="fill">
+		<div class="container">
+			<span class="showSide"></span>
+			<a class="brand" href="{{ ctx.authsession ? dispatcher.build_url('admin/status/overview') : '#' }}">{{ hostname }}</a>
+			<div class="status" id="indicators"></div>
+		</div>
+	</div>
+</header>
+
+<div class="navbar">
+	<a href="{{ dispatcher.build_url('admin/status/overview') }}"><img src="{{ media }}/images/home.png"></a>
+	{% if (show_proxy_icon): %}
+	<a href="{{ dispatcher.build_url('admin/services/openclash') }}"><img src="{{ media }}/images/openclash.png"></a>
+	{% endif %}
+	<a href="{{ dispatcher.build_url('admin/network/network') }}"><img src="{{ media }}/images/link.png"></a>
+	<a href="{{ dispatcher.build_url('admin/status/realtime') }}"><img src="{{ media }}/images/rank.png"></a>
+	<a href="{{ dispatcher.build_url('admin/system/admin') }}"><img src="{{ media }}/images/user.png"></a>
+</div>
+
+<div class="main">
+	<div class="loading"><span><div class="loading-img"></div>{{ _('Collecting data...') }}</span></div>
+	<div class="main-left" id="mainmenu" style="display:none"></div>
+	<div class="main-right">
+		<div class="modemenu-buttons" style="display:none">
+			<ul id="modemenu"></ul>
+		</div>
+		<div class="darkMask"></div>
+		<div id="maincontent">
+			<div class="container">
+				{% if (getuid() == 0 && getspnam('root')?.pwdp === '' && ctx.authsession && current_page != 'admin-system-admin' && current_page != 'admin-system-admin-password'): %}
+				<div class="alert-message warning">
+					<h4>{{ _('No password set!') }}</h4>
+					<p>{{ _('There is no password set on this router. Please configure a root password to protect the web interface.') }}</p>
+					{% if (dispatcher.lookup('admin/system/admin')): %}
+					<div class="right"><a class="btn" href="{{ dispatcher.build_url('admin/system/admin') }}">{{ _('Go to password configuration...') }}</a></div>
+					{% endif %}
+				</div>
+				{% endif %}
+
+				{% if (boardinfo?.rootfs_type == 'initramfs'): %}
+				<div class="alert-message warning">
+					<h4>{{ _('System running in recovery (initramfs) mode.') }}</h4>
+					<p>{{ _('No changes to settings will be stored and are lost after rebooting. This mode should only be used to install a firmware upgrade') }}</p>
+					{% if (dispatcher.lookup('admin/system/flash')): %}
+					<div class="right"><a class="btn" href="{{ dispatcher.build_url('admin/system/flash') }}">{{ _('Go to firmware upgrade...') }}</a></div>
+					{% endif %}
+				</div>
+				{% endif %}
+
+				<noscript>
+					<div class="alert-message warning">
+						<h4>{{ _('JavaScript required!') }}</h4>
+						<p>{{ _('You must enable JavaScript in your browser or LuCI will not work properly.') }}</p>
+					</div>
+				</noscript>
+
+				<div id="tabmenu" style="display:none"></div>
+				<script src="{{ media }}/js/style.js?v={{ theme_rev }}"></script>
