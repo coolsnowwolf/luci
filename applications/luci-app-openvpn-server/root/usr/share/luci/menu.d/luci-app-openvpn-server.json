@@ -1,0 +1,14 @@
+{
+	"admin/vpn/openvpn-server": {
+		"title": "OpenVPN Server",
+		"order": 80,
+		"action": {
+			"type": "view",
+			"path": "vpn/openvpn-server"
+		},
+		"depends": {
+			"acl": [ "luci-app-openvpn-server" ],
+			"uci": { "openvpn": true }
+		}
+	}
+}

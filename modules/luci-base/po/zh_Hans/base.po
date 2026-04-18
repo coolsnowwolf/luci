@@ -425,6 +425,10 @@ msgstr "802.11k：通过无线电测量启用信标报告。"
 msgid "802.11k: Enable neighbor report via radio measurements."
 msgstr "802.11k：通过无线电测量启用邻居报告。"
 
+#: modules/luci-mod-network/htdocs/luci-static/resources/view/network/wireless.js:3287
+msgid "Enables The 802.11k standard provides information to discover the best available access point"
+msgstr "启用 802.11k 标准，为客户端提供发现最佳可用接入点所需的信息。"
+
 #: modules/luci-mod-network/htdocs/luci-static/resources/view/network/wireless.js:1869
 msgid "802.11r Fast Transition"
 msgstr "802.11r 快速切换"
@@ -436,6 +440,10 @@ msgstr "802.11s？安装 mesh wpad"
 #: modules/luci-mod-network/htdocs/luci-static/resources/view/network/wireless.js:1257
 msgid "802.11v: BSS Max Idle. Units: seconds."
 msgstr "802.11v：BSS 最长空闲时间。单位：秒。"
+
+#: modules/luci-mod-network/htdocs/luci-static/resources/view/network/wireless.js:3299
+msgid "Enables 802.11v allows client devices to exchange information about the network topology, facilitating overall improvement of the wireless network."
+msgstr "启用 802.11v 后，客户端设备可以交换网络拓扑信息，从而有助于整体提升无线网络性能。"
 
 #: modules/luci-mod-network/htdocs/luci-static/resources/view/network/wireless.js:1967
 msgid "802.11v: Basic Service Set (BSS) transition management."
@@ -6059,6 +6067,10 @@ msgstr "隔离网桥端口"
 msgid "Isolate Clients"
 msgstr "客户端隔离"
 
+#: modules/luci-mod-network/htdocs/luci-static/resources/view/network/wireless.js:2511
+msgid "Enable weak signal rejection"
+msgstr "启用弱信号剔除"
+
 #: modules/luci-mod-system/htdocs/luci-static/resources/view/system/flash.js:238
 msgid ""
 "It appears that you are trying to flash an image that does not fit into the "
@@ -9328,6 +9340,14 @@ msgstr "RSN 预认证"
 #: modules/luci-mod-network/htdocs/luci-static/resources/view/network/wireless.js:1068
 msgid "RSSI threshold for joining mesh"
 msgstr "加入 mesh 的 RSSI 阈值"
+
+#: modules/luci-mod-network/htdocs/luci-static/resources/view/network/wireless.js:2519
+msgid "Minimum association RSSI"
+msgstr "最小接入 RSSI"
+
+#: modules/luci-mod-network/htdocs/luci-static/resources/view/network/wireless.js:2520
+msgid "Reject association requests from clients below this signal threshold."
+msgstr "拒绝信号强度低于此阈值的客户端接入请求。"
 
 #: modules/luci-mod-network/htdocs/luci-static/resources/view/network/wireless.js:1023
 msgid "RTS/CTS Threshold"

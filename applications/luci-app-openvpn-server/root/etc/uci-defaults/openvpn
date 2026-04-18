@@ -6,7 +6,7 @@ openvpn_port="$(uci -q get openvpn.myvpn.port)"
 uci -q batch <<-EOF >/dev/null
 	delete network.vpn0
 	set network.vpn0=interface
-	set network.vpn0.ifname='tun0'
+	set network.vpn0.device='tun0'
 	set network.vpn0.proto='none'
 
 	commit network
@@ -47,6 +47,17 @@ uci -q batch <<-EOF >/dev/null
 EOF
 
 mkdir -p /etc/openvpn/pki
+
+[ "$(uci -q get openvpn.myvpn.ca)" = "/etc/openvpn/ca.crt" ] && \
+	uci -q set openvpn.myvpn.ca='/etc/openvpn/pki/ca.crt'
+[ "$(uci -q get openvpn.myvpn.dh)" = "/etc/openvpn/dh.pem" ] && \
+	uci -q set openvpn.myvpn.dh='/etc/openvpn/pki/dh.pem'
+[ "$(uci -q get openvpn.myvpn.cert)" = "/etc/openvpn/server.crt" ] && \
+	uci -q set openvpn.myvpn.cert='/etc/openvpn/pki/server.crt'
+[ "$(uci -q get openvpn.myvpn.key)" = "/etc/openvpn/server.key" ] && \
+	uci -q set openvpn.myvpn.key='/etc/openvpn/pki/server.key'
+
+uci -q commit openvpn
 
 rm -f /tmp/luci-indexcache
 exit 0

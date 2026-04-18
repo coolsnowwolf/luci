@@ -31,9 +31,15 @@ msgstr "启用"
 msgid "Proto"
 msgstr "协议"
 
+msgid "TCP Server"
+msgstr "TCP 服务器"
+
 #: applications/luci-app-openvpn-server/luasrc/model/cbi/openvpn-server/openvpn-server.lua:17
 msgid "TCP Server IPv4"
 msgstr "TCP Server IPv4"
+
+msgid "UDP Server"
+msgstr "UDP 服务器"
 
 #: applications/luci-app-openvpn-server/luasrc/model/cbi/openvpn-server/openvpn-server.lua:18
 msgid "UDP Server IPv4"
@@ -94,6 +100,21 @@ msgstr "重新生成 OpenVPN 证书文件"
 #: applications/luci-app-openvpn-server/luasrc/model/cbi/openvpn-server/openvpn-server.lua:52
 msgid "Renew"
 msgstr "重新生成"
+
+msgid "Failed to prepare certificate files"
+msgstr "准备证书文件失败"
+
+msgid "Failed to generate client configuration"
+msgstr "生成客户端配置失败"
+
+msgid "Generated client configuration is empty"
+msgstr "生成的客户端配置为空"
+
+msgid "Failed to renew OpenVPN certificates"
+msgstr "重新生成 OpenVPN 证书失败"
+
+msgid "OpenVPN certificate files have been renewed."
+msgstr "OpenVPN 证书文件已重新生成。"
 
 #: applications/luci-app-openvpn-server/luasrc/model/cbi/openvpn-server/openvpn-server.lua:58
 msgid "Special Code"

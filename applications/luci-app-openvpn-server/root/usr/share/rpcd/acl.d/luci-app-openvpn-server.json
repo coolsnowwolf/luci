@@ -1,11 +1,25 @@
 {
 	"luci-app-openvpn-server": {
-		"description": "Grant UCI access for luci-app-openvpn-server",
+		"description": "Grant access to OpenVPN server configuration",
 		"read": {
-			"uci": [ "openvpn" ]
+			"file": {
+				"/etc/openvpn-addon.conf": [ "read" ],
+				"/etc/openvpn/ensurecert.sh": [ "exec" ],
+				"/etc/openvpn/genovpn.sh": [ "exec" ],
+				"/etc/openvpn/renewcert.sh": [ "exec" ],
+				"/tmp/my.ovpn": [ "read" ]
+			},
+			"ubus": {
+				"luci": [ "setInitAction" ],
+				"service": [ "list" ]
+			},
+			"uci": [ "openvpn", "network", "firewall" ]
 		},
 		"write": {
-			"uci": [ "openvpn" ]
+			"file": {
+				"/etc/openvpn-addon.conf": [ "write" ]
+			},
+			"uci": [ "openvpn", "network", "firewall" ]
 		}
 	}
 }
