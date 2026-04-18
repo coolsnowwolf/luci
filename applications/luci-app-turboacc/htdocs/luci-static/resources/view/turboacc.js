@@ -32,6 +32,13 @@ var getTCPCCAStat = rpc.declare({
 	expect: { '': {} }
 });
 
+var callInitAction = rpc.declare({
+	object: 'luci',
+	method: 'setInitAction',
+	params: [ 'name', 'action' ],
+	expect: { result: false }
+});
+
 function getServiceStatus() {
 	return Promise.all([
 		L.resolveDefault(getFastPathStat(), {}),
@@ -62,13 +69,15 @@ return view.extend({
 	load: function() {
 		return Promise.all([
 			uci.load('turboacc'),
-			L.resolveDefault(getSystemFeatures(), {})
+			L.resolveDefault(getSystemFeatures(), {}),
+			L.resolveDefault(fs.stat('/etc/init.d/qca-nss-ecm'), null)
 		]);
 	},
 
 	render: function(data) {
 		var m, s, o;
 		var features = data[1];
+		features.hasNSSECM = !!features.hasNSSECM || !!data[2];
 
 		m = new form.Map('turboacc', _('TurboACC settings'),
 			_('Open source flow offloading engine (fast path or hardware NAT).'));
@@ -124,6 +133,8 @@ return view.extend({
 			o.value('fast_classifier', _('Fast classifier'));
 		if (features.hasSHORTCUTFECM)
 			o.value('shortcut_fe_cm', _('SFE connection manager'));
+		if (features.hasNSSECM)
+			o.value('qca_nss_ecm', _('QCA NSS ECM'));
 		if (features.hasMEDIATEKHNAT)
 			o.value('mediatek_hnat', _('MediaTek HNAT'));
 		o.default = 'disabled';
@@ -136,6 +147,8 @@ return view.extend({
 				desc.innerHTML = _('Fast classifier connection manager for the shortcut forwarding engine.');
 			else if (value === 'shortcut_fe_cm')
 				desc.innerHTML = _('Simple connection manager for the shortcut forwarding engine.');
+			else if (value === 'qca_nss_ecm')
+				desc.innerHTML = _('Qualcomm NSS ECM acceleration engine.');
 			else if (value === 'mediatek_hnat')
 				desc.innerHTML = _('MediaTek\'s open source hardware offloading engine.');
 			else
@@ -177,10 +190,10 @@ return view.extend({
 		o = s.option(form.ListValue, 'fullcone', _('Full cone NAT'),
 			_('Full cone NAT (NAT1) can improve gaming performance effectively.'));
 		o.value('0', _('Disable'))
-		if (features.hasXTFULLCONENAT || features.hasNFTFULLCONENAT)
+		if (features.hasXTFULLCONENAT || features.hasNFTFULLCONENAT) {
 			o.value('1', _('FULLCONENAT'));
-		if (!features.hasNFTFULLCONENAT)
 			o.value('2', _('Boardcom Fullcone NAT1'));
+		}
 		o.default = '0';
 		o.rmempty = false;
 
@@ -192,5 +205,23 @@ return view.extend({
 		o.rmempty = false;
 
 		return m.render();
+	},
+
+	handleSaveApply(ev, mode) {
+		const applyNssEcmRestart = () => {
+			const section = uci.sections('turboacc', 'turboacc').find(s => s['.name'] == 'config');
+
+			if (section?.fastpath === 'qca_nss_ecm')
+				callInitAction('qca-nss-ecm', 'restart');
+		};
+
+		const fn = L.bind(() => {
+			uci.unload('turboacc');
+			uci.load('turboacc').then(applyNssEcmRestart);
+			document.removeEventListener('uci-applied', fn);
+		});
+
+		document.addEventListener('uci-applied', fn);
+		return this.super('handleSaveApply', [ev, mode]);
 	}
 });

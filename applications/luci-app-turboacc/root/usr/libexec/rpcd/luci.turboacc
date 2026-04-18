@@ -22,6 +22,7 @@ local methods = {
 				hasFLOWOFFLOADING = fs.access("/lib/modules/" .. boardinfo.kernel .. "/xt_FLOWOFFLOAD.ko") or fs.access("/lib/modules/" .. boardinfo.kernel .. "/xt_FLOWOFFLOAD.ko"),
 				hasFASTCLASSIFIER = fs.access("/lib/modules/" .. boardinfo.kernel .. "/fast-classifier.ko"),
 				hasSHORTCUTFECM   = fs.access("/lib/modules/" .. boardinfo.kernel .. "/shortcut-fe-cm.ko"),
+				hasNSSECM         = fs.access("/etc/init.d/qca-nss-ecm"),
 				hasMEDIATEKHNAT   = fs.access("/lib/modules/" .. boardinfo.kernel .. "/mtkhnat.ko"),
 				hasXTFULLCONENAT  = fs.access("/lib/modules/" .. boardinfo.kernel .. "/xt_FULLCONENAT.ko"),
 				hasNFTFULLCONENAT  = fs.access("/lib/modules/" .. boardinfo.kernel .. "/nft_fullcone.ko"),

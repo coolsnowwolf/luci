@@ -3,11 +3,18 @@
 		"description": "Grant UCI access for luci-app-turboacc",
 		"read": {
 			"ubus": {
+				"file": [ "stat" ],
 				"luci.turboacc": [ "getSystemFeatures", "getFastPathStat", "getFullConeStat", "getTCPCCAStat" ]
+			},
+			"file": {
+				"/etc/init.d/qca-nss-ecm": [ "read" ]
 			},
 			"uci": [ "turboacc" ]
 		},
 		"write": {
+			"ubus": {
+				"luci": [ "setInitAction" ]
+			},
 			"uci": [ "turboacc" ]
 		}
 	}
