@@ -1,5 +1,6 @@
 'use strict';
 'require view';
+'require fs';
 'require poll';
 'require ui';
 'require uci';
@@ -97,16 +98,22 @@ return view.extend({
 			callTimezone(),
 			callGetUnixtime(),
 			uci.load('luci'),
-			uci.load('system')
+			uci.load('system'),
+			L.hasSystemFeature('zram')
+				? L.resolveDefault(fs.read('/sys/block/zram0/comp_algorithm'), '')
+				: ''
 		]);
 	},
 
-	render([ntpd_enabled, timezones, unixtime]) {
+	render([ntpd_enabled, timezones, unixtime, _luci, _system, zram_algorithms]) {
 		let m, s, o;
+		const system_section = uci.sections('system', 'system')[0];
 
 		m = new form.Map('system',
 			_('System'),
 			_('Here you can configure the basic aspects of your device like its hostname or the timezone.'));
+		this.map = m;
+		this.systemSid = system_section?.['.name'];
 
 		m.chain('luci');
 
@@ -207,17 +214,42 @@ return view.extend({
 		if (L.hasSystemFeature('zram')) {
 			s.tab('zram', _('ZRam Settings'));
 
+			o = s.taboption('zram', form.Flag, 'zram_enabled', _('Enable'));
+			o.enabled = '1';
+			o.disabled = '0';
+			o.default = '1';
+			o.rmempty = false;
+			o.cfgvalue = function(section_id) {
+				return String(uci.get('system', section_id, 'zram_enabled') ?? '1');
+			};
+
 			o = s.taboption('zram', form.Value, 'zram_size_mb', _('ZRam Size'), _('Size of the ZRam device in megabytes'));
 			o.optional    = true;
 			o.placeholder = 16;
 			o.datatype    = 'uinteger';
+			o.depends('zram_enabled', '1');
+
+			const supported_algorithms = String(zram_algorithms || '')
+				.trim()
+				.split(/\s+/)
+				.map(algo => algo.replace(/[\[\]]/g, ''))
+				.filter((algo, index, list) => algo && list.indexOf(algo) === index);
+			const current_algorithm = uci.get('system', '@system[0]', 'zram_comp_algo');
 
 			o = s.taboption('zram', form.ListValue, 'zram_comp_algo', _('ZRam Compression Algorithm'));
 			o.optional    = true;
-			o.default     = 'lzo';
-			o.value('lzo', 'lzo');
-			o.value('lz4', 'lz4');
-			o.value('zstd', 'zstd');
+			o.default     = current_algorithm || supported_algorithms[0] || 'lzo';
+			o.depends('zram_enabled', '1');
+
+			if (!supported_algorithms.length) {
+				[ 'lzo', 'lz4', 'zstd' ].forEach(algo => o.value(algo, algo));
+			}
+			else {
+				supported_algorithms.forEach(algo => o.value(algo, algo));
+
+				if (current_algorithm && supported_algorithms.indexOf(current_algorithm) < 0)
+					o.value(current_algorithm, '%s (%s)'.format(current_algorithm, _('unsupported')));
+			}
 		}
 
 		/*
@@ -324,5 +356,35 @@ return view.extend({
 
 			return mapEl;
 		});
+	},
+
+	isZramChanged() {
+		if (!L.hasSystemFeature('zram') || !this.map || !this.systemSid)
+			return false;
+
+		const enabled = this.map.lookupOption('zram_enabled', this.systemSid);
+		const size = this.map.lookupOption('zram_size_mb', this.systemSid);
+		const algo = this.map.lookupOption('zram_comp_algo', this.systemSid);
+		const current_enabled = String(uci.get('system', '@system[0]', 'zram_enabled') ?? '1');
+		const current_size = String(uci.get('system', '@system[0]', 'zram_size_mb') ?? '');
+		const current_algo = String(uci.get('system', '@system[0]', 'zram_comp_algo') ?? '');
+		const form_enabled = String(enabled ? (enabled[0].formvalue(enabled[1]) ?? '') : current_enabled);
+		const form_size = String(size ? (size[0].formvalue(size[1]) ?? '') : current_size);
+		const form_algo = String(algo ? (algo[0].formvalue(algo[1]) ?? '') : current_algo);
+
+		return (form_enabled !== current_enabled || form_size !== current_size || form_algo !== current_algo);
+	},
+
+	handleSaveApply(ev, mode) {
+		if (this.isZramChanged()) {
+			const fn = L.bind(() => {
+				callRcInit('zram', 'restart');
+				document.removeEventListener('uci-applied', fn);
+			});
+
+			document.addEventListener('uci-applied', fn);
+		}
+
+		return this.super('handleSaveApply', [ev, mode]);
 	}
 });

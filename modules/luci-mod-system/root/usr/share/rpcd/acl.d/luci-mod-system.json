@@ -2,7 +2,11 @@
 	"luci-mod-system-config": {
 		"description": "Grant access to system configuration",
 		"read": {
+			"file": {
+				"/sys/block/zram0/comp_algorithm": [ "read" ]
+			},
 			"ubus": {
+				"file": [ "read" ],
 				"luci": [ "getLEDs", "getTimezones", "getUSBDevices", "getUnixtime" ],
 				"rc": [ "list" ]
 			},
