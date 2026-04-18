@@ -2507,6 +2507,22 @@ return view.extend({
 
 						return currentMode;
 					};
+
+					o = ss.taboption('general', form.Flag, 'min_asoc_rssi_enable', _('Enable weak signal rejection'));
+					o.depends('mode', 'ap');
+					o.depends('mode', 'ap-wds');
+					o.cfgvalue = function(section_id) {
+						return (uci.get('wireless', section_id, 'min_asoc_rssi_enable') == '1' ||
+						        uci.get('wireless', section_id, 'min_asoc_rssi') != null) ? '1' : '0';
+					};
+
+					o = ss.taboption('general', form.Value, 'min_asoc_rssi', _('Minimum association RSSI'),
+						_('Reject association requests from clients below this signal threshold.'));
+					o.optional = true;
+					o.placeholder = -90;
+					o.datatype = 'range(-100,0)';
+					o.depends({ mode: 'ap', min_asoc_rssi_enable: '1' });
+					o.depends({ mode: 'ap-wds', min_asoc_rssi_enable: '1' });
 				}
 
 

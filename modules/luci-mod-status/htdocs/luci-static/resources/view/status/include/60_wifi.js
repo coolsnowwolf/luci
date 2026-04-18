@@ -347,6 +347,12 @@ function getDisplayNoise(net, iwinfoInfoMap) {
 }
 
 function getDisplayTXPower(net, iwinfoInfoMap) {
+	const configured = +uci.get('wireless', net.getWifiDeviceName(), 'txpower');
+	const radioDisabled = (uci.get('wireless', net.getWifiDeviceName(), 'disabled') == '1');
+
+	if (radioDisabled)
+		return null;
+
 	let txpower = net.getTXPower();
 
 	if (txpower != null && txpower > 0)
@@ -359,8 +365,7 @@ function getDisplayTXPower(net, iwinfoInfoMap) {
 			return txpower;
 	}
 
-	txpower = +uci.get('wireless', net.getWifiDeviceName(), 'txpower');
-	return (!isNaN(txpower) && txpower > 0) ? txpower : null;
+	return (!isNaN(configured) && configured > 0) ? configured : null;
 }
 
 function getDisplaySignalPercent(net, is_assoc) {
