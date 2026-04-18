@@ -1,0 +1,23 @@
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8"
+
+#: applications/luci-app-uugamebooster/htdocs/luci-static/resources/view/uugamebooster.js:70
+msgid "Enable"
+msgstr ""
+
+#: applications/luci-app-uugamebooster/htdocs/luci-static/resources/view/uugamebooster.js:32
+#: applications/luci-app-uugamebooster/htdocs/luci-static/resources/view/uugamebooster.js:34
+msgid "UU GameAcc"
+msgstr ""
+
+#: applications/luci-app-uugamebooster/htdocs/luci-static/resources/view/uugamebooster.js:50
+msgid "UU Game Accelerator"
+msgstr ""
+
+#: applications/luci-app-uugamebooster/htdocs/luci-static/resources/view/uugamebooster.js:51
+msgid "A Paid Game Acceleration service"
+msgstr ""
+
+#: applications/luci-app-uugamebooster/htdocs/luci-static/resources/view/uugamebooster.js:64
+msgid "Collecting data..."
+msgstr ""
