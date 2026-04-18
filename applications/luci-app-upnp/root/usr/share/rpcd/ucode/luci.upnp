@@ -24,11 +24,12 @@ const methods = {
 			const leasefile = open(uci.get('upnpd', 'config', 'upnp_lease_file'), 'r');
 
 			if (leasefile) {
-				for (let line = leasefile.read('line'); length(line); line = leasefile.read('line')) {
+				for (let line = leasefile.read('line'), idx = 1; length(line); line = leasefile.read('line'), idx++) {
 					const record = split(line, ':', 6);
 
 					if (length(record) == 6) {
 						push(leases, {
+							token: `${idx}`,
 							proto: uc(record[0]),
 							extport: +record[1],
 							intaddr: arrtoip(iptoarr(record[2])),
@@ -46,7 +47,7 @@ const methods = {
 
 			if (ipt) {
 				for (let line = ipt.read('line'); length(line); line = ipt.read('line')) {
-					let m = match(line, /^([0-9]+)\s+([a-z]+).+dpt:([0-9]+) to:(\S+):([0-9]+)/);
+					let m = match(line, /^\s*([0-9]+)\s+\d+\s+\d+\s+\S+\s+([a-z]+).+dpt:([0-9]+)\s+to:(\S+):([0-9]+)/);
 
 					if (m) {
 						push(rules, {
@@ -94,6 +95,7 @@ const methods = {
 						    lease.intport == rule.intport &&
 						    lease.extport == rule.extport)
 						{
+							rule.num = lease.token;
 							rule.descr = lease.description;
 							rule.expires = lease.expires;
 							break;
