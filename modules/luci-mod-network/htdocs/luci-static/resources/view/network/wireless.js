@@ -798,6 +798,31 @@ function parseIwPhyMaxWidthMap(stdout) {
 		if (!currentPhy)
 			continue;
 
+		const widthHint = rawLine.match(/Supported Channel Width:\s*(.+)$/);
+		if (widthHint) {
+			let maxWidth = 20;
+			const widths = [];
+
+			widthHint[1].replace(/\b(20|40|80|160|320)\s*MHz\b/g, function(_, mhz) {
+				widths.push(+mhz);
+			});
+
+			if (widthHint[1].match(/\b80\+80\b/))
+				widths.push(160);
+
+			if (widths.length)
+				maxWidth = Math.max.apply(Math, widths);
+
+			mapping[currentPhy] = Math.max(mapping[currentPhy] || 0, maxWidth);
+			continue;
+		}
+
+		const ehtWidth = rawLine.match(/EHT TX\/RX MCS and NSS set (\d+)\s*MHz/);
+		if (ehtWidth) {
+			mapping[currentPhy] = Math.max(mapping[currentPhy] || 0, +ehtWidth[1]);
+			continue;
+		}
+
 		const radarMatch = rawLine.match(/radar detect widths:\s*\{([^}]*)\}/);
 		if (!radarMatch)
 			continue;
@@ -809,7 +834,7 @@ function parseIwPhyMaxWidthMap(stdout) {
 		});
 
 		if (widths.length)
-			mapping[currentPhy] = Math.max.apply(Math, widths);
+			mapping[currentPhy] = Math.max(mapping[currentPhy] || 0, Math.max.apply(Math, widths));
 	}
 
 	return mapping;
@@ -1470,16 +1495,60 @@ var CBIWifiFrequencyValue = form.Value.extend({
 		sel.vals = vals;
 	},
 
+	setSelectValue: function(sel, value) {
+		if (value == null)
+			return false;
+
+		for (let i = 0; i < sel.options.length; i++) {
+			if (sel.options[i].value == value) {
+				sel.options[i].selected = true;
+				sel.selectedIndex = i;
+				return true;
+			}
+		}
+
+		return false;
+	},
+
+	filterHTModesByChannel: function(vals, band, channel) {
+		if (!Array.isArray(vals))
+			return vals;
+
+		const ch = +channel;
+		const restrictWide = (band == '5g' && !(ch > 0 && ch <= 100));
+
+		if (!restrictWide)
+			return vals;
+
+		const filtered = [];
+
+		for (let i = 0; i < vals.length; i += 3) {
+			const value = vals[i];
+			const label = vals[i + 1];
+			const meta = Object.assign({}, vals[i + 2]);
+
+			if (/(160|320|80_80)/.test(String(value)))
+				meta.available = false;
+
+			filtered.push(value, label, meta);
+		}
+
+		return filtered;
+	},
+
 	toggleWifiMode: function(elem) {
-		this.toggleWifiHTMode(elem);
 		this.toggleWifiBand(elem);
 	},
 
 	toggleWifiHTMode: function(elem) {
 		const mode = elem.querySelector('.mode');
+		const band = elem.querySelector('.band');
+		const chan = elem.querySelector('.channel');
 		const bwdt = elem.querySelector('.htmode');
+		const current = bwdt.value;
 
-		this.setValues(bwdt, this.htmodes[mode.value]);
+		this.setValues(bwdt, this.filterHTModesByChannel(this.htmodes[mode.value], band.value, chan.value));
+		this.setSelectValue(bwdt, current);
 	},
 
 	toggleWifiBand: function(elem) {
@@ -1510,6 +1579,7 @@ var CBIWifiFrequencyValue = form.Value.extend({
 		const chan = elem.querySelector('.channel');
 
 		this.setValues(chan, this.channels[band.value]);
+		this.toggleWifiHTMode(elem);
 
 		this.map.checkDepends();
 		this.checkWifiChannelRestriction(elem);
@@ -1533,20 +1603,6 @@ var CBIWifiFrequencyValue = form.Value.extend({
 		const hwval = isQcaWifiHwtype(hwtype) ? (cfg_hwval || devinfo.hwmode) : (devinfo.hwmode || cfg_hwval);
 		const chval = cfg_chval || devinfo.channel;
 		const bandval = cfg_bandval || getConfiguredBand(hwtype, hwval, chval, null);
-		const setSelectValue = function(sel, value) {
-			if (value == null)
-				return false;
-
-			for (let i = 0; i < sel.options.length; i++) {
-				if (sel.options[i].value == value) {
-					sel.options[i].selected = true;
-					sel.selectedIndex = i;
-					return true;
-				}
-			}
-
-			return false;
-		};
 		const forceSelectValue = function(sel, value) {
 			if (value == null)
 				return false;
@@ -1578,7 +1634,7 @@ var CBIWifiFrequencyValue = form.Value.extend({
 		else if (/HT20|HT40/.test(htval))
 			modeval = 'n';
 
-		if (!setSelectValue(mode, modeval) && !forceSelectValue(mode, modeval) && mode.options.length)
+		if (!this.setSelectValue(mode, modeval) && !forceSelectValue(mode, modeval) && mode.options.length)
 			mode.selectedIndex = Math.max(0, mode.options.length - 1);
 
 		const active_mode = modeval || mode.value || (mode.selectedIndex >= 0 ? mode.options[mode.selectedIndex].value : '');
@@ -1588,24 +1644,24 @@ var CBIWifiFrequencyValue = form.Value.extend({
 
 		if (isQcaWifiHwtype(hwtype)) {
 			this.useBandOption = true;
-			setSelectValue(band, getConfiguredBand(hwtype, hwval, chval, bandval));
+			this.setSelectValue(band, getConfiguredBand(hwtype, hwval, chval, bandval));
 		}
 		else if (hwtype == 'mac80211') {
 			this.useBandOption = true;
-			setSelectValue(band, bandval);
+			this.setSelectValue(band, bandval);
 		}
 		else if (hwval != null) {
 			this.useBandOption = false;
-			setSelectValue(band, /a/.test(hwval) ? '5g': '2g');
+			this.setSelectValue(band, /a/.test(hwval) ? '5g': '2g');
 		}
 		else {
 			this.useBandOption = true;
-			setSelectValue(band, bandval);
+			this.setSelectValue(band, bandval);
 		}
 
 		this.toggleWifiBand(elem);
 
-		if (!setSelectValue(bwdt, htval) && bwdt.options.length)
+		if (!this.setSelectValue(bwdt, htval) && bwdt.options.length)
 			bwdt.selectedIndex = Math.max(0, bwdt.options.length - 1);
 
 		const effective_chval = (cfg_chval == 'auto' || devcfg.channel == 'auto') ? 'auto' : chval;
@@ -1613,8 +1669,10 @@ var CBIWifiFrequencyValue = form.Value.extend({
 		if (effective_chval == 'auto' && !Array.from(chan.options).some(o => o.value == 'auto'))
 			chan.insertBefore(E('option', { value: 'auto' }, [ 'auto' ]), chan.firstChild);
 
-		if (!setSelectValue(chan, effective_chval) && chan.options.length)
+		if (!this.setSelectValue(chan, effective_chval) && chan.options.length)
 			chan.selectedIndex = 0;
+
+		this.toggleWifiHTMode(elem);
 
 		this.checkWifiChannelRestriction(elem);
 
