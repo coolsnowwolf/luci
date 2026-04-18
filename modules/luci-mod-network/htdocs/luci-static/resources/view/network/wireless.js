@@ -2581,6 +2581,39 @@ return view.extend({
 					o.datatype = 'range(-100,0)';
 					o.depends({ mode: 'ap', min_asoc_rssi_enable: '1' });
 					o.depends({ mode: 'ap-wds', min_asoc_rssi_enable: '1' });
+
+					o = ss.taboption('general', form.Flag, 'wmm', _('WMM Mode'), _('Where Wi-Fi Multimedia (WMM) Mode QoS is disabled, clients may be limited to 802.11a/802.11g rates.'));
+					o.depends('mode', 'ap');
+					o.depends('mode', 'ap-wds');
+					o.default = o.enabled;
+
+					o = ss.taboption('advanced', form.Flag, 'doth', '802.11h');
+					o.depends('mode', 'ap');
+					o.depends('mode', 'ap-wds');
+
+					o = ss.taboption('advanced', form.Flag, 'isolate', _('Isolate Clients'), _('Prevents client-to-client communication'));
+					o.depends('mode', 'ap');
+					o.depends('mode', 'ap-wds');
+
+					o = ss.taboption('advanced', form.Flag, 'uapsd', _('U-APSD'));
+					o.depends('mode', 'ap');
+					o.depends('mode', 'ap-wds');
+
+					o = ss.taboption('advanced', form.Value, 'mcast_rate', _('Multicast Rate'));
+					o.depends('mode', 'ap');
+					o.depends('mode', 'ap-wds');
+
+					o = ss.taboption('advanced', form.Value, 'frag', _('Fragmentation Threshold'));
+					o.datatype = 'min(256)';
+					o.depends('mode', 'ap');
+					o.depends('mode', 'ap-wds');
+					o.placeholder = 2346;
+
+					o = ss.taboption('advanced', form.Value, 'rts', _('RTS/CTS Threshold'));
+					o.datatype = 'uinteger';
+					o.depends('mode', 'ap');
+					o.depends('mode', 'ap-wds');
+					o.placeholder = 2347;
 				}
 
 
