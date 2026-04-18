@@ -19,7 +19,7 @@
 	const current_path = length(dispatch_path) ? join('-', dispatch_path) : 'main-login';
 	const current_page = length(request_path) ? join('-', request_path) : current_path;
 	const show_proxy_icon = access('/etc/config/google_fu_mode');
-	const theme_rev = `${version?.luciversion ?? 'dev'}-designfix-20260418`;
+	const theme_rev = `${version?.luciversion ?? 'dev'}-designfix-20260418i`;
 
 	http.prepare_content('text/html; charset=UTF-8');
 -%}

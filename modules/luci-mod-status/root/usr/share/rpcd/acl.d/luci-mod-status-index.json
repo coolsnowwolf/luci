@@ -9,7 +9,7 @@
 				"/www/luci-static/resources/view/status/include": [ "list" ]
 			},
 			"ubus": {
-				"luci": [ "getVersion", "getUnixtime", "getOdhcp6cStats", "getBuiltinEthernetPorts" ],
+				"luci": [ "getVersion", "getUnixtime", "getOdhcp6cStats", "getBuiltinEthernetPorts", "getCPUBench", "getCPUInfo", "getCPUUsage" ],
 				"file": [ "list", "read" ],
 				"system": [ "board", "info" ]
 			}

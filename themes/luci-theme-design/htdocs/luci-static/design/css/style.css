@@ -1846,6 +1846,7 @@ form.inline + form.inline,
 .cbi-dropdown > .more,
 .cbi-dropdown > ul > li[placeholder] {
 	color: rgba(118, 131, 143, 0.85);
+	display: none;
 }
 
 .cbi-dropdown > ul > li {
@@ -1859,18 +1860,6 @@ form.inline + form.inline,
 	text-overflow: ellipsis;
 	color: var(--inputtext_color);
 	background: transparent;
-}
-
-.cbi-dropdown.btn > ul > li,
-.cbi-dropdown.cbi-button > ul > li {
-	display: flex;
-	align-items: center;
-	min-height: 35px;
-	height: 35px;
-	padding-top: 0;
-	padding-bottom: 0;
-	line-height: 35px;
-	color: inherit;
 }
 
 .cbi-dropdown > ul > li .hide-open {
@@ -1960,6 +1949,20 @@ form.inline + form.inline,
 	color: var(--text_color);
 	background: var(--sectionbg_color);
 	border: var(--input_border);
+}
+
+.cbi-dropdown.btn[open] > ul.dropdown > li[selected],
+.cbi-dropdown.cbi-button[open] > ul.dropdown > li[selected] {
+	color: #2f6f9f;
+	background: #d9eefb;
+}
+
+.cbi-dropdown.btn[open] > ul.dropdown > li.focus:not([selected]),
+.cbi-dropdown.btn[open] > ul.dropdown > li:hover:not([selected]),
+.cbi-dropdown.cbi-button[open] > ul.dropdown > li.focus:not([selected]),
+.cbi-dropdown.cbi-button[open] > ul.dropdown > li:hover:not([selected]) {
+	color: #2f6f9f;
+	background: #eef7ff;
 }
 
 .cbi-dropdown[open] > ul.dropdown > li {
@@ -2242,6 +2245,82 @@ body.modal-overlay-active #modal_overlay {
     line-height: 20px;
 /*     min-width: 100px; */
     margin: 0;
+}
+
+/* Keep LuCI split action buttons readable and vertically centered. */
+.cbi-dropdown.btn > ul > li[display],
+.cbi-dropdown.cbi-button > ul > li[display] {
+	display: flex;
+	align-items: center;
+	min-height: 35px;
+	height: 35px;
+	padding-top: 0;
+	padding-bottom: 0;
+	line-height: 35px;
+	color: #fff;
+}
+
+.cbi-dropdown.btn > .open,
+.cbi-dropdown.cbi-button > .open {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 2.25rem;
+	min-height: 35px;
+	height: 35px;
+	line-height: 35px;
+	color: transparent;
+	opacity: 1;
+	font-size: 0;
+	position: relative;
+}
+
+.cbi-dropdown.btn > .open::before,
+.cbi-dropdown.cbi-button > .open::before {
+	content: "▾";
+	display: block;
+	font-size: 1rem;
+	font-weight: 700;
+	line-height: 1;
+	color: #fff;
+	text-indent: 0;
+}
+
+.cbi-dropdown.btn > .more,
+.cbi-dropdown.cbi-button > .more {
+	display: none;
+}
+
+.right .cbi-dropdown.btn,
+.right .cbi-dropdown.cbi-button,
+.right .cbi-dropdown.btn > ul > li[display],
+.right .cbi-dropdown.cbi-button > ul > li[display],
+.right .cbi-dropdown.btn > .open,
+.right .cbi-dropdown.cbi-button > .open {
+	line-height: 35px;
+	vertical-align: middle;
+}
+
+/* Override generic .btn/.cbi-button rules so split dropdown buttons keep the
+   arrow inside the same row instead of wrapping below the main label. */
+.cbi-dropdown.btn,
+.cbi-dropdown.cbi-button,
+.btn.cbi-button.cbi-dropdown,
+div.cbi-dropdown.btn,
+div.cbi-dropdown.cbi-button {
+	display: inline-flex !important;
+	align-items: stretch;
+	flex-wrap: nowrap;
+	padding: 0 !important;
+	white-space: nowrap;
+	vertical-align: middle;
+}
+
+.cbi-dropdown.btn > ul,
+.cbi-dropdown.cbi-button > ul {
+	width: auto;
+	flex: 0 1 auto;
+	overflow: hidden;
 }
 
 .right,
