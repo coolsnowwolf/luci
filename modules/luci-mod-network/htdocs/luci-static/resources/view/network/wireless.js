@@ -25,12 +25,146 @@ const callIwinfoInfoCompat = rpc.declare({
 	params: [ 'device' ],
 	expect: {}
 });
+const callIwinfoDevices = rpc.declare({
+	object: 'iwinfo',
+	method: 'devices',
+	expect: { devices: [] }
+});
 
 let cachedIwinfoInfoMap = null;
 let cachedIwinfoInfoPromise = null;
-let cachedIwRegCountryMap = null;
-let cachedIwRegCountryPromise = null;
-let cachedIwDevPhyMap = null;
+let cachedIwinfoResolver = null;
+let cachedIwinfoResolverPromise = null;
+
+function pushUnique(list, value) {
+	if (value && list.indexOf(value) < 0)
+		list.push(value);
+}
+
+function getQcaFallbackIfname(device, section) {
+	if (/^ath\d+$/.test(String(section || '')))
+		return section;
+
+	if (/^wifi\d+$/.test(String(device || '')))
+		return 'ath' + device.replace(/^wifi/, '');
+
+	return null;
+}
+
+function buildIwinfoDeviceLookup(devices) {
+	const lookup = Object.create(null);
+
+	for (const device of L.toArray(devices))
+		if (device)
+			lookup[device] = true;
+
+	return lookup;
+}
+
+function getWifiNetIdBySection(section) {
+	let index = 0;
+
+	for (const iface of uci.sections('wireless', 'wifi-iface')) {
+		if (!iface.device)
+			continue;
+
+		index = (iface.device == section.device) ? (index + 1) : index;
+
+		if (iface['.name'] == section['.name'])
+			return '%s.network%d'.format(section.device, index);
+	}
+
+	return null;
+}
+
+function buildIwinfoResolver(devices) {
+	const deviceLookup = buildIwinfoDeviceLookup(devices);
+	const aliasMap = Object.create(null);
+	const queryTargets = [];
+	const radioTargets = Object.create(null);
+
+	function registerTarget(target) {
+		if (target && deviceLookup[target])
+			pushUnique(queryTargets, target);
+	}
+
+	function registerAlias(alias, target) {
+		if (alias && target && deviceLookup[target] && aliasMap[alias] == null)
+			aliasMap[alias] = target;
+	}
+
+	for (const iface of uci.sections('wireless', 'wifi-iface')) {
+		const device = iface.device;
+		const section = iface['.name'];
+		const configuredIfname = iface.ifname;
+		const netid = getWifiNetIdBySection(iface);
+		const fallback = getQcaFallbackIfname(device, section);
+		let target = null;
+
+		for (const candidate of [ configuredIfname, section, fallback, device ]) {
+			if (candidate && deviceLookup[candidate]) {
+				target = candidate;
+				break;
+			}
+		}
+
+		if (target && radioTargets[device] == null)
+			radioTargets[device] = target;
+
+		registerTarget(target);
+		registerAlias(configuredIfname, target);
+		registerAlias(section, target);
+		registerAlias(netid, target);
+		registerAlias(fallback, target);
+		registerAlias(device, target);
+	}
+
+	for (const radio of uci.sections('wireless', 'wifi-device')) {
+		const name = radio['.name'];
+		const target = radioTargets[name] || (deviceLookup[name] ? name : null);
+
+		registerTarget(target);
+		registerAlias(name, target);
+	}
+
+	return {
+		deviceLookup,
+		aliasMap,
+		queryTargets
+	};
+}
+
+function loadIwinfoResolver(force) {
+	if (force)
+		cachedIwinfoResolverPromise = null;
+
+	if (!force && cachedIwinfoResolver != null)
+		return Promise.resolve(cachedIwinfoResolver);
+
+	if (cachedIwinfoResolverPromise != null)
+		return cachedIwinfoResolverPromise;
+
+	cachedIwinfoResolverPromise = L.resolveDefault(callIwinfoDevices(), {}).then((res) => {
+		cachedIwinfoResolver = buildIwinfoResolver(res?.devices);
+		cachedIwinfoResolverPromise = null;
+		return cachedIwinfoResolver;
+	}).catch(() => {
+		cachedIwinfoResolverPromise = null;
+
+		if (cachedIwinfoResolver != null)
+			return cachedIwinfoResolver;
+
+		cachedIwinfoResolver = {
+			deviceLookup: Object.create(null),
+			aliasMap: Object.create(null),
+			queryTargets: []
+		};
+
+		return cachedIwinfoResolver;
+	});
+
+	return cachedIwinfoResolverPromise;
+}
 
 function loadIwinfoInfoMap(force) {
 	if (force)
@@ -42,31 +176,29 @@ function loadIwinfoInfoMap(force) {
 	if (cachedIwinfoInfoPromise != null)
 		return cachedIwinfoInfoPromise;
 
-	const radios = uci.sections('wireless', 'wifi-device').map((s) => s['.name']);
-	const networks = uci.sections('wireless', 'wifi-iface').reduce((names, s) => {
-		for (const candidate of [ s['.name'], s.ifname ]) {
-			if (candidate && names.indexOf(candidate) < 0)
-				names.push(candidate);
-		}
+	cachedIwinfoInfoPromise = loadIwinfoResolver(force).then((resolver) => {
+		return Promise.all(resolver.queryTargets.map((name) =>
+			L.resolveDefault(callIwinfoInfoCompat(name), null).then((info) => [ name, info ])
+		)).then((entries) => {
+			const nextMap = {};
 
-		return names;
-	}, []);
-	const devices = radios.concat(networks).filter((name, index, list) => !!name && list.indexOf(name) === index);
+			for (const [ name, info ] of entries)
+				if (info != null)
+					nextMap[name] = info;
 
-	cachedIwinfoInfoPromise = Promise.all(devices.map((name) =>
-		L.resolveDefault(callIwinfoInfoCompat(name), null).then((info) => [ name, info ])
-	)).then((entries) => {
-		const nextMap = {};
+			for (const alias in resolver.aliasMap) {
+				const target = resolver.aliasMap[alias];
 
-		for (const [ name, info ] of entries)
-			if (info != null)
-				nextMap[name] = info;
+				if (target && nextMap[target] != null)
+					nextMap[alias] = nextMap[target];
+			}
 
-		if (Object.keys(nextMap).length > 0 || cachedIwinfoInfoMap == null)
-			cachedIwinfoInfoMap = nextMap;
+			if (Object.keys(nextMap).length > 0 || cachedIwinfoInfoMap == null)
+				cachedIwinfoInfoMap = nextMap;
 
-		cachedIwinfoInfoPromise = null;
-		return cachedIwinfoInfoMap || nextMap;
+			cachedIwinfoInfoPromise = null;
+			return cachedIwinfoInfoMap || nextMap;
+		});
 	}).catch(() => {
 		cachedIwinfoInfoPromise = null;
 
@@ -82,48 +214,6 @@ function loadIwinfoInfoMap(force) {
 
 function refreshIwinfoInfoMap() {
 	return loadIwinfoInfoMap(true);
-}
-
-function loadIwRegCountryMap(force) {
-	if (force)
-		cachedIwRegCountryPromise = null;
-
-	if (!force && cachedIwRegCountryMap != null && cachedIwDevPhyMap != null)
-		return Promise.resolve({
-			regCountryMap: cachedIwRegCountryMap,
-			devPhyMap: cachedIwDevPhyMap
-		});
-
-	if (cachedIwRegCountryPromise != null)
-		return cachedIwRegCountryPromise;
-
-	cachedIwRegCountryPromise = Promise.all([
-		L.resolveDefault(fs.exec_direct('/usr/sbin/iw', [ 'dev' ]), ''),
-		L.resolveDefault(fs.exec_direct('/usr/sbin/iw', [ 'reg', 'get' ]), '')
-	]).then((outputs) => {
-		cachedIwDevPhyMap = parseIwDevPhyMap(outputs[0]);
-		cachedIwRegCountryMap = parseIwRegCountryMap(outputs[1]);
-		cachedIwRegCountryPromise = null;
-
-		return {
-			regCountryMap: cachedIwRegCountryMap || {},
-			devPhyMap: cachedIwDevPhyMap || {}
-		};
-	}).catch(() => {
-		cachedIwRegCountryPromise = null;
-
-		if (cachedIwRegCountryMap == null)
-			cachedIwRegCountryMap = {};
-		if (cachedIwDevPhyMap == null)
-			cachedIwDevPhyMap = {};
-
-		return {
-			regCountryMap: cachedIwRegCountryMap,
-			devPhyMap: cachedIwDevPhyMap
-		};
-	});
-
-	return cachedIwRegCountryPromise;
 }
 
 function count_changes(section_id) {
@@ -426,14 +516,6 @@ function getDisplayCountryCode(radioNet) {
 	if (configCountry)
 		return configCountry;
 
-	const phyCountry = getNonDefaultCountryCode(getIwinfoInfoCandidates(radioNet).map((candidate) => {
-		const phy = cachedIwDevPhyMap ? cachedIwDevPhyMap[candidate] : null;
-		return phy && cachedIwRegCountryMap ? cachedIwRegCountryMap[phy] : null;
-	}));
-
-	if (phyCountry)
-		return phyCountry;
-
 	return radioNet.getCountryCode() || uci.get('wireless', radioNet.getWifiDeviceName(), 'country') || '00';
 }
 
@@ -522,18 +604,14 @@ function getIwinfoInfoCandidates(radioNet) {
 	const ifname = radioNet.getIfname();
 	const section = radioNet.getName();
 	const device = radioNet.getWifiDeviceName();
+	const fallback = getQcaFallbackIfname(device, section);
 
 	if (ifname)
 		candidates.push(ifname);
 	if (section && candidates.indexOf(section) < 0)
 		candidates.push(section);
 
-	if (isQcaWifiHwtype(hwtype) && /^wifi\d+$/.test(device)) {
-		let fallback = section;
-
-		if (!/^ath\d+$/.test(fallback))
-			fallback = 'ath' + device.replace(/^wifi/, '');
-
+	if (isQcaWifiHwtype(hwtype) && fallback) {
 		if (candidates.indexOf(fallback) < 0)
 			candidates.push(fallback);
 	}
@@ -625,21 +703,22 @@ function getAssocListCandidates(radioNet) {
 	const hwtype = uci.get('wireless', radioNet.getWifiDeviceName(), 'type');
 	const ifname = radioNet.getIfname();
 	const section = radioNet.getName();
+	const device = radioNet.getWifiDeviceName();
+	const fallback = getQcaFallbackIfname(device, section);
 
-	if (ifname)
-		candidates.push(ifname);
-	if (section && candidates.indexOf(section) < 0)
-		candidates.push(section);
+	if (cachedIwinfoResolver?.aliasMap) {
+		for (const candidate of [ ifname, section, fallback, device ])
+			pushUnique(candidates, cachedIwinfoResolver.aliasMap[candidate]);
 
-	if (isQcaWifiHwtype(hwtype) && /^wifi\d+$/.test(radioNet.getWifiDeviceName())) {
-		let fallback = section;
-
-		if (!/^ath\d+$/.test(fallback))
-			fallback = 'ath' + radioNet.getWifiDeviceName().replace(/^wifi/, '');
-
-		if (candidates.indexOf(fallback) < 0)
-			candidates.push(fallback);
+		if (candidates.length)
+			return candidates;
 	}
+
+	pushUnique(candidates, ifname);
+	pushUnique(candidates, section);
+
+	if (isQcaWifiHwtype(hwtype))
+		pushUnique(candidates, fallback);
 
 	return candidates;
 }
@@ -863,27 +942,34 @@ function probeAssocListCandidates(candidates, probeFn) {
 }
 
 function getAssocListForNetwork(radioNet) {
-	const candidates = getAssocListCandidates(radioNet);
 	const hwtype = uci.get('wireless', radioNet.getWifiDeviceName(), 'type');
+	const candidates = getAssocListCandidates(radioNet);
+	const resolvedIfname = candidates[0];
 
 	function tryFallbackAssoclist() {
 		if (!isQcaWifiHwtype(hwtype) || radioNet.getMode() != 'ap')
 			return [];
 
-		return probeAssocListCandidates(candidates, callWlanconfigAssoclistCompat);
+		return probeAssocListCandidates(useResolvedIfname ? candidates.slice(1) : candidates, callWlanconfigAssoclistCompat);
 	}
 
-	return radioNet.getAssocList().then((entries) => {
+	const useResolvedIfname = (isQcaWifiHwtype(hwtype) && resolvedIfname && resolvedIfname != radioNet.getIfname());
+	const assocPromise = useResolvedIfname
+		? L.resolveDefault(callIwinfoAssoclistCompat(resolvedIfname), [])
+		: radioNet.getAssocList();
+	const compatCandidates = useResolvedIfname ? candidates.slice(1) : candidates;
+
+	return assocPromise.then((entries) => {
 		if (Array.isArray(entries) && entries.length)
 			return entries;
 
-		return probeAssocListCandidates(candidates, callIwinfoAssoclistCompat).then((compatEntries) => {
+		return probeAssocListCandidates(compatCandidates, callIwinfoAssoclistCompat).then((compatEntries) => {
 			if (Array.isArray(compatEntries) && compatEntries.length)
 				return compatEntries;
 
 			return tryFallbackAssoclist();
 		});
-	}).catch(() => probeAssocListCandidates(candidates, callIwinfoAssoclistCompat).then((compatEntries) => {
+	}).catch(() => probeAssocListCandidates(compatCandidates, callIwinfoAssoclistCompat).then((compatEntries) => {
 		if (Array.isArray(compatEntries) && compatEntries.length)
 			return compatEntries;
 
@@ -2007,10 +2093,7 @@ return view.extend({
 			uci.load('wireless'),
 			uci.load('system'),
 			firewall.getZones(),
-		]).then((data) => Promise.all([
-			refreshIwinfoInfoMap(),
-			loadIwRegCountryMap(true)
-		]).then(() => data));
+		]).then((data) => refreshIwinfoInfoMap().then(() => data));
 	},
 
 	checkAnonymousSections: function() {

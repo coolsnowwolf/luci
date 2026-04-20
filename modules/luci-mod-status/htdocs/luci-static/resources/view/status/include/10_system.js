@@ -40,6 +40,7 @@ var callCPUUsage = rpc.declare({
 
 return baseclass.extend({
 	title: _('System'),
+	disableCache: true,
 
 	load: function() {
 		return Promise.all([

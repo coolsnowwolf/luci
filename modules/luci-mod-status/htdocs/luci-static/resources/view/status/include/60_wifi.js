@@ -21,8 +21,100 @@ const callIwinfoInfoCompat = rpc.declare({
 	expect: {}
 });
 
+const callIwinfoDevices = rpc.declare({
+	object: 'iwinfo',
+	method: 'devices',
+	expect: { devices: [] }
+});
+
 function isQcaWifiHwtype(hwtype) {
 	return (hwtype == 'qcawifi' || hwtype == 'qcawificfg80211');
+}
+
+function pushUnique(list, value) {
+	if (value && list.indexOf(value) < 0)
+		list.push(value);
+}
+
+function getQcaFallbackIfname(device, section) {
+	if (/^ath\d+$/.test(String(section || '')))
+		return section;
+
+	if (/^wifi\d+$/.test(String(device || '')))
+		return 'ath' + device.replace(/^wifi/, '');
+
+	return null;
+}
+
+function buildIwinfoDeviceLookup(devices) {
+	const lookup = Object.create(null);
+
+	for (const device of L.toArray(devices))
+		if (device)
+			lookup[device] = true;
+
+	return lookup;
+}
+
+function getResolvedIwinfoDeviceName(net, deviceLookup) {
+	const ifname = net.getIfname();
+	const section = net.getName();
+	const device = net.getWifiDeviceName();
+	const fallback = getQcaFallbackIfname(device, section);
+
+	for (const candidate of [ ifname, section, fallback, device ])
+		if (candidate && deviceLookup[candidate])
+			return candidate;
+
+	return null;
+}
+
+function buildIwinfoResolver(radios, networks, devices) {
+	const deviceLookup = buildIwinfoDeviceLookup(devices);
+	const aliasMap = Object.create(null);
+	const queryTargets = [];
+	const radioTargets = Object.create(null);
+
+	function registerTarget(target) {
+		if (target && deviceLookup[target])
+			pushUnique(queryTargets, target);
+	}
+
+	function registerAlias(alias, target) {
+		if (alias && target && deviceLookup[target] && aliasMap[alias] == null)
+			aliasMap[alias] = target;
+	}
+
+	networks.forEach((net) => {
+		const target = getResolvedIwinfoDeviceName(net, deviceLookup);
+		const ifname = net.getIfname();
+		const section = net.getName();
+		const device = net.getWifiDeviceName();
+		const fallback = getQcaFallbackIfname(device, section);
+
+		if (target && radioTargets[device] == null)
+			radioTargets[device] = target;
+
+		registerTarget(target);
+		registerAlias(ifname, target);
+		registerAlias(section, target);
+		registerAlias(fallback, target);
+		registerAlias(device, target);
+	});
+
+	radios.forEach((radio) => {
+		const name = radio.getName();
+		const target = radioTargets[name] || (deviceLookup[name] ? name : null);
+
+		registerTarget(target);
+		registerAlias(name, target);
+	});
+
+	return {
+		deviceLookup,
+		aliasMap,
+		queryTargets
+	};
 }
 
 function isNetworkDisabled(net) {
@@ -194,18 +286,14 @@ function getIwinfoInfoCandidates(net) {
 	const ifname = net.getIfname();
 	const section = net.getName();
 	const device = net.getWifiDeviceName();
+	const fallback = getQcaFallbackIfname(device, section);
 
 	for (const candidate of [ ifname, section ]) {
 		if (candidate && candidates.indexOf(candidate) < 0)
 			candidates.push(candidate);
 	}
 
-	if (isQcaWifiHwtype(hwtype) && /^wifi\d+$/.test(device)) {
-		let fallback = section;
-
-		if (!/^ath\d+$/.test(fallback))
-			fallback = 'ath' + device.replace(/^wifi/, '');
-
+	if (isQcaWifiHwtype(hwtype) && fallback) {
 		if (candidates.indexOf(fallback) < 0)
 			candidates.push(fallback);
 	}
@@ -232,56 +320,6 @@ function getDisplayBitRate(net, iwinfoInfoMap) {
 	return null;
 }
 
-function parseIwDevPhyMap(stdout) {
-	const lines = String(stdout || '').split(/\n/);
-	const map = {};
-	let currentPhy = null;
-
-	for (const rawLine of lines) {
-		const line = rawLine.trim();
-		const phyMatch = line.match(/^phy#(\d+)$/);
-		const ifaceMatch = line.match(/^Interface\s+(\S+)$/);
-
-		if (phyMatch) {
-			currentPhy = `phy#${phyMatch[1]}`;
-			continue;
-		}
-
-		if (currentPhy && ifaceMatch)
-			map[ifaceMatch[1]] = currentPhy;
-	}
-
-	return map;
-}
-
-function parseIwRegCountryMap(stdout) {
-	const lines = String(stdout || '').split(/\n/);
-	const map = {};
-	let currentScope = null;
-
-	for (const rawLine of lines) {
-		const line = rawLine.trim();
-		const globalMatch = line.match(/^global$/i);
-		const phyMatch = line.match(/^(phy#\d+)\b/);
-		const countryMatch = line.match(/^country\s+([A-Z0-9]{2})\s*:/i);
-
-		if (globalMatch) {
-			currentScope = 'global';
-			continue;
-		}
-
-		if (phyMatch) {
-			currentScope = phyMatch[1];
-			continue;
-		}
-
-		if (currentScope && countryMatch)
-			map[currentScope] = countryMatch[1].toUpperCase();
-	}
-
-	return map;
-}
-
 function getNonDefaultCountryCode(candidates) {
 	for (const candidate of candidates) {
 		const country = String(candidate || '').toUpperCase();
@@ -293,7 +331,7 @@ function getNonDefaultCountryCode(candidates) {
 	return null;
 }
 
-function getDisplayCountryCode(net, iwinfoInfoMap, phyCountryMap, ifacePhyMap) {
+function getDisplayCountryCode(net, iwinfoInfoMap) {
 	const candidates = getIwinfoInfoCandidates(net);
 
 	const infoCountry = getNonDefaultCountryCode(candidates.map((candidate) => iwinfoInfoMap?.[candidate]?.country));
@@ -310,15 +348,6 @@ function getDisplayCountryCode(net, iwinfoInfoMap, phyCountryMap, ifacePhyMap) {
 
 	if (configCountry)
 		return configCountry;
-
-	const phyCountry = getNonDefaultCountryCode(candidates.map((candidate) => {
-		const phy = ifacePhyMap?.[candidate];
-
-		return phy ? phyCountryMap?.[phy] : null;
-	}));
-
-	if (phyCountry)
-		return phyCountry;
 
 	for (const candidate of getIwinfoInfoCandidates(net)) {
 		const country = iwinfoInfoMap?.[candidate]?.country;
@@ -530,33 +559,34 @@ function probeAssocListCandidates(candidates, probeFn) {
 	return tryNext();
 }
 
-function getAssocListCandidates(net) {
+function getAssocListCandidates(net, resolver) {
 	const candidates = [];
 	const hwtype = uci.get('wireless', net.getWifiDeviceName(), 'type');
 	const ifname = net.getIfname();
 	const section = net.getName();
 	const device = net.getWifiDeviceName();
+	const fallback = getQcaFallbackIfname(device, section);
 
-	for (const candidate of [ ifname, section ]) {
-		if (candidate && candidates.indexOf(candidate) < 0)
-			candidates.push(candidate);
+	if (resolver?.aliasMap) {
+		for (const candidate of [ ifname, section, fallback, device ])
+			pushUnique(candidates, resolver.aliasMap[candidate]);
+
+		if (candidates.length)
+			return candidates;
 	}
 
-	if (isQcaWifiHwtype(hwtype) && /^wifi\d+$/.test(device)) {
-		let fallback = section;
+	for (const candidate of [ ifname, section ])
+		pushUnique(candidates, candidate);
 
-		if (!/^ath\d+$/.test(fallback))
-			fallback = 'ath' + device.replace(/^wifi/, '');
-
-		if (candidates.indexOf(fallback) < 0)
-			candidates.push(fallback);
-	}
+	if (isQcaWifiHwtype(hwtype))
+		pushUnique(candidates, fallback);
 
 	return candidates;
 }
 
 return baseclass.extend({
 	title: _('Wireless'),
+	disableCache: true,
 
 	WPSTranslateTbl: {
 		Disabled: _('Disabled'),
@@ -573,24 +603,18 @@ return baseclass.extend({
 		expect: { 'access': false }
 	}),
 
-	loadIwinfoInfoMap(radios, networks) {
-		const devices = [];
+	loadIwinfoResolver(radios, networks) {
+		return L.resolveDefault(callIwinfoDevices(), {}).then((res) => {
+			return buildIwinfoResolver(radios, networks, res?.devices);
+		}).catch(() => ({
+			deviceLookup: Object.create(null),
+			aliasMap: Object.create(null),
+			queryTargets: []
+		}));
+	},
 
-		radios.forEach((radio) => {
-			const name = radio.getName();
-
-			if (name && devices.indexOf(name) < 0)
-				devices.push(name);
-		});
-
-		networks.forEach((net) => {
-			getIwinfoInfoCandidates(net).forEach((candidate) => {
-				if (candidate && devices.indexOf(candidate) < 0)
-					devices.push(candidate);
-			});
-		});
-
-		return Promise.all(devices.map((name) =>
+	loadIwinfoInfoMap(resolver) {
+		return Promise.all(resolver.queryTargets.map((name) =>
 			L.resolveDefault(callIwinfoInfoCompat(name), null).then((info) => [ name, info ])
 		)).then((entries) => {
 			const map = {};
@@ -599,36 +623,39 @@ return baseclass.extend({
 				if (info != null)
 					map[name] = info;
 
+			for (const alias in resolver.aliasMap) {
+				const target = resolver.aliasMap[alias];
+
+				if (target && map[target] != null)
+					map[alias] = map[target];
+			}
+
 			return map;
 		});
 	},
 
-	loadIwRuntimeMaps() {
-		return Promise.all([
-			L.resolveDefault(fs.exec_direct('/usr/sbin/iw', [ 'dev' ]), ''),
-			L.resolveDefault(fs.exec_direct('/usr/sbin/iw', [ 'reg', 'get' ]), '')
-		]).then((outputs) => ({
-			ifacePhyMap: parseIwDevPhyMap(outputs[0]),
-			phyCountryMap: parseIwRegCountryMap(outputs[1])
-		}));
-	},
-
 	getAssocListForNetwork(net) {
-		const candidates = getAssocListCandidates(net);
 		const hwtype = uci.get('wireless', net.getWifiDeviceName(), 'type');
+		const candidates = getAssocListCandidates(net, this.iwinfoResolver);
+		const resolvedIfname = candidates[0];
+		const useResolvedIfname = (isQcaWifiHwtype(hwtype) && resolvedIfname && resolvedIfname != net.getIfname());
+		const assocPromise = useResolvedIfname
+			? L.resolveDefault(callIwinfoAssoclistCompat(resolvedIfname), [])
+			: L.resolveDefault(net.getAssocList(), []);
+		const fallbackCandidates = useResolvedIfname ? candidates.slice(1) : candidates;
 
-		return L.resolveDefault(net.getAssocList(), []).then((entries) => {
+		return assocPromise.then((entries) => {
 			if (Array.isArray(entries) && entries.length)
 				return entries;
 
-			return probeAssocListCandidates(candidates, callIwinfoAssoclistCompat).then((compatEntries) => {
+			return probeAssocListCandidates(fallbackCandidates, callIwinfoAssoclistCompat).then((compatEntries) => {
 				if (Array.isArray(compatEntries) && compatEntries.length)
 					return compatEntries;
 
 				if (!isQcaWifiHwtype(hwtype) || net.getMode() != 'ap')
 					return [];
 
-				return probeAssocListCandidates(candidates, callWlanconfigAssoclistCompat);
+				return probeAssocListCandidates(fallbackCandidates, callWlanconfigAssoclistCompat);
 			});
 		});
 	},
@@ -780,7 +807,7 @@ return baseclass.extend({
 			badges.push(badge);
 
 			chan = (chan != null) ? chan : getDisplayChannel(net);
-			coco = (coco != null) ? coco : getDisplayCountryCode(net, this.iwinfoInfoMap, this.phyCountryMap, this.ifacePhyMap);
+			coco = (coco != null) ? coco : getDisplayCountryCode(net, this.iwinfoInfoMap);
 			freq = (freq != null) ? freq : getDisplayFrequency(net, chan, this.iwinfoInfoMap);
 			rate = (rate != null) ? rate : getDisplayBitRate(net, this.iwinfoInfoMap);
 			noise = (noise != null) ? noise : getDisplayNoise(net, this.iwinfoInfoMap);
@@ -819,33 +846,37 @@ return baseclass.extend({
 			const tasks = [];
 			const radios_networks_hints = data[1];
 			const hasWPS = L.hasSystemFeature('hostapd', 'wps');
+			const hasReadPermission = data[3];
 
-			for (let i = 0; i < radios_networks_hints.length; i++) {
-				tasks.push(this.getAssocListForNetwork(radios_networks_hints[i]).then(L.bind((net, list) => {
-					net.assoclist = list.sort((a, b) => { return a.mac > b.mac });
-				}, this, radios_networks_hints[i])));
+			return this.loadIwinfoResolver(data[0], data[1]).then(L.bind((resolver) => {
+				this.iwinfoResolver = resolver;
 
-				if (hasWPS && uci.get('wireless', radios_networks_hints[i].sid, 'wps_pushbutton') == '1') {
-					radios_networks_hints[i].isWPSEnabled = true;
-					tasks.push(L.resolveDefault(this.handleGetWPSStatus(radios_networks_hints[i].getIfname()), null)
-						.then(L.bind((net, data) => {
-							net.wps_status = data ? data.pbc_status : _('No Data');
-					}, this, radios_networks_hints[i])));
+				for (let i = 0; i < radios_networks_hints.length; i++) {
+					radios_networks_hints[i].assoclist = [];
+
+					if (hasReadPermission) {
+						tasks.push(this.getAssocListForNetwork(radios_networks_hints[i]).then(L.bind((net, list) => {
+							net.assoclist = list.sort((a, b) => { return a.mac > b.mac });
+						}, this, radios_networks_hints[i])));
+					}
+
+					if (hasWPS && uci.get('wireless', radios_networks_hints[i].sid, 'wps_pushbutton') == '1') {
+						radios_networks_hints[i].isWPSEnabled = true;
+						tasks.push(L.resolveDefault(this.handleGetWPSStatus(radios_networks_hints[i].getIfname()), null)
+							.then(L.bind((net, data) => {
+								net.wps_status = data ? data.pbc_status : _('No Data');
+						}, this, radios_networks_hints[i])));
+					}
 				}
-			}
 
-			tasks.push(this.loadIwinfoInfoMap(data[0], data[1]).then(L.bind((map) => {
-				this.iwinfoInfoMap = map;
-			}, this)));
+				tasks.push(this.loadIwinfoInfoMap(resolver).then(L.bind((map) => {
+					this.iwinfoInfoMap = map;
+				}, this)));
 
-			tasks.push(this.loadIwRuntimeMaps().then(L.bind((maps) => {
-				this.ifacePhyMap = maps.ifacePhyMap || {};
-				this.phyCountryMap = maps.phyCountryMap || {};
-			}, this)));
-
-			return Promise.all(tasks).then(() => {
-				return data;
-			});
+				return Promise.all(tasks).then(() => {
+					return data;
+				});
+			}, this));
 		}, this));
 	},
 

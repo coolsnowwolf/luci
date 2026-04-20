@@ -15,7 +15,7 @@
 			},
 			"ubus": {
 				"file": [ "exec" ],
-				"iwinfo": [ "assoclist", "countrylist", "freqlist", "info", "txpowerlist" ],
+				"iwinfo": [ "assoclist", "countrylist", "devices", "freqlist", "info", "txpowerlist" ],
 				"luci": [ "getSwconfigFeatures", "getSwconfigPortState" ],
 				"network.wireless": [ "status" ]
 			},

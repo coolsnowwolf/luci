@@ -18,6 +18,8 @@ const callUfpList = rpc.declare({
 
 return baseclass.extend({
 	title: _('DHCP Leases'),
+	deferFirstLoad: true,
+	disableCache: true,
 
 	isMACStatic: {},
 	isDUIDStatic: {},

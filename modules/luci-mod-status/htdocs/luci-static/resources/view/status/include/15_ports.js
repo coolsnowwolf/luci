@@ -621,6 +621,8 @@ function renderNetworksTooltip(pmap) {
 
 return baseclass.extend({
 	title: _('Port status'),
+	deferFirstLoad: true,
+	disableCache: true,
 
 	load() {
 		return Promise.all([
