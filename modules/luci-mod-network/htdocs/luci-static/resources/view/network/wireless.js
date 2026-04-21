@@ -77,6 +77,27 @@ function getWifiNetIdBySection(section) {
 	return null;
 }
 
+function getLegacyIwinfoProbeTargets() {
+	const targets = [];
+
+	for (const radio of uci.sections('wireless', 'wifi-device'))
+		pushUnique(targets, radio['.name']);
+
+	for (const iface of uci.sections('wireless', 'wifi-iface')) {
+		const device = iface.device;
+		const section = iface['.name'];
+		const configuredIfname = iface.ifname;
+		const fallback = getQcaFallbackIfname(device, section);
+
+		pushUnique(targets, configuredIfname);
+		pushUnique(targets, section);
+		pushUnique(targets, fallback);
+		pushUnique(targets, device);
+	}
+
+	return targets;
+}
+
 function buildIwinfoResolver(devices) {
 	const deviceLookup = buildIwinfoDeviceLookup(devices);
 	const aliasMap = Object.create(null);
@@ -177,7 +198,9 @@ function loadIwinfoInfoMap(force) {
 		return cachedIwinfoInfoPromise;
 
 	cachedIwinfoInfoPromise = loadIwinfoResolver(force).then((resolver) => {
-		return Promise.all(resolver.queryTargets.map((name) =>
+		const queryTargets = resolver.queryTargets.length ? resolver.queryTargets : getLegacyIwinfoProbeTargets();
+
+		return Promise.all(queryTargets.map((name) =>
 			L.resolveDefault(callIwinfoInfoCompat(name), null).then((info) => [ name, info ])
 		)).then((entries) => {
 			const nextMap = {};
@@ -417,11 +440,15 @@ function getDisplayTxPower(radioNet) {
 	const hwtype = uci.get('wireless', radioNet.getWifiDeviceName(), 'type');
 	const txpower = radioNet.getTXPower();
 	const cfgvalue = getConfiguredTxPower(radioNet);
-	const iwinfo = cachedIwinfoInfoMap ? cachedIwinfoInfoMap[radioNet.getWifiDeviceName()] : null;
+	const iwinfoCandidates = getIwinfoInfoCandidates(radioNet).map((candidate) => {
+		return cachedIwinfoInfoMap ? cachedIwinfoInfoMap[candidate] : null;
+	});
 
 	if (isQcaWifiHwtype(hwtype)) {
-		if (isPlausibleTxPowerValue(iwinfo != null ? iwinfo.txpower : null, hwtype))
-			return iwinfo.txpower;
+		for (const info of iwinfoCandidates)
+			if (isPlausibleTxPowerValue(info != null ? info.txpower : null, hwtype))
+				return info.txpower;
+
 		if (isPlausibleTxPowerValue(txpower, hwtype))
 			return txpower;
 		if (isPlausibleTxPowerValue(cfgvalue, hwtype))
@@ -431,8 +458,11 @@ function getDisplayTxPower(radioNet) {
 
 	if (isPlausibleTxPowerValue(txpower, hwtype))
 		return txpower;
-	if (isPlausibleTxPowerValue(iwinfo != null ? iwinfo.txpower : null, hwtype))
-		return iwinfo.txpower;
+
+	for (const info of iwinfoCandidates)
+		if (isPlausibleTxPowerValue(info != null ? info.txpower : null, hwtype))
+			return info.txpower;
+
 	if (isPlausibleTxPowerValue(cfgvalue, hwtype))
 		return cfgvalue;
 
