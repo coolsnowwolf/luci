@@ -11,7 +11,7 @@ PKG_LICENSE:=Apache-2.0
 
 PKG_NAME:=luci-app-openvpn-server
 PKG_VERSION:=3.0
-PKG_RELEASE:=1
+PKG_RELEASE:=2
 
 include ../../luci.mk
 
