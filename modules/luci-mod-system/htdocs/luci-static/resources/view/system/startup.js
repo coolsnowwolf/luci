@@ -10,6 +10,7 @@ return view.extend({
 	callRcList: rpc.declare({
 		object: 'rc',
 		method: 'list',
+		params: [ 'skip_running_check' ],
 		expect: { '': {} }
 	}),
 
@@ -22,7 +23,7 @@ return view.extend({
 	load: function() {
 		return Promise.all([
 			L.resolveDefault(fs.read('/etc/rc.local'), ''),
-			this.callRcList()
+			this.callRcList(true)
 		]);
 	},
 
