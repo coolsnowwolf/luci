@@ -1,5 +1,6 @@
 'use strict';
 'require baseclass';
+'require fs';
 'require request';
 'require ui';
 
@@ -15,13 +16,58 @@ return baseclass.extend({
 				window.location.hash);
 		}
 
+		this.dynamicMenuTargets = {};
+
 		this.syncConditionalMenuCache()
 			.then(L.bind(function(reloading) {
 				if (reloading)
 					return;
 
-				return ui.menu.load().then(L.bind(this.render, this));
+				return this.resolveDynamicMenuTargets()
+					.then(L.bind(function() {
+						return ui.menu.load().then(L.bind(this.render, this));
+					}, this));
 			}, this));
+	},
+
+	resolveDynamicMenuTargets: function() {
+		this.dynamicMenuTargets = {};
+
+		if (!document.body.classList.contains('logged-in'))
+			return Promise.resolve();
+
+		return this.resolveFirewallMenuTarget().then(L.bind(function(target) {
+			if (target)
+				this.dynamicMenuTargets['admin/status/nftables'] = target;
+		}, this));
+	},
+
+	resolveFirewallMenuTarget: function() {
+		return L.resolveDefault(fs.exec_direct('/usr/sbin/nft', [ '--terse', '--json', 'list', 'ruleset' ], 'json'), null).then(function(nft) {
+			var hasTables = false;
+
+			if (!Array.isArray(nft && nft.nftables))
+				return null;
+
+			for (var i = 0; i < nft.nftables.length; i++) {
+				if (nft.nftables[i] && nft.nftables[i].hasOwnProperty('table')) {
+					hasTables = true;
+					break;
+				}
+			}
+
+			return hasTables ? null : 'admin/status/nftables/iptables';
+		});
+	},
+
+	getMenuHref: function(url, child) {
+		var path = [ url, child.name ].filter(Boolean).join('/'),
+			target = this.dynamicMenuTargets[path];
+
+		if (target)
+			return L.url.apply(L, target.split('/'));
+
+		return L.url(url, child.name);
 	},
 
 	reloadPageWithMenuFlush: function() {
@@ -180,11 +226,11 @@ return baseclass.extend({
 				ul.classList.add('active');
 				slideClass += " active";
 				menuClass += " active";
-			}
+				}
 
 			ul.appendChild(E('li', { 'class': slideClass }, [
 				E('a', {
-					'href': L.url(url, children[i].name),
+					'href': this.getMenuHref(url, children[i]),
 					'click': (l == 1) ? ui.createHandlerFn(this, 'handleMenuExpand') : null,
 					'class': menuClass,
 					'data-title': hasChildren ? children[i].title.replace(" ", "_") : children[i].title.replace(" ", "_"),

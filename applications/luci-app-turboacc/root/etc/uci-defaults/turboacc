@@ -14,7 +14,9 @@ EOF
 
 kernel_ver="$(uname -r)"
 
-if [ -e "/lib/modules/$kernel_ver/mtkhnat.ko" ]; then
+if [ -e "/etc/init.d/qca-nss-ecm" ]; then
+	uci -q set "turboacc.config.fastpath"="qca_nss_ecm"
+elif [ -e "/lib/modules/$kernel_ver/mtkhnat.ko" ]; then
 	uci -q set "turboacc.config.fastpath"="mediatek_hnat"
 	uci -q set "turboacc.config.fastpath_mh_eth_hnat"="1"
 	uci -q set "turboacc.config.fastpath_mh_eth_hnat_v6"="1"

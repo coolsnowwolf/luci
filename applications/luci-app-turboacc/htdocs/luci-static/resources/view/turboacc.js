@@ -115,13 +115,6 @@ return view.extend({
 			]);
 		}
 
-		/* Mark user edited */
-		s = m.section(form.NamedSection, 'global', 'turboacc');
-		o = s.option(form.HiddenValue, 'set');
-		o.load = (/* ... */) => { return 1 };
-		o.readonly = true;
-		o.rmempty = false;
-
 		s = m.section(form.NamedSection, 'config', 'turboacc');
 
 		o = s.option(form.ListValue, 'fastpath', _('Fastpath engine'),
@@ -207,7 +200,18 @@ return view.extend({
 		return m.render();
 	},
 
+	markUserEdited() {
+		uci.set('turboacc', 'global', 'set', '1');
+	},
+
+	handleSave(ev) {
+		this.markUserEdited();
+		return this.super('handleSave', [ev]);
+	},
+
 	handleSaveApply(ev, mode) {
+		this.markUserEdited();
+
 		const applyNssEcmRestart = () => {
 			const section = uci.sections('turboacc', 'turboacc').find(s => s['.name'] == 'config');
 

@@ -65,6 +65,18 @@
         });
     }
 
+    function getOverviewPortColumns(width, cardCount) {
+        if (width <= 480) {
+            return 1;
+        }
+
+        if (width <= 768) {
+            return Math.min(cardCount, 2);
+        }
+
+        return Math.min(cardCount, 8);
+    }
+
     function syncOverviewPortStatus() {
         var view = document.getElementById('view');
         var portGroups = new Map();
@@ -186,7 +198,7 @@
 
         portGroups.forEach(function (cards, parent) {
             var width = window.innerWidth || document.documentElement.clientWidth || 1280;
-            var columns;
+            var columns = getOverviewPortColumns(width, cards.length);
 
             cards.forEach(function (card) {
                 var body = card.querySelector('.ifacebox-body');
@@ -220,18 +232,6 @@
                 }
             });
 
-            if (width <= 480) {
-                columns = 1;
-            } else if (width <= 768) {
-                columns = Math.min(cards.length, 2);
-            } else if (cards.length <= 4) {
-                columns = cards.length;
-            } else if (cards.length <= 6) {
-                columns = 3;
-            } else {
-                columns = 4;
-            }
-
             parent.style.setProperty('display', 'grid', 'important');
             parent.style.setProperty('grid-template-columns', 'repeat(' + columns + ', minmax(0, 1fr))', 'important');
             parent.style.setProperty('align-items', 'stretch', 'important');
@@ -258,6 +258,8 @@
             childList: true,
             subtree: true
         });
+
+        window.addEventListener('resize', syncOverviewPortStatus);
     }
 
     function syncNetworkInterfaceIcons() {
