@@ -427,6 +427,15 @@ function getConfiguredTxPower(radioNet) {
 	return (!isNaN(cfgvalue) && cfgvalue > 0) ? cfgvalue : null;
 }
 
+function isUnsetChannelValue(channel) {
+	return channel == null || channel === '';
+}
+
+function shouldDisplayAutoChannel(hwtype, configChannel, runtimeChannel) {
+	return configChannel == 'auto' || runtimeChannel == 'auto' ||
+		((isQcaWifiHwtype(hwtype) || hwtype == 'mt_dbdc') && isUnsetChannelValue(configChannel));
+}
+
 function isPlausibleTxPowerValue(txpower, hwtype) {
 	if (txpower == null || isNaN(txpower) || txpower <= 0)
 		return false;
@@ -1359,7 +1368,8 @@ var CBIWifiFrequencyValue = form.Value.extend({
 		const bandval = uci.get('wireless', device_section, 'band');
 		const cfg_channel = uci.get('wireless', device_section, 'channel');
 		const chval = +cfg_channel;
-		const allow_auto = (hwtype == 'mt_dbdc' || cfg_channel == 'auto' || L.hasSystemFeature('hostapd', 'acs'));
+		const allow_auto = (hwtype == 'mt_dbdc' || isQcaWifiHwtype(hwtype) ||
+			cfg_channel == 'auto' || L.hasSystemFeature('hostapd', 'acs'));
 
 		return Promise.all([
 			network.getWifiDevice(device_section),
@@ -1406,7 +1416,7 @@ var CBIWifiFrequencyValue = form.Value.extend({
 				);
 			}
 
-			if (cfg_channel == 'auto' || devcfg.channel == 'auto') {
+			if (shouldDisplayAutoChannel(hwtype, cfg_channel, devcfg.channel)) {
 				for (const band of Object.keys(this.channels)) {
 					if (!Array.isArray(this.channels[band]))
 						continue;
@@ -1713,7 +1723,8 @@ var CBIWifiFrequencyValue = form.Value.extend({
 		const cfgvals = Array.isArray(cfgvalue) ? cfgvalue : null;
 		const cfg_htval = cfgvals ? cfgvals[0] : uci.get('wireless', config_section, 'htmode');
 		const cfg_hwval = uci.get('wireless', config_section, 'hwmode');
-		const cfg_chval = devcfg.channel || (cfgvals ? cfgvals[2] : uci.get('wireless', config_section, 'channel'));
+		const config_chval = cfgvals ? cfgvals[2] : uci.get('wireless', config_section, 'channel');
+		const cfg_chval = devcfg.channel || config_chval;
 		const cfg_bandval = devcfg.band || uci.get('wireless', config_section, 'band');
 		const htval = isQcaWifiHwtype(hwtype) ? (cfg_htval || devinfo.htmode) : (devinfo.htmode || cfg_htval);
 		const hwval = isQcaWifiHwtype(hwtype) ? (cfg_hwval || devinfo.hwmode) : (devinfo.hwmode || cfg_hwval);
@@ -1780,7 +1791,7 @@ var CBIWifiFrequencyValue = form.Value.extend({
 		if (!this.setSelectValue(bwdt, htval) && bwdt.options.length)
 			bwdt.selectedIndex = Math.max(0, bwdt.options.length - 1);
 
-		const effective_chval = (cfg_chval == 'auto' || devcfg.channel == 'auto') ? 'auto' : chval;
+		const effective_chval = shouldDisplayAutoChannel(hwtype, config_chval, devcfg.channel) ? 'auto' : chval;
 
 		if (effective_chval == 'auto' && !Array.from(chan.options).some(o => o.value == 'auto'))
 			chan.insertBefore(E('option', { value: 'auto' }, [ 'auto' ]), chan.firstChild);
