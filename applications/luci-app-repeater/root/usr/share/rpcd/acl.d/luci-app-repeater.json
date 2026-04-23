@@ -1,0 +1,26 @@
+{
+	"luci-app-repeater": {
+		"description": "Grant access to wireless repeater configuration",
+		"read": {
+			"file": {
+				"/sbin/logread": [ "exec" ]
+			},
+			"ubus": {
+				"file": [ "exec" ],
+				"iwinfo": [ "freqlist", "info" ],
+				"luci-rpc": [ "getBoardJSON", "getHostHints", "getNetworkDevices", "getWirelessDevices" ],
+				"network": [ "get_proto_handlers" ],
+				"network.interface": [ "dump" ],
+				"network.wireless": [ "status" ]
+			},
+			"uci": [ "firewall", "luci", "network", "repeater", "wireless" ]
+		},
+		"write": {
+			"ubus": {
+				"file": [ "exec" ],
+				"iwinfo": [ "scan" ]
+			},
+			"uci": [ "firewall", "network", "repeater", "wireless" ]
+		}
+	}
+}

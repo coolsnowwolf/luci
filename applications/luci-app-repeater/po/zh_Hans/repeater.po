@@ -1,0 +1,395 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Project-Id-Version: luci-app-repeater\n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: none\n"
+"Language: zh-Hans\n"
+"MIME-Version: 1.0\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:101
+msgid "2.4 GHz"
+msgstr "2.4 GHz"
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:103
+msgid "5 GHz"
+msgstr "5 GHz"
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:105
+msgid "6 GHz"
+msgstr "6 GHz"
+
+#: applications/luci-app-repeater/root/usr/share/rpcd/acl.d/luci-app-repeater.json:3
+msgid "Grant access to wireless repeater configuration"
+msgstr "授予无线中继配置访问权限"
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:107
+msgid "Unknown"
+msgstr "未知"
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:127
+msgid "Open / None"
+msgstr "开放 / 无加密"
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:129
+msgid "OWE"
+msgstr "OWE"
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:131
+msgid "WEP Open System"
+msgstr "WEP 开放式"
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:133
+msgid "WEP Shared Key"
+msgstr "WEP 共享密钥"
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:135
+msgid "WPA-PSK"
+msgstr "WPA-PSK"
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:137
+msgid "WPA2-PSK"
+msgstr "WPA2-PSK"
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:139
+msgid "WPA/WPA2-PSK Mixed"
+msgstr "WPA/WPA2-PSK 混合"
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:141
+msgid "WPA3-SAE"
+msgstr "WPA3-SAE"
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:143
+msgid "WPA2/WPA3-SAE Mixed"
+msgstr "WPA2/WPA3-SAE 混合"
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:221
+msgid "Password may be incorrect"
+msgstr "密码可能不正确"
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:224
+msgid "The access point rejected association"
+msgstr "接入点拒绝了关联请求"
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:227
+msgid "Authentication failed or timed out"
+msgstr "认证失败或超时"
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:230
+msgid "Target SSID was not found"
+msgstr "未找到目标 SSID"
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:233
+msgid "Unable to complete the connection attempt"
+msgstr "无法完成连接尝试"
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:356
+msgid "Start refresh"
+msgstr "开始刷新"
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:361
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:481
+msgid "Stop refresh"
+msgstr "停止刷新"
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:395
+msgid "The selected network uses an enterprise or unsupported authentication mode. You may need to configure it manually."
+msgstr "所选网络使用企业级或当前页面不支持的认证方式，可能需要手动配置。"
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:443
+msgid "hidden"
+msgstr "隐藏"
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:450
+msgid "Use this network"
+msgstr "使用该网络"
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:456
+msgid "No networks found nearby."
+msgstr "附近未发现无线网络。"
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:467
+msgid "Signal"
+msgstr "信号"
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:468
+msgid "SSID"
+msgstr "SSID"
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:469
+msgid "Channel"
+msgstr "信道"
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:470
+msgid "BSSID"
+msgstr "BSSID"
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:471
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:864
+msgid "Encryption"
+msgstr "加密方式"
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:483
+msgid "Starting wireless scan..."
+msgstr "正在启动无线扫描..."
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:485
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:849
+msgid "Wireless Scan"
+msgstr "无线扫描"
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:493
+msgid "Dismiss"
+msgstr "关闭"
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:511
+msgid "Please choose a wireless radio first."
+msgstr "请先选择一个无线射频。"
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:521
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:962
+msgid "Stop Wireless Repeater"
+msgstr "停止无线中继"
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:522
+msgid "This will remove the wireless station, the generated network interface, and related firewall bindings created by this app."
+msgstr "这会移除本应用下发的无线客户端、生成的网络接口以及相关防火墙绑定。"
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:527
+msgid "Cancel"
+msgstr "取消"
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:532
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:965
+msgid "Stop"
+msgstr "停止"
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:543
+msgid "Cleaning up repeater configuration..."
+msgstr "正在清理无线中继配置..."
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:604
+msgid "A wireless radio must be selected."
+msgstr "必须选择一个无线射频。"
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:607
+msgid "SSID must not be empty."
+msgstr "SSID 不能为空。"
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:610
+msgid "The selected radio is not available."
+msgstr "所选射频不可用。"
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:613
+msgid "A password or key is required for the selected encryption mode."
+msgstr "当前加密方式需要填写密码或密钥。"
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:670
+msgid "LAN interface was not found. Please create network.lan first."
+msgstr "未找到 LAN 接口，请先创建 network.lan。"
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:701
+msgid "Not configured"
+msgstr "尚未配置"
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:702
+msgid "Choose a radio, scan for an SSID, then save and apply the settings."
+msgstr "请选择射频、扫描 SSID，然后保存并应用设置。"
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:724
+msgid "Connected to %s, waiting for DHCP"
+msgstr "已连接到 %s，正在等待 DHCP"
+
+#: applications/luci-app-repeater/root/usr/share/luci/menu.d/luci-app-repeater.json:3
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:814
+msgid "Wireless Repeater"
+msgstr "无线中继"
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:731
+msgid "Connected to %s"
+msgstr "已连接到 %s"
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:735
+msgid "IP: %s"
+msgstr "IP：%s"
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:736
+msgid "Bridged through %s"
+msgstr "已通过 %s 桥接"
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:744
+msgid "Authenticating / connecting..."
+msgstr "正在认证 / 连接中..."
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:745
+msgid "Wireless interface: %s"
+msgstr "无线接口：%s"
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:745
+msgid "The station interface is starting."
+msgstr "无线客户端接口正在启动。"
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:753
+msgid "Connection failed"
+msgstr "连接失败"
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:753
+msgid "Not connected"
+msgstr "未连接"
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:754
+msgid "The repeater station is not associated with the selected SSID."
+msgstr "无线中继客户端尚未关联到所选 SSID。"
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:787
+msgid "Unable to query repeater status"
+msgstr "无法获取中继状态"
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:808
+msgid "Stopped"
+msgstr "已停止"
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:809
+msgid "The repeater is not currently running. Click Save & Apply to start it again."
+msgstr "无线中继当前未运行，点击“保存并应用”即可再次启动。"
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:815
+msgid "Create a wireless client uplink, scan nearby access points, and attach the resulting station either to WAN or to LAN."
+msgstr "创建无线客户端上联，扫描附近 AP，并将生成的客户端接口接入 WAN 或 LAN。"
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:823
+msgid "Repeater Settings"
+msgstr "中继设置"
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:825
+msgid "Connection Status"
+msgstr "连接状态"
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:828
+msgid "Collecting status..."
+msgstr "正在收集状态..."
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:832
+msgid "Wireless Radio"
+msgstr "无线射频"
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:833
+msgid "Choose the 2.4 GHz, 5 GHz, or 6 GHz radio that should work as the repeater station."
+msgstr "选择要作为无线中继客户端使用的 2.4 GHz、5 GHz 或 6 GHz 射频。"
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:842
+msgid "Attach As"
+msgstr "接入方式"
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:843
+msgid "Attach the repeater client either as a WAN uplink or directly into LAN bridge mode."
+msgstr "将无线中继客户端作为 WAN 上联接入，或直接桥接到 LAN。"
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:844
+msgid "WAN"
+msgstr "WAN"
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:845
+msgid "LAN"
+msgstr "LAN"
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:850
+msgid "Open a scan dialog similar to the standard wireless page and copy the selected SSID into the fields below."
+msgstr "打开一个类似标准无线页面的扫描窗口，并将选中的 SSID 回填到下方字段。"
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:963
+msgid "Immediately remove the wireless station, the generated network interface, and related firewall bindings created by this app."
+msgstr "立即移除本应用下发的无线客户端、生成的网络接口以及相关防火墙绑定。"
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:852
+msgid "Scan"
+msgstr "扫描"
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:855
+msgid "Target SSID"
+msgstr "目标 SSID"
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:856
+msgid "Filled automatically after scan, but you can also enter the SSID manually for hidden networks."
+msgstr "扫描后会自动填充；对于隐藏网络，也可以手动输入 SSID。"
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:859
+msgid "Lock To BSSID"
+msgstr "锁定到 BSSID"
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:860
+msgid "Optional. If set, only the selected BSSID will be used instead of roaming between APs with the same SSID."
+msgstr "可选。如果填写，只会连接到指定的 BSSID，而不会在相同 SSID 的多个 AP 之间漫游。"
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:865
+msgid "The detected encryption is filled automatically after scan. You can still adjust it before applying."
+msgstr "扫描后会自动填入检测到的加密方式，你仍可在应用前手动调整。"
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:1060
+msgid "Algorithm"
+msgstr "算法"
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:1061
+msgid "Choose the cipher algorithm used by the target wireless network, for example AES (CCMP)."
+msgstr "选择目标无线网络使用的加密算法，例如 AES（CCMP）。"
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:1062
+msgid "auto"
+msgstr "自动"
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:1063
+msgid "AES (CCMP)"
+msgstr "AES（CCMP）"
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:1064
+msgid "AES (CCMP-256)"
+msgstr "AES（CCMP-256）"
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:1065
+msgid "AES (GCMP)"
+msgstr "AES（GCMP）"
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:1066
+msgid "AES (GCMP-256)"
+msgstr "AES（GCMP-256）"
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:1067
+msgid "TKIP"
+msgstr "TKIP"
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:1068
+msgid "TKIP + AES (CCMP)"
+msgstr "TKIP + AES（CCMP）"
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:1085
+msgid "WPA3-SAE does not support TKIP. Please choose an AES-based algorithm."
+msgstr "WPA3-SAE 不支持 TKIP，请选择基于 AES 的算法。"
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:878
+msgid "Password / Key"
+msgstr "密码 / 密钥"
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:879
+msgid "Enter the WPA passphrase or WEP key for the selected network."
+msgstr "输入所选网络的 WPA 密码或 WEP 密钥。"
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:896
+msgid "A password or key is required."
+msgstr "需要填写密码或密钥。"
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:900
+msgid "Expecting a valid WEP key."
+msgstr "请输入有效的 WEP 密钥。"
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:903
+msgid "Expecting a WPA key with at least 8 characters."
+msgstr "请输入至少 8 个字符的 WPA 密钥。"
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:908
+msgid "Note"
+msgstr "注意"
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:911
+msgid "LAN mode bridges the wireless client into the existing LAN network. Some chipsets may require 4addr/WDS support from the upstream access point."
+msgstr "LAN 模式会把无线客户端桥接到现有 LAN 网络。某些芯片可能需要上游 AP 支持 4addr/WDS。"

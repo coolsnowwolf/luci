@@ -1,0 +1,393 @@
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8"
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:101
+msgid "2.4 GHz"
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:103
+msgid "5 GHz"
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:105
+msgid "6 GHz"
+msgstr ""
+
+#: applications/luci-app-repeater/root/usr/share/rpcd/acl.d/luci-app-repeater.json:3
+msgid "Grant access to wireless repeater configuration"
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:107
+msgid "Unknown"
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:127
+msgid "Open / None"
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:129
+msgid "OWE"
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:131
+msgid "WEP Open System"
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:133
+msgid "WEP Shared Key"
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:135
+msgid "WPA-PSK"
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:137
+msgid "WPA2-PSK"
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:139
+msgid "WPA/WPA2-PSK Mixed"
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:141
+msgid "WPA3-SAE"
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:143
+msgid "WPA2/WPA3-SAE Mixed"
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:221
+msgid "Password may be incorrect"
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:224
+msgid "The access point rejected association"
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:227
+msgid "Authentication failed or timed out"
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:230
+msgid "Target SSID was not found"
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:233
+msgid "Unable to complete the connection attempt"
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:356
+msgid "Start refresh"
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:361
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:481
+msgid "Stop refresh"
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:395
+msgid "The selected network uses an enterprise or unsupported authentication mode. You may need to configure it manually."
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:443
+msgid "hidden"
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:450
+msgid "Use this network"
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:456
+msgid "No networks found nearby."
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:467
+msgid "Signal"
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:468
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:855
+msgid "SSID"
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:469
+msgid "Channel"
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:470
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:859
+msgid "BSSID"
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:471
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:864
+msgid "Encryption"
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:483
+msgid "Starting wireless scan..."
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:485
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:849
+msgid "Wireless Scan"
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:493
+msgid "Dismiss"
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:511
+msgid "Please choose a wireless radio first."
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:521
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:962
+msgid "Stop Wireless Repeater"
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:522
+msgid "This will remove the wireless station, the generated network interface, and related firewall bindings created by this app."
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:527
+msgid "Cancel"
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:532
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:965
+msgid "Stop"
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:543
+msgid "Cleaning up repeater configuration..."
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:604
+msgid "A wireless radio must be selected."
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:607
+msgid "SSID must not be empty."
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:610
+msgid "The selected radio is not available."
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:613
+msgid "A password or key is required for the selected encryption mode."
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:670
+msgid "LAN interface was not found. Please create network.lan first."
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:701
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:753
+msgid "Not configured"
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:702
+msgid "Choose a radio, scan for an SSID, then save and apply the settings."
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:724
+msgid "Connected to %s, waiting for DHCP"
+msgstr ""
+
+#: applications/luci-app-repeater/root/usr/share/luci/menu.d/luci-app-repeater.json:3
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:724
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:731
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:814
+msgid "Wireless Repeater"
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:731
+msgid "Connected to %s"
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:735
+msgid "IP: %s"
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:736
+msgid "Bridged through %s"
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:744
+msgid "Authenticating / connecting..."
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:745
+msgid "Wireless interface: %s"
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:745
+msgid "The station interface is starting."
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:753
+msgid "Connection failed"
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:753
+msgid "Not connected"
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:754
+msgid "The repeater station is not associated with the selected SSID."
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:787
+msgid "Unable to query repeater status"
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:808
+msgid "Stopped"
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:809
+msgid "The repeater is not currently running. Click Save & Apply to start it again."
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:815
+msgid "Create a wireless client uplink, scan nearby access points, and attach the resulting station either to WAN or to LAN."
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:823
+msgid "Repeater Settings"
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:825
+msgid "Connection Status"
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:828
+msgid "Collecting status..."
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:832
+msgid "Wireless Radio"
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:833
+msgid "Choose the 2.4 GHz, 5 GHz, or 6 GHz radio that should work as the repeater station."
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:842
+msgid "Attach As"
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:843
+msgid "Attach the repeater client either as a WAN uplink or directly into LAN bridge mode."
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:844
+msgid "WAN"
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:845
+msgid "LAN"
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:850
+msgid "Open a scan dialog similar to the standard wireless page and copy the selected SSID into the fields below."
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:963
+msgid "Immediately remove the wireless station, the generated network interface, and related firewall bindings created by this app."
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:852
+msgid "Scan"
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:855
+msgid "Target SSID"
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:856
+msgid "Filled automatically after scan, but you can also enter the SSID manually for hidden networks."
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:859
+msgid "Lock To BSSID"
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:860
+msgid "Optional. If set, only the selected BSSID will be used instead of roaming between APs with the same SSID."
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:865
+msgid "The detected encryption is filled automatically after scan. You can still adjust it before applying."
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:1060
+msgid "Algorithm"
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:1061
+msgid "Choose the cipher algorithm used by the target wireless network, for example AES (CCMP)."
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:1062
+msgid "auto"
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:1063
+msgid "AES (CCMP)"
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:1064
+msgid "AES (CCMP-256)"
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:1065
+msgid "AES (GCMP)"
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:1066
+msgid "AES (GCMP-256)"
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:1067
+msgid "TKIP"
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:1068
+msgid "TKIP + AES (CCMP)"
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:1085
+msgid "WPA3-SAE does not support TKIP. Please choose an AES-based algorithm."
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:878
+msgid "Password / Key"
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:879
+msgid "Enter the WPA passphrase or WEP key for the selected network."
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:896
+msgid "A password or key is required."
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:900
+msgid "Expecting a valid WEP key."
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:903
+msgid "Expecting a WPA key with at least 8 characters."
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:908
+msgid "Note"
+msgstr ""
+
+#: applications/luci-app-repeater/htdocs/luci-static/resources/view/network/repeater.js:911
+msgid "LAN mode bridges the wireless client into the existing LAN network. Some chipsets may require 4addr/WDS support from the upstream access point."
+msgstr ""

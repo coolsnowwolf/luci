@@ -1,0 +1,16 @@
+{
+	"admin/network/repeater": {
+		"title": "Wireless Repeater",
+		"order": 35,
+		"action": {
+			"type": "view",
+			"path": "network/repeater"
+		},
+		"depends": {
+			"acl": [ "luci-app-repeater" ],
+			"uci": {
+				"wireless": true
+			}
+		}
+	}
+}
