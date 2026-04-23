@@ -8,9 +8,36 @@ local sys  = require "luci.sys"
 
 string.trim = util.trim
 
+local mtk_wed_modules = {
+	"mt7915e",
+	"mt7996e"
+}
+
 local function readfile(path)
 	local s = fs.readfile(path)
 	return s and (s:gsub("^%s+", ""):gsub("%s+$", ""))
+end
+
+local function has_mtkwed_module(kernel)
+	for _, mod in ipairs(mtk_wed_modules) do
+		if fs.access("/lib/modules/" .. kernel .. "/" .. mod .. ".ko") then
+			return true
+		end
+	end
+
+	return false
+end
+
+local function get_mtkwed_param()
+	for _, mod in ipairs(mtk_wed_modules) do
+		local path = "/sys/module/" .. mod .. "/parameters/wed_enable"
+
+		if fs.access(path) then
+			return readfile(path)
+		end
+	end
+
+	return nil
 end
 
 local methods = {
@@ -24,6 +51,8 @@ local methods = {
 				hasSHORTCUTFECM   = fs.access("/lib/modules/" .. boardinfo.kernel .. "/shortcut-fe-cm.ko"),
 				hasNSSECM         = fs.access("/etc/init.d/qca-nss-ecm"),
 				hasMEDIATEKHNAT   = fs.access("/lib/modules/" .. boardinfo.kernel .. "/mtkhnat.ko"),
+				hasMTKWEDWO       = (sys.call("grep -Eq 'mediatek' /etc/openwrt_release") == 0) and
+					has_mtkwed_module(boardinfo.kernel),
 				hasXTFULLCONENAT  = fs.access("/lib/modules/" .. boardinfo.kernel .. "/xt_FULLCONENAT.ko"),
 				hasNFTFULLCONENAT  = fs.access("/lib/modules/" .. boardinfo.kernel .. "/nft_fullcone.ko"),
 				hasTCPCCA         = readfile("/proc/sys/net/ipv4/tcp_available_congestion_control")
@@ -49,8 +78,15 @@ local methods = {
 			elseif fs.stat("/sys/kernel/debug/hnat", "type") == "dir" then
 				local ethernet_hnat = (readfile("/sys/kernel/debug/hnat/hook_toggle") ~= "enabled") and
 					" / Ethernet HNAT Disabled" or ""
-				local wireless_hnat = (sys.call("grep -q 'WHNAT=1' '/etc/wireless/mediatek/'*_card*.dat") ~= 0) and
-					" / Wireless HNAT Disabled" or ""
+				local wireless_hnat = ""
+				local wed_enabled = get_mtkwed_param()
+				if wed_enabled ~= nil then
+					wireless_hnat = (wed_enabled == "Y" or wed_enabled == "1") and "" or
+						" / Wireless HNAT Disabled"
+				else
+					wireless_hnat = (sys.call("grep -q 'WHNAT=1' '/etc/wireless/mediatek/'*_card*.dat") ~= 0) and
+						" / Wireless HNAT Disabled" or ""
+				end
 				if (ethernet_hnat == "") or (wireless_hnat == "") then
 					fptype = "MediaTek HNAT" .. ethernet_hnat .. wireless_hnat
 				end

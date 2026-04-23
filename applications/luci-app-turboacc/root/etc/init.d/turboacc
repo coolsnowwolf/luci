@@ -6,11 +6,94 @@ START=90
 STOP=10
 USE_PROCD=1
 
+MTK_WED_MODULES="mt7915e mt7996e"
+
 start_service() {
 	config_load "turboacc"
 
 	local fastpath
 	config_get fastpath "config" "fastpath"
+	local fastpath_fo_hw
+	config_get_bool fastpath_fo_hw "config" "fastpath_fo_hw" "0"
+	local fastpath_mh_eth_hnat_wed
+	config_get_bool fastpath_mh_eth_hnat_wed "config" "fastpath_mh_eth_hnat_wed" "0"
+
+	local kernel_version
+	kernel_version="$(uname -r)"
+
+	find_wed_module() {
+		local mod
+
+		for mod in $MTK_WED_MODULES; do
+			lsmod | grep -q "^$mod " && {
+				echo "$mod"
+				return 0
+			}
+		done
+
+		for mod in $MTK_WED_MODULES; do
+			[ -e "/lib/modules/$kernel_version/$mod.ko" ] && {
+				echo "$mod"
+				return 0
+			}
+		done
+
+		return 1
+	}
+
+	find_loaded_wed_module() {
+		local mod
+
+		for mod in $MTK_WED_MODULES; do
+			lsmod | grep -q "^$mod " && {
+				echo "$mod"
+				return 0
+			}
+		done
+
+		return 1
+	}
+
+	is_wed_wo_enabled() {
+		local mod="$1"
+		local value
+
+		[ -n "$mod" ] || return 1
+		[ -r "/sys/module/$mod/parameters/wed_enable" ] || return 1
+
+		value="$(cat "/sys/module/$mod/parameters/wed_enable" 2>/dev/null)"
+
+		[ "$value" = "Y" ] || [ "$value" = "1" ]
+	}
+
+	load_wed_wo() {
+		local mod
+		local loaded_mod
+
+		mod="$(find_wed_module)" || return 0
+		loaded_mod="$(find_loaded_wed_module)" || true
+
+		[ "$loaded_mod" = "$mod" ] && is_wed_wo_enabled "$mod" && return 0
+
+		wifi down >/dev/null 2>&1
+		rmmod "$mod" 2>/dev/null
+		sleep 1
+		modprobe "$mod" wed_enable=Y 2>/dev/null || modprobe "$mod" 2>/dev/null
+		wifi up >/dev/null 2>&1
+	}
+
+	unload_wed_wo() {
+		local mod
+
+		mod="$(find_loaded_wed_module)" || return 0
+		is_wed_wo_enabled "$mod" || return 0
+
+		wifi down >/dev/null 2>&1
+		rmmod "$mod" 2>/dev/null
+		sleep 1
+		modprobe "$mod" 2>/dev/null
+		wifi up >/dev/null 2>&1
+	}
 
 	if [ "$fastpath" != "fast_classifier" ] && lsmod | grep -q "fast_classifier"; then
 		echo "0" > "/sys/fast_classifier/skip_to_bridge_ingress" 2>"/dev/null"
@@ -64,6 +147,14 @@ start_service() {
 		echo "8 $fastpath_mh_eth_hnat_v6" > "$hnat_path/hnat_setting"
 		;;
 	esac
+
+	if [ "$fastpath_mh_eth_hnat_wed" -eq "1" ] &&
+	   [ "$fastpath" = "flow_offloading" ] &&
+	   [ "$fastpath_fo_hw" -eq "1" ]; then
+		load_wed_wo
+	else
+		unload_wed_wo
+	fi
 
 	uci -q set "firewall.@defaults[0].flow_offloading"="$flow_offloading"
 	uci -q set "firewall.@defaults[0].flow_offloading_hw"="$flow_offloading_hw"

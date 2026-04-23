@@ -2,3 +2,4 @@ config turboacc 'global'
 	option set '0'
 
 config turboacc 'config'
+	option fastpath_mh_eth_hnat_wed '0'

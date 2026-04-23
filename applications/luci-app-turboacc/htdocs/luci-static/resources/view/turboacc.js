@@ -180,6 +180,14 @@ return view.extend({
 		o.rmempty = false;
 		o.depends('fastpath_mh_eth_hnat', '1');
 
+		if (features.hasMTKWEDWO) {
+			o = s.option(form.Flag, 'fastpath_mh_eth_hnat_wed', _('MTK WED WO offloading'),
+				_('Requires hardware support, implemented at least for Filogic 8x0'));
+			o.default = o.disabled;
+			o.rmempty = false;
+			o.depends({ 'fastpath': 'flow_offloading', 'fastpath_fo_hw': '1' });
+		}
+
 		o = s.option(form.ListValue, 'fullcone', _('Full cone NAT'),
 			_('Full cone NAT (NAT1) can improve gaming performance effectively.'));
 		o.value('0', _('Disable'))
