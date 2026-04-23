@@ -1,0 +1,86 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Project-Id-Version: luci-app-onekeyap\n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: none\n"
+"Language: zh-Hans\n"
+"MIME-Version: 1.0\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: applications/luci-app-onekeyap/root/usr/share/rpcd/acl.d/luci-app-onekeyap.json:3
+msgid "Grant access to one-key AP mode switching"
+msgstr "授予一键 AP 模式切换访问权限"
+
+#: applications/luci-app-onekeyap/htdocs/luci-static/resources/view/network/onekeyap.js:16
+msgid "Not detected"
+msgstr "未检测到"
+
+#: applications/luci-app-onekeyap/htdocs/luci-static/resources/view/network/onekeyap.js:22
+msgid "Enable Router Mode"
+msgstr "开启路由器模式"
+
+#: applications/luci-app-onekeyap/htdocs/luci-static/resources/view/network/onekeyap.js:22
+msgid "Enable AP Mode"
+msgstr "开启 AP 模式"
+
+#: applications/luci-app-onekeyap/htdocs/luci-static/resources/view/network/onekeyap.js:24
+msgid "Switching mode"
+msgstr "正在切换模式"
+
+#: applications/luci-app-onekeyap/htdocs/luci-static/resources/view/network/onekeyap.js:26
+msgid "Running %s, the network will reload briefly. Please wait..."
+msgstr "正在执行 %s，网络会短暂重载，请稍候..."
+
+#: applications/luci-app-onekeyap/htdocs/luci-static/resources/view/network/onekeyap.js:32
+msgid "Command execution failed"
+msgstr "命令执行失败"
+
+#: applications/luci-app-onekeyap/htdocs/luci-static/resources/view/network/onekeyap.js:37
+msgid "Switching failed"
+msgstr "切换失败"
+
+#: applications/luci-app-onekeyap/htdocs/luci-static/resources/view/network/onekeyap.js:40
+msgid "The switch request has been submitted. The page will refresh in a few seconds. If the address changes, you can still use 192.168.0.1."
+msgstr "切换请求已提交。页面将在几秒后自动刷新，如果地址变化，可继续通过 192.168.0.1 访问。"
+
+#: applications/luci-app-onekeyap/htdocs/luci-static/resources/view/network/onekeyap.js:54
+msgid "AP Mode"
+msgstr "AP 模式"
+
+#: applications/luci-app-onekeyap/htdocs/luci-static/resources/view/network/onekeyap.js:54
+msgid "Router Mode"
+msgstr "路由器模式"
+
+#: applications/luci-app-onekeyap/root/usr/share/luci/menu.d/luci-app-onekeyap.json:3
+#: applications/luci-app-onekeyap/htdocs/luci-static/resources/view/network/onekeyap.js:62
+msgid "One-Key AP Mode"
+msgstr "一键 AP 模式"
+
+#: applications/luci-app-onekeyap/htdocs/luci-static/resources/view/network/onekeyap.js:64
+msgid "Merge current WAN ports into LAN with one click. In AP mode, LAN becomes a DHCP client while keeping 192.168.0.1/24 as a fallback management address."
+msgstr "一键把当前 WAN 口并入 LAN，并在 AP 模式下让 LAN 改为 DHCP Client，同时保留 192.168.0.1/24 作为保底管理地址。"
+
+#: applications/luci-app-onekeyap/htdocs/luci-static/resources/view/network/onekeyap.js:67
+msgid "Current Mode"
+msgstr "当前模式"
+
+#: applications/luci-app-onekeyap/htdocs/luci-static/resources/view/network/onekeyap.js:68
+msgid "Current LAN Ports"
+msgstr "当前 LAN 口"
+
+#: applications/luci-app-onekeyap/htdocs/luci-static/resources/view/network/onekeyap.js:69
+msgid "Current LAN IPv4"
+msgstr "当前 LAN IPv4"
+
+#: applications/luci-app-onekeyap/htdocs/luci-static/resources/view/network/onekeyap.js:70
+msgid "Original LAN Ports"
+msgstr "原始 LAN 口"
+
+#: applications/luci-app-onekeyap/htdocs/luci-static/resources/view/network/onekeyap.js:71
+msgid "Original WAN Ports"
+msgstr "原始 WAN 口"
+
+#: applications/luci-app-onekeyap/htdocs/luci-static/resources/view/network/onekeyap.js:72
+msgid "Fallback Address"
+msgstr "保底地址"

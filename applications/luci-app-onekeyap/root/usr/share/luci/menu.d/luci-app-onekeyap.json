@@ -1,0 +1,13 @@
+{
+	"admin/network/onekeyap": {
+		"title": "One-Key AP Mode",
+		"order": 36,
+		"action": {
+			"type": "view",
+			"path": "network/onekeyap"
+		},
+		"depends": {
+			"acl": [ "luci-app-onekeyap" ]
+		}
+	}
+}

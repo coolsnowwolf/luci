@@ -1,0 +1,490 @@
+#!/bin/sh
+
+. /lib/functions.sh
+. /usr/share/libubox/jshn.sh
+
+STATE_CONFIG="onekeyap"
+STATE_SECTION="main"
+BACKUP_DIR="/etc/onekeyap"
+NETWORK_BACKUP="${BACKUP_DIR}/network.backup"
+DHCP_BACKUP="${BACKUP_DIR}/dhcp.backup"
+RELOAD_LOG="/tmp/onekeyap-reload.log"
+
+append_unique() {
+	local var="$1"
+	local item current
+
+	shift
+	eval "current=\${$var}"
+
+	for item in "$@"; do
+		[ -n "$item" ] || continue
+
+		case " $current " in
+			*" $item "*) ;;
+			*) current="${current:+$current }$item" ;;
+		esac
+	done
+
+	eval "$var=\$current"
+}
+
+ensure_state() {
+	if ! uci -q get "${STATE_CONFIG}.${STATE_SECTION}" >/dev/null; then
+		uci batch <<-EOF >/dev/null
+			set ${STATE_CONFIG}.${STATE_SECTION}=settings
+			set ${STATE_CONFIG}.${STATE_SECTION}.mode='router'
+			set ${STATE_CONFIG}.${STATE_SECTION}.fallback_ip='192.168.0.1'
+			set ${STATE_CONFIG}.${STATE_SECTION}.fallback_mask='255.255.255.0'
+			set ${STATE_CONFIG}.${STATE_SECTION}.fallback_cidr='24'
+EOF
+		uci commit "${STATE_CONFIG}" >/dev/null
+	fi
+}
+
+state_get() {
+	uci -q get "${STATE_CONFIG}.${STATE_SECTION}.$1"
+}
+
+state_set() {
+	uci set "${STATE_CONFIG}.${STATE_SECTION}.$1=$2"
+}
+
+state_set_list() {
+	local option="$1"
+	local item
+
+	shift
+	uci -q delete "${STATE_CONFIG}.${STATE_SECTION}.${option}"
+
+	for item in "$@"; do
+		[ -n "$item" ] || continue
+		uci add_list "${STATE_CONFIG}.${STATE_SECTION}.${option}=${item}"
+	done
+}
+
+reply_json() {
+	local code="${1:-0}"
+	local mode="${2}"
+	local message="${3}"
+
+	json_init
+	json_add_int code "${code}"
+	[ -n "${mode}" ] && json_add_string mode "${mode}"
+	[ -n "${message}" ] && json_add_string message "${message}"
+	json_dump
+}
+
+json_add_words() {
+	local name="$1"
+	local item
+
+	shift
+	json_add_array "${name}"
+	for item in "$@"; do
+		[ -n "${item}" ] || continue
+		json_add_string "" "${item}"
+	done
+	json_close_array
+}
+
+collect_ipv4_addrs() {
+	local dev="$1"
+
+	[ -n "${dev}" ] || return 0
+
+	ip -o -4 addr show dev "${dev}" 2>/dev/null | awk '{ print $4 }'
+}
+
+find_device_section_match=""
+
+find_device_section_cb() {
+	local section="$1"
+	local target="$2"
+	local name
+
+	config_get name "${section}" name
+	[ "${name}" = "${target}" ] && find_device_section_match="${section}"
+}
+
+find_device_section() {
+	local target="$1"
+
+	find_device_section_match=""
+	config_load network
+	config_foreach find_device_section_cb device "${target}"
+
+	printf '%s\n' "${find_device_section_match}"
+}
+
+collect_interface_devices() {
+	local iface="$1"
+	local direct dev section ports type
+
+	direct="$(uci -q get "network.${iface}.device")"
+	[ -n "${direct}" ] || direct="$(uci -q get "network.${iface}.ifname")"
+	[ -n "${direct}" ] || return 0
+
+	for dev in ${direct}; do
+		case "${dev}" in
+			@*) continue ;;
+		esac
+
+		section="$(find_device_section "${dev}")"
+		type="$(uci -q get "network.${section}.type")"
+
+		if [ -n "${section}" ] && [ "${type}" = "bridge" ]; then
+			ports="$(uci -q get "network.${section}.ports")"
+			if [ -n "${ports}" ]; then
+				printf '%s\n' "${ports}"
+			else
+				printf '%s\n' "${dev}"
+			fi
+		else
+			printf '%s\n' "${dev}"
+		fi
+	done
+}
+
+zone_networks=""
+
+find_zone_networks_cb() {
+	local section="$1"
+	local target="$2"
+	local name network
+
+	config_get name "${section}" name
+	[ "${name}" = "${target}" ] || return 0
+
+	config_get network "${section}" network
+	zone_networks="${network}"
+}
+
+get_wan_networks() {
+	local iface result=""
+
+	zone_networks=""
+	config_load firewall
+	config_foreach find_zone_networks_cb zone "wan"
+
+	if [ -n "${zone_networks}" ]; then
+		for iface in ${zone_networks}; do
+			uci -q get "network.${iface}" >/dev/null || continue
+			append_unique result "${iface}"
+		done
+	fi
+
+	if [ -z "${result}" ]; then
+		for iface in wan wan6; do
+			uci -q get "network.${iface}" >/dev/null || continue
+			append_unique result "${iface}"
+		done
+	fi
+
+	printf '%s\n' "${result}"
+}
+
+get_lan_ports() {
+	local result="" item
+
+	for item in $(collect_interface_devices lan); do
+		append_unique result "${item}"
+	done
+
+	printf '%s\n' "${result}"
+}
+
+get_wan_ports() {
+	local iface result="" item
+
+	for iface in $(get_wan_networks); do
+		for item in $(collect_interface_devices "${iface}"); do
+			append_unique result "${item}"
+		done
+	done
+
+	printf '%s\n' "${result}"
+}
+
+ensure_lan_bridge() {
+	local current_lan_device bridge_section final_device port
+
+	current_lan_device="$(uci -q get network.lan.device)"
+	final_device="${current_lan_device}"
+
+	if [ -n "${current_lan_device}" ]; then
+		bridge_section="$(find_device_section "${current_lan_device}")"
+	fi
+
+	if [ -n "${bridge_section}" ] && [ "$(uci -q get "network.${bridge_section}.type")" = "bridge" ]; then
+		final_device="${current_lan_device}"
+	else
+		final_device="br-lan"
+		bridge_section="$(find_device_section "${final_device}")"
+		[ -n "${bridge_section}" ] || bridge_section="$(uci add network device)"
+	fi
+
+	uci set "network.${bridge_section}=device"
+	uci set "network.${bridge_section}.name=${final_device}"
+	uci set "network.${bridge_section}.type=bridge"
+	uci -q delete "network.${bridge_section}.ports"
+
+	for port in "$@"; do
+		[ -n "${port}" ] || continue
+		uci add_list "network.${bridge_section}.ports=${port}"
+	done
+
+	uci set "network.lan.device=${final_device}"
+	uci -q delete network.lan.ifname
+	uci -q delete network.lan.type
+
+	printf '%s\n' "${final_device}"
+}
+
+schedule_reload() {
+	local target_mode="$1"
+
+	(
+		sleep 1
+		/etc/init.d/network restart
+		/etc/init.d/dnsmasq restart
+		/etc/init.d/odhcpd restart
+		/etc/init.d/firewall restart
+		[ "${target_mode}" = "ap" ] && /usr/libexec/onekeyap refresh-fallback
+	) >"${RELOAD_LOG}" 2>&1 &
+}
+
+get_lan_runtime_device() {
+	local json dev
+
+	json="$(ubus call network.interface.lan status 2>/dev/null)"
+	if [ -n "${json}" ]; then
+		json_load "${json}"
+		json_get_var dev l3_device
+		[ -n "${dev}" ] || json_get_var dev device
+		json_cleanup
+	fi
+
+	[ -n "${dev}" ] || dev="$(uci -q get network.lan.device)"
+	[ -n "${dev}" ] || dev="$(state_get ap_lan_device)"
+
+	printf '%s\n' "${dev}"
+}
+
+refresh_fallback() {
+	local mode dev fallback_ip fallback_cidr
+
+	ensure_state
+	mode="$(state_get mode)"
+	[ "${mode}" = "ap" ] || exit 0
+
+	dev="$(get_lan_runtime_device)"
+	fallback_ip="$(state_get fallback_ip)"
+	fallback_cidr="$(state_get fallback_cidr)"
+
+	[ -n "${dev}" ] || exit 0
+	[ -n "${fallback_ip}" ] || exit 0
+	[ -n "${fallback_cidr}" ] || fallback_cidr="24"
+
+	ip -o -4 addr show dev "${dev}" 2>/dev/null | grep -q " ${fallback_ip}/${fallback_cidr} " && exit 0
+	ip addr add "${fallback_ip}/${fallback_cidr}" dev "${dev}" 2>/dev/null
+}
+
+remove_current_fallback() {
+	local dev fallback_ip fallback_cidr
+
+	dev="$(get_lan_runtime_device)"
+	fallback_ip="$(state_get fallback_ip)"
+	fallback_cidr="$(state_get fallback_cidr)"
+
+	[ -n "${dev}" ] || return 0
+	[ -n "${fallback_ip}" ] || return 0
+	[ -n "${fallback_cidr}" ] || fallback_cidr="24"
+
+	ip addr del "${fallback_ip}/${fallback_cidr}" dev "${dev}" 2>/dev/null
+}
+
+status() {
+	local mode button_text fallback_ip fallback_cidr
+	local current_lan_ports current_lan_ipv4
+	local saved_lan_ports saved_wan_ports
+	local lan_runtime_dev item current_lan_ports_words="" current_lan_ipv4_words=""
+
+	ensure_state
+
+	mode="$(state_get mode)"
+	[ -n "${mode}" ] || mode="router"
+
+	if [ "${mode}" = "ap" ]; then
+		button_text="开启路由器模式"
+	else
+		button_text="开启 AP 模式"
+	fi
+
+	fallback_ip="$(state_get fallback_ip)"
+	fallback_cidr="$(state_get fallback_cidr)"
+	[ -n "${fallback_ip}" ] || fallback_ip="192.168.0.1"
+	[ -n "${fallback_cidr}" ] || fallback_cidr="24"
+
+	current_lan_ports="$(get_lan_ports)"
+	saved_lan_ports="$(state_get last_lan_ports)"
+	saved_wan_ports="$(state_get last_wan_ports)"
+	lan_runtime_dev="$(get_lan_runtime_device)"
+
+	for item in ${current_lan_ports}; do
+		append_unique current_lan_ports_words "${item}"
+	done
+
+	for item in $(collect_ipv4_addrs "${lan_runtime_dev}"); do
+		append_unique current_lan_ipv4_words "${item}"
+	done
+
+	json_init
+	json_add_int code 0
+	json_add_string mode "${mode}"
+	json_add_string button_text "${button_text}"
+	json_add_string fallback_ip "${fallback_ip}/${fallback_cidr}"
+	json_add_words current_lan_ports ${current_lan_ports_words}
+	json_add_words current_lan_ipv4 ${current_lan_ipv4_words}
+	json_add_words saved_lan_ports ${saved_lan_ports}
+	json_add_words saved_wan_ports ${saved_wan_ports}
+	json_dump
+}
+
+enable_ap() {
+	local mode lan_ports wan_ports all_ports="" lan_device iface item
+
+	ensure_state
+	mode="$(state_get mode)"
+
+	if [ "${mode}" = "ap" ]; then
+		reply_json 0 "ap" "当前已经是 AP 模式。"
+		return 0
+	fi
+
+	mkdir -p "${BACKUP_DIR}" || {
+		reply_json 1 "router" "无法创建备份目录。"
+		return 0
+	}
+
+	cp /etc/config/network "${NETWORK_BACKUP}" || {
+		reply_json 1 "router" "备份 network 配置失败。"
+		return 0
+	}
+
+	cp /etc/config/dhcp "${DHCP_BACKUP}" || {
+		reply_json 1 "router" "备份 dhcp 配置失败。"
+		return 0
+	}
+
+	lan_ports="$(get_lan_ports)"
+	wan_ports="$(get_wan_ports)"
+
+	for item in ${lan_ports} ${wan_ports}; do
+		append_unique all_ports "${item}"
+	done
+
+	if [ -z "${all_ports}" ]; then
+		reply_json 1 "router" "未检测到可并入 LAN 的接口。"
+		return 0
+	fi
+
+	lan_device="$(ensure_lan_bridge ${all_ports})"
+
+	uci set network.lan.proto='dhcp'
+	uci -q delete network.lan.ipaddr
+	uci -q delete network.lan.netmask
+	uci -q delete network.lan.gateway
+	uci -q delete network.lan.broadcast
+	uci -q delete network.lan.ip6assign
+	uci -q delete network.lan.ip6hint
+	uci -q delete network.lan.ip6ifaceid
+	uci -q delete network.lan.ip6class
+
+	for iface in $(get_wan_networks); do
+		uci -q get "network.${iface}" >/dev/null || continue
+		uci set "network.${iface}.proto=none"
+		uci set "network.${iface}.auto=0"
+		uci -q delete "network.${iface}.device"
+		uci -q delete "network.${iface}.ifname"
+	done
+
+	if ! uci -q get dhcp.lan >/dev/null; then
+		uci set dhcp.lan=dhcp
+		uci set dhcp.lan.interface='lan'
+	fi
+
+	uci set dhcp.lan.ignore='1'
+	uci set dhcp.lan.dhcpv4='disabled'
+	uci set dhcp.lan.dhcpv6='disabled'
+	uci set dhcp.lan.ra='disabled'
+	uci set dhcp.lan.ndp='disabled'
+
+	state_set mode 'ap'
+	state_set ap_lan_device "${lan_device}"
+	state_set_list last_lan_ports ${lan_ports}
+	state_set_list last_wan_ports ${wan_ports}
+	state_set_list last_wan_networks $(get_wan_networks)
+
+	uci commit network >/dev/null
+	uci commit dhcp >/dev/null
+	uci commit "${STATE_CONFIG}" >/dev/null
+
+	schedule_reload ap
+
+	reply_json 0 "ap" "AP 模式切换请求已提交，WAN 口会并入 LAN，并保留 192.168.0.1/24 作为保底地址。"
+}
+
+enable_router() {
+	local mode
+
+	ensure_state
+	mode="$(state_get mode)"
+
+	if [ "${mode}" != "ap" ]; then
+		reply_json 0 "router" "当前已经是路由器模式。"
+		return 0
+	fi
+
+	if [ ! -f "${NETWORK_BACKUP}" ] || [ ! -f "${DHCP_BACKUP}" ]; then
+		reply_json 1 "ap" "未找到原始配置备份，无法恢复路由器模式。"
+		return 0
+	fi
+
+	remove_current_fallback
+
+	cp "${NETWORK_BACKUP}" /etc/config/network || {
+		reply_json 1 "ap" "恢复 network 配置失败。"
+		return 0
+	}
+
+	cp "${DHCP_BACKUP}" /etc/config/dhcp || {
+		reply_json 1 "ap" "恢复 dhcp 配置失败。"
+		return 0
+	}
+
+	state_set mode 'router'
+	uci commit "${STATE_CONFIG}" >/dev/null
+
+	schedule_reload router
+
+	reply_json 0 "router" "路由器模式恢复请求已提交，原始 WAN/LAN 配置会被还原。"
+}
+
+case "$1" in
+	status)
+		status
+	;;
+	enable-ap)
+		enable_ap
+	;;
+	enable-router)
+		enable_router
+	;;
+	refresh-fallback)
+		refresh_fallback
+	;;
+	*)
+		reply_json 1 "" "用法: $0 {status|enable-ap|enable-router|refresh-fallback}"
+	;;
+esac

@@ -1,0 +1,17 @@
+{
+	"luci-app-onekeyap": {
+		"description": "Grant access to one-key AP mode switching",
+		"read": {
+			"cgi-io": [ "exec" ],
+			"file": {
+				"/usr/libexec/onekeyap status": [ "exec" ]
+			}
+		},
+		"write": {
+			"file": {
+				"/usr/libexec/onekeyap enable-ap": [ "exec" ],
+				"/usr/libexec/onekeyap enable-router": [ "exec" ]
+			}
+		}
+	}
+}

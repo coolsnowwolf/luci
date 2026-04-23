@@ -1,0 +1,79 @@
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8"
+
+#: applications/luci-app-onekeyap/root/usr/share/rpcd/acl.d/luci-app-onekeyap.json:3
+msgid "Grant access to one-key AP mode switching"
+msgstr ""
+
+#: applications/luci-app-onekeyap/htdocs/luci-static/resources/view/network/onekeyap.js:16
+msgid "Not detected"
+msgstr ""
+
+#: applications/luci-app-onekeyap/htdocs/luci-static/resources/view/network/onekeyap.js:22
+msgid "Enable Router Mode"
+msgstr ""
+
+#: applications/luci-app-onekeyap/htdocs/luci-static/resources/view/network/onekeyap.js:22
+msgid "Enable AP Mode"
+msgstr ""
+
+#: applications/luci-app-onekeyap/htdocs/luci-static/resources/view/network/onekeyap.js:24
+msgid "Switching mode"
+msgstr ""
+
+#: applications/luci-app-onekeyap/htdocs/luci-static/resources/view/network/onekeyap.js:26
+msgid "Running %s, the network will reload briefly. Please wait..."
+msgstr ""
+
+#: applications/luci-app-onekeyap/htdocs/luci-static/resources/view/network/onekeyap.js:32
+msgid "Command execution failed"
+msgstr ""
+
+#: applications/luci-app-onekeyap/htdocs/luci-static/resources/view/network/onekeyap.js:37
+msgid "Switching failed"
+msgstr ""
+
+#: applications/luci-app-onekeyap/htdocs/luci-static/resources/view/network/onekeyap.js:40
+msgid "The switch request has been submitted. The page will refresh in a few seconds. If the address changes, you can still use 192.168.0.1."
+msgstr ""
+
+#: applications/luci-app-onekeyap/htdocs/luci-static/resources/view/network/onekeyap.js:54
+msgid "AP Mode"
+msgstr ""
+
+#: applications/luci-app-onekeyap/htdocs/luci-static/resources/view/network/onekeyap.js:54
+msgid "Router Mode"
+msgstr ""
+
+#: applications/luci-app-onekeyap/root/usr/share/luci/menu.d/luci-app-onekeyap.json:3
+#: applications/luci-app-onekeyap/htdocs/luci-static/resources/view/network/onekeyap.js:62
+msgid "One-Key AP Mode"
+msgstr ""
+
+#: applications/luci-app-onekeyap/htdocs/luci-static/resources/view/network/onekeyap.js:64
+msgid "Merge current WAN ports into LAN with one click. In AP mode, LAN becomes a DHCP client while keeping 192.168.0.1/24 as a fallback management address."
+msgstr ""
+
+#: applications/luci-app-onekeyap/htdocs/luci-static/resources/view/network/onekeyap.js:67
+msgid "Current Mode"
+msgstr ""
+
+#: applications/luci-app-onekeyap/htdocs/luci-static/resources/view/network/onekeyap.js:68
+msgid "Current LAN Ports"
+msgstr ""
+
+#: applications/luci-app-onekeyap/htdocs/luci-static/resources/view/network/onekeyap.js:69
+msgid "Current LAN IPv4"
+msgstr ""
+
+#: applications/luci-app-onekeyap/htdocs/luci-static/resources/view/network/onekeyap.js:70
+msgid "Original LAN Ports"
+msgstr ""
+
+#: applications/luci-app-onekeyap/htdocs/luci-static/resources/view/network/onekeyap.js:71
+msgid "Original WAN Ports"
+msgstr ""
+
+#: applications/luci-app-onekeyap/htdocs/luci-static/resources/view/network/onekeyap.js:72
+msgid "Fallback Address"
+msgstr ""
