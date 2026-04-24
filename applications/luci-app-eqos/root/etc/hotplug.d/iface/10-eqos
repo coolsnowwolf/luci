@@ -2,4 +2,6 @@
 [ "$ACTION" = "ifup" ] || exit 0
 [ "$INTERFACE" = "lan" ] || exit 0
 
+[ "$(uci -q get eqos.config.mode)" = "nss" ] && exit 0
+
 /etc/init.d/eqos start

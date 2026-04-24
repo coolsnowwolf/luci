@@ -1,10 +1,14 @@
 # The bandwidth unit is Mbit/s
 config eqos 'config'
 	option enabled      0
+	option mode         'software'
 	option download     100
 	option upload       20
+	option nss_interface ''
+	option nss_qdisc_opts ''
 
 # Limiting the bandwidth of a single Device
+# These entries are only used in software mode.
 #config device
 #	option ip       "192.168.1.100"
 #	option download 10

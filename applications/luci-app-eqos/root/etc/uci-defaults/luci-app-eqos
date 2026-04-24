@@ -1,0 +1,8 @@
+#!/bin/sh
+
+if ! uci -q get eqos.config >/dev/null 2>&1 && uci -q get eqos.@eqos[0] >/dev/null 2>&1; then
+	uci -q rename eqos.@eqos[0]=config
+	uci -q commit eqos
+fi
+
+exit 0

@@ -9,50 +9,68 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.0.6\n"
 
-#: applications/luci-app-eqos/htdocs/luci-static/resources/view/eqos.js:64
 msgid "Comment"
 msgstr "注释"
 
-#: applications/luci-app-eqos/htdocs/luci-static/resources/view/eqos.js:28
-#: applications/luci-app-eqos/htdocs/luci-static/resources/view/eqos.js:56
 msgid "Download speed (Mbit/s)"
 msgstr "下载速度 (Mbit/s)"
 
-#: applications/luci-app-eqos/htdocs/luci-static/resources/view/eqos.js:18
-#: applications/luci-app-eqos/root/usr/share/luci/menu.d/luci-app-eqos.json:3
 msgid "EQoS"
 msgstr "网速控制"
 
-#: applications/luci-app-eqos/htdocs/luci-static/resources/view/eqos.js:24
-#: applications/luci-app-eqos/htdocs/luci-static/resources/view/eqos.js:43
 msgid "Enable"
 msgstr "启用"
 
-#: applications/luci-app-eqos/root/usr/share/rpcd/acl.d/luci-app-eqos.json:3
 msgid "Grant UCI access for luci-app-eqos"
 msgstr "授予 luci-app-eqos 访问 UCI 配置的权限"
 
-#: applications/luci-app-eqos/htdocs/luci-static/resources/view/eqos.js:46
 msgid "IP address"
 msgstr "IP 地址"
 
-#: applications/luci-app-eqos/htdocs/luci-static/resources/view/eqos.js:19
+msgid "NSS advanced options"
+msgstr "NSS 高级选项"
+
+msgid "NSS mode notes"
+msgstr "NSS 模式说明"
+
+msgid "NSS physical interface"
+msgstr "NSS 物理接口"
+
 msgid "Network speed control service."
 msgstr "网速控制服务。"
 
-#: applications/luci-app-eqos/htdocs/luci-static/resources/view/eqos.js:38
+msgid "Optional nssfq_codel options, for example \"interval 50ms quantum 304\"."
+msgstr "可选的 nssfq_codel 参数，例如“interval 50ms quantum 304”。"
+
+msgid "Physical interface used by nssifb, usually the WAN Ethernet device."
+msgstr "nssifb 使用的物理接口，通常为 WAN 口对应的以太网设备。"
+
+msgid "QoS mode"
+msgstr "QoS 模式"
+
+msgid "Qualcomm NSS hardware QoS"
+msgstr "高通 NSS 硬件 QoS"
+
+msgid "Qualcomm NSS mode only shapes total upload/download bandwidth on the selected physical interface. Per-IP device rules below are ignored in this mode."
+msgstr "高通 NSS 模式只对所选物理接口的总上传/下载带宽进行整形。下方按 IP 的限速规则在此模式下会被忽略。"
+
+msgid "Software mode keeps per-IP limits. Qualcomm NSS mode uses nssifb hardware shaping for total bandwidth only."
+msgstr "软件模式保留按 IP 限速。高通 NSS 模式使用 nssifb 仅对总带宽进行硬件整形。"
+
+msgid "Software QoS (per-IP)"
+msgstr "软件 QoS（按 IP）"
+
 msgid "Speed limit based on IP address"
 msgstr "基于 IP 限速"
 
-#: applications/luci-app-eqos/htdocs/luci-static/resources/view/eqos.js:29
+msgid "These rules are only applied in Software QoS mode."
+msgstr "这些规则仅在软件 QoS 模式下生效。"
+
 msgid "Total download bandwidth."
 msgstr "总下载带宽。"
 
-#: applications/luci-app-eqos/htdocs/luci-static/resources/view/eqos.js:34
 msgid "Total upload bandwidth."
 msgstr "总上传带宽。"
 
-#: applications/luci-app-eqos/htdocs/luci-static/resources/view/eqos.js:33
-#: applications/luci-app-eqos/htdocs/luci-static/resources/view/eqos.js:60
 msgid "Upload speed (Mbit/s)"
 msgstr "上传速度 (Mbit/s)"

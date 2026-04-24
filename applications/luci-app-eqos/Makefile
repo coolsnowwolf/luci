@@ -1,7 +1,7 @@
 include $(TOPDIR)/rules.mk
 
 LUCI_TITLE:=LuCI support for Easy QoS
-LUCI_DEPENDS:=+tc +kmod-sched-core +kmod-ifb
+LUCI_DEPENDS:=+tc +kmod-sched-core +kmod-ifb +kmod-qca-nss-drv-qdisc +kmod-qca-nss-drv-igs
 
 PKG_MAINTAINER:=Jianhui Zhao <jianhuizhao329@gmail.com>
 

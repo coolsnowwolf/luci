@@ -1,29 +1,349 @@
 #!/bin/sh
 
-dev=br-lan
+set -f
 
-stop_qos() {
-	tc qdisc del dev $dev root 2>/dev/null
-	tc qdisc del dev $dev ingress 2>/dev/null
-	tc qdisc del dev ${dev}-ifb root 2>/dev/null
-	ip link del dev ${dev}-ifb 2>/dev/null
+SW_DEV="${EQOS_SW_DEV:-br-lan}"
+SW_IFB="${SW_DEV}-ifb"
+NSS_IFB="nssifb"
+STATE_DIR="/var/run/eqos"
+NSS_IFACE_STATE="${STATE_DIR}/nss-iface"
+NSS_TARGET="5ms"
+NSS_MAXQLIMIT_MS=100
+NSS_MINLIMIT=200
+NSS_OVERHEAD=18
+NSS_IFB_ALREADY_UP=0
+
+log_msg() {
+	if command -v logger >/dev/null 2>&1; then
+		logger -t eqos "$*"
+	else
+		echo "eqos: $*" >&2
+	fi
 }
 
-start_qos() {
-	local dl=$1
-	local up=$2
-	
-	tc qdisc add dev $dev root handle 1: htb
-	tc class add dev $dev parent 1: classid 1:1 htb rate ${dl}mbit
-	
-	ip link add dev ${dev}-ifb name ${dev}-ifb type ifb
-	ip link set dev ${dev}-ifb up
-	
-	tc qdisc add dev ${dev}-ifb root handle 1: htb
-	tc class add dev ${dev}-ifb parent 1: classid 1:1 htb rate ${up}mbit
-	
-	tc qdisc add dev $dev ingress
-	tc filter add dev $dev parent ffff: protocol ip u32 match u32 0 0 flowid 1:1 action mirred egress redirect dev ${dev}-ifb
+ensure_state_dir() {
+	[ -d "$STATE_DIR" ] || mkdir -p "$STATE_DIR"
+}
+
+uci_get_eqos() {
+	local option="$1"
+	local value
+
+	value="$(uci -q get "eqos.config.${option}" 2>/dev/null)" || value=""
+	[ -n "$value" ] || value="$(uci -q get "eqos.@eqos[0].${option}" 2>/dev/null)" || value=""
+
+	printf '%s\n' "$value"
+}
+
+resolve_nss_interface() {
+	local iface="$1"
+
+	[ -n "$iface" ] || iface="$(uci -q get network.wan.device)"
+	[ -n "$iface" ] || iface="$(uci -q get network.wan.ifname)"
+	[ -n "$iface" ] || iface="eth0"
+
+	iface="${iface%% *}"
+	iface="${iface%%.*}"
+
+	printf '%s\n' "$iface"
+}
+
+get_nss_iface_state() {
+	if [ -s "$NSS_IFACE_STATE" ]; then
+		cat "$NSS_IFACE_STATE"
+	else
+		resolve_nss_interface "$(uci_get_eqos nss_interface)"
+	fi
+}
+
+set_nss_iface_state() {
+	ensure_state_dir
+	printf '%s\n' "$1" > "$NSS_IFACE_STATE"
+}
+
+clear_nss_iface_state() {
+	rm -f "$NSS_IFACE_STATE"
+}
+
+get_mtu() {
+	local iface="$1"
+
+	if [ -r "/sys/class/net/${iface}/mtu" ]; then
+		cat "/sys/class/net/${iface}/mtu"
+	else
+		echo 1500
+	fi
+}
+
+calc_limit() {
+	local speed_kbit="$1"
+	local mtu="$2"
+	local max_delay_ms="${3:-$NSS_MAXQLIMIT_MS}"
+
+	awk -v speed="$speed_kbit" -v mtu="$mtu" -v maxdelay="$max_delay_ms" -v minlimit="$NSS_MINLIMIT" '
+		BEGIN {
+			limit = int((speed * 125) * (maxdelay / 1000) / mtu);
+			if (limit < minlimit)
+				limit = minlimit;
+			print limit;
+		}
+	'
+}
+
+calc_burst() {
+	local speed_kbit="$1"
+	local mtu="$2"
+
+	awk -v speed="$speed_kbit" -v mtu="$mtu" '
+		BEGIN {
+			burst = int(speed / 8);
+			if (burst < mtu)
+				burst = mtu;
+			burst = int((burst + mtu - 1) / mtu) * mtu;
+			print burst;
+		}
+	'
+}
+
+calc_quantum() {
+	local speed_kbit="$1"
+	local mtu="$2"
+	local quantum="$mtu"
+
+	if [ "$speed_kbit" -lt 100000 ]; then
+		quantum=$((quantum / 5 + 1))
+	fi
+
+	printf '%s\n' "$quantum"
+}
+
+normalize_qdisc_opts() {
+	local speed_kbit="$1"
+	local mtu="$2"
+	local opts="$3"
+	local quantum
+
+	case " $opts " in
+		*" interval "*) ;;
+		*) opts="interval 100ms${opts:+ $opts}" ;;
+	esac
+
+	case " $opts " in
+		*" quantum "*) ;;
+		*)
+			quantum="$(calc_quantum "$speed_kbit" "$mtu")"
+			opts="quantum ${quantum}${opts:+ $opts}"
+		;;
+	esac
+
+	case " $opts " in
+		*" flows "*) ;;
+		*) opts="flows 1024${opts:+ $opts}" ;;
+	esac
+
+	printf '%s\n' "$opts"
+}
+
+tc_supports_nss() {
+	tc qdisc add dev lo root nsstbl help 2>&1 | grep -q 'Usage: .*nsstbl'
+}
+
+load_nss_ifb_module() {
+	if [ -d /sys/module/nss_ifb ] || [ -d /sys/module/nss-ifb ]; then
+		return 0
+	fi
+
+	modprobe nss-ifb 2>/dev/null || insmod nss-ifb 2>/dev/null
+}
+
+get_nss_param_path() {
+	if [ -w /sys/module/nss_ifb/parameters/nss_dev_name ]; then
+		echo /sys/module/nss_ifb/parameters/nss_dev_name
+		return 0
+	fi
+
+	if [ -w /sys/module/nss-ifb/parameters/nss_dev_name ]; then
+		echo /sys/module/nss-ifb/parameters/nss_dev_name
+		return 0
+	fi
+
+	return 1
+}
+
+is_link_up() {
+	ip link show dev "$1" 2>/dev/null | grep -q 'UP'
+}
+
+prepare_nss_ifb() {
+	local iface="$1"
+	local param_path
+	local current_iface=""
+
+	case "$iface" in
+		eth*)
+		;;
+		*)
+			log_msg "Qualcomm NSS mode requires a physical ethX interface, got '${iface}'"
+			return 1
+		;;
+	esac
+
+	tc_supports_nss || {
+		log_msg "tc binary does not support Qualcomm NSS qdisc commands"
+		return 1
+	}
+
+	load_nss_ifb_module || {
+		log_msg "failed to load nss-ifb kernel module"
+		return 1
+	}
+
+	param_path="$(get_nss_param_path)" || {
+		log_msg "nss-ifb parameter path not found"
+		return 1
+	}
+
+	if ! ip link show "$NSS_IFB" >/dev/null 2>&1; then
+		ip link add dev "$NSS_IFB" type nss_ifb || {
+			log_msg "failed to create ${NSS_IFB} interface"
+			return 1
+		}
+	fi
+
+	[ -r "$param_path" ] && current_iface="$(cat "$param_path" 2>/dev/null)"
+
+	if is_link_up "$NSS_IFB"; then
+		NSS_IFB_ALREADY_UP=1
+	else
+		NSS_IFB_ALREADY_UP=0
+	fi
+
+	if [ "$current_iface" != "$iface" ]; then
+		ip link set dev "$NSS_IFB" down 2>/dev/null || true
+		NSS_IFB_ALREADY_UP=0
+		printf '%s' "$iface" > "$param_path" || {
+			log_msg "failed to set nss-ifb source interface to ${iface}"
+			return 1
+		}
+	fi
+
+	return 0
+}
+
+add_nss_shaper() {
+	local iface="$1"
+	local rate_mbit="$2"
+	local mtu="$3"
+	local qdisc_opts="$4"
+	local speed_kbit burst limit
+
+	speed_kbit=$((rate_mbit * 1000))
+	burst="$(calc_burst "$speed_kbit" "$mtu")"
+	limit="$(calc_limit "$speed_kbit" "$mtu" "$NSS_MAXQLIMIT_MS")"
+	qdisc_opts="$(normalize_qdisc_opts "$speed_kbit" "$mtu" "$qdisc_opts")"
+
+	tc qdisc add dev "$iface" root handle 1: nsstbl burst "${burst}b" rate "${rate_mbit}mbit" mtu "${mtu}b" || return 1
+	tc qdisc add dev "$iface" parent 1: handle 10: nssfq_codel limit "$limit" target "$NSS_TARGET" $qdisc_opts set_default || return 1
+}
+
+stop_software_qos() {
+	tc qdisc del dev "$SW_DEV" root 2>/dev/null
+	tc qdisc del dev "$SW_DEV" ingress 2>/dev/null
+	tc qdisc del dev "$SW_IFB" root 2>/dev/null
+	ip link del dev "$SW_IFB" 2>/dev/null
+}
+
+stop_nss_qos() {
+	local iface
+
+	iface="$(get_nss_iface_state)"
+
+	tc qdisc del dev "$iface" root 2>/dev/null
+	tc qdisc del dev "$NSS_IFB" root 2>/dev/null
+	ip link set dev "$NSS_IFB" down 2>/dev/null
+	clear_nss_iface_state
+}
+
+stop_qos() {
+	stop_software_qos
+	stop_nss_qos
+}
+
+start_software_qos() {
+	local dl="$1"
+	local up="$2"
+
+	tc qdisc add dev "$SW_DEV" root handle 1: htb || return 1
+	tc class add dev "$SW_DEV" parent 1: classid 1:1 htb rate "${dl}mbit" || return 1
+
+	ip link add dev "$SW_IFB" type ifb || return 1
+	ip link set dev "$SW_IFB" up || return 1
+
+	tc qdisc add dev "$SW_IFB" root handle 1: htb || return 1
+	tc class add dev "$SW_IFB" parent 1: classid 1:1 htb rate "${up}mbit" || return 1
+
+	tc qdisc add dev "$SW_DEV" ingress || return 1
+	tc filter add dev "$SW_DEV" parent ffff: protocol ip u32 match u32 0 0 flowid 1:1 action mirred egress redirect dev "$SW_IFB" || return 1
+}
+
+start_nss_qos() {
+	local dl="$1"
+	local up="$2"
+	local iface
+	local qdisc_opts="$4"
+	local mtu
+
+	iface="$(resolve_nss_interface "$3")"
+	mtu="$(get_mtu "$iface")"
+	mtu=$((mtu + NSS_OVERHEAD))
+
+	prepare_nss_ifb "$iface" || return 1
+
+	tc qdisc del dev "$iface" root 2>/dev/null
+	tc qdisc del dev "$NSS_IFB" root 2>/dev/null
+
+	add_nss_shaper "$iface" "$up" "$mtu" "$qdisc_opts" || {
+		log_msg "failed to add NSS upload shaper on ${iface}"
+		return 1
+	}
+
+	if [ "$NSS_IFB_ALREADY_UP" -ne 1 ]; then
+		sleep 1
+		ip link set dev "$NSS_IFB" up || {
+			tc qdisc del dev "$iface" root 2>/dev/null
+			log_msg "failed to bring ${NSS_IFB} up"
+			return 1
+		}
+	fi
+
+	sleep 1
+
+	add_nss_shaper "$NSS_IFB" "$dl" "$mtu" "$qdisc_opts" || {
+		tc qdisc del dev "$iface" root 2>/dev/null
+		tc qdisc del dev "$NSS_IFB" root 2>/dev/null
+		ip link set dev "$NSS_IFB" down 2>/dev/null
+		log_msg "failed to add NSS download shaper on ${NSS_IFB}"
+		return 1
+	}
+
+	set_nss_iface_state "$iface"
+	log_msg "started Qualcomm NSS QoS on ${iface}"
+	return 0
+}
+
+add_software_limit() {
+	local ip="$1"
+	local dl="$2"
+	local up="$3"
+	local cnt
+
+	cnt="$(tc class show dev "$SW_DEV" | wc -l)"
+
+	tc class add dev "$SW_DEV" parent 1:1 classid 1:1"$cnt" htb rate "${dl}mbit" ceil "${dl}mbit" || return 1
+	tc filter add dev "$SW_DEV" parent 1:0 protocol ip u32 match ip dst "$ip" flowid 1:1"$cnt" || return 1
+
+	tc class add dev "$SW_IFB" parent 1:1 classid 1:1"$cnt" htb rate "${up}mbit" ceil "${up}mbit" || return 1
+	tc filter add dev "$SW_IFB" parent 1:0 protocol ip u32 match ip src "$ip" flowid 1:1"$cnt" || return 1
 }
 
 case "$1" in
@@ -31,30 +351,30 @@ case "$1" in
 		stop_qos
 	;;
 	"start")
+		mode="${2:-software}"
 		stop_qos
-		start_qos $2 $3
+		case "$mode" in
+			nss)
+				start_nss_qos "$3" "$4" "$5" "$6"
+			;;
+			software|*)
+				start_software_qos "$3" "$4"
+			;;
+		esac
 	;;
 	"add")
-		ip="$2"
-		dl="$3"
-		up="$4"
-		
-		cnt=$(tc class show dev $dev | wc -l)
-		
-		tc class add dev $dev parent 1:1 classid 1:1$cnt htb rate ${dl}mbit ceil ${dl}mbit
-		tc filter add dev $dev parent 1:0 protocol ip u32 match ip dst $ip flowid 1:1$cnt
-		
-		tc class add dev ${dev}-ifb parent 1:1 classid 1:1$cnt htb rate ${up}mbit ceil ${up}mbit
-		tc filter add dev ${dev}-ifb parent 1:0 protocol ip u32 match ip src $ip flowid 1:1$cnt
+		add_software_limit "$2" "$3" "$4"
 	;;
 	*)
 		echo "Usage: $0 <command> [options]"
 		echo "Commands:"
-		echo "  start dl_rate up_rate       #Total bandwidth (Mbit/s)"
+		echo "  start software dl_rate up_rate"
+		echo "  start nss dl_rate up_rate [ethX] [nssfq_codel_opts]"
 		echo "  stop"
-		echo "  add ip dl_rate up_rate      #Limiting the bandwidth of a single IP (Mbit/s)"
-		echo "Example:"
-		echo "  $0 start 30 20              # Total bandwidth: down 30Mbit/s up 20Mbit/s"
-		echo "  $0 add 192.168.22.12 10 2   # down 10Mbit/s  up 2Mbit/s"
+		echo "  add ip dl_rate up_rate      # software mode only"
+		echo "Examples:"
+		echo "  $0 start software 30 20"
+		echo "  $0 start nss 500 50 eth1 \"interval 50ms quantum 304\""
+		echo "  $0 add 192.168.22.12 10 2"
 	;;
 esac

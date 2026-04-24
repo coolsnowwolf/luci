@@ -3,6 +3,23 @@
 
 START=50
 USE_PROCD=1
+MAIN_CFG=config
+
+capture_main_cfg() {
+	[ -n "$MAIN_CFG" ] || MAIN_CFG="$1"
+}
+
+find_main_cfg() {
+	local marker
+
+	MAIN_CFG=config
+	config_get marker "$MAIN_CFG" "enabled"
+	[ -n "$marker" ] && return 0
+
+	MAIN_CFG=
+	config_foreach capture_main_cfg "eqos"
+	[ -n "$MAIN_CFG" ] || MAIN_CFG=config
+}
 
 parse_device() {
 	local cfg="$1"
@@ -21,18 +38,22 @@ parse_device() {
 
 start_service() {
 	config_load "eqos"
+	find_main_cfg
 
 	local enabled
-	config_get_bool enabled "config" "enabled" "0"
+	config_get_bool enabled "$MAIN_CFG" "enabled" "0"
 	[ "$enabled" -eq "1" ] || return 1
 
-	local download upload
-	config_get download "config" "download"
-	config_get upload "config" "upload"
+	local mode download upload nss_interface nss_qdisc_opts
+	config_get mode "$MAIN_CFG" "mode" "software"
+	config_get download "$MAIN_CFG" "download"
+	config_get upload "$MAIN_CFG" "upload"
+	config_get nss_interface "$MAIN_CFG" "nss_interface"
+	config_get nss_qdisc_opts "$MAIN_CFG" "nss_qdisc_opts"
 
-	eqos start "$download" "$upload"
+	eqos start "$mode" "$download" "$upload" "$nss_interface" "$nss_qdisc_opts" || return 1
 
-	config_foreach parse_device "device"
+	[ "$mode" = "software" ] && config_foreach parse_device "device"
 }
 
 stop_service() {
