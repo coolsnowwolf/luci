@@ -4,8 +4,30 @@
 -#}
 
 {%
+	import { access } from 'fs';
+	import { cursor } from 'uci';
+
+	const wizard_request = ctx.request_path ?? [];
+	let wizard_pending = false;
+
+	if (ctx.authsession &&
+	    wizard_request[0] == 'admin' &&
+	    wizard_request[1] != 'wizard' &&
+	    access('/etc/config/wizard') &&
+	    !access('/usr/sbin/quickstart') &&
+	    !access('/etc/config/finished')) {
+		let wizard_uci = cursor();
+		wizard_pending = (wizard_uci.get('wizard', 'config', 'finished') != '1');
+	}
+
 	include(`themes/${theme}/header`);
 -%}
+
+{% if (wizard_pending): %}
+<script>
+	window.location.replace({{ sprintf('%J', dispatcher.build_url('admin/wizard')) }});
+</script>
+{% endif %}
 
 <script src="{{ resource }}/luci.js?v={# PKG_VERSION #}-{{ pkgs_update_time }}"></script>
 <script>
