@@ -533,11 +533,28 @@ function getDisplayTxPowerLabel() {
 	return _('Tx-Power');
 }
 
+function getDisplayIwinfoChannel(radioNet) {
+	for (const candidate of getIwinfoInfoCandidates(radioNet)) {
+		const info = cachedIwinfoInfoMap ? cachedIwinfoInfoMap[candidate] : null;
+		const channel = info != null ? +info.channel : NaN;
+
+		if (!isNaN(channel) && channel > 0)
+			return channel;
+	}
+
+	return null;
+}
+
 function getDisplayChannel(radioNet) {
 	let channel = radioNet.getChannel();
 
 	if (channel != null && channel !== '' && channel !== 'auto')
 		return +channel;
+
+	channel = getDisplayIwinfoChannel(radioNet);
+
+	if (channel != null)
+		return channel;
 
 	channel = uci.get('wireless', radioNet.getWifiDeviceName(), 'channel');
 
@@ -566,12 +583,29 @@ function getDerivedFrequencyGHz(hwmode, channel) {
 	return null;
 }
 
+function normalizeIwinfoFrequency(freq) {
+	freq = +freq;
+
+	if (isNaN(freq) || freq <= 0)
+		return null;
+
+	return '%.03f'.format(freq / 1000);
+}
+
 function getDisplayFrequency(radioNet, channel) {
 	const frequency = radioNet.getFrequency();
 	const hwmode = uci.get('wireless', radioNet.getWifiDeviceName(), 'hwmode') || '';
 
 	if (frequency != null && frequency !== '')
 		return frequency;
+
+	for (const candidate of getIwinfoInfoCandidates(radioNet)) {
+		const info = cachedIwinfoInfoMap ? cachedIwinfoInfoMap[candidate] : null;
+		const resolved = normalizeIwinfoFrequency(info != null ? info.frequency : null);
+
+		if (resolved != null)
+			return resolved;
+	}
 
 	return getDerivedFrequencyGHz(hwmode, channel);
 }
@@ -1847,12 +1881,12 @@ var CBIWifiFrequencyValue = form.Value.extend({
 		const band = elem.querySelector('.band');
 		const chan = elem.querySelector('.channel');
 		const restricted_chan = elem.querySelector('.restricted_channel');
-		const channels = this.channels[band.value];
 
-		if (chan.selectedIndex < 0)
+		if (chan.selectedIndex < 0 || !restricted_chan)
 			return;
 
-		const no_outdoor = channels[(chan.selectedIndex*3)+2].no_outdoor;
+		const channelMeta = this.getChannelMeta(band.value, chan.value);
+		const no_outdoor = !!(channelMeta && channelMeta.no_outdoor);
 		restricted_chan.style.display = no_outdoor ? '': 'none';
 	},
 
@@ -2597,13 +2631,12 @@ return view.extend({
 
 					if (ppeVpTarget) {
 						o = ss.taboption('advanced', form.Flag, 'ppe_vp', _('Enable wireless PPE acceleration'));
+						o.ucisection = radioNet.getName();
 						o.enabled = 'active';
 						o.disabled = 'none';
 						o.rmempty = false;
-						o.depends('mode', 'ap');
-						o.depends('mode', 'mesh');
 						o.cfgvalue = function(section_id) {
-							const value = uci.get('wireless', section_id, 'ppe_vp');
+							const value = uci.get('wireless', this.ucisection ?? section_id, 'ppe_vp');
 							return (value == null || value === '') ? 'active' : value;
 						};
 					}
