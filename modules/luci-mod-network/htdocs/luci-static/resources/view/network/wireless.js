@@ -1768,6 +1768,7 @@ var CBIWifiFrequencyValue = form.Value.extend({
 
 		const ch = +channel;
 		const channelMeta = this.getChannelMeta(band, channel);
+		const bandName = String(band || '');
 		const restrictWide = (band == '5g' && !(ch > 0 && ch <= 100));
 
 		const filtered = [];
@@ -1776,11 +1777,18 @@ var CBIWifiFrequencyValue = form.Value.extend({
 			const value = vals[i];
 			const label = vals[i + 1];
 			const meta = Object.assign({}, vals[i + 2]);
+			const valueName = String(value || '');
 
-			if (restrictWide && /(160|320|80_80)/.test(String(value)))
+			if (bandName == '2g' && /(80_80|80|160|320)/.test(valueName))
 				meta.available = false;
 
-			if (this.hwtype == 'mac80211' && band == '2g' && channelMeta && /^(HT|HE|EHT)40$/.test(String(value))) {
+			if (bandName != '6g' && /320/.test(valueName))
+				meta.available = false;
+
+			if (restrictWide && /(160|320|80_80)/.test(valueName))
+				meta.available = false;
+
+			if (this.hwtype == 'mac80211' && band == '2g' && channelMeta && /^(HT|HE|EHT)40$/.test(valueName)) {
 				const plusAvailable = !!(meta.available && channelMeta.ht40plus);
 				const minusAvailable = !!(meta.available && channelMeta.ht40minus);
 
