@@ -81,9 +81,13 @@ function getLegacyIwinfoProbeTargets() {
 	const targets = [];
 
 	for (const radio of uci.sections('wireless', 'wifi-device'))
-		pushUnique(targets, radio['.name']);
+		if (!isConfigWifiDeviceDisabled(radio['.name']))
+			pushUnique(targets, radio['.name']);
 
 	for (const iface of uci.sections('wireless', 'wifi-iface')) {
+		if (isConfigWifiIfaceDisabled(iface))
+			continue;
+
 		const device = iface.device;
 		const section = iface['.name'];
 		const configuredIfname = iface.ifname;
@@ -96,6 +100,13 @@ function getLegacyIwinfoProbeTargets() {
 	}
 
 	return targets;
+}
+
+function parseIwDevInfoTxPower(stdout) {
+	const match = String(stdout || '').match(/\btxpower\s+([0-9]+(?:\.[0-9]+)?)\s*dBm\b/i);
+	const value = match ? parseFloat(match[1]) : NaN;
+
+	return (!isNaN(value) && value > 0) ? value : null;
 }
 
 function buildIwinfoResolver(devices) {
@@ -115,6 +126,9 @@ function buildIwinfoResolver(devices) {
 	}
 
 	for (const iface of uci.sections('wireless', 'wifi-iface')) {
+		if (isConfigWifiIfaceDisabled(iface))
+			continue;
+
 		const device = iface.device;
 		const section = iface['.name'];
 		const configuredIfname = iface.ifname;
@@ -142,6 +156,10 @@ function buildIwinfoResolver(devices) {
 
 	for (const radio of uci.sections('wireless', 'wifi-device')) {
 		const name = radio['.name'];
+
+		if (isConfigWifiDeviceDisabled(name))
+			continue;
+
 		const target = radioTargets[name] || (deviceLookup[name] ? name : null);
 
 		registerTarget(target);
@@ -209,18 +227,35 @@ function loadIwinfoInfoMap(force) {
 				if (info != null)
 					nextMap[name] = info;
 
-			for (const alias in resolver.aliasMap) {
-				const target = resolver.aliasMap[alias];
+			const missingTxPowerTargets = queryTargets.filter((name) => {
+				const txpower = nextMap[name]?.txpower;
 
-				if (target && nextMap[target] != null)
-					nextMap[alias] = nextMap[target];
-			}
+				return (txpower == null || isNaN(txpower) || txpower <= 0);
+			});
 
-			if (Object.keys(nextMap).length > 0 || cachedIwinfoInfoMap == null)
-				cachedIwinfoInfoMap = nextMap;
+			return Promise.all(missingTxPowerTargets.map((name) =>
+				L.resolveDefault(fs.exec_direct('/usr/sbin/iw', [ 'dev', name, 'info' ]), '').then((stdout) => [ name, parseIwDevInfoTxPower(stdout) ])
+			)).then((fallbacks) => {
+				for (const [ name, txpower ] of fallbacks) {
+					if (txpower == null)
+						continue;
 
-			cachedIwinfoInfoPromise = null;
-			return cachedIwinfoInfoMap || nextMap;
+					nextMap[name] = Object.assign({}, nextMap[name] || {}, { txpower });
+				}
+
+				for (const alias in resolver.aliasMap) {
+					const target = resolver.aliasMap[alias];
+
+					if (target && nextMap[target] != null)
+						nextMap[alias] = nextMap[target];
+				}
+
+				if (Object.keys(nextMap).length > 0 || cachedIwinfoInfoMap == null)
+					cachedIwinfoInfoMap = nextMap;
+
+				cachedIwinfoInfoPromise = null;
+				return cachedIwinfoInfoMap || nextMap;
+			});
 		});
 	}).catch(() => {
 		cachedIwinfoInfoPromise = null;
@@ -250,8 +285,19 @@ function isQcaWifiHwtype(hwtype) {
 	return (hwtype == 'qcawifi' || hwtype == 'qcawificfg80211');
 }
 
+function isConfigWifiDeviceDisabled(deviceName) {
+	return (uci.get('wireless', deviceName, 'disabled') == '1');
+}
+
+function isConfigWifiIfaceDisabled(ifaceSection) {
+	const iface = L.isObject(ifaceSection) ? ifaceSection : uci.get('wireless', ifaceSection);
+
+	return (iface != null && iface['.type'] == 'wifi-iface' &&
+		(iface.disabled == '1' || isConfigWifiDeviceDisabled(iface.device)));
+}
+
 function isNetworkDisabled(radioNet) {
-	return (radioNet.get('disabled') == '1' || uci.get('wireless', radioNet.getWifiDeviceName(), 'disabled') == '1');
+	return (radioNet.get('disabled') == '1' || isConfigWifiDeviceDisabled(radioNet.getWifiDeviceName()));
 }
 
 function isRadioDisplayUp(radioDev, wifiNets) {
@@ -997,6 +1043,9 @@ function probeAssocListCandidates(candidates, probeFn) {
 }
 
 function getAssocListForNetwork(radioNet) {
+	if (isNetworkDisabled(radioNet))
+		return Promise.resolve([]);
+
 	const hwtype = uci.get('wireless', radioNet.getWifiDeviceName(), 'type');
 	const candidates = getAssocListCandidates(radioNet);
 	const resolvedIfname = candidates[0];
@@ -1494,11 +1543,15 @@ var CBIWifiFrequencyValue = form.Value.extend({
 					return obj;
 				}, {});
 
+			const has_he_modes = !!(htmodelist.HE20 || htmodelist.HE40 || htmodelist.HE80 || htmodelist.HE160);
+			const has_eht_modes = !!(htmodelist.EHT20 || htmodelist.EHT40 || htmodelist.EHT80 || htmodelist.EHT160 || htmodelist.EHT320);
 			const has_5g_channels = this.channels['5g'].length > (allow_auto ? 3 : 0);
 			const has_ac = (hwmodelist.ac || ((hwmodelist.ax || hwmodelist.be || /^11ax|^11be/.test(hwval)) && has_5g_channels)) &&
 				(L.hasSystemFeature('hostapd', '11ac') || htmodelist.VHT20 || htmodelist.VHT40 || htmodelist.VHT80 || htmodelist.VHT160);
-			const has_ax = hwmodelist.ax && (L.hasSystemFeature('hostapd', '11ax') || htmodelist.HE20 || htmodelist.HE40 || htmodelist.HE80 || htmodelist.HE160);
-			const has_be = hwmodelist.be && (L.hasSystemFeature('hostapd', '11be') || htmodelist.EHT20 || htmodelist.EHT40 || htmodelist.EHT80 || htmodelist.EHT160 || htmodelist.EHT320);
+			const has_ax = (hwmodelist.ax || has_eht_modes) &&
+				(L.hasSystemFeature('hostapd', '11ax') || has_he_modes || has_eht_modes);
+			const has_be = (hwmodelist.be || has_eht_modes) &&
+				(L.hasSystemFeature('hostapd', '11be') || has_eht_modes);
 
 			if (isQcaWifiHwtype(hwtype)) {
 				const qca_has_be = has_be || /^11be/.test(hwval);
@@ -2034,6 +2087,15 @@ var CBIWifiTxPowerValue = form.ListValue.extend({
 	}),
 
 	load: function(section_id) {
+		const device_section = this.getDeviceSection ? this.getDeviceSection(section_id) : section_id;
+
+		if (isConfigWifiDeviceDisabled(device_section)) {
+			this.powerval = this.wifiNetwork ? getDisplayTxPower(this.wifiNetwork) : null;
+			this.poweroff = this.wifiNetwork ? this.wifiNetwork.getTXPowerOffset() : null;
+			this.value('', _('driver default'));
+			return form.ListValue.prototype.load.apply(this, [section_id]);
+		}
+
 		return this.callTxPowerList(section_id).then(L.bind(function(pwrlist) {
 			this.powerval = this.wifiNetwork ? getDisplayTxPower(this.wifiNetwork) : null;
 			this.poweroff = this.wifiNetwork ? this.wifiNetwork.getTXPowerOffset() : null;
@@ -2071,6 +2133,11 @@ var CBIWifiCountryValue = form.Value.extend({
 	}),
 
 	load: function(section_id) {
+		const device_section = this.getDeviceSection ? this.getDeviceSection(section_id) : section_id;
+
+		if (isConfigWifiDeviceDisabled(device_section))
+			return form.Value.prototype.load.apply(this, [section_id]);
+
 		return this.callCountryList(section_id).then(L.bind(function(countrylist) {
 			if (Array.isArray(countrylist) && countrylist.length > 0) {
 				this.value('', _('driver default'));
