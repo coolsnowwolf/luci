@@ -30,6 +30,11 @@ const callIwinfoDevices = rpc.declare({
 	method: 'devices',
 	expect: { devices: [] }
 });
+const callSystemBoard = rpc.declare({
+	object: 'system',
+	method: 'board',
+	expect: {}
+});
 
 let cachedIwinfoInfoMap = null;
 let cachedIwinfoInfoPromise = null;
@@ -643,6 +648,12 @@ function getConfiguredWirelessMode(hwtype, hwmode, htmode) {
 		return 'n';
 
 	return '';
+}
+
+function isPpeVpTarget(boardinfo) {
+	const target = String(boardinfo?.release?.target || '');
+
+	return /(^|\/)ipq(?:53|95)xx\//.test(target);
 }
 
 function getFrequencyListBand(entry, hwmode) {
@@ -2305,7 +2316,11 @@ return view.extend({
 			uci.load('wireless'),
 			uci.load('system'),
 			firewall.getZones(),
-		]).then((data) => refreshIwinfoInfoMap().then(() => data));
+			callSystemBoard()
+		]).then((data) => {
+			this.boardinfo = data[4] || {};
+			return refreshIwinfoInfoMap().then(() => data);
+		});
 	},
 
 	checkAnonymousSections: function() {
@@ -2357,6 +2372,7 @@ return view.extend({
 
 	renderOverview: function(zones) {
 		let m, s, o;
+		const ppeVpTarget = isPpeVpTarget(this.boardinfo);
 
 		m = new form.Map('wireless');
 		m.chain('network');
@@ -2578,6 +2594,19 @@ return view.extend({
 				else if (isQcaWifiHwtype(hwtype)) {
 					o = ss.taboption('advanced', CBIWifiCountryValue, 'country', _('Country Code'));
 					o.wifiNetwork = radioNet;
+
+					if (ppeVpTarget) {
+						o = ss.taboption('advanced', form.Flag, 'ppe_vp', _('Enable wireless PPE acceleration'));
+						o.enabled = 'active';
+						o.disabled = 'none';
+						o.rmempty = false;
+						o.depends('mode', 'ap');
+						o.depends('mode', 'mesh');
+						o.cfgvalue = function(section_id) {
+							const value = uci.get('wireless', section_id, 'ppe_vp');
+							return (value == null || value === '') ? 'active' : value;
+						};
+					}
 				}
 				else if (hwtype == 'mt_dbdc') {
 					o = ss.taboption('advanced', CBIWifiCountryValue, 'country', _('Country Code'));

@@ -3685,6 +3685,10 @@ msgstr "启用 NTP 客户端"
 msgid "Enable Private PSK (PPSK)"
 msgstr "启用私有 PSK (PPSK)"
 
+#: modules/luci-mod-network/htdocs/luci-static/resources/view/network/wireless.js:2599
+msgid "Enable wireless PPE acceleration"
+msgstr "启用无线PPE加速"
+
 #: protocols/luci-proto-vpnc/htdocs/luci-static/resources/protocol/vpnc.js:96
 msgid "Enable Single DES"
 msgstr "启用单个 DES"
