@@ -687,7 +687,7 @@ function getConfiguredWirelessMode(hwtype, hwmode, htmode) {
 function isPpeVpTarget(boardinfo) {
 	const target = String(boardinfo?.release?.target || '');
 
-	return /(^|\/)ipq(?:53|95)xx\//.test(target);
+	return (/(^|\/)ipq(?:53|95)xx\//).test(target);
 }
 
 function getFrequencyListBand(entry, hwmode) {
