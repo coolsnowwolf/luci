@@ -643,18 +643,50 @@ function getDisplayCountryCode(radioNet) {
 	return radioNet.getCountryCode() || uci.get('wireless', radioNet.getWifiDeviceName(), 'country') || '00';
 }
 
-function getConfiguredBand(hwtype, hwmode, channel, bandval) {
+function normalizeQcaBandValue(bandval) {
+	switch (String(bandval ?? '')) {
+	case '1':
+		return '2g';
+	case '2':
+		return '5g';
+	case '3':
+		return '6g';
+	default:
+		return String(bandval || '');
+	}
+}
+
+function getQcaBandCode(band) {
+	switch (String(band || '')) {
+	case '2g':
+		return '1';
+	case '5g':
+		return '2';
+	case '6g':
+		return '3';
+	default:
+		return null;
+	}
+}
+
+function getConfiguredBand(hwtype, hwmode, channel, bandval, htmode) {
 	hwmode = String(hwmode || '');
-	bandval = String(bandval || '');
+	htmode = String(htmode || '');
+	bandval = isQcaWifiHwtype(hwtype) ? normalizeQcaBandValue(bandval) : String(bandval || '');
 	channel = +channel;
 
 	if (bandval)
 		return bandval;
-	if (/^11bea/.test(hwmode))
+	if (/^11bea/.test(hwmode)) {
+		if (/^(?:HT|EHT)320$/.test(htmode))
+			return '6g';
+		return (!isNaN(channel) && channel > 0 && channel < 36) ? '6g' : '5g';
+	}
+	if (/^11axa/.test(hwmode))
 		return (!isNaN(channel) && channel > 0 && channel < 36) ? '6g' : '5g';
 	if (/^11beg|^11axg|^11ng|^11g|^11b/.test(hwmode))
 		return '2g';
-	if (/^11ac|^11axa|^11na|^11a/.test(hwmode))
+	if (/^11ac|^11na|^11a/.test(hwmode))
 		return '5g';
 	if (/a/.test(hwmode))
 		return '5g';
@@ -717,8 +749,18 @@ function getFrequencyListBand(entry, hwmode) {
 			return '6g';
 	}
 
-	if (band == 2 || band == 5 || band == 6 || band == 60)
-		return '%dg'.format(band);
+	switch (band) {
+	case 1:
+		return '2g';
+	case 2:
+	case 5:
+		return '5g';
+	case 3:
+	case 6:
+		return '6g';
+	case 60:
+		return '60g';
+	}
 
 	return null;
 }
@@ -1542,7 +1584,7 @@ var CBIWifiFrequencyValue = form.Value.extend({
 				}
 			}
 
-			const configured_band = getConfiguredBand(hwtype, statuscfg.hwmode ?? hwval, devcfg.channel ?? cfg_channel, devcfg.band ?? bandval);
+			const configured_band = getConfiguredBand(hwtype, statuscfg.hwmode ?? hwval, devcfg.channel ?? cfg_channel, devcfg.band ?? bandval, statuscfg.htmode ?? htval);
 			const has_band_channels = (band) => {
 				const channels = this.channels[band];
 				const offset = (channels?.[0] == 'auto') ? 3 : 0;
@@ -1657,7 +1699,8 @@ var CBIWifiFrequencyValue = form.Value.extend({
 					'ac': [ '5g', '5 GHz', { available: has_band_channels('5g') } ],
 					'ax': [
 						'2g', '2.4 GHz', { available: has_band_channels('2g') },
-						'5g', '5 GHz', { available: has_band_channels('5g') }
+						'5g', '5 GHz', { available: has_band_channels('5g') },
+						'6g', '6 GHz', { available: has_band_channels('6g') }
 					],
 					'be': [
 						'2g', '2.4 GHz', { available: has_band_channels('2g') },
@@ -1919,7 +1962,7 @@ var CBIWifiFrequencyValue = form.Value.extend({
 		const htval = isQcaWifiHwtype(hwtype) ? (cfg_htval || devinfo.htmode) : (devinfo.htmode || cfg_htval);
 		const hwval = isQcaWifiHwtype(hwtype) ? (cfg_hwval || devinfo.hwmode) : (devinfo.hwmode || cfg_hwval);
 		const chval = cfg_chval || devinfo.channel;
-		const bandval = cfg_bandval || getConfiguredBand(hwtype, hwval, chval, null);
+		const bandval = cfg_bandval || getConfiguredBand(hwtype, hwval, chval, null, htval);
 		const forceSelectValue = function(sel, value) {
 			if (value == null)
 				return false;
@@ -1961,7 +2004,7 @@ var CBIWifiFrequencyValue = form.Value.extend({
 
 		if (isQcaWifiHwtype(hwtype)) {
 			this.useBandOption = true;
-			this.setSelectValue(band, getConfiguredBand(hwtype, hwval, chval, bandval));
+			this.setSelectValue(band, getConfiguredBand(hwtype, hwval, chval, bandval, htval));
 		}
 		else if (hwtype == 'mac80211') {
 			this.useBandOption = true;
@@ -2090,6 +2133,7 @@ var CBIWifiFrequencyValue = form.Value.extend({
 
 		if (isQcaWifiHwtype(hwtype)) {
 			let hwmode = getValue('hwmode');
+			const qcaBand = (hwtype == 'qcawificfg80211') ? getQcaBandCode(band) : null;
 
 			if (hwtype == 'qcawifi') {
 				if (mode == 'ac')
@@ -2115,7 +2159,11 @@ var CBIWifiFrequencyValue = form.Value.extend({
 			}
 
 			setValue('hwmode', hwmode);
-			unsetValue('band');
+
+			if (hwtype == 'qcawificfg80211' && qcaBand != null)
+				setValue('band', qcaBand);
+			else
+				unsetValue('band');
 		}
 		else if (this.useBandOption) {
 			setValue('band', band);
