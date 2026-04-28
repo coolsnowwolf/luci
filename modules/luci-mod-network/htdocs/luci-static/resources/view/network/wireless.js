@@ -46,6 +46,16 @@ function pushUnique(list, value) {
 		list.push(value);
 }
 
+function mergeUniqueValues(...lists) {
+	const merged = [];
+
+	for (const list of lists)
+		for (const value of L.toArray(list))
+			pushUnique(merged, value);
+
+	return merged;
+}
+
 function getQcaFallbackIfname(device, section) {
 	if (/^ath\d+$/.test(String(section || '')))
 		return section;
@@ -1541,7 +1551,9 @@ var CBIWifiFrequencyValue = form.Value.extend({
 			const statuscfg = L.isObject(wstatus[device_section]?.config) ? wstatus[device_section].config : {};
 			const devcfg = {
 				channel: statuscfg.channel ?? (wifidevs ? wifidevs.ubus('dev', 'config', 'channel') : null),
-				band: statuscfg.band ?? (wifidevs ? wifidevs.ubus('dev', 'config', 'band') : null)
+				band: statuscfg.band ?? (wifidevs ? wifidevs.ubus('dev', 'config', 'band') : null),
+				hwmode: statuscfg.hwmode ?? (wifidevs ? wifidevs.ubus('dev', 'config', 'hwmode') : null),
+				htmode: statuscfg.htmode ?? (wifidevs ? wifidevs.ubus('dev', 'config', 'htmode') : null)
 			};
 
 			this.devinfo = devinfo;
@@ -1592,8 +1604,19 @@ var CBIWifiFrequencyValue = form.Value.extend({
 				return Array.isArray(channels) && (channels.length > offset || (configured_band == band && channels.length > 0));
 			};
 
-			let hwmode_values = L.toArray(wifidevs ? wifidevs.getHWModes() : null);
-			let htmode_values = L.toArray(wifidevs ? wifidevs.getHTModes() : null);
+			const merge_mode_sources = (hwtype == 'mac80211');
+			let hwmode_values = merge_mode_sources
+				? mergeUniqueValues(
+					wifidevs ? wifidevs.getHWModes() : null,
+					devinfo.hwmodes
+				)
+				: L.toArray(wifidevs ? wifidevs.getHWModes() : null);
+			let htmode_values = merge_mode_sources
+				? mergeUniqueValues(
+					wifidevs ? wifidevs.getHTModes() : null,
+					devinfo.htmodes
+				)
+				: L.toArray(wifidevs ? wifidevs.getHTModes() : null);
 
 			if (!hwmode_values.length)
 				hwmode_values = L.toArray(devinfo.hwmodes);
@@ -1959,8 +1982,8 @@ var CBIWifiFrequencyValue = form.Value.extend({
 		const config_chval = cfgvals ? cfgvals[2] : uci.get('wireless', config_section, 'channel');
 		const cfg_chval = devcfg.channel || config_chval;
 		const cfg_bandval = devcfg.band || uci.get('wireless', config_section, 'band');
-		const htval = isQcaWifiHwtype(hwtype) ? (cfg_htval || devinfo.htmode) : (devinfo.htmode || cfg_htval);
-		const hwval = isQcaWifiHwtype(hwtype) ? (cfg_hwval || devinfo.hwmode) : (devinfo.hwmode || cfg_hwval);
+		const htval = cfg_htval || devcfg.htmode || devinfo.htmode;
+		const hwval = cfg_hwval || devcfg.hwmode || devinfo.hwmode;
 		const chval = cfg_chval || devinfo.channel;
 		const bandval = cfg_bandval || getConfiguredBand(hwtype, hwval, chval, null, htval);
 		const forceSelectValue = function(sel, value) {
