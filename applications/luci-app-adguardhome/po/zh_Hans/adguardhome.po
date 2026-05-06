@@ -1,71 +1,80 @@
 msgid ""
-msgstr "Content-Type: text/plain; charset=UTF-8"
+msgstr ""
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-03 06:40+0800\n"
+"PO-Revision-Date: 2026-05-04 17:00+0000\n"
+"Last-Translator: MomoFlora <2519840456@qq.com>\n"
+"Language-Team: Chinese (Simplified Han script)\n"
+"Language: zh_Hans\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 
 #: applications/luci-app-adguardhome/htdocs/luci-static/resources/view/adguardhome/config.js:244
 msgid ""
 "A soft memory cap for the Go runtime, allowing the garbage collector to run "
 "more frequently as usage approaches the limit to prevent Out-of-Memory (OOM) "
 "kills."
-msgstr ""
+msgstr "Go 运行时的软内存上限，当使用量接近限制时，允许垃圾回收器更频繁地运行，以防止内存溢出（OOM）杀死进程。"
 
 #: applications/luci-app-adguardhome/htdocs/luci-static/resources/view/adguardhome/config.js:113
 #: applications/luci-app-adguardhome/root/usr/share/luci/menu.d/luci-app-adguardhome.json:3
 msgid "AdGuard Home"
-msgstr ""
+msgstr "AdGuard Home"
 
 #: applications/luci-app-adguardhome/htdocs/luci-static/resources/view/adguardhome/config.js:137
 #: applications/luci-app-adguardhome/htdocs/luci-static/resources/view/adguardhome/config.js:199
 msgid "Advanced Settings"
-msgstr ""
+msgstr "高级设置"
 
 #: applications/luci-app-adguardhome/htdocs/luci-static/resources/view/adguardhome/config.js:146
 msgid "Configuration file"
-msgstr ""
+msgstr "配置文件"
 
 #: applications/luci-app-adguardhome/htdocs/luci-static/resources/view/adguardhome/config.js:89
 #: applications/luci-app-adguardhome/htdocs/luci-static/resources/view/adguardhome/config.js:147
 msgid ""
 "Configuration file must be stored in its own directory, and not in '/etc'."
-msgstr ""
+msgstr "配置文件必须存储在它自己的目录中，而不是 '/etc' 中。"
 
 #: applications/luci-app-adguardhome/htdocs/luci-static/resources/view/adguardhome/config.js:159
 msgid "Directory where filters, logs, and statistics are stored."
-msgstr ""
+msgstr "存储过滤器、日志和统计信息的目录。"
 
 #: applications/luci-app-adguardhome/htdocs/luci-static/resources/view/adguardhome/config.js:132
 msgid "File System Access"
-msgstr ""
+msgstr "文件系统访问"
 
 #: applications/luci-app-adguardhome/htdocs/luci-static/resources/view/adguardhome/config.js:133
 msgid ""
 "Files and directories that AdGuard Home should have read-only or read-write "
 "access to."
-msgstr ""
+msgstr "AdGuard Home 应该具有只读或读写访问权限的文件和目录。"
 
 #: applications/luci-app-adguardhome/htdocs/luci-static/resources/view/adguardhome/config.js:129
 msgid "General Settings"
-msgstr ""
+msgstr "常规设置"
 
 #: applications/luci-app-adguardhome/htdocs/luci-static/resources/view/adguardhome/config.js:147
 msgid "Enable service"
-msgstr ""
+msgstr "启用服务"
 
 #: applications/luci-app-adguardhome/htdocs/luci-static/resources/view/adguardhome/config.js:148
 msgid "Start AdGuard Home on boot and keep the service running."
-msgstr ""
+msgstr "开机启动 AdGuard Home，并保持服务持续运行。"
 
 #: applications/luci-app-adguardhome/htdocs/luci-static/resources/view/adguardhome/config.js:138
 msgid ""
 "Go environment variables that tune garbage collector and memory management."
-msgstr ""
+msgstr "调整垃圾回收器和内存管理的 Go 环境变量。"
 
 #: applications/luci-app-adguardhome/root/usr/share/rpcd/acl.d/luci-app-adguardhome.json:3
 msgid "Grant permissions for the AdGuard Home LuCI app"
-msgstr ""
+msgstr "授予 AdGuard Home LuCI 应用的权限"
 
 #: applications/luci-app-adguardhome/htdocs/luci-static/resources/view/adguardhome/config.js:181
 msgid "Group the service runs under."
-msgstr ""
+msgstr "服务运行所在的用户组。"
 
 #: applications/luci-app-adguardhome/htdocs/luci-static/resources/view/adguardhome/config.js:149
 #: applications/luci-app-adguardhome/htdocs/luci-static/resources/view/adguardhome/config.js:161
@@ -75,93 +84,93 @@ msgstr ""
 #: applications/luci-app-adguardhome/htdocs/luci-static/resources/view/adguardhome/config.js:232
 #: applications/luci-app-adguardhome/htdocs/luci-static/resources/view/adguardhome/config.js:247
 msgid "If empty, defaults to"
-msgstr ""
+msgstr "如果为空，默认为"
 
 #: applications/luci-app-adguardhome/htdocs/luci-static/resources/view/adguardhome/config.js:139
 msgid "Modify at your own risk."
-msgstr ""
+msgstr "请自行修改，风险自负。"
 
 #: applications/luci-app-adguardhome/htdocs/luci-static/resources/view/adguardhome/config.js:24
 msgid "Not running"
-msgstr ""
+msgstr "未运行"
 
 #: applications/luci-app-adguardhome/htdocs/luci-static/resources/view/adguardhome/config.js:148
 msgid "Parent directory will be owned by the service user."
-msgstr ""
+msgstr "父目录将由服务用户拥有。"
 
 #: applications/luci-app-adguardhome/htdocs/luci-static/resources/view/adguardhome/config.js:83
 #: applications/luci-app-adguardhome/htdocs/luci-static/resources/view/adguardhome/config.js:99
 msgid "Path must be absolute."
-msgstr ""
+msgstr "路径必须是绝对路径。"
 
 #: applications/luci-app-adguardhome/htdocs/luci-static/resources/view/adguardhome/config.js:86
 msgid "Path must not end with a slash."
-msgstr ""
+msgstr "路径末尾不能有斜杠。"
 
 #: applications/luci-app-adguardhome/htdocs/luci-static/resources/view/adguardhome/config.js:207
 msgid "Read-only access"
-msgstr ""
+msgstr "只读访问"
 
 #: applications/luci-app-adguardhome/htdocs/luci-static/resources/view/adguardhome/config.js:208
 msgid "Read-write access"
-msgstr ""
+msgstr "读写访问"
 
 #: applications/luci-app-adguardhome/htdocs/luci-static/resources/view/adguardhome/config.js:23
 msgid "Running"
-msgstr ""
+msgstr "正在运行"
 
 #: applications/luci-app-adguardhome/htdocs/luci-static/resources/view/adguardhome/config.js:122
 msgid "Service Status"
-msgstr ""
+msgstr "服务状态"
 
 #: applications/luci-app-adguardhome/htdocs/luci-static/resources/view/adguardhome/config.js:180
 msgid "Service group"
-msgstr ""
+msgstr "服务组"
 
 #: applications/luci-app-adguardhome/htdocs/luci-static/resources/view/adguardhome/config.js:170
 msgid "Service user"
-msgstr ""
+msgstr "服务用户"
 
 #: applications/luci-app-adguardhome/htdocs/luci-static/resources/view/adguardhome/config.js:230
 msgid ""
 "The maximum number of operating system threads that can execute user-level "
 "Go code simultaneously."
-msgstr ""
+msgstr "操作系统线程的最大数量，能够同时执行用户级 Go 代码。"
 
 #: applications/luci-app-adguardhome/htdocs/luci-static/resources/view/adguardhome/config.js:215
 msgid ""
 "Tunes the garbage collector's aggressiveness by setting the percentage of "
 "heap growth allowed before the next collection cycle triggers."
-msgstr ""
+msgstr "通过设置堆增长的百分比来调整垃圾回收器的 aggressiveness，决定在下一个回收周期触发前允许的堆增长量。"
 
 #: applications/luci-app-adguardhome/htdocs/luci-static/resources/view/adguardhome/config.js:171
 msgid "User the service runs under."
-msgstr ""
+msgstr "服务运行时使用的用户。"
 
 #: applications/luci-app-adguardhome/htdocs/luci-static/resources/view/adguardhome/config.js:191
 msgid "Verbose logging"
-msgstr ""
+msgstr "详细日志"
 
 #: applications/luci-app-adguardhome/htdocs/luci-static/resources/view/adguardhome/config.js:119
 msgid "Version"
-msgstr ""
+msgstr "版本"
 
 #: applications/luci-app-adguardhome/htdocs/luci-static/resources/view/adguardhome/config.js:160
 msgid "Will be owned by the service user."
-msgstr ""
+msgstr "将由服务用户拥有。"
 
 #: applications/luci-app-adguardhome/htdocs/luci-static/resources/view/adguardhome/config.js:158
 msgid "Working directory"
-msgstr ""
+msgstr "工作目录"
 
 #: applications/luci-app-adguardhome/htdocs/luci-static/resources/view/adguardhome/config.js:247
 msgid "unset"
-msgstr ""
+msgstr "未设置"
 
 #: applications/luci-app-adguardhome/htdocs/luci-static/resources/view/adguardhome/config.js:217
 msgid "unset and 100"
-msgstr ""
+msgstr "未设置并为 100"
 
 #: applications/luci-app-adguardhome/htdocs/luci-static/resources/view/adguardhome/config.js:232
 msgid "unset and matching the number of CPUs"
-msgstr ""
+msgstr "未设置并匹配 CPU 的数量"

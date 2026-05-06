@@ -139,6 +139,16 @@ return view.extend({
 				' ' + _('Modify at your own risk.'),
 		);
 
+		const enabledOpt = mainSect.taboption(
+			'general',
+			form.Flag,
+			'enabled',
+			_('Enable service'),
+			_('Start AdGuard Home on boot and keep the service running.'),
+		);
+		enabledOpt.default = '0';
+		enabledOpt.rmempty = false;
+
 		const configFileOpt = mainSect.taboption(
 			'general',
 			form.Value,
