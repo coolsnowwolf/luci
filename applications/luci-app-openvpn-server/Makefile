@@ -10,8 +10,8 @@ LUCI_DEPENDS:=+luci-base +openvpn-openssl +openvpn-easy-rsa +kmod-tun
 PKG_LICENSE:=Apache-2.0
 
 PKG_NAME:=luci-app-openvpn-server
-PKG_VERSION:=3.0
-PKG_RELEASE:=2
+PKG_VERSION:=3.0.1
+PKG_RELEASE:=3
 
 include ../../luci.mk
 

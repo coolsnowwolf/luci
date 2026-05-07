@@ -22,6 +22,13 @@ const callInitAction = rpc.declare({
 	expect: { result: false }
 });
 
+const callServiceSignal = rpc.declare({
+	object: 'service',
+	method: 'signal',
+	params: [ 'name', 'instance', 'signal' ],
+	expect: { '': {} }
+});
+
 function getServiceStatus() {
 	return L.resolveDefault(callServiceList('openvpn'), {}).then(function(res) {
 		try {
@@ -387,15 +394,20 @@ return view.extend({
 				dest: 'vpn'
 			});
 
-			return uci.save().then(() => enabled);
-		}).then(enabled => {
+			return uci.save();
+		});
+	},
+
+	restartServices() {
+		return uci.load('openvpn').then(() => {
+			const enabled = uci.get('openvpn', 'myvpn', 'enabled') == '1';
 			const tasks = [];
 
 			if (enabled)
 				tasks.push(fs.exec('/etc/openvpn/ensurecert.sh'));
 
-			tasks.push(callInitAction('firewall', 'restart'));
-			tasks.push(callInitAction('openvpn', 'restart'));
+			if (enabled)
+				tasks.push(callServiceSignal('openvpn', 'myvpn', 1));
 
 			return Promise.all(tasks);
 		});
@@ -411,6 +423,20 @@ return view.extend({
 	},
 
 	handleSaveApply(ev, mode) {
-		return this.handleSave(ev);
+		const fn = L.bind(function() {
+			document.removeEventListener('uci-applied', fn);
+
+			this.restartServices().catch(err => {
+				notifyError(err);
+			});
+		}, this);
+
+		document.addEventListener('uci-applied', fn);
+
+		return this.super('handleSaveApply', [ev, mode]).catch(err => {
+			document.removeEventListener('uci-applied', fn);
+			notifyError(err);
+			return Promise.reject(err);
+		});
 	}
 });

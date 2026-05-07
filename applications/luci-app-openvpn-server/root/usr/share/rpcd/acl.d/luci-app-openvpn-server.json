@@ -19,6 +19,9 @@
 			"file": {
 				"/etc/openvpn-addon.conf": [ "write" ]
 			},
+			"ubus": {
+				"service": [ "signal" ]
+			},
 			"uci": [ "openvpn", "network", "firewall" ]
 		}
 	}
