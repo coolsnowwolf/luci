@@ -4759,13 +4759,15 @@ body.node-admin-services-dockerman-overview[data-page="admin-services-dockerman"
 body.node-admin-services-dockerman-overview[data-page="admin-services-dockerman"] .table.cbi-section-table .td[data-title="Value"],
 body.node-admin-services-dockerman-overview[data-page="admin-services-dockerman"] .table.cbi-section-table .td[data-title="值"] {
     text-align: center !important;
+    white-space: normal !important;
 }
 
 body.node-admin-services-dockerman-overview[data-page="admin-services-dockerman"] .table.cbi-section-table .td[data-title="Value"] output,
 body.node-admin-services-dockerman-overview[data-page="admin-services-dockerman"] .table.cbi-section-table .td[data-title="值"] output {
     display: block !important;
-    width: 100%;
+    width: min(100%, 72rem);
     max-width: 100%;
+    margin: 0 auto;
     white-space: normal !important;
     overflow-wrap: anywhere !important;
     word-break: break-word !important;
