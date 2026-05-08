@@ -32,6 +32,15 @@ return view.extend({
 	renderZones([ctHelpers, fwDefaults]) {
 		let m, s, o, out;
 		const fw4 = L.hasSystemFeature('firewall4');
+		const addTCPCCAOption = () => {
+			const tcpcca = s.option(form.ListValue, 'tcpcca', _('TCP CCA'),
+				_('TCP congestion control algorithm.'));
+			tcpcca.value('bbr', 'bbr');
+			tcpcca.value('cubic', 'cubic');
+			tcpcca.value('reno', 'reno');
+			tcpcca.default = 'cubic';
+			tcpcca.rmempty = false;
+		};
 
 		m = new form.Map('firewall', _('Firewall - Zone Settings'),
 			_('The firewall creates zones over your network interfaces to control network traffic flow.'));
@@ -61,8 +70,12 @@ return view.extend({
 			o.value('1', _('FULLCONENAT'));
 			if (!fw4)
 				o.value('2', _('Boardcom Fullcone NAT1'));
+			addTCPCCAOption();
 			if (fw4)
 				o = s.option(form.Flag, 'fullcone6', _('Enable FullCone NAT6'));
+		}
+		else {
+			addTCPCCAOption();
 		}
 
 		let p = [
@@ -89,18 +102,21 @@ return view.extend({
 			o = s.option(form.RichListValue, "offloading_type", _("Flow offloading type"));
 			o.value('0', _("None"));
 			o.value('1', _("Software flow offloading"), _('Software based offloading for routing/NAT.'));
-			o.value('2', _("Hardware flow offloading"), _('Hardware based offloading for routing with/without NAT.') + ' ' + _(' Requires hardware NAT support.'));
+			if (L.hasSystemFeature('offloading_hw'))
+				o.value('2', _("Hardware flow offloading"), _('Hardware based offloading for routing with/without NAT.') + ' ' + _(' Requires hardware NAT support.'));
 			o.optional = false;
 			o.load = function (section_id) {
 				const flow_offloading = uci.get('firewall', section_id, 'flow_offloading');
 				const flow_offloading_hw = uci.get('firewall', section_id, 'flow_offloading_hw');
+				const has_hw_offloading = L.hasSystemFeature('offloading_hw');
 				return (flow_offloading === '1')
-					? (flow_offloading_hw === '1' ? '2' : '1')
+					? ((flow_offloading_hw === '1' && has_hw_offloading) ? '2' : '1')
 					: '0';
 			};
 			o.write = function(section_id, value) {
 				uci.set('firewall', section_id, 'flow_offloading', value === '0' ? null : '1');
-				uci.set('firewall', section_id, 'flow_offloading_hw', value === '2' ? '1' : null);
+				uci.set('firewall', section_id, 'flow_offloading_hw',
+					(value === '2' && L.hasSystemFeature('offloading_hw')) ? '1' : null);
 			};
 		}
 
