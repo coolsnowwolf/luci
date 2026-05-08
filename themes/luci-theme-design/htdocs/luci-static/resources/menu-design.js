@@ -93,12 +93,14 @@ return baseclass.extend({
 
 		return Promise.all([
 			this.getFileListStamp('/usr/share/luci/menu.d', '.json'),
-			this.getFileListStamp('/usr/share/rpcd/acl.d', '.json')
+			this.getFileListStamp('/usr/share/rpcd/acl.d', '.json'),
+			L.resolveDefault(fs.stat('/etc/config/wireless'), null)
 		]).then(function(stamps) {
 			return JSON.stringify({
 				google_fu_mode: googleFuMode,
 				menu_definitions: stamps[0],
-				acl_definitions: stamps[1]
+				acl_definitions: stamps[1],
+				wireless_config: stamps[2] ? [ stamps[2].mtime || 0, stamps[2].size || 0 ].join(':') : 'absent'
 			});
 		});
 	},
