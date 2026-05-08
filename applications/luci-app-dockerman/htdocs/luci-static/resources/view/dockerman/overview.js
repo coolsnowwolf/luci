@@ -63,6 +63,154 @@ function getVolumesInUseByContainers(containers) {
 	return inUse;
 }
 
+function formatScalar(value) {
+	if (value == null || value === '')
+		return '-';
+
+	if (Array.isArray(value))
+		return value.length ? value.join(', ') : '-';
+
+	if (typeof value === 'boolean')
+		return value ? 'true' : 'false';
+
+	return String(value);
+}
+
+function formatKeyValueObject(obj) {
+	if (!obj || typeof obj !== 'object')
+		return formatScalar(obj);
+
+	const pairs = [];
+	for (const [key, value] of Object.entries(obj)) {
+		if (value == null || value === '' || value === false)
+			continue;
+
+		pairs.push(`${key}: ${formatScalar(value)}`);
+	}
+
+	return pairs.length ? pairs.join('; ') : '-';
+}
+
+function formatPlugins(plugins) {
+	if (!plugins || typeof plugins !== 'object')
+		return '-';
+
+	const parts = [];
+	for (const [type, entries] of Object.entries(plugins)) {
+		if (!entries)
+			continue;
+
+		if (Array.isArray(entries))
+			parts.push(`${type}: ${entries.length ? entries.join(', ') : '-'}`);
+		else
+			parts.push(`${type}: ${formatScalar(entries)}`);
+	}
+
+	return parts.length ? parts.join('; ') : '-';
+}
+
+function formatRegistryConfig(registryConfig) {
+	if (!registryConfig || typeof registryConfig !== 'object')
+		return '-';
+
+	const parts = [];
+	if (Array.isArray(registryConfig.Mirrors) && registryConfig.Mirrors.length)
+		parts.push(`Mirrors: ${registryConfig.Mirrors.join(', ')}`);
+
+	if (Array.isArray(registryConfig.InsecureRegistryCIDRs) && registryConfig.InsecureRegistryCIDRs.length)
+		parts.push(`Insecure CIDRs: ${registryConfig.InsecureRegistryCIDRs.join(', ')}`);
+
+	return parts.length ? parts.join('; ') : '-';
+}
+
+function formatRuntimes(runtimes) {
+	if (!runtimes || typeof runtimes !== 'object')
+		return '-';
+
+	const parts = [];
+	for (const [name, runtime] of Object.entries(runtimes)) {
+		const path = runtime?.path ? ` (${runtime.path})` : '';
+		parts.push(`${name}${path}`);
+	}
+
+	return parts.length ? parts.join(', ') : '-';
+}
+
+function formatSwarm(swarm) {
+	if (!swarm || typeof swarm !== 'object')
+		return '-';
+
+	const parts = [];
+	if (swarm.LocalNodeState)
+		parts.push(`State: ${swarm.LocalNodeState}`);
+	if (swarm.NodeID)
+		parts.push(`NodeID: ${swarm.NodeID}`);
+	if (swarm.NodeAddr)
+		parts.push(`NodeAddr: ${swarm.NodeAddr}`);
+	if (swarm.ControlAvailable != null)
+		parts.push(`Control: ${swarm.ControlAvailable ? 'yes' : 'no'}`);
+
+	return parts.length ? parts.join('; ') : '-';
+}
+
+function formatContainerd(containerd) {
+	if (!containerd || typeof containerd !== 'object')
+		return '-';
+
+	const parts = [];
+	if (containerd.Address)
+		parts.push(`Address: ${containerd.Address}`);
+	if (containerd.Namespaces && typeof containerd.Namespaces === 'object')
+		parts.push(`Namespaces: ${formatKeyValueObject(containerd.Namespaces)}`);
+
+	return parts.length ? parts.join('; ') : '-';
+}
+
+function formatInfoBody(body) {
+	const rows = [];
+	for (const [key, value] of Object.entries(body || {})) {
+		if (!value)
+			continue;
+
+		let formatted = null;
+		switch (key) {
+		case 'Plugins':
+			formatted = formatPlugins(value);
+			break;
+		case 'RegistryConfig':
+			formatted = formatRegistryConfig(value);
+			break;
+		case 'Runtimes':
+			formatted = formatRuntimes(value);
+			break;
+		case 'Swarm':
+			formatted = formatSwarm(value);
+			break;
+		case 'Containerd':
+			formatted = formatContainerd(value);
+			break;
+		case 'Warnings':
+		case 'Labels':
+		case 'SecurityOptions':
+		case 'CDISpecDirs':
+			formatted = formatScalar(value);
+			break;
+		case 'DriverStatus':
+			formatted = Array.isArray(value) ? value.map(v => Array.isArray(v) ? `${v[0]}: ${v[1]}` : formatScalar(v)).join('; ') : formatScalar(value);
+			break;
+		default:
+			if (typeof value === 'object')
+				formatted = formatKeyValueObject(value);
+			else
+				formatted = formatScalar(value);
+		}
+
+		rows.push({ entry: key, value: formatted });
+	}
+
+	return rows;
+}
+
 
 return dm2.dv.extend({
 	load() {
@@ -115,7 +263,7 @@ return dm2.dv.extend({
 
 		this.parseHeaders(version_response.headers, version_headers);
 		this.parseBody(version_response.body, version_body);
-		this.parseBody(info_response.body, info_body);
+		info_body.push(...formatInfoBody(info_response.body));
 		// this.parseBody(df_response.body, df_body);
 		const view = this;
 		const info = info_response.body;

@@ -4735,6 +4735,43 @@ body.modal-overlay-active #modal_overlay .modal.cbi-modal .cbi-value-field.cbi-d
     margin-bottom: 1rem;
 }
 
+body.node-admin-services-dockerman-overview[data-page="admin-services-dockerman"] .table.cbi-section-table {
+    width: 100% !important;
+    table-layout: fixed !important;
+}
+
+body.node-admin-services-dockerman-overview[data-page="admin-services-dockerman"] .table.cbi-section-table .tr > .td,
+body.node-admin-services-dockerman-overview[data-page="admin-services-dockerman"] .table.cbi-section-table .tr > .th {
+    display: table-cell !important;
+    vertical-align: top !important;
+}
+
+body.node-admin-services-dockerman-overview[data-page="admin-services-dockerman"] .table.cbi-section-table .tr > .td:first-child,
+body.node-admin-services-dockerman-overview[data-page="admin-services-dockerman"] .table.cbi-section-table .tr > .th:first-child {
+    width: 14rem !important;
+}
+
+body.node-admin-services-dockerman-overview[data-page="admin-services-dockerman"] .table.cbi-section-table .td[data-title="Entry"],
+body.node-admin-services-dockerman-overview[data-page="admin-services-dockerman"] .table.cbi-section-table .th[data-title="Entry"] {
+    width: 14rem !important;
+}
+
+body.node-admin-services-dockerman-overview[data-page="admin-services-dockerman"] .table.cbi-section-table .td[data-title="Value"],
+body.node-admin-services-dockerman-overview[data-page="admin-services-dockerman"] .table.cbi-section-table .td[data-title="值"] {
+    text-align: center !important;
+}
+
+body.node-admin-services-dockerman-overview[data-page="admin-services-dockerman"] .table.cbi-section-table .td[data-title="Value"] output,
+body.node-admin-services-dockerman-overview[data-page="admin-services-dockerman"] .table.cbi-section-table .td[data-title="值"] output {
+    display: block !important;
+    width: 100%;
+    max-width: 100%;
+    white-space: normal !important;
+    overflow-wrap: anywhere !important;
+    word-break: break-word !important;
+    text-align: center !important;
+}
+
 [data-page="admin-network-network"] .ifacebox {
     margin: 0.5rem;
     border-radius: 8px;

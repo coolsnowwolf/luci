@@ -32,22 +32,13 @@ application/json-seq: ␊ = \n | ^J | 0xa, ␞ = ␞ | ^^ | 0x1e
 
 return dm2.dv.extend({
 	load() {
-		const now = Math.floor(Date.now() / 1000);
 		this.js_api = false;
-
-		return Promise.all([
-			dm2.docker_events({ query: { since: `0`, until: `${now}` } }),
-			dm2.js_api_ready.then(([ok, ]) => this.js_api = ok),
-		]);
+		return Promise.resolve([]);
 	},
 
-	render([events, js_api_available]) {
-		if (events?.code !== 200) {
-			return E('div', {}, [ events?.body?.message ]);
-		}
-
-		this.outputText = events?.body ? JSON.stringify(events?.body, null, 2) + '\n' : '';
-		const event_list = events?.body || [];
+	render() {
+		this.outputText = '';
+		const event_list = [];
 		const view = this;
 
 		const mainContainer = E('div', { 'class': 'cbi-map' }, [
@@ -98,7 +89,7 @@ return dm2.dv.extend({
 						E('input', {
 							'id': 'event-from-date',
 							'type': 'datetime-local',
-							'value': '1970-01-01T00:00',
+							'value': new Date(Date.now() - (60 * 60 * 1000)).toISOString().slice(0, 16),
 							'step': 60,
 							'style': 'width: 180px;',
 							'change': () => { view.renderEventsTable(event_list); }
@@ -150,6 +141,16 @@ return dm2.dv.extend({
 							}
 						}, _('Now'))
 					])
+				]),
+				E('div', { 'class': 'cbi-value' }, [
+					E('label', { 'class': 'cbi-value-title' }, '\u00a0'),
+					E('div', { 'class': 'cbi-value-field' }, [
+						E('button', {
+							'type': 'button',
+							'class': 'cbi-button cbi-button-action',
+							'click': () => { view.renderEventsTable(event_list); }
+						}, _('Load Events'))
+					])
 				])
 			])
 		]);
@@ -158,9 +159,17 @@ return dm2.dv.extend({
 		this.tableSection = E('div', { 'class': 'cbi-section', 'id': 'events-section' });
 		mainContainer.appendChild(this.tableSection);
 
-		this.renderEventsTable(event_list);
+		this.tableSection.appendChild(E('em', {}, _('Loading recent events…')));
 
 		mainContainer.appendChild(this.insertOutputFrame(E('div', {}), null));
+
+		dm2.js_api_ready.then(([ok, ]) => {
+			view.js_api = ok;
+		}).catch(() => {
+			view.js_api = false;
+		});
+
+		window.setTimeout(() => view.renderEventsTable(event_list), 0);
 
 		return mainContainer;
 	},
