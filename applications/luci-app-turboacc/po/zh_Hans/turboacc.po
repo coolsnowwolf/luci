@@ -135,6 +135,9 @@ msgstr "需要硬件 NAT 支持。目前 mt762x/mt798x 已实现。"
 msgid "Requires hardware support, implemented at least for Filogic 8x0"
 msgstr "需要硬件支持，目前 Filogic 8x0 已实现"
 
+msgid "Takes effect after rebooting the router."
+msgstr "重启路由器后生效。"
+
 #: applications/luci-app-turboacc/htdocs/luci-static/resources/view/turboacc.js:126
 msgid "SFE connection manager"
 msgstr "SFE connection manager"

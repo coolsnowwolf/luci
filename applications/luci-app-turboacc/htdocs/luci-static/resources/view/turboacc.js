@@ -182,7 +182,8 @@ return view.extend({
 
 		if (features.hasMTKWEDWO) {
 			o = s.option(form.Flag, 'fastpath_mh_eth_hnat_wed', _('MTK WED WO offloading'),
-				_('Requires hardware support, implemented at least for Filogic 8x0'));
+				_('Requires hardware support, implemented at least for Filogic 8x0') + ' ' +
+				_('Takes effect after rebooting the router.'));
 			o.default = o.disabled;
 			o.rmempty = false;
 			o.depends({ 'fastpath': 'flow_offloading', 'fastpath_fo_hw': '1' });

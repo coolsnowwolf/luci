@@ -21,19 +21,12 @@ start_service() {
 	local kernel_version
 	kernel_version="$(uname -r)"
 
-	find_wed_module() {
+	find_wed_param() {
 		local mod
 
 		for mod in $MTK_WED_MODULES; do
-			lsmod | grep -q "^$mod " && {
-				echo "$mod"
-				return 0
-			}
-		done
-
-		for mod in $MTK_WED_MODULES; do
-			[ -e "/lib/modules/$kernel_version/$mod.ko" ] && {
-				echo "$mod"
+			[ -e "/sys/module/$mod/parameters/wed_enable" ] && {
+				echo "/sys/module/$mod/parameters/wed_enable"
 				return 0
 			}
 		done
@@ -41,58 +34,42 @@ start_service() {
 		return 1
 	}
 
-	find_loaded_wed_module() {
-		local mod
+	get_wed_param_value() {
+		local param_path="$1"
 
-		for mod in $MTK_WED_MODULES; do
-			lsmod | grep -q "^$mod " && {
-				echo "$mod"
-				return 0
-			}
-		done
+		[ -n "$param_path" ] || return 1
+		[ -r "$param_path" ] || return 1
 
-		return 1
+		cat "$param_path" 2>/dev/null
 	}
 
-	is_wed_wo_enabled() {
-		local mod="$1"
-		local value
+	set_wed_wo() {
+		local target_value="$1"
+		local param_path
+		local current_value
 
-		[ -n "$mod" ] || return 1
-		[ -r "/sys/module/$mod/parameters/wed_enable" ] || return 1
+		param_path="$(find_wed_param)" || return 0
+		current_value="$(get_wed_param_value "$param_path")" || return 0
+		[ -w "$param_path" ] || return 0
 
-		value="$(cat "/sys/module/$mod/parameters/wed_enable" 2>/dev/null)"
+		case "$target_value" in
+		Y)
+			[ "$current_value" = "Y" ] || [ "$current_value" = "1" ] && return 0
+			;;
+		N)
+			[ "$current_value" = "N" ] || [ "$current_value" = "0" ] && return 0
+			;;
+		esac
 
-		[ "$value" = "Y" ] || [ "$value" = "1" ]
+		echo "$target_value" > "$param_path" 2>/dev/null || true
 	}
 
 	load_wed_wo() {
-		local mod
-		local loaded_mod
-
-		mod="$(find_wed_module)" || return 0
-		loaded_mod="$(find_loaded_wed_module)" || true
-
-		[ "$loaded_mod" = "$mod" ] && is_wed_wo_enabled "$mod" && return 0
-
-		wifi down >/dev/null 2>&1
-		rmmod "$mod" 2>/dev/null
-		sleep 1
-		modprobe "$mod" wed_enable=Y 2>/dev/null || modprobe "$mod" 2>/dev/null
-		wifi up >/dev/null 2>&1
+		set_wed_wo "Y"
 	}
 
 	unload_wed_wo() {
-		local mod
-
-		mod="$(find_loaded_wed_module)" || return 0
-		is_wed_wo_enabled "$mod" || return 0
-
-		wifi down >/dev/null 2>&1
-		rmmod "$mod" 2>/dev/null
-		sleep 1
-		modprobe "$mod" 2>/dev/null
-		wifi up >/dev/null 2>&1
+		set_wed_wo "N"
 	}
 
 	if [ "$fastpath" != "fast_classifier" ] && lsmod | grep -q "fast_classifier"; then
