@@ -234,6 +234,7 @@ return view.extend({
 			o.value('feed 1', _('<IP-Address>'));
 			o.value('feed 1 ,', _('<IP-Address><CSV-Separator>'));
 			o.value('feed 13', _('<IP-Address><Space><Netmask>'));
+			o.value('feed 4 "', _('<JSON Lines><IP-Address><JSON Lines>'));
 			o.value('suricata 1', _('<Suricata Syntax>'));
 			o.optional = true;
 			o.rmempty = true;
