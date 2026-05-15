@@ -230,6 +230,40 @@ function addBoardNetworkPorts(knownPorts, seenPorts, role, entry, mapping, board
 		addResolvedPort(knownPorts, seenPorts, role, value, mapping, board, swstate);
 }
 
+function forEachBoardNetworkEntry(board, cb)
+{
+	if (!L.isObject(board) || !L.isObject(board.network))
+		return;
+
+	for (const role in board.network)
+		if (L.isObject(board.network[role]))
+			cb(role, board.network[role]);
+}
+
+function isEnumeratedEthernetPort(dev)
+{
+	if (!L.isObject(dev) || typeof(dev.getName) !== 'function' ||
+	    typeof(dev.getType) !== 'function' || typeof(dev._devstate) !== 'function')
+		return false;
+
+	const name = dev.getName();
+	const type = dev.getType();
+
+	return isString(name) && /^eth\d+$/.test(name) &&
+		dev._devstate('type') == 1 &&
+		(type == 'ethernet' || type == 'switch');
+}
+
+function addSystemEthernetPorts(knownPorts, seenPorts, devices, mapping, board, swstate)
+{
+	if (!Array.isArray(devices))
+		return;
+
+	for (const dev of devices)
+		if (isEnumeratedEthernetPort(dev))
+			addResolvedPort(knownPorts, seenPorts, 'unknown', dev.getName(), mapping, board, swstate);
+}
+
 function resolveVLANChain(ifname, bridges, mapping)
 {
 	while (!mapping[ifname]) {
@@ -630,10 +664,12 @@ return baseclass.extend({
 			L.resolveDefault(fs.read('/etc/board.json'), '{}'),
 			firewall.getZones(),
 			network.getNetworks(),
+			network.getDevices(),
 			uci.load('network')
 		]).then((data) => {
 			const builtinPorts = data[0] || [];
 			const board = JSON.parse(data[1] || '{}');
+			const devices = data[4] || [];
 			const allPorts = new Set();
 			const swstate = {};
 			const tasks = [];
@@ -643,16 +679,18 @@ return baseclass.extend({
 					allPorts.add(port.device);
 			});
 
-			if (allPorts.size === 0 && board.network) {
-				['lan', 'wan'].forEach((role) => {
-					if (board.network[role]) {
-						if (Array.isArray(board.network[role].ports))
-							board.network[role].ports.forEach((p) => allPorts.add(p));
-						else if (board.network[role].device)
-							allPorts.add(board.network[role].device);
-					}
-				});
-			}
+			forEachBoardNetworkEntry(board, function(role, entry) {
+				parseBoardPortList(entry.ports).forEach((p) => allPorts.add(p));
+				parseBoardPortList(entry.ifname).forEach((p) => allPorts.add(p));
+
+				if (isString(entry.device))
+					allPorts.add(entry.device);
+			});
+
+			devices.forEach((dev) => {
+				if (isEnumeratedEthernetPort(dev))
+					allPorts.add(dev.getName());
+			});
 
 			if (L.isObject(board) && L.isObject(board.switch)) {
 				for (const switchName in board.switch) {
@@ -689,9 +727,10 @@ return baseclass.extend({
 
 	render(data) {
 		const board = JSON.parse(data[1]),
-		      swstate = data[5] || {},
+		      devices = data[4] || [],
+		      swstate = data[6] || {},
 		      port_map = buildInterfaceMapping(data[2], data[3], board),
-		      pseMap = data[6] || {};
+		      pseMap = data[7] || {};
 		let known_ports = [];
 		const seenPorts = {};
 		const vlanMap = {};
@@ -705,14 +744,11 @@ return baseclass.extend({
 			}, []);
 		}
 
-		if (L.isObject(board) && L.isObject(board.network)) {
-			for (let k = 'lan'; k != null; k = (k == 'lan') ? 'wan' : null) {
-				if (!L.isObject(board.network[k]))
-					continue;
+		forEachBoardNetworkEntry(board, function(role, entry) {
+			addBoardNetworkPorts(known_ports, seenPorts, role, entry, vlanMap, board, swstate);
+		});
 
-				addBoardNetworkPorts(known_ports, seenPorts, k, board.network[k], vlanMap, board, swstate);
-			}
-		}
+		addSystemEthernetPorts(known_ports, seenPorts, devices, vlanMap, board, swstate);
 
 		if (!known_ports.length)
 			return null;
