@@ -15,7 +15,54 @@ const callSystemValidateFirmwareImage = rpc.declare({
 	expect: { '': { valid: false, forcable: true } }
 });
 
-function findStorageSize(procmtd, procpart) {
+function getBlockDevice(name) {
+	const diskPatterns = [
+		/^(sd[a-z]+)$/,
+		/^(sd[a-z]+)\d+$/,
+		/^(vd[a-z]+)$/,
+		/^(vd[a-z]+)\d+$/,
+		/^(xvd[a-z]+)$/,
+		/^(xvd[a-z]+)\d+$/,
+		/^(hd[a-z]+)$/,
+		/^(hd[a-z]+)\d+$/,
+		/^(mmcblk\d+)$/,
+		/^(mmcblk\d+)p\d+$/,
+		/^(nvme\d+n\d+)$/,
+		/^(nvme\d+n\d+)p\d+$/
+	];
+
+	for (const pattern of diskPatterns) {
+		const match = name.match(pattern);
+
+		if (match)
+			return match[1];
+	}
+
+	return null;
+}
+
+function findMountedDisk(procmounts) {
+	const preferredMounts = new Set([ '/', '/rom', '/boot', '/boot/efi' ]);
+	const mountedDisks = new Set();
+
+	procmounts.split(/\n/).forEach(function(ln) {
+		const fields = ln.trim().split(/\s+/);
+		const source = fields[0];
+		const target = fields[1];
+
+		if (!preferredMounts.has(target) || !source || !source.startsWith('/dev/'))
+			return;
+
+		const disk = getBlockDevice(source.substring(5));
+
+		if (disk)
+			mountedDisks.add(disk);
+	});
+
+	return mountedDisks;
+}
+
+function findStorageSize(procmtd, procpart, procmounts) {
 	let kernsize = 0, rootsize = 0, wholesize = 0;
 
 	procmtd.split(/\n/).forEach(function(ln) {
@@ -48,15 +95,42 @@ function findStorageSize(procmtd, procpart) {
 	else if (kernsize > 0 && rootsize > kernsize)
 		return kernsize + rootsize;
 
+	const mountedDisks = findMountedDisk(procmounts);
+	const disks = {};
+	const partitionedDisks = new Set();
+
 	procpart.split(/\n/).forEach(function(ln) {
 		const match = ln.match(/^\s*\d+\s+\d+\s+(\d+)\s+(\S+)$/);
-		if (match) {
-			const size = parseInt(match[1], 10);
+		if (!match)
+			return;
 
-			if (!match[2].match(/\d/) && size > 2048 && wholesize == 0)
-				wholesize = size * 1024;
+		const size = parseInt(match[1], 10) * 1024;
+		const name = match[2];
+		const disk = getBlockDevice(name);
+
+		if (!disk || size <= 2048 * 1024)
+			return;
+
+		if (name == disk) {
+			disks[disk] = size;
+			return;
 		}
+
+		partitionedDisks.add(disk);
 	});
+
+	for (const disk of mountedDisks) {
+		if (disks[disk] > wholesize)
+			wholesize = disks[disk];
+	}
+
+	if (wholesize > 0)
+		return wholesize;
+
+	for (const disk of partitionedDisks) {
+		if (disks[disk] > wholesize)
+			wholesize = disks[disk];
+	}
 
 	return wholesize;
 }
@@ -376,7 +450,7 @@ return view.extend({
 	render([p_fstat, hostname, procmtd, procpart, procmounts]) {
 		const has_sysupgrade = (p_fstat.type == 'file');
 		const has_rootfs_data = (procmtd.match(/"rootfs_data"/) != null) || (procmounts.match("overlayfs:/overlay / ") != null);
-		const storage_size = findStorageSize(procmtd, procpart);
+		const storage_size = findStorageSize(procmtd, procpart, procmounts);
 		let m, s, o, ss;
 
 		m = new form.JSONMap(mapdata, _('Flash operations'));
