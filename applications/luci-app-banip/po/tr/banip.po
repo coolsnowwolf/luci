@@ -48,19 +48,23 @@ msgstr "-- Seçimi Ayarla --"
 msgid "-- default --"
 msgstr "-- varsayılan --"
 
-#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:234
+#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:239
 msgid "<IP-Address>"
 msgstr ""
 
-#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:235
+#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:240
 msgid "<IP-Address><CSV-Separator>"
 msgstr ""
 
-#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:236
+#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:241
 msgid "<IP-Address><Space><Netmask>"
 msgstr ""
 
-#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:237
+#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:242
+msgid "<JSON Lines><IP-Address><JSON Lines>"
+msgstr ""
+
+#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:243
 msgid "<Suricata Syntax>"
 msgstr ""
 
@@ -242,7 +246,7 @@ msgstr "CPU Çekirdekleri"
 msgid "Cancel"
 msgstr "Vazgeç"
 
-#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:241
+#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:247
 msgid "Chain"
 msgstr ""
 
@@ -266,7 +270,7 @@ msgstr ""
 "Bu sekmedeki değişikliklerin etkili olması için banIP hizmetinin yeniden "
 "başlatılması gerekir."
 
-#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:306
+#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:312
 msgid "Clear"
 msgstr ""
 
@@ -308,7 +312,7 @@ msgstr ""
 msgid "Deduplicate IPs"
 msgstr "IP'leri tekilleştirme"
 
-#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:247
+#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:253
 msgid "Description"
 msgstr "Açıklama"
 
@@ -328,7 +332,7 @@ msgstr "Devre dışı bırak"
 msgid "Don't check SSL server certificates during download."
 msgstr "İndirme sırasında SSL sunucu sertifikalarını kontrol etme."
 
-#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:279
+#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:285
 msgid "Download"
 msgstr ""
 
@@ -392,8 +396,8 @@ msgstr "Öğe Sayısı"
 msgid "Elements (max. 50)"
 msgstr ""
 
-#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:203
-#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:251
+#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:208
+#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:257
 #: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/overview.js:654
 msgid "Empty field not allowed"
 msgstr "Boş alana izin verilmiyor"
@@ -465,7 +469,7 @@ msgstr "Harici İzin Listesi Beslemeleri"
 msgid "External Blocklist Feeds"
 msgstr "Harici Engelleme Listesi Beslemeleri"
 
-#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/setreport.js:376
+#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/setreport.js:380
 msgid "Failed to generate a banIP report!"
 msgstr ""
 
@@ -477,7 +481,7 @@ msgstr ""
 msgid "Feed Flag Reset"
 msgstr ""
 
-#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:198
+#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:203
 msgid "Feed Name"
 msgstr "Akış Adı"
 
@@ -489,7 +493,7 @@ msgstr "Akış Seçimi"
 msgid "Feed/Set Settings"
 msgstr "Besleme/Ayarlar"
 
-#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:297
+#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:303
 msgid "Fill"
 msgstr ""
 
@@ -497,11 +501,11 @@ msgstr ""
 msgid "Firewall Log"
 msgstr "Güvenlik Duvarı Günlüğü"
 
-#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:256
+#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:262
 msgid "Flag"
 msgstr "Bayrak"
 
-#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:262
+#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:268
 msgid "Flag not supported"
 msgstr "Bayrak desteklenmiyor"
 
@@ -561,11 +565,11 @@ msgstr "IPv6 Ağ Arayüzleri"
 msgid "IPv6 Support"
 msgstr "IPv6 Desteği"
 
-#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:242
+#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:248
 msgid "Inbound"
 msgstr ""
 
-#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:244
+#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:250
 msgid "Inbound & Outbound"
 msgstr ""
 
@@ -601,7 +605,7 @@ msgstr "Bilgi"
 msgid "Invalid URL format"
 msgstr ""
 
-#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:206
+#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:211
 #: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/overview.js:657
 msgid "Invalid characters"
 msgstr "Geçersiz karakter"
@@ -610,7 +614,7 @@ msgstr "Geçersiz karakter"
 msgid "Invalid expiry format, e.g. 5m, 2h, 1d or 1h30m"
 msgstr ""
 
-#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:120
+#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:125
 msgid "Invalid input values, unable to save modifications."
 msgstr "Geçersiz giriş değerleri, değişiklikler kaydedilemiyor."
 
@@ -785,7 +789,7 @@ msgstr ""
 msgid "Opt out specific feeds from the deduplication process."
 msgstr ""
 
-#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:243
+#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:249
 msgid "Outbound"
 msgstr ""
 
@@ -824,10 +828,9 @@ msgstr ""
 #: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/overview.js:258
 msgid ""
 "Override the pre-configured download options for the selected download "
-"utility."
+"utility. The output flag, e.g. '-o' for curl or '-O' for wget, must be the "
+"last parameter."
 msgstr ""
-"Seçilen indirme yardımcı programı için önceden yapılandırılmış indirme "
-"seçeneklerini geçersiz kıl."
 
 #: applications/luci-app-banip/root/usr/share/luci/menu.d/luci-app-banip.json:25
 msgid "Overview"
@@ -877,7 +880,7 @@ msgstr ""
 "banIP bildirim E-Postaları için alıcı adresi, bu bilgi E-Posta işlevini "
 "etkinleştirmek için gereklidir."
 
-#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/setreport.js:382
+#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/setreport.js:387
 msgid "Refresh"
 msgstr "Yenile"
 
@@ -914,7 +917,7 @@ msgstr "İnternet erişimini az sayıda güvenli IP'ye kısıtlayın."
 msgid "Result"
 msgstr "Sonuç"
 
-#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:233
+#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:238
 msgid "Rule"
 msgstr ""
 
@@ -938,7 +941,7 @@ msgstr ""
 "WAN-DoS saldırılarını önlemek için saniye başına paket cinsinden SYN eşiği. "
 "Bu korumayı devre dışı bırakmak için '0' olarak ayarlayın."
 
-#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:315
+#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:321
 msgid "Save"
 msgstr "Kaydet"
 
@@ -1190,11 +1193,11 @@ msgstr ""
 "WAN-DoS saldırılarını önlemek için saniye başına paket cinsinden UDP eşiği. "
 "Bu korumayı devre dışı bırakmak için '0' olarak ayarlayın."
 
-#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:211
+#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:216
 msgid "URLv4"
 msgstr "URLv4"
 
-#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:222
+#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:227
 msgid "URLv6"
 msgstr "URLv6"
 
@@ -1223,12 +1226,12 @@ msgstr "Kural kümesi dosyası ayrıştırılamıyor!"
 msgid "Unable to save modifications: %s"
 msgstr "Düzenlemeler kaydedilemedi: %s"
 
-#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:288
+#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:294
 msgid "Upload"
 msgstr ""
 
-#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:80
-#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:86
+#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:85
+#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:91
 msgid "Upload of the custom feed file failed."
 msgstr "Özel akış dosyasının yüklenmesi başarısız oldu."
 
@@ -1236,7 +1239,7 @@ msgstr "Özel akış dosyasının yüklenmesi başarısız oldu."
 msgid "Verbose Debug Logging"
 msgstr "Ayrıntılı Hata Ayıklama Günlüğü"
 
-#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:182
+#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:187
 msgid ""
 "With this editor you can upload your local custom feed file or fill up an "
 "initial one (a 1:1 copy of the version shipped with the package). The file "
@@ -1374,6 +1377,13 @@ msgstr ""
 #: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/overview.js:563
 msgid "warn"
 msgstr "uyar"
+
+#~ msgid ""
+#~ "Override the pre-configured download options for the selected download "
+#~ "utility."
+#~ msgstr ""
+#~ "Seçilen indirme yardımcı programı için önceden yapılandırılmış indirme "
+#~ "seçeneklerini geçersiz kıl."
 
 #~ msgid ""
 #~ "Set the nft chain priority within the banIP table, lower values means "

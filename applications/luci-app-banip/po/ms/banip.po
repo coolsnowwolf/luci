@@ -48,19 +48,23 @@ msgstr ""
 msgid "-- default --"
 msgstr ""
 
-#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:234
+#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:239
 msgid "<IP-Address>"
 msgstr ""
 
-#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:235
+#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:240
 msgid "<IP-Address><CSV-Separator>"
 msgstr ""
 
-#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:236
+#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:241
 msgid "<IP-Address><Space><Netmask>"
 msgstr ""
 
-#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:237
+#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:242
+msgid "<JSON Lines><IP-Address><JSON Lines>"
+msgstr ""
+
+#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:243
 msgid "<Suricata Syntax>"
 msgstr ""
 
@@ -230,7 +234,7 @@ msgstr ""
 msgid "Cancel"
 msgstr ""
 
-#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:241
+#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:247
 msgid "Chain"
 msgstr ""
 
@@ -250,7 +254,7 @@ msgstr ""
 msgid "Changes on this tab needs a banIP service restart to take effect."
 msgstr ""
 
-#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:306
+#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:312
 msgid "Clear"
 msgstr ""
 
@@ -290,7 +294,7 @@ msgstr ""
 msgid "Deduplicate IPs"
 msgstr ""
 
-#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:247
+#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:253
 msgid "Description"
 msgstr "Keterangan"
 
@@ -308,7 +312,7 @@ msgstr ""
 msgid "Don't check SSL server certificates during download."
 msgstr ""
 
-#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:279
+#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:285
 msgid "Download"
 msgstr ""
 
@@ -372,8 +376,8 @@ msgstr ""
 msgid "Elements (max. 50)"
 msgstr ""
 
-#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:203
-#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:251
+#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:208
+#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:257
 #: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/overview.js:654
 msgid "Empty field not allowed"
 msgstr ""
@@ -442,7 +446,7 @@ msgstr ""
 msgid "External Blocklist Feeds"
 msgstr ""
 
-#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/setreport.js:376
+#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/setreport.js:380
 msgid "Failed to generate a banIP report!"
 msgstr ""
 
@@ -454,7 +458,7 @@ msgstr ""
 msgid "Feed Flag Reset"
 msgstr ""
 
-#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:198
+#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:203
 msgid "Feed Name"
 msgstr ""
 
@@ -466,7 +470,7 @@ msgstr ""
 msgid "Feed/Set Settings"
 msgstr ""
 
-#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:297
+#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:303
 msgid "Fill"
 msgstr ""
 
@@ -474,11 +478,11 @@ msgstr ""
 msgid "Firewall Log"
 msgstr ""
 
-#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:256
+#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:262
 msgid "Flag"
 msgstr ""
 
-#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:262
+#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:268
 msgid "Flag not supported"
 msgstr ""
 
@@ -536,11 +540,11 @@ msgstr ""
 msgid "IPv6 Support"
 msgstr ""
 
-#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:242
+#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:248
 msgid "Inbound"
 msgstr ""
 
-#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:244
+#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:250
 msgid "Inbound & Outbound"
 msgstr ""
 
@@ -574,7 +578,7 @@ msgstr ""
 msgid "Invalid URL format"
 msgstr ""
 
-#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:206
+#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:211
 #: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/overview.js:657
 msgid "Invalid characters"
 msgstr ""
@@ -583,7 +587,7 @@ msgstr ""
 msgid "Invalid expiry format, e.g. 5m, 2h, 1d or 1h30m"
 msgstr ""
 
-#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:120
+#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:125
 msgid "Invalid input values, unable to save modifications."
 msgstr ""
 
@@ -752,7 +756,7 @@ msgstr ""
 msgid "Opt out specific feeds from the deduplication process."
 msgstr ""
 
-#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:243
+#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:249
 msgid "Outbound"
 msgstr ""
 
@@ -791,7 +795,8 @@ msgstr ""
 #: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/overview.js:258
 msgid ""
 "Override the pre-configured download options for the selected download "
-"utility."
+"utility. The output flag, e.g. '-o' for curl or '-O' for wget, must be the "
+"last parameter."
 msgstr ""
 
 #: applications/luci-app-banip/root/usr/share/luci/menu.d/luci-app-banip.json:25
@@ -837,7 +842,7 @@ msgid ""
 "required to enable E-Mail functionality."
 msgstr ""
 
-#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/setreport.js:382
+#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/setreport.js:387
 msgid "Refresh"
 msgstr ""
 
@@ -874,7 +879,7 @@ msgstr ""
 msgid "Result"
 msgstr ""
 
-#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:233
+#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:238
 msgid "Rule"
 msgstr ""
 
@@ -896,7 +901,7 @@ msgid ""
 "this safeguard set it to '0'."
 msgstr ""
 
-#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:315
+#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:321
 msgid "Save"
 msgstr ""
 
@@ -1136,11 +1141,11 @@ msgid ""
 "this safeguard set it to '0'."
 msgstr ""
 
-#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:211
+#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:216
 msgid "URLv4"
 msgstr ""
 
-#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:222
+#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:227
 msgid "URLv6"
 msgstr ""
 
@@ -1169,12 +1174,12 @@ msgstr ""
 msgid "Unable to save modifications: %s"
 msgstr ""
 
-#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:288
+#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:294
 msgid "Upload"
 msgstr "Muat naik"
 
-#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:80
-#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:86
+#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:85
+#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:91
 msgid "Upload of the custom feed file failed."
 msgstr ""
 
@@ -1182,7 +1187,7 @@ msgstr ""
 msgid "Verbose Debug Logging"
 msgstr ""
 
-#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:182
+#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:187
 msgid ""
 "With this editor you can upload your local custom feed file or fill up an "
 "initial one (a 1:1 copy of the version shipped with the package). The file "
