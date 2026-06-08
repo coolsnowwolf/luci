@@ -90,12 +90,13 @@
 
 <%+header%>
 
-<h2 name="content"><%:Join Network: Wireless Scan%></h2>
+<h2 name="content"><%:Join Network: Wireless Scan%><span id="wifi_counts"> ...</span><span style="float:right;" title="<%=dev%>"><%=iw.ifname%></span></h2>
 
 <div class="cbi-map">
 	<fieldset class="cbi-section">
 		<table class="cbi-section-table" style="empty-cells:hide">
 			<tr class="cbi-section-table-titles">
+				<th class="cbi-section-table-cell" style="text-align: center;">#</th>
 				<th class="cbi-section-table-cell" style="text-align: center;"><%:Signal%></th>
 				<th class="cbi-section-table-cell">SSID</th>
 				<th class="cbi-section-table-cell" style="text-align: center;"><%:Channel%></th>
@@ -107,8 +108,9 @@
 			<!-- scan list -->
 			<% for i, net in ipairs(scanlist(1)) do net.encryption = net.encryption or { } %>
 			<tr class="cbi-section-table-row cbi-rowstyle-<%=1 + ((i-1) % 2)%>">
+				<td class="cbi-value-field" style="vertical-align: middle; text-align: center;"><%=i%></td>
 				<td class="cbi-value-field" style="vertical-align: middle; text-align: center; padding: 5px 10px 5px;">
-					<span title="<%=percent_wifi_signal(net)%>%" class="ifacebadge" style="padding: 2px 5px; background-image: none; background-color: transparent;"><img src="<%=guess_wifi_signal(net)%>"><span style="margin-left: 6px;"><%=net.signal%> dBm</span></span>
+					<span title="<%=percent_wifi_signal(net)%>%" class="ifacebadge" style="padding: 2px 5px;"><img src="<%=guess_wifi_signal(net)%>"><span style="margin-left: 6px;"><%=net.signal%> dBm</span></span>
 				</td>
 				<td class="cbi-value-field" style="vertical-align: middle; padding: 5px 10px 5px;"><%=net.ssid and utl.pcdata(net.ssid) or "<em>%s</em>" % translate("hidden")%></td>
 				<td class="cbi-value-field" style="vertical-align: middle; text-align: center; padding: 5px 10px 5px;"><%=net.channel%></td>
@@ -152,5 +154,9 @@
 		<input class="cbi-button cbi-input-find" type="submit" value="<%:Repeat scan%>" />
 	</form>
 </div>
+
+<script type="text/javascript">//<![CDATA[
+	document.querySelector("#wifi_counts").innerText = "(" + document.querySelectorAll("tr.cbi-section-table-row").length + ")";
+//]]></script>
 
 <%+footer%>
