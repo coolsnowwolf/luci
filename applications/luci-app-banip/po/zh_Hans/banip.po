@@ -1,15 +1,14 @@
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2026-05-02 12:03+0000\n"
-"Last-Translator: 大王叫我来巡山 "
-"<hamburger2048@users.noreply.hosted.weblate.org>\n"
+"PO-Revision-Date: 2026-05-26 08:43+0000\n"
+"Last-Translator: Cypress <nksyn@qq.com>\n"
 "Language-Team: Chinese (Simplified Han script) <https://hosted.weblate.org/"
 "projects/openwrt/luciapplicationsbanip/zh_Hans/>\n"
 "Language: zh_Hans\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.17.1\n"
+"X-Generator: Weblate 2026.6.dev0\n"
 
 #: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/overview.js:640
 #: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/overview.js:709
@@ -49,19 +48,23 @@ msgstr "-- IP 集选择 --"
 msgid "-- default --"
 msgstr "-- 默认 --"
 
-#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:234
+#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:239
 msgid "<IP-Address>"
 msgstr "<IP 地址>"
 
-#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:235
+#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:240
 msgid "<IP-Address><CSV-Separator>"
 msgstr "<IP-Address><CSV-Separator>"
 
-#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:236
+#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:241
 msgid "<IP-Address><Space><Netmask>"
 msgstr "<IP-Address><Space><Netmask>"
 
-#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:237
+#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:242
+msgid "<JSON Lines><IP-Address><JSON Lines>"
+msgstr "<JSON Lines><IP-Address><JSON Lines>"
+
+#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:243
 msgid "<Suricata Syntax>"
 msgstr "<Suricata 语法>"
 
@@ -220,7 +223,7 @@ msgstr "阻止列表的修改已保存, 重新加载 banIP 以使更改生效。
 
 #: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/overview.js:618
 msgid "Burst size in packets for the shared NFT log limit."
-msgstr ""
+msgstr "共享 NFT 日志限制的 Burst 数据包大小。"
 
 #: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/overview.js:327
 msgid "CPU Cores"
@@ -232,7 +235,7 @@ msgstr "CPU 核心数"
 msgid "Cancel"
 msgstr "取消"
 
-#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:241
+#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:247
 msgid "Chain"
 msgstr "链"
 
@@ -252,7 +255,7 @@ msgstr "此标签页上的更改需要重新加载 banIP 服务方能生效。"
 msgid "Changes on this tab needs a banIP service restart to take effect."
 msgstr "此标签页上进行的更改需要重启 banIP 服务才能生效。"
 
-#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:306
+#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:312
 msgid "Clear"
 msgstr "清除"
 
@@ -293,7 +296,7 @@ msgstr "去除所有活跃集合中的重复 IP 地址并整理本地黑名单�
 msgid "Deduplicate IPs"
 msgstr "IP 去重"
 
-#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:247
+#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:253
 msgid "Description"
 msgstr "描述"
 
@@ -311,7 +314,7 @@ msgstr "禁用"
 msgid "Don't check SSL server certificates during download."
 msgstr "下载期间不检查 SSL 服务器证书。"
 
-#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:279
+#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:285
 msgid "Download"
 msgstr "下载"
 
@@ -375,8 +378,8 @@ msgstr "元素数量"
 msgid "Elements (max. 50)"
 msgstr "元素（最多 50）"
 
-#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:203
-#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:251
+#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:208
+#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:257
 #: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/overview.js:654
 msgid "Empty field not allowed"
 msgstr "不允许空的字段"
@@ -448,7 +451,7 @@ msgstr "外部白名单源"
 msgid "External Blocklist Feeds"
 msgstr "外部黑名单源"
 
-#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/setreport.js:376
+#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/setreport.js:380
 msgid "Failed to generate a banIP report!"
 msgstr "生成 banIP 报告失败！"
 
@@ -460,7 +463,7 @@ msgstr "源完毕"
 msgid "Feed Flag Reset"
 msgstr "源标记重置"
 
-#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:198
+#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:203
 msgid "Feed Name"
 msgstr "源名称"
 
@@ -472,7 +475,7 @@ msgstr "源选择"
 msgid "Feed/Set Settings"
 msgstr "源/集合设置"
 
-#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:297
+#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:303
 msgid "Fill"
 msgstr "补充/修改"
 
@@ -480,11 +483,11 @@ msgstr "补充/修改"
 msgid "Firewall Log"
 msgstr "防火墙日志"
 
-#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:256
+#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:262
 msgid "Flag"
 msgstr "标记"
 
-#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:262
+#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:268
 msgid "Flag not supported"
 msgstr "此标记不受支持"
 
@@ -542,11 +545,11 @@ msgstr "IPv6 网络接口"
 msgid "IPv6 Support"
 msgstr "IPv6 支持"
 
-#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:242
+#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:248
 msgid "Inbound"
 msgstr "传入"
 
-#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:244
+#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:250
 msgid "Inbound & Outbound"
 msgstr "传入&传出"
 
@@ -580,7 +583,7 @@ msgstr "信息"
 msgid "Invalid URL format"
 msgstr "无效 URL 格式"
 
-#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:206
+#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:211
 #: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/overview.js:657
 msgid "Invalid characters"
 msgstr "无效字符"
@@ -589,7 +592,7 @@ msgstr "无效字符"
 msgid "Invalid expiry format, e.g. 5m, 2h, 1d or 1h30m"
 msgstr "无效的过期时间格式，如 5m, 2h, 1d 或 1h30m"
 
-#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:120
+#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:125
 msgid "Invalid input values, unable to save modifications."
 msgstr "输入值无效，无法保存更改。"
 
@@ -637,7 +640,7 @@ msgstr "通过 syslog-ng 解析日志文件来取消通过 logread 的标准解�
 
 #: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/overview.js:618
 msgid "Log Burst Limit"
-msgstr ""
+msgstr "记录 Burst 限制"
 
 #: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/overview.js:599
 msgid "Log Count"
@@ -758,7 +761,7 @@ msgstr "进行拦截前允许同一 IP 的失败登录尝试在日志中出现�
 msgid "Opt out specific feeds from the deduplication process."
 msgstr "将特定源排除在去重过程之外。"
 
-#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:243
+#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:249
 msgid "Outbound"
 msgstr "传出"
 
@@ -797,12 +800,15 @@ msgstr "覆盖默认源榜删除现有的端口/协议限制。"
 #: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/overview.js:258
 msgid ""
 "Override the pre-configured download options for the selected download "
-"utility."
-msgstr "对所选的下载工具绕过预先配置的下载选项。"
+"utility. The output flag, e.g. '-o' for curl or '-O' for wget, must be the "
+"last parameter."
+msgstr ""
+"覆盖所选下载工具的预配置下载选项。输出标记，如 curl 的 '-o' 或 wget 的 '-O'，"
+"必须是最后一个参数。"
 
 #: applications/luci-app-banip/root/usr/share/luci/menu.d/luci-app-banip.json:25
 msgid "Overview"
-msgstr "概览"
+msgstr "概况"
 
 #: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/overview.js:586
 msgid ""
@@ -846,7 +852,7 @@ msgid ""
 "required to enable E-Mail functionality."
 msgstr "banIP 通知电子邮件的接收地址，要开启电子邮件功能必须填写此信息。"
 
-#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/setreport.js:382
+#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/setreport.js:387
 msgid "Refresh"
 msgstr "刷新"
 
@@ -883,7 +889,7 @@ msgstr "限制来自/对少量安全 IP 的互联网访问。"
 msgid "Result"
 msgstr "结果"
 
-#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:233
+#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:238
 msgid "Rule"
 msgstr "规则"
 
@@ -905,7 +911,7 @@ msgid ""
 "this safeguard set it to '0'."
 msgstr "SYN 阈值用于防止 WAN DoS 攻击。要禁用此保护措施将其设置为 '0'。"
 
-#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:315
+#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:321
 msgid "Save"
 msgstr "保存"
 
@@ -1153,11 +1159,11 @@ msgid ""
 "this safeguard set it to '0'."
 msgstr "UDP 阈值用于防止 WAN DoS 攻击。要禁用此保护措施将其设置为 '0'。"
 
-#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:211
+#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:216
 msgid "URLv4"
 msgstr "URLv4"
 
-#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:222
+#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:227
 msgid "URLv6"
 msgstr "URLv6"
 
@@ -1186,12 +1192,12 @@ msgstr "无法解析规则集文件！"
 msgid "Unable to save modifications: %s"
 msgstr "无法保存更改：%s"
 
-#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:288
+#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:294
 msgid "Upload"
 msgstr "上传"
 
-#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:80
-#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:86
+#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:85
+#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:91
 msgid "Upload of the custom feed file failed."
 msgstr "上传自定义源文件失败。"
 
@@ -1199,7 +1205,7 @@ msgstr "上传自定义源文件失败。"
 msgid "Verbose Debug Logging"
 msgstr "详细的调试记录"
 
-#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:182
+#: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/feeds.js:187
 msgid ""
 "With this editor you can upload your local custom feed file or fill up an "
 "initial one (a 1:1 copy of the version shipped with the package). The file "
@@ -1335,6 +1341,11 @@ msgstr "sshd 登录失败"
 #: applications/luci-app-banip/htdocs/luci-static/resources/view/banip/overview.js:563
 msgid "warn"
 msgstr "警告"
+
+#~ msgid ""
+#~ "Override the pre-configured download options for the selected download "
+#~ "utility."
+#~ msgstr "对所选的下载工具绕过预先配置的下载选项。"
 
 #~ msgid "Enable nft counter for every Set element."
 #~ msgstr "为每个集合元素开启 nft 计数。"
