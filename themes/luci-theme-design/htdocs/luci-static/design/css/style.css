@@ -2347,8 +2347,30 @@ div.cbi-dropdown.cbi-button {
 	display: inline;
 }
 
+/* Page action buttons: right-aligned at bottom right */
 .cbi-page-actions {
-    text-align: center;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: .5em;
+}
+
+.cbi-page-actions > form[method="post"] {
+    display: inline-block;
+}
+
+/* Modal button row: left-right layout (ignore on left, save on right) */
+.modal .cbi-page-actions,
+.modal > .button-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: .5em;
+}
+
+.modal .cbi-page-actions > button:first-of-type,
+.modal > .button-row > button:first-of-type {
+    margin-right: auto;
 }
 
 .cbi-page-actions > form[method="post"] {
