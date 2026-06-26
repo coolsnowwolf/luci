@@ -2351,6 +2351,25 @@ div.cbi-dropdown.cbi-button {
     text-align: center;
 }
 
+/* Modal button row: left-right layout (ignore on left, save on right) */
+.modal .cbi-page-actions,
+.modal > .button-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal .cbi-page-actions > button:not(:last-of-type),
+.modal > .button-row > button:not(:last-of-type),
+.modal .cbi-page-actions > form:not(:last-of-type) {
+    margin-right: .5em;
+}
+
+.modal .cbi-page-actions > button:first-of-type,
+.modal > .button-row > button:first-of-type {
+    margin-right: auto;
+}
+
 .cbi-page-actions > form[method="post"] {
 	display: inline-block;
 }
