@@ -5,8 +5,8 @@ msgstr "Content-Type: text/plain; charset=UTF-8"
 msgid "Acceleration Status"
 msgstr ""
 
-#: applications/luci-app-turboacc/htdocs/luci-static/resources/view/turboacc.js:182
-msgid "Boardcom fullcone"
+#: applications/luci-app-turboacc/htdocs/luci-static/resources/view/turboacc.js:197
+msgid "Broadcom Fullcone NAT1"
 msgstr ""
 
 #: applications/luci-app-turboacc/htdocs/luci-static/resources/view/turboacc.js:151

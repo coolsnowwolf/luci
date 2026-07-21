@@ -194,7 +194,7 @@ return view.extend({
 		o.value('0', _('Disable'))
 		if (features.hasXTFULLCONENAT || features.hasNFTFULLCONENAT) {
 			o.value('1', _('FULLCONENAT'));
-			o.value('2', _('Boardcom Fullcone NAT1'));
+			o.value('2', _('Broadcom Fullcone NAT1'));
 		}
 		o.default = '0';
 		o.rmempty = false;

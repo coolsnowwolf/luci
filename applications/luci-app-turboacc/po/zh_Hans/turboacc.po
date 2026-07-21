@@ -12,10 +12,6 @@ msgstr ""
 msgid "Acceleration Status"
 msgstr "加速状态"
 
-#: applications/luci-app-turboacc/htdocs/luci-static/resources/view/turboacc.js:182
-msgid "Boardcom fullcone"
-msgstr "Boardcom fullcone"
-
 #: applications/luci-app-turboacc/htdocs/luci-static/resources/view/turboacc.js:151
 msgid "Bridge Acceleration"
 msgstr "桥接加速"
@@ -93,9 +89,9 @@ msgstr "全锥形 NAT1"
 msgid "FULLCONENAT"
 msgstr "兼容模式全锥形 NAT1"
 
-#: applications/luci-app-turboacc/htdocs/luci-static/resources/view/turboacc.js:177
-msgid "Boardcom Fullcone NAT1"
-msgstr "高性能 Boardcom 全锥形 NAT1"
+#: applications/luci-app-turboacc/htdocs/luci-static/resources/view/turboacc.js:197
+msgid "Broadcom Fullcone NAT1"
+msgstr "高性能 Broadcom 全锥形 NAT1"
 
 #: applications/luci-app-turboacc/htdocs/luci-static/resources/view/turboacc.js:178
 msgid "Full cone NAT (NAT1) can improve gaming performance effectively."
@@ -175,7 +171,3 @@ msgstr "Turbo ACC 网络加速设置"
 #: applications/luci-app-turboacc/htdocs/luci-static/resources/view/turboacc.js:181
 msgid "xt_FULLCONENAT"
 msgstr "兼容模式"
-
-#: applications/luci-app-turboacc/htdocs/luci-static/resources/view/turboacc.js:182
-msgid "Boardcom fullcone"
-msgstr "高性能模式"

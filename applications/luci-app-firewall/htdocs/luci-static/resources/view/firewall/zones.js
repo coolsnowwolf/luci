@@ -68,7 +68,7 @@ return view.extend({
 			o = s.option(form.ListValue, 'fullcone', _('Enable FullCone NAT'));
 			o.value('0', _('Disable'));
 			o.value('1', _('FULLCONENAT'));
-			o.value('2', _('Boardcom Fullcone NAT1'));
+			o.value('2', _('Broadcom Fullcone NAT1'));
 			addTCPCCAOption();
 			if (fw4)
 				o = s.option(form.Flag, 'fullcone6', _('Enable FullCone NAT6'));

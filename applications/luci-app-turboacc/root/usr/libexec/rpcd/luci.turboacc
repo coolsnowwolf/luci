@@ -104,9 +104,9 @@ local methods = {
 			(readfile("/sys/module/nft_fullcone/refcnt") or "0") ~= "0" then
 				fctype = "nft_FULLCONENAT"
 			elseif sys.call("nft list ruleset 2>/dev/null | grep -q 'masquerade fullcone'") == 0 then
-				fctype = "Boardcom Fullcone NAT1"
+				fctype = "Broadcom Fullcone NAT1"
 			elseif sys.call("iptables -t nat -L zone_wan_postrouting 2>/dev/null | grep -q fullcone") == 0 then
-				fctype = "Boardcom Fullcone NAT1"
+				fctype = "Broadcom Fullcone NAT1"
 			end
 			print(json.stringify({ type = fctype }))
 		end
