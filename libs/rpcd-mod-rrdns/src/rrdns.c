@@ -251,7 +251,7 @@ rrdns_handle_response(struct uloop_fd *ufd, unsigned int ev)
 static char *
 rrdns_find_nameserver(void)
 {
-	static char line[2*INET6_ADDRSTRLEN];
+	static char line[512];
 	struct in6_addr in6;
 	FILE *resolvconf;
 	char *p;
