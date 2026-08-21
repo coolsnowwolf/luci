@@ -403,7 +403,7 @@ char *get_ip_addr(char *ifname) {
 	// Type of address to retrieve - IPv4 IP address
 	ifr.ifr_addr.sa_family = AF_INET;
 	// Copy the interface name in the ifreq structure
-	strncpy(ifr.ifr_name, ifname, IFNAMSIZ - 1);
+	snprintf(ifr.ifr_name, IFNAMSIZ, "%s", ifname);
 	ioctl(n, SIOCGIFADDR, &ifr);
 	close(n);
 	return inet_ntoa(((struct sockaddr_in *)&ifr.ifr_addr)->sin_addr);
@@ -503,12 +503,12 @@ void testnetspeed(int mode, int y, unsigned long int rx, unsigned long int tx) {
 	switch (mode) {
 		case SPLIT:
 			setTextSize(2);
-			strcpy(buf, tx_str);
+			snprintf(buf, sizeof(buf), "%s", tx_str);
 			setCursor((127 - (strlen(buf) + 1) * 11) / 2, 0);
 			oled_write(24);
 			print_str(buf);
 
-			strcpy(buf, rx_str);
+			snprintf(buf, sizeof(buf), "%s", rx_str);
 			setCursor((127 - (strlen(buf) + 1) * 11) / 2, 16);
 			oled_write(25);
 			print_str(buf);
