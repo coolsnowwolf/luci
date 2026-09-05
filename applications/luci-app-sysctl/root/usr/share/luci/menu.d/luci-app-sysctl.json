@@ -1,0 +1,13 @@
+{
+	"admin/system/sysctl": {
+		"title": "内核参数",
+		"order": 65,
+		"action": {
+			"type": "view",
+			"path": "sysctl"
+		},
+		"depends": {
+			"acl": [ "luci-app-sysctl" ]
+		}
+	}
+}
