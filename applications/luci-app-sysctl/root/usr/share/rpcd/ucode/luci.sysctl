@@ -549,6 +549,32 @@ function file_delete_key(path, key) {
 	return { code: 0, removed: removed };
 }
 
+// Strip the normal "key = value" echo lines that sysctl -p prints to stdout
+// for every successfully applied entry. What remains (if anything) is a
+// genuine error message like "sysctl: permission denied on key '...'".
+// NOTE: ucode regex has no non-capturing groups; plain pattern is fine here.
+function strip_echo(out) {
+	if (out == null || length(out) == 0)
+		return '';
+
+	let lines = split(out, '\n');
+	let rest = [];
+
+	for (let i = 0; i < length(lines); i++) {
+		let t = trim(lines[i]);
+
+		if (t == null || length(t) == 0)
+			continue;
+
+		if (match(t, /^[A-Za-z0-9_][A-Za-z0-9_.\/-]*[ \t]*=[ \t]*\S/) != null)
+			continue;
+
+		push(rest, t);
+	}
+
+	return join('\n', rest);
+}
+
 const methods = {
 	status: {
 		args: {},
@@ -763,7 +789,7 @@ const methods = {
 				let out = (p != null) ? p.read('all') : null;
 				let rc = (p != null) ? p.close() : -1;
 
-				out = (out == null) ? '' : trim(out);
+				out = strip_echo((out == null) ? '' : trim(out));
 
 				if (rc != 0 || length(out) > 0)
 					push(errors, { file: confs[i], code: rc, output: out });
@@ -1011,6 +1037,57 @@ const methods = {
 				return { code: 1, error: 'Invalid key' };
 
 			return file_delete_key(p, key);
+		}
+	},
+
+	// Locate a sysctl key across ALL config sources, in application order.
+	// Without args: return only keys defined in >= 2 files (duplicate map).
+	// With args.key: return that key's definitions even if defined once
+	// (used by the add/edit form to warn about shadowing overrides).
+	// Entries are ordered by file load order -> the LAST enabled entry wins.
+	dup_check: {
+		args: { key: '' },
+		call: function(request) {
+			let a = (request.args != null) ? request.args : {};
+			let want = trim(a.key);
+			let confs = collect_confs();
+			let by_key = {};
+			let order = [];
+
+			for (let i = 0; i < length(confs); i++) {
+				let path = confs[i];
+				let entries = parse_conf(path);
+
+				for (let j = 0; j < length(entries); j++) {
+					let k = entries[j].key;
+
+					if (want != null && length(want) > 0 && k != want)
+						continue;
+
+					if (by_key[k] == null) {
+						by_key[k] = [];
+						push(order, k);
+					}
+
+					push(by_key[k], {
+						path: path,
+						value: entries[j].value,
+						disabled: entries[j].disabled
+					});
+				}
+			}
+
+			let min_defs = (want != null && length(want) > 0) ? 1 : 2;
+			let dups = [];
+
+			for (let i = 0; i < length(order); i++) {
+				let k = order[i];
+
+				if (length(by_key[k]) >= min_defs)
+					push(dups, { key: k, entries: by_key[k] });
+			}
+
+			return { code: 0, dups: dups };
 		}
 	}
 };

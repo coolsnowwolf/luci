@@ -11,8 +11,9 @@
 					"preset_status",
 					"preset_fetch",
 					"preset_check",
-					"file_view",
-					"preset_list"
+				"file_view",
+				"preset_list",
+				"dup_check"
 				]
 			}
 		},

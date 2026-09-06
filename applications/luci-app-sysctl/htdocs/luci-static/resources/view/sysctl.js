@@ -40,6 +40,7 @@ var callPresetList = rpc.declare({
 var callFileView = rpc.declare({ object: 'luci.sysctl', method: 'file_view', params: [ 'path' ] });
 var callFileSet = rpc.declare({ object: 'luci.sysctl', method: 'file_set', params: [ 'path', 'key', 'value', 'disabled' ] });
 var callFileDelete = rpc.declare({ object: 'luci.sysctl', method: 'file_delete', params: [ 'path', 'key' ] });
+var callDupCheck = rpc.declare({ object: 'luci.sysctl', method: 'dup_check', params: [ 'key' ] });
 
 var KEY_RE = /^[A-Za-z0-9_][A-Za-z0-9_.\/-]*$/;
 
@@ -179,6 +180,7 @@ return view.extend({
 		}, _('暂无自定义参数，点击下方“添加参数”开始。'));
 		this.editFormBox = E('div', { 'style': 'display:none' });
 		this.fileViewBox = E('div', { 'style': 'display:none' });
+		this.dupBox = E('div', { 'style': 'display:none' });
 		this.applyResultBox = E('div', { 'style': 'display:none' });
 		this.sourceChipsBox = E('div', { 'class': 'lsc-chips' });
 
@@ -209,6 +211,7 @@ return view.extend({
 			this.tableWrapBox,
 			this.customEmptyBox,
 			this.fileViewBox,
+			this.dupBox,
 			this.applyResultBox,
 			E('div', { 'class': 'cbi-page-actions' }, [
 				E('button', {
@@ -220,6 +223,11 @@ return view.extend({
 					'class': 'cbi-button cbi-button-apply',
 					'click': ui.createHandlerFn(this, 'applyConfig')
 				}, _('应用配置')),
+				' ',
+				E('button', {
+					'class': 'cbi-button',
+					'click': ui.createHandlerFn(this, 'showDupCheck')
+				}, _('检测重复')),
 				' ',
 				E('button', {
 					'class': 'cbi-button cbi-button-negative',
@@ -294,7 +302,11 @@ return view.extend({
 	},
 
 	showEditForm: function(entry) {
-		this.editing = (entry != null) ? entry : null;
+		/* "添加参数" button calls this with null -> use a blank new-entry
+		 * state, otherwise renderEditForm would bail out and the form would
+		 * never open (latent bug since v1.0, other entries always passed an
+		 * object so it never surfaced until now). */
+		this.editing = (entry != null) ? entry : { isNew: true };
 		this.editFromBrowse = (entry != null && entry.fromBrowse === true);
 		this.renderEditForm();
 
@@ -350,6 +362,20 @@ return view.extend({
 
 		saveBtn.addEventListener('click', function() { self.saveEditForm(keyInput, valInput, applyChk, disabledChk, errBox); });
 
+		var editDupBox = E('div', { 'style': 'display:none' });
+		this.editDupBox = editDupBox;
+
+		keyInput.addEventListener('input', function() {
+			if (self.editDupTimer != null)
+				window.clearTimeout(self.editDupTimer);
+
+			var v = keyInput.value;
+
+			self.editDupTimer = window.setTimeout(function() {
+				self.refreshEditDup((v || '').trim());
+			}, 400);
+		});
+
 		dom.content(this.editFormBox, [
 			E('div', { 'class': 'lsc-card' }, [
 				E('strong', {}, title),
@@ -369,6 +395,7 @@ return view.extend({
 					])
 				]),
 				E('div', { 'style': 'color:#666;margin-top:4px' }, note),
+				editDupBox,
 				errBox,
 				E('div', { 'style': 'margin-top:8px' }, [
 					saveBtn, ' ',
@@ -376,10 +403,19 @@ return view.extend({
 				])
 			])
 		]);
+
+		if (key != '')
+			this.refreshEditDup(key);
 	},
 
 	hideEditForm: function() {
 		this.editing = null;
+
+		if (this.editDupTimer != null) {
+			window.clearTimeout(this.editDupTimer);
+			this.editDupTimer = null;
+		}
+
 		this.renderEditForm();
 
 		/* edit was started from the browse section: scroll back there so the
@@ -390,6 +426,83 @@ return view.extend({
 			if (this.browseSectionBox != null && this.browseSectionBox.scrollIntoView)
 				this.browseSectionBox.scrollIntoView({ block: 'start' });
 		}
+	},
+
+	/* Summarize where a key is defined besides the custom config, and whether
+	 * any of those files load AFTER the custom config (=> would override it). */
+	summarizeDup: function(d) {
+		var customPath = '/etc/sysctl.d/99-luci-sysctl.conf';
+		var files = (this.statusData != null && this.statusData.files != null) ? this.statusData.files : [];
+		var paths = [];
+		var i;
+
+		for (i = 0; i < files.length; i++)
+			paths.push(files[i].path);
+
+		var customIdx = paths.indexOf(customPath);
+		var others = [];
+		var shadowed = false;
+
+		for (i = 0; i < d.entries.length; i++) {
+			var e = d.entries[i];
+
+			if (e.path == customPath)
+				continue;
+
+			others.push(e.path.replace('/etc/', '') + ' (' + e.value + ')');
+
+			if (!e.disabled && customIdx >= 0 && paths.indexOf(e.path) > customIdx)
+				shadowed = true;
+		}
+
+		return { others: others, shadowed: shadowed };
+	},
+
+	/* Inline warning inside the add/edit form: warn BEFORE saving that the
+	 * key is also defined in other config files (and whether those files
+	 * would override the custom entry). */
+	refreshEditDup: function(key) {
+		var self = this;
+		var box = this.editDupBox;
+
+		if (box == null)
+			return;
+
+		if (key == null || key == '' || !KEY_RE.test(key)) {
+			box.style.display = 'none';
+			dom.content(box, []);
+			return;
+		}
+
+		callDupCheck(key).then(function(res) {
+			var dups = (res != null && res.dups != null) ? res.dups : [];
+
+			if (dups.length == 0 || self.editing == null) {
+				box.style.display = 'none';
+				dom.content(box, []);
+				return;
+			}
+
+			var sum = self.summarizeDup(dups[0]);
+
+			if (sum.others.length == 0) {
+				box.style.display = 'none';
+				dom.content(box, []);
+				return;
+			}
+
+			var msg = sum.shadowed
+				? _('注意：该参数在自定义配置之后加载的文件中也有定义（%s），保存后会被覆盖、不会生效。请直接编辑对应文件或删除其同名条目。').format(sum.others.join('、'))
+				: _('该参数在其他文件中也有定义（%s）。自定义配置加载顺序靠后，保存后以这里的值为准。').format(sum.others.join('、'));
+
+			box.style.display = '';
+			dom.content(box, [
+				E('div', { 'style': (sum.shadowed ? 'color:#b3261e' : 'color:#a35a00') + ';margin-top:4px' }, msg)
+			]);
+		}).catch(function() {
+			box.style.display = 'none';
+			dom.content(box, []);
+		});
 	},
 
 	saveEditForm: function(keyInput, valInput, applyChk, disabledChk, errBox) {
@@ -466,6 +579,26 @@ return view.extend({
 
 			dom.content(self.applyResultBox, [ E('div', { 'class': 'alert-message', 'style': 'margin:6px 0' }, notes) ]);
 			self.applyResultBox.style.display = '';
+
+			/* post-save heads-up: same key also defined in other files? */
+			callDupCheck(key).then(function(dres) {
+				var dups = (dres != null && dres.dups != null) ? dres.dups : [];
+
+				if (dups.length == 0)
+					return;
+
+				var sum = self.summarizeDup(dups[0]);
+
+				if (sum.others.length == 0)
+					return;
+
+				var msg = sum.shadowed
+					? _('注意：该参数在自定义配置之后加载的文件中也有定义（%s），你的取值会被覆盖。').format(sum.others.join('、'))
+					: _('该参数在其他文件中也有定义（%s），自定义配置加载靠后，以你的值为准。').format(sum.others.join('、'));
+
+				notes.push(E('p', { 'style': 'color:' + (sum.shadowed ? '#b3261e' : '#a35a00') }, msg));
+				dom.content(self.applyResultBox, [ E('div', { 'class': 'alert-message', 'style': 'margin:6px 0' }, notes) ]);
+			}).catch(function() {});
 		}).catch(function(e) {
 			errBox.textContent = '';
 			errBox.appendChild(self.errorBox(_('保存失败：%s').format(e.message), self.backendErrorHint(e.message)));
@@ -676,7 +809,11 @@ return view.extend({
 				rows.push(E('tr', {}, [
 					E('td', {}, [ E('code', {}, (e.disabled ? '# ' : '') + e.key) ]),
 					E('td', {}, [ E('code', {}, e.value) ]),
-					E('td', {}, [ E('code', {}, (e.disabled || e.current == null) ? '—' : e.current) ]),
+					E('td', {}, [ E('code', {
+						/* value differs from kernel state: likely overridden by a
+						 * later config file (or write failed) -> highlight it */
+						'style': (!e.disabled && e.current != null && e.current != e.value) ? 'color:#a35a00;font-weight:600' : ''
+					}, (e.disabled || e.current == null) ? '—' : e.current) ]),
 					E('td', { 'style': 'white-space:nowrap' }, ops)
 				]));
 			}
@@ -812,6 +949,139 @@ return view.extend({
 		this.fileEditing = null;
 		this.refreshSourceChips();
 		this.renderFilePanel();
+	},
+
+	/* ---------- duplicate-key detection & cleanup ---------- */
+
+	showDupCheck: function() {
+		var self = this;
+
+		this.dupBox.style.display = '';
+		dom.content(this.dupBox, [
+			E('h3', { 'style': 'text-align:center' }, _('同名参数检测')),
+			E('p', { 'style': 'color:#777;text-align:center' }, _('扫描中…'))
+		]);
+
+		if (this.dupBox.scrollIntoView)
+			this.dupBox.scrollIntoView({ block: 'start' });
+
+		callDupCheck('').then(function(res) {
+			self.renderDupResults((res != null && res.dups != null) ? res.dups : []);
+		}).catch(function(e) {
+			dom.content(self.dupBox, [
+				E('h3', { 'style': 'text-align:center' }, _('同名参数检测')),
+				self.errorBox(_('扫描失败：%s').format(e.message), self.backendErrorHint(e.message))
+			]);
+		});
+	},
+
+	hideDupCheck: function() {
+		this.dupBox.style.display = 'none';
+		dom.content(this.dupBox, []);
+	},
+
+	renderDupResults: function(dups) {
+		var self = this;
+		var rows = [];
+		var customPath = '/etc/sysctl.d/99-luci-sysctl.conf';
+		var collapseBtn = E('div', { 'style': 'text-align:center;margin-top:8px' }, [
+			E('button', { 'class': 'btn', 'click': ui.createHandlerFn(self, 'hideDupCheck') }, _('收起'))
+		]);
+
+		if (dups.length == 0) {
+			dom.content(this.dupBox, [
+				E('h3', { 'style': 'text-align:center' }, _('同名参数检测')),
+				E('p', { 'style': 'text-align:center;color:#777;padding:8px' },
+					_('未发现在多个文件中重复定义的参数。')),
+				collapseBtn
+			]);
+			return;
+		}
+
+		for (var i = 0; i < dups.length; i++) {
+			var d = dups[i];
+			var entRows = [];
+			var finalEntry = null;
+
+			for (var j = 0; j < d.entries.length; j++) {
+				var e = d.entries[j];
+
+				if (!e.disabled)
+					finalEntry = e;
+
+				entRows.push(E('div', {
+					'style': 'display:flex;align-items:center;justify-content:center;gap:8px;margin:3px 0'
+				}, [
+					E('code', {}, e.path.replace('/etc/', '')),
+					E('span', { 'style': 'color:#999' }, '='),
+					E('code', {}, e.value),
+					e.disabled
+						? badge(_('已禁用'), 'off')
+						: E('span', { 'style': 'color:#18794e;font-size:12px' }, _('生效来源')),
+					(e.path != customPath)
+						? E('button', {
+							'class': 'cbi-button cbi-button-remove',
+							'title': _('从该文件删除此条目'),
+							'click': ui.createHandlerFn(self, 'dupDeleteEntry', e, d.key)
+						}, _('删除'))
+						: E('span', { 'style': 'color:#34618e;font-size:12px' }, _('自定义'))
+				]));
+			}
+
+			/* files order == application order; compare against custom conf */
+			var files = (this.statusData != null && this.statusData.files != null) ? this.statusData.files : [];
+			var paths = [];
+
+			for (var k = 0; k < files.length; k++)
+				paths.push(files[k].path);
+
+			var customIdx = paths.indexOf(customPath);
+			var shadowed = (finalEntry != null && customIdx >= 0 && paths.indexOf(finalEntry.path) > customIdx);
+			var warnText = (shadowed && finalEntry != null)
+				? _('生效来源（%s）加载在自定义配置之后：“添加参数”里设置该参数不会生效，请直接编辑该文件或删除其同名条目。').format(finalEntry.path.replace('/etc/', ''))
+				: _('自定义配置加载顺序靠后，“添加参数”设置该参数时会覆盖以上取值。');
+
+			rows.push(E('tr', {}, [
+				E('td', {}, [ E('code', {}, d.key) ]),
+				E('td', {}, E('div', {}, entRows)),
+				E('td', { 'style': 'max-width:300px' }, E('div', {
+					'style': 'color:' + (shadowed ? '#b3261e' : '#666')
+				}, warnText))
+			]));
+		}
+
+		dom.content(this.dupBox, [
+			E('h3', { 'style': 'text-align:center' }, _('同名参数检测')),
+			E('p', { 'style': 'color:#666;margin:4px 0;text-align:center' },
+				_('以下参数在多个配置文件中重复定义，按应用顺序以最后一个为准：')),
+			E('div', { 'class': 'lsc-tablewrap' }, E('table', { 'class': 'lsc-table' }, [
+				E('thead', {}, E('tr', {}, [
+					E('th', {}, _('参数名')),
+					E('th', {}, _('各文件定义（按应用顺序）')),
+					E('th', {}, _('说明'))
+				])),
+				E('tbody', rows)
+			])),
+			collapseBtn
+		]);
+	},
+
+	dupDeleteEntry: function(e, key) {
+		var self = this;
+
+		return callFileDelete(e.path, key).then(function(res) {
+			if (res == null || res.code != 0) {
+				ui.addNotification(null,
+					E('p', {}, _('删除失败：%s').format((res != null && res.error) ? res.error : _('未知错误'))),
+					'error');
+				return;
+			}
+
+			self.reloadList();
+			self.showDupCheck();
+		}).catch(function(err) {
+			ui.addNotification(null, E('p', {}, _('删除失败：%s').format(err.message)), 'error');
+		});
 	},
 
 	/* ---------- section 2: online preset ---------- */
