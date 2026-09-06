@@ -208,12 +208,12 @@ return view.extend({
 		return E('div', { 'class': 'cbi-section' }, [
 			E('h3', {}, _('自定义参数')),
 			E('div', { 'class': 'cbi-section-descr' }, descr),
+			this.applyResultBox,
 			this.editFormBox,
 			this.tableWrapBox,
 			this.customEmptyBox,
 			this.fileViewBox,
 			this.dupBox,
-			this.applyResultBox,
 			E('div', { 'class': 'cbi-page-actions' }, [
 				E('button', {
 					'class': 'cbi-button cbi-button-add',
@@ -572,14 +572,16 @@ return view.extend({
 			else if (applyNow && res.applied === false)
 				notes.push(E('p', { 'style': 'color:#a80' }, _('参数 %s 已写入配置，但运行时校验不一致，请检查取值格式。').format(key)));
 
+			var hasWarn = (res.rename_leftover != null) || (!res.exists) || (applyNow && (res.applied === 'readonly' || res.applied === false));
+			var saveAutoHide = hasWarn ? 8000 : 4000;
+
 			if (notes.length == 0)
 				notes.push(E('p', {}, (st.fromMain && isNew) ? _('已创建覆盖条目：%s。') : _('参数 %s 已保存。').format(key)));
 
 			self.hideEditForm();
 			self.reloadList();
 
-			dom.content(self.applyResultBox, [ E('div', { 'class': 'alert-message', 'style': 'margin:6px 0' }, notes) ]);
-			self.applyResultBox.style.display = '';
+			self.showApplyResult([ E('div', { 'class': 'alert-message', 'style': 'margin:6px 0' }, notes) ], saveAutoHide);
 
 			/* post-save heads-up: same key also defined in other files? */
 			callDupCheck(key).then(function(dres) {
@@ -597,8 +599,8 @@ return view.extend({
 					? _('注意：该参数在自定义配置之后加载的文件中也有定义（%s），你的取值会被覆盖。').format(sum.others.join('、'))
 					: _('该参数在其他文件中也有定义（%s），自定义配置加载靠后，以你的值为准。').format(sum.others.join('、'));
 
-				notes.push(E('p', { 'style': 'color:' + (sum.shadowed ? '#b3261e' : '#a35a00') }, msg));
-				dom.content(self.applyResultBox, [ E('div', { 'class': 'alert-message', 'style': 'margin:6px 0' }, notes) ]);
+					notes.push(E('p', { 'style': 'color:' + (sum.shadowed ? '#b3261e' : '#a35a00') }, msg));
+				self.showApplyResult([ E('div', { 'class': 'alert-message', 'style': 'margin:6px 0' }, notes) ], 8000);
 			}).catch(function() {});
 		}).catch(function(e) {
 			errBox.textContent = '';
@@ -696,11 +698,44 @@ return view.extend({
 		});
 	},
 
+	/* Unified result-bar display: shows nodes, optional auto-hide after
+	 * autoHideMs (0 = stay until replaced). Re-calling resets the timer. */
+	showApplyResult: function(nodes, autoHideMs) {
+		if (this.applyResultTimer != null) {
+			window.clearTimeout(this.applyResultTimer);
+			this.applyResultTimer = null;
+		}
+
+		dom.content(this.applyResultBox, nodes);
+		this.applyResultBox.style.display = '';
+
+		if (autoHideMs > 0) {
+			var box = this.applyResultBox;
+
+			this.applyResultTimer = window.setTimeout(function() {
+				box.style.display = 'none';
+				dom.content(box, []);
+			}, autoHideMs);
+		}
+	},
+
+	hideApplyResult: function() {
+		if (this.applyResultTimer != null) {
+			window.clearTimeout(this.applyResultTimer);
+			this.applyResultTimer = null;
+		}
+
+		this.applyResultBox.style.display = 'none';
+		dom.content(this.applyResultBox, []);
+	},
+
 	applyConfig: function() {
 		var self = this;
 
-		dom.content(this.applyResultBox, [ E('p', { 'style': 'color:#777;padding:6px' }, _('正在应用全部配置，请稍候…')) ]);
-		this.applyResultBox.style.display = '';
+		this.showApplyResult([ E('p', { 'style': 'color:#777;padding:6px' }, _('正在应用全部配置，请稍候…')) ], 0);
+
+		if (this.applyResultBox.scrollIntoView)
+			this.applyResultBox.scrollIntoView({ block: 'nearest' });
 
 		return callApply().then(function(res) {
 			var errors = (res != null && res.errors != null) ? res.errors : [];
@@ -711,7 +746,8 @@ return view.extend({
 			}
 			else if (errors.length == 0) {
 				content = E('div', { 'class': 'alert-message', 'style': 'margin:6px 0' }, [
-					E('p', {}, _('全部配置已成功应用。'))
+					E('p', {}, _('全部配置已成功应用。')),
+					E('p', { 'style': 'color:#777;font-size:12px;margin:2px 0 0' }, _('（本提示将在数秒后自动消失）'))
 				]);
 			}
 			else {
@@ -751,10 +787,14 @@ return view.extend({
 				]);
 			}
 
-			dom.content(self.applyResultBox, [ content ]);
+			self.showApplyResult([ content ], (res != null && res.code == 0 && errors.length == 0) ? 4000 : 0);
+
+			if (self.applyResultBox.scrollIntoView)
+				self.applyResultBox.scrollIntoView({ block: 'nearest' });
+
 			self.reloadList();
 		}).catch(function(e) {
-			dom.content(self.applyResultBox, [ self.errorBox(_('应用失败：%s').format(e.message), self.backendErrorHint(e.message)) ]);
+			self.showApplyResult([ self.errorBox(_('应用失败：%s').format(e.message), self.backendErrorHint(e.message)) ], 0);
 		});
 	},
 

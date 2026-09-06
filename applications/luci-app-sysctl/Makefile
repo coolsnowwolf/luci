@@ -13,7 +13,7 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=luci-app-sysctl
-PKG_VERSION:=1.7.4
+PKG_VERSION:=1.7.6
 PKG_RELEASE:=1
 
 PKG_LICENSE:=Apache-2.0
@@ -25,8 +25,11 @@ LUCI_DESCRIPTION:=View live kernel parameters and manage custom sysctl entries \
  Supports browsing /proc/sys, searching parameters, one-click apply and \
  immediate runtime activation of single parameters.
 LUCI_DEPENDS:=+luci-base +rpcd +rpcd-mod-ucode
-LUCI_CONFFILES:=/etc/sysctl.d/99-luci-sysctl.conf
 LUCI_PKGARCH:=all
+
+define Package/luci-app-sysctl/conffiles
+/etc/sysctl.d/99-luci-sysctl.conf
+endef
 
 include $(TOPDIR)/feeds/luci/luci.mk
 
