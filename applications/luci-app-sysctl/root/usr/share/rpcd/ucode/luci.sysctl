@@ -791,8 +791,37 @@ const methods = {
 
 				out = strip_echo((out == null) ? '' : trim(out));
 
-				if (rc != 0 || length(out) > 0)
-					push(errors, { file: confs[i], code: rc, output: out });
+				/* busybox `sysctl -e -p` echoes every line and silently
+				 * swallows write failures -> echo alone proves nothing.
+				 * Read back each enabled entry from /proc/sys instead:
+				 * anything that differs was NOT accepted by the kernel. */
+				let not_applied = [];
+				let entries = parse_conf(confs[i]);
+
+				for (let j = 0; j < length(entries); j++) {
+					if (entries[j].disabled)
+						continue;
+
+					let cur = read_current(entries[j].key);
+
+					if (cur == null)
+						continue;   // key unknown to this kernel, -e skips it by design
+
+					if (cur != entries[j].value)
+						push(not_applied, {
+							key: entries[j].key,
+							value: entries[j].value,
+							current: cur
+						});
+				}
+
+				if (rc != 0 || length(out) > 0 || length(not_applied) > 0)
+					push(errors, {
+						file: confs[i],
+						code: rc,
+						output: out,
+						not_applied: not_applied
+					});
 			}
 
 			return { code: 0, errors: errors };

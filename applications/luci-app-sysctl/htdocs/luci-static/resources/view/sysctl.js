@@ -76,7 +76,8 @@ var LSC_CSS = [
 	'.lsc-root .cbi-button:hover { filter: brightness(1.06); }',
 	'.lsc-root h2, .lsc-root h3, .lsc-root h4, .lsc-root th, .lsc-root .lsc-badge, .lsc-root code, .lsc-root .lsc-muted, .lsc-root .cbi-section-descr, .lsc-root .lsc-card * { text-transform: none !important; }',
 	'.lsc-root .lsc-muted { color: #777; }',
-	'.lsc-root .cbi-page-actions { float: none !important; text-align: center !important; }'
+	'.lsc-root .cbi-page-actions { float: none !important; text-align: center !important; display: flex !important; flex-wrap: wrap; justify-content: center !important; align-items: center; gap: .5rem; }',
+	'.lsc-root .cbi-page-actions > br { display: none; }'
 ].join('\n');
 
 return view.extend({
@@ -619,6 +620,12 @@ return view.extend({
 			self.refreshCustomTable();
 			self.refreshPresetStatus();
 			self.refreshSourceChips();
+
+			/* re-render an open file panel so its "当前值" column reflects
+			 * the kernel state AFTER an apply/refresh (values were stale
+			 * otherwise, making applied settings look ineffective) */
+			if (self.fileViewPath != null)
+				self.renderFilePanel();
 		}).catch(function(e) {
 			ui.addNotification(null, E('p', {}, _('加载失败：%s').format(e.message)), 'error');
 		});
@@ -710,14 +717,36 @@ return view.extend({
 			else {
 				var items = [];
 
-				for (var i = 0; i < errors.length; i++)
-					items.push(E('li', {}, [
-						E('strong', {}, errors[i].file),
-						E('pre', { 'style': 'white-space:pre-wrap;margin:4px 0' }, errors[i].output || '')
-					]));
+				for (var i = 0; i < errors.length; i++) {
+					var er = errors[i];
+					var parts = [ E('strong', {}, er.file) ];
+
+					/* real command errors (permission denied etc.) */
+					if (er.output)
+						parts.push(E('pre', { 'style': 'white-space:pre-wrap;margin:4px 0' }, er.output));
+
+					/* kernel did not accept these values (echo was silent,
+					 * but read-back differs) */
+					if (er.not_applied != null && er.not_applied.length > 0) {
+						var naItems = [];
+
+						for (var j = 0; j < er.not_applied.length; j++) {
+							var na = er.not_applied[j];
+
+							naItems.push(E('li', {}, _('%s：写入 %s，内核当前 %s').format(
+								na.key, na.value, na.current)));
+						}
+
+						parts.push(E('p', { 'style': 'margin:4px 0' },
+							_('以下参数内核未接受（可能被限制、随后被覆盖或需要重启生效）：')));
+						parts.push(E('ul', { 'style': 'margin:2px 0' }, naItems));
+					}
+
+					items.push(E('li', {}, parts));
+				}
 
 				content = E('div', { 'class': 'alert-message warning', 'style': 'margin:6px 0' }, [
-					E('p', {}, _('应用完成，以下文件存在报错（常见原因：参数不存在、只读或权限不足）：')),
+					E('p', {}, _('应用完成，以下内容需要留意（常见原因：参数不存在、只读、被内核拒绝或被其他文件覆盖）：')),
 					E('ul', {}, items)
 				]);
 			}
