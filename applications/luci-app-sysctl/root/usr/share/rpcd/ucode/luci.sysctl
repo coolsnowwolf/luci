@@ -1,0 +1,1018 @@
+// SPDX-License-Identifier: Apache-2.0
+//
+// luci.sysctl - rpcd ucode plugin (rpcd-mod-ucode)
+//
+// Provides the ubus object "luci.sysctl" used by the LuCI application
+// "luci-app-sysctl" to view and manage kernel sysctl parameters.
+//
+// rpcd loads every regular file below /usr/share/rpcd/ucode/, executes it
+// with an embedded ucode VM and uses the value returned at the top level
+// as the ubus object signature:
+//
+//     { "object-name": { "method-name": { "args": {...}, "call": fn } } }
+//
+// Method callbacks receive a request object exposing "request.args" (the
+// ubus call arguments) and "request.info" (caller/ACL information). The
+// plain object returned by the callback is sent back as ubus reply.
+//
+// Methods:
+//   status()                          -> list of config files, sanity info
+//   list()                            -> custom + /etc/sysctl.conf entries
+//   browse(prefix)                    -> children of /proc/sys subtree
+//   search(query, limit)              -> substring search over all params
+//   set(key, value, disabled, apply)  -> upsert entry in 99-luci-sysctl.conf
+//   remove(key)                       -> delete entry from 99-luci-sysctl.conf
+//   apply()                           -> run "sysctl -e -p" over all confs
+//
+// Online preset (wholesale-managed /etc/sysctl.d/98-online-preset.conf):
+//   preset_status()                   -> imported preset state + entries
+//   preset_fetch(url, prefix)         -> download + parse + conflict check
+//   preset_import(url, prefix)        -> download + write 98-online-preset.conf
+//   preset_check()                    -> re-download and diff against current
+//   preset_remove()                   -> remove the preset file
+//   preset_list(url, prefix)          -> list .conf files in a github.com
+//                                        directory ("tree") URL
+//
+// Per-file viewing/editing of user-visible config sources:
+//   file_view(path)                   -> entries of one config file
+//   file_set(path, key, value, dis)   -> rewrite a single line in place
+//   file_delete(path, key)            -> remove matching lines
+//
+// Editable paths: /etc/sysctl.conf and /etc/sysctl.d/*.conf, EXCEPT the two
+// plugin-managed files (98-online-preset.conf, 99-luci-sysctl.conf) which
+// must be managed through their dedicated UI sections.
+
+'use strict';
+
+import { access, lsdir, popen, readfile, stat, unlink, writefile } from 'fs';
+
+const MAIN_CONF = '/etc/sysctl.conf';
+const SYSCTL_D = '/etc/sysctl.d';
+const CUSTOM_CONF = SYSCTL_D + '/99-luci-sysctl.conf';
+const PRESET_CONF = SYSCTL_D + '/98-online-preset.conf';
+const PROC_SYS = '/proc/sys';
+const SYSCTL_BIN = '/sbin/sysctl';
+
+// valid sysctl key: components of [A-Za-z0-9_-], joined by dots ("/" allowed
+// inside components as an alternative separator, as accepted by busybox sysctl)
+const KEY_RE = /^[A-Za-z0-9_][A-Za-z0-9_.\/-]*$/;
+
+function trim(s) {
+	if (s == null)
+		return s;
+
+	return replace(replace(s, /^[ \t\r\n]+/, ''), /[ \t\r\n]+$/, '');
+}
+
+// fs.access() returns true when the path exists and null otherwise;
+// coerce the result to a real boolean for API responses
+function path_exists(path) {
+	return (access(path) != null);
+}
+
+function shquote(s) {
+	return "'" + replace(s, /'/g, "'\\''") + "'";
+}
+
+// Map "net.ipv4.ip_forward" -> "/proc/sys/net/ipv4/ip_forward"
+// (note: ucode's join() takes the separator first)
+function proc_file(key) {
+	return PROC_SYS + '/' + join('/', split(key, '.'));
+}
+
+function read_current(key) {
+	let v = readfile(proc_file(key));
+	return (v == null) ? null : trim(v);
+}
+
+// Parse a sysctl configuration file into an array of entries.
+// A line of the form "# key = value" is treated as a disabled entry,
+// plain comments ("# ...") are skipped.
+function parse_conf(path) {
+	let entries = [];
+	let data = readfile(path);
+
+	if (data == null || length(data) == 0)
+		return entries;
+
+	let lines = split(data, '\n');
+
+	for (let i = 0; i < length(lines); i++) {
+		let line = trim(lines[i]);
+		let disabled = false;
+
+		if (line == null || length(line) == 0)
+			continue;
+
+		if (substr(line, 0, 1) == '#') {
+			let stripped = trim(substr(line, 1));
+
+			// only treat commented-out assignments as disabled entries
+			if (match(stripped, /^([A-Za-z0-9_][A-Za-z0-9_.\/-]*)[ \t]*=/) == null)
+				continue;
+
+			disabled = true;
+			line = stripped;
+		}
+
+		let m = match(line, /^([A-Za-z0-9_][A-Za-z0-9_.\/-]*)[ \t]*=[ \t]*(.*)$/);
+
+		if (m == null)
+			continue;
+
+		push(entries, {
+			key: m[1],
+			value: (m[2] != null) ? trim(m[2]) : '',
+			line: i + 1,
+			disabled: disabled
+		});
+	}
+
+	return entries;
+}
+
+function render_conf(entries) {
+	let buf = '# Custom kernel parameters managed by luci-app-sysctl.\n' +
+	          '# A line prefixed with "#" means the entry is disabled.\n\n';
+
+	for (let i = 0; i < length(entries); i++) {
+		let e = entries[i];
+
+		buf += (e.disabled ? '# ' : '') + e.key + ' = ' + e.value + '\n';
+	}
+
+	return buf;
+}
+
+// Merge live /proc/sys values into parsed entries
+function decorate(entries) {
+	let out = [];
+
+	for (let i = 0; i < length(entries); i++) {
+		let e = entries[i];
+		let cur = read_current(e.key);
+
+		push(out, {
+			key: e.key,
+			value: e.value,
+			line: e.line,
+			disabled: e.disabled,
+			exists: path_exists(proc_file(e.key)),
+			current: (e.disabled || cur == null) ? null : cur,
+			match: (e.disabled || cur == null) ? null : (cur == e.value)
+		});
+	}
+
+	return out;
+}
+
+// Config files in application order: /etc/sysctl.conf first,
+// then /etc/sysctl.d/*.conf in lexicographic order.
+function collect_confs() {
+	let paths = [];
+
+	if (access(MAIN_CONF))
+		push(paths, MAIN_CONF);
+
+	if (access(SYSCTL_D)) {
+		let names = sort(lsdir(SYSCTL_D) || []);
+
+		for (let i = 0; i < length(names); i++)
+			if (match(names[i], /\.conf$/) != null)
+				push(paths, SYSCTL_D + '/' + names[i]);
+	}
+
+	return paths;
+}
+
+// Recursively read all parameters below `dir` into `out` (key -> value)
+function walk(dir, prefix, out) {
+	let names = lsdir(dir);
+
+	if (names == null)
+		return;
+
+	names = sort(names);
+
+	for (let i = 0; i < length(names); i++) {
+		let name = names[i];
+		let full = dir + '/' + name;
+		let st = stat(full);
+
+		if (st == null)
+			continue;
+
+		if (st.type == 'directory') {
+			walk(full, prefix + name + '.', out);
+		}
+		else {
+			let v = readfile(full);
+			out[prefix + name] = (v == null) ? '' : trim(v);
+		}
+	}
+}
+
+// Write a value directly to /proc/sys, returning a status string on failure
+// or a boolean on success.
+function write_proc(key, value) {
+	let p = proc_file(key);
+
+	if (access(p) == null)
+		return 'missing';
+
+	if (writefile(p, value + '\n') == null)
+		return 'readonly';
+
+	return (read_current(key) == value);
+}
+
+// ------------------------- online preset helpers ---------------------------
+
+// Normalize a user-supplied URL: strip whitespace and convert a github.com
+// blob page URL to its raw.githubusercontent.com equivalent. Returns null
+// when the input is not a usable http(s) URL.
+function norm_url(url) {
+	url = trim(url);
+
+	if (url == null || length(url) == 0)
+		return null;
+
+	if (substr(url, 0, 8) != 'https://' && substr(url, 0, 7) != 'http://')
+		return null;
+
+	let m = match(url, /^https:\/\/github\.com\/([^\/]+)\/([^\/]+)\/blob\/(.+)$/);
+
+	if (m != null)
+		url = 'https://raw.githubusercontent.com/' + m[1] + '/' + m[2] + '/' + m[3];
+
+	return url;
+}
+
+// Prepend an optional mirror prefix (e.g. "gh-proxy.org"); the scheme is
+// auto-completed and a trailing slash is ensured.
+function apply_prefix(url, prefix) {
+	prefix = trim(prefix);
+
+	if (prefix == null || length(prefix) == 0)
+		return url;
+
+	if (substr(prefix, 0, 8) != 'https://' && substr(prefix, 0, 7) != 'http://')
+		prefix = 'https://' + prefix;
+
+	if (substr(prefix, length(prefix) - 1, 1) != '/')
+		prefix += '/';
+
+	return prefix + url;
+}
+
+// Download a URL using whichever fetcher is available on the target system.
+// Tries curl, then wget (busybox/uclient), then uclient-fetch. Returns the
+// response body or null when all attempts fail.
+function http_get(url) {
+	let cmds = [
+		'curl -fsSL --max-time 15 ' + shquote(url) + ' 2>/dev/null',
+		'wget -q -T 15 -O - ' + shquote(url) + ' 2>/dev/null',
+		'uclient-fetch -q -T 15 -O - ' + shquote(url) + ' 2>/dev/null'
+	];
+
+	for (let i = 0; i < length(cmds); i++) {
+		let p = popen(cmds[i], 'r');
+		let out = (p != null) ? p.read('all') : null;
+		let rc = (p != null) ? p.close() : -1;
+
+		if (rc == 0 && out != null && length(out) > 0)
+			return out;
+	}
+
+	return null;
+}
+
+// Parse downloaded preset content: comments/blank lines skipped, invalid
+// lines collected for reporting. Returns { params, invalid }.
+function parse_preset_content(data) {
+	let res = { params: [], invalid: [] };
+
+	if (data == null)
+		return res;
+
+	let stripped = trim(data);
+
+	// guard against HTML error pages
+	if (length(stripped) == 0 || substr(stripped, 0, 1) == '<')
+		return res;
+
+	let lines = split(data, '\n');
+
+	for (let i = 0; i < length(lines); i++) {
+		let line = trim(lines[i]);
+
+		if (line == null || length(line) == 0 || substr(line, 0, 1) == '#')
+			continue;
+
+		let m = match(line, /^([A-Za-z0-9_][A-Za-z0-9_.\/-]*)[ \t]*=[ \t]*(.*)$/);
+
+		if (m == null) {
+			push(res.invalid, line);
+			continue;
+		}
+
+		push(res.params, { key: m[1], value: (m[2] != null) ? trim(m[2]) : '' });
+	}
+
+	return res;
+}
+
+// Index of keys already defined elsewhere (used for conflict reporting);
+// the preset file itself is excluded.
+function existing_keys() {
+	let idx = {};
+	let confs = collect_confs();
+
+	for (let i = 0; i < length(confs); i++) {
+		let p = confs[i];
+
+		if (p == PRESET_CONF)
+			continue;
+
+		let entries = parse_conf(p);
+
+		for (let j = 0; j < length(entries); j++)
+			if (!entries[j].disabled && idx[entries[j].key] == null)
+				idx[entries[j].key] = p;
+	}
+
+	return idx;
+}
+
+// Read preset metadata recorded in the file header comments.
+function preset_meta() {
+	let data = readfile(PRESET_CONF);
+
+	if (data == null)
+		return { present: false };
+
+	let source = null;
+	let fetched = null;
+	let lines = split(data, '\n');
+
+	for (let i = 0; i < length(lines); i++) {
+		let line = trim(lines[i]);
+
+		if (line == null)
+			continue;
+
+		if (substr(line, 0, 10) == '# source: ')
+			source = trim(substr(line, 10));
+		else if (substr(line, 0, 11) == '# fetched: ')
+			fetched = trim(substr(line, 11));
+	}
+
+	let entries = parse_conf(PRESET_CONF);
+	let count = 0;
+
+	for (let i = 0; i < length(entries); i++)
+		if (!entries[i].disabled)
+			count++;
+
+	return { present: true, count: count, source: source, fetched: fetched };
+}
+
+function render_preset(url, params) {
+	let buf = '# Online preset managed by luci-app-sysctl\n' +
+	          '# source: ' + url + '\n' +
+	          '# fetched: ' + time() + '\n' +
+	          '# This file is replaced wholesale on update. To override a\n' +
+	          '# single entry, add it to 99-luci-sysctl.conf instead.\n\n';
+
+	for (let i = 0; i < length(params); i++)
+		buf += params[i].key + ' = ' + params[i].value + '\n';
+
+	return buf;
+}
+
+// Download + parse + conflict report, shared by fetch/import.
+function preset_download(url, prefix) {
+	let norm = norm_url(url);
+
+	if (norm == null)
+		return { code: 1, error: 'Invalid URL, expected an http(s) URL' };
+
+	let final_url = apply_prefix(norm, prefix);
+	let data = http_get(final_url);
+
+	if (data == null)
+		return { code: 2, error: 'Download failed: ' + final_url, url: final_url };
+
+	let parsed = parse_preset_content(data);
+
+	if (length(parsed.params) == 0)
+		return { code: 3, error: 'No valid sysctl entries found at ' + final_url, url: final_url, invalid: parsed.invalid };
+
+	let idx = existing_keys();
+	let conflicts = [];
+
+	for (let i = 0; i < length(parsed.params); i++) {
+		let k = parsed.params[i].key;
+
+		if (idx[k] != null)
+			push(conflicts, { key: k, file: idx[k] });
+	}
+
+	return { code: 0, url: final_url, parsed: parsed, conflicts: conflicts };
+}
+
+// ----------------------- per-file viewing/editing ---------------------------
+
+// Recognize a github.com directory ("tree") URL and convert it to the
+// matching GitHub contents API endpoint. Returns null when the URL is not
+// a tree URL (e.g. a plain file URL).
+//   https://github.com/u/r/tree/main/dir    -> .../contents/dir?ref=main
+// (note: ucode's regex engine has no non-capturing groups, so the branch
+// and the sub-path are split manually)
+function github_tree_to_api(url) {
+	let m = match(url, /^https:\/\/github\.com\/([^\/]+)\/([^\/]+)\/tree\/(.+)$/);
+
+	if (m == null)
+		return null;
+
+	let rest = m[3];
+	let slash = index(rest, '/');
+	let branch = (slash > 0) ? substr(rest, 0, slash) : rest;
+	let path = (slash > 0) ? substr(rest, slash + 1) : '';
+
+	let api = 'https://api.github.com/repos/' + m[1] + '/' + m[2] + '/contents';
+
+	if (length(path) > 0)
+		api += '/' + path;
+
+	return api + '?ref=' + branch;
+}
+
+// Whitelist of user-editable config sources. The plugin-managed files
+// (PRESET_CONF / CUSTOM_CONF) are deliberately excluded: they are managed
+// through their dedicated UI sections and rewriting them here would bypass
+// the plugin's own state.
+function editable_path(p) {
+	if (p == null || length(p) == 0)
+		return false;
+
+	if (p == MAIN_CONF)
+		return true;
+
+	if (p == CUSTOM_CONF || p == PRESET_CONF)
+		return false;
+
+	if (substr(p, 0, length(SYSCTL_D) + 1) == SYSCTL_D + '/') {
+		let base = substr(p, length(SYSCTL_D) + 1);
+
+		// plain filename only (no traversal), must end in .conf
+		if (match(base, /^[A-Za-z0-9_.-]+\.conf$/) != null)
+			return true;
+	}
+
+	return false;
+}
+
+// True when the raw line assigns `key` (enabled or commented-out form)
+function line_matches_key(raw, key) {
+	let t = trim(raw);
+
+	if (t == null || length(t) == 0)
+		return false;
+
+	if (substr(t, 0, 1) == '#') {
+		let m = match(trim(substr(t, 1)), /^([A-Za-z0-9_][A-Za-z0-9_.\/-]*)[ \t]*=/);
+		return (m != null && m[1] == key);
+	}
+
+	let m = match(t, /^([A-Za-z0-9_][A-Za-z0-9_.\/-]*)[ \t]*=/);
+	return (m != null && m[1] == key);
+}
+
+// Replace the first line assigning `key` with a new value, keeping every
+// other line (comments, ordering, formatting) untouched.
+function file_rewrite(path, key, value, disabled) {
+	let data = readfile(path);
+
+	if (data == null)
+		return { code: 2, error: 'Cannot read ' + path };
+
+	let lines = split(data, '\n');
+	let out = [];
+	let replaced = false;
+
+	for (let i = 0; i < length(lines); i++) {
+		let raw = lines[i];
+
+		if (!replaced && line_matches_key(raw, key)) {
+			push(out, (disabled ? '# ' : '') + key + ' = ' + value);
+			replaced = true;
+		}
+		else {
+			push(out, raw);
+		}
+	}
+
+	if (!replaced)
+		return { code: 3, error: 'Key not found in ' + path };
+
+	if (writefile(path, join('\n', out)) == null)
+		return { code: 4, error: 'Failed to write ' + path };
+
+	return { code: 0 };
+}
+
+// Remove all lines assigning `key` from the file.
+function file_delete_key(path, key) {
+	let data = readfile(path);
+
+	if (data == null)
+		return { code: 2, error: 'Cannot read ' + path };
+
+	let lines = split(data, '\n');
+	let out = [];
+	let removed = 0;
+
+	for (let i = 0; i < length(lines); i++) {
+		if (line_matches_key(lines[i], key))
+			removed++;
+		else
+			push(out, lines[i]);
+	}
+
+	if (removed == 0)
+		return { code: 3, error: 'Key not found in ' + path };
+
+	if (writefile(path, join('\n', out)) == null)
+		return { code: 4, error: 'Failed to write ' + path };
+
+	return { code: 0, removed: removed };
+}
+
+const methods = {
+	status: {
+		args: {},
+		call: function(request) {
+			let confs = collect_confs();
+			let files = [];
+
+			for (let i = 0; i < length(confs); i++) {
+				push(files, {
+					path: confs[i],
+					count: length(parse_conf(confs[i])),
+					managed: (confs[i] == CUSTOM_CONF)
+				});
+			}
+
+			return {
+				files: files,
+				custom_path: CUSTOM_CONF,
+				sysctl_bin: path_exists(SYSCTL_BIN),
+				initd: path_exists('/etc/init.d/sysctl')
+			};
+		}
+	},
+
+	list: {
+		args: {},
+		call: function(request) {
+			return {
+				custom: (access(CUSTOM_CONF)) ? decorate(parse_conf(CUSTOM_CONF)) : [],
+				main: (access(MAIN_CONF)) ? decorate(parse_conf(MAIN_CONF)) : []
+			};
+		}
+	},
+
+	browse: {
+		args: { prefix: '' },
+		call: function(request) {
+			let a = (request.args != null) ? request.args : {};
+			let prefix = (a.prefix != null) ? a.prefix : '';
+
+			if (prefix != '' && match(prefix, /^[A-Za-z0-9_]+([.][A-Za-z0-9_]+)*\.$/) == null)
+				return { code: 1, error: 'Invalid prefix', items: [] };
+
+			let dir = PROC_SYS;
+			let base = '';
+
+			if (prefix != '') {
+				base = prefix;
+				dir = PROC_SYS + '/' + join('/', split(substr(prefix, 0, length(prefix) - 1), '.'));
+			}
+
+			let names = sort(lsdir(dir) || []);
+			let items = [];
+
+			for (let i = 0; i < length(names); i++) {
+				let name = names[i];
+				let full = dir + '/' + name;
+				let st = stat(full);
+
+				if (st == null)
+					continue;
+
+				if (st.type == 'directory') {
+					push(items, { name: name, type: 'group', prefix: base + name + '.' });
+				}
+				else {
+					let v = readfile(full);
+
+					push(items, {
+						name: name,
+						type: 'param',
+						key: base + name,
+						value: (v == null) ? '' : trim(v)
+					});
+				}
+			}
+
+			return { items: items };
+		}
+	},
+
+	search: {
+		args: { query: '', limit: 100 },
+		call: function(request) {
+			let a = (request.args != null) ? request.args : {};
+			let q = (a.query != null) ? trim(a.query) : '';
+			let limit = 100;
+
+			if (a.limit != null) {
+				let n = int(a.limit, 100);
+
+				if (n > 0 && n <= 1000)
+					limit = n;
+			}
+
+			if (q == null || length(q) < 2)
+				return { items: [], truncated: false };
+
+			let all = {};
+			walk(PROC_SYS, '', all);
+
+			let ql = lc(q);
+			let keylist = sort(keys(all));
+			let items = [];
+			let truncated = false;
+
+			for (let i = 0; i < length(keylist); i++) {
+				let key = keylist[i];
+
+				// match on key name (>= 2 chars), or on value (>= 3 chars)
+				if (index(lc(key), ql) < 0 &&
+				    (length(q) < 3 || index(all[key], q) < 0))
+					continue;
+
+				push(items, { key: key, value: all[key] });
+
+				if (length(items) >= limit) {
+					truncated = true;
+					break;
+				}
+			}
+
+			return { items: items, truncated: truncated };
+		}
+	},
+
+	set: {
+		args: { key: '', value: '', disabled: false, apply: false },
+		call: function(request) {
+			let a = (request.args != null) ? request.args : {};
+			let key = trim(a.key);
+			let value = (a.value == null) ? '' : trim(a.value);
+			let disabled = (a.disabled == true);
+			let apply = (a.apply == true);
+
+			if (key == null || length(key) == 0 || match(key, KEY_RE) == null)
+				return { code: 1, error: 'Invalid key' };
+
+			if (match(value, /[\r\n]/) != null)
+				return { code: 1, error: 'Invalid value' };
+
+			let exists = path_exists(proc_file(key));
+			let entries = (access(CUSTOM_CONF)) ? parse_conf(CUSTOM_CONF) : [];
+			let found = false;
+
+			for (let i = 0; i < length(entries); i++) {
+				if (entries[i].key == key) {
+					entries[i].value = value;
+					entries[i].disabled = disabled;
+					found = true;
+					break;
+				}
+			}
+
+			if (!found)
+				push(entries, { key: key, value: value, line: 0, disabled: disabled });
+
+			if (writefile(CUSTOM_CONF, render_conf(entries)) == null)
+				return { code: 2, error: 'Failed to write ' + CUSTOM_CONF };
+
+			let applied = null;
+
+			if (apply && !disabled)
+				applied = write_proc(key, value);
+
+			return {
+				code: 0,
+				exists: exists,
+				applied: applied,
+				current: (apply && !disabled) ? read_current(key) : null
+			};
+		}
+	},
+
+	remove: {
+		args: { key: '' },
+		call: function(request) {
+			let a = (request.args != null) ? request.args : {};
+			let key = trim(a.key);
+
+			if (key == null || length(key) == 0)
+				return { code: 1, error: 'Missing key' };
+
+			let entries = (access(CUSTOM_CONF)) ? parse_conf(CUSTOM_CONF) : [];
+			let out = [];
+
+			for (let i = 0; i < length(entries); i++)
+				if (entries[i].key != key)
+					push(out, entries[i]);
+
+			if (length(out) == length(entries))
+				return { code: 3, error: 'Key not found in ' + CUSTOM_CONF };
+
+			if (writefile(CUSTOM_CONF, render_conf(out)) == null)
+				return { code: 2, error: 'Failed to write ' + CUSTOM_CONF };
+
+			return { code: 0 };
+		}
+	},
+
+	apply: {
+		args: {},
+		call: function(request) {
+			let confs = collect_confs();
+			let errors = [];
+
+			if (!path_exists(SYSCTL_BIN))
+				return { code: 4, error: 'sysctl binary not found', errors: errors };
+
+			for (let i = 0; i < length(confs); i++) {
+				let p = popen(SYSCTL_BIN + ' -e -p ' + shquote(confs[i]) + ' 2>&1', 'r');
+				let out = (p != null) ? p.read('all') : null;
+				let rc = (p != null) ? p.close() : -1;
+
+				out = (out == null) ? '' : trim(out);
+
+				if (rc != 0 || length(out) > 0)
+					push(errors, { file: confs[i], code: rc, output: out });
+			}
+
+			return { code: 0, errors: errors };
+		}
+	},
+
+	preset_status: {
+		args: {},
+		call: function(request) {
+			let meta = preset_meta();
+
+			return {
+				present: meta.present,
+				path: PRESET_CONF,
+				count: (meta.present) ? meta.count : 0,
+				source: meta.source,
+				fetched: meta.fetched,
+				params: (meta.present) ? decorate(parse_conf(PRESET_CONF)) : []
+			};
+		}
+	},
+
+	preset_fetch: {
+		args: { url: '', prefix: '' },
+		call: function(request) {
+			let a = (request.args != null) ? request.args : {};
+			let dl = preset_download(a.url, a.prefix);
+
+			if (dl.code != 0)
+				return { code: dl.code, error: dl.error, url: dl.url, invalid: dl.invalid };
+
+			return {
+				code: 0,
+				url: dl.url,
+				params: dl.parsed.params,
+				invalid: dl.parsed.invalid,
+				conflicts: dl.conflicts
+			};
+		}
+	},
+
+	preset_import: {
+		args: { url: '', prefix: '' },
+		call: function(request) {
+			let a = (request.args != null) ? request.args : {};
+			let dl = preset_download(a.url, a.prefix);
+
+			if (dl.code != 0)
+				return { code: dl.code, error: dl.error, url: dl.url, invalid: dl.invalid };
+
+			if (writefile(PRESET_CONF, render_preset(dl.url, dl.parsed.params)) == null)
+				return { code: 4, error: 'Failed to write ' + PRESET_CONF };
+
+			return {
+				code: 0,
+				count: length(dl.parsed.params),
+				path: PRESET_CONF,
+				url: dl.url
+			};
+		}
+	},
+
+	preset_check: {
+		args: {},
+		call: function(request) {
+			let meta = preset_meta();
+
+			if (!meta.present || meta.source == null)
+				return { code: 5, error: 'No online preset imported yet' };
+
+			let data = http_get(meta.source);
+
+			if (data == null)
+				return { code: 2, error: 'Download failed: ' + meta.source, url: meta.source };
+
+			let parsed = parse_preset_content(data);
+
+			if (length(parsed.params) == 0)
+				return { code: 3, error: 'No valid sysctl entries found at ' + meta.source, url: meta.source, invalid: parsed.invalid };
+
+			// remote state (last definition wins, order preserved)
+			let remote = {};
+			let order = [];
+
+			for (let i = 0; i < length(parsed.params); i++) {
+				if (remote[parsed.params[i].key] == null)
+					push(order, parsed.params[i].key);
+
+				remote[parsed.params[i].key] = parsed.params[i].value;
+			}
+
+			// local state (preset file contains no disabled entries)
+			let local = {};
+			let entries = parse_conf(PRESET_CONF);
+
+			for (let i = 0; i < length(entries); i++)
+				if (!entries[i].disabled)
+					local[entries[i].key] = entries[i].value;
+
+			let added = [];
+			let changed = [];
+			let removed = [];
+
+			for (let i = 0; i < length(order); i++) {
+				let k = order[i];
+
+				if (local[k] == null)
+					push(added, { key: k, value: remote[k] });
+				else if (local[k] != remote[k])
+					push(changed, { key: k, from: local[k], to: remote[k] });
+			}
+
+			let lkeys = sort(keys(local));
+
+			for (let i = 0; i < length(lkeys); i++)
+				if (remote[lkeys[i]] == null)
+					push(removed, { key: lkeys[i], old: local[lkeys[i]] });
+
+			return {
+				code: 0,
+				url: meta.source,
+				remote_count: length(parsed.params),
+				local_count: length(local),
+				added: added,
+				changed: changed,
+				removed: removed
+			};
+		}
+	},
+
+	preset_remove: {
+		args: {},
+		call: function(request) {
+			if (access(PRESET_CONF) == null)
+				return { code: 5, error: 'No online preset imported yet' };
+
+			if (!unlink(PRESET_CONF))
+				return { code: 4, error: 'Failed to remove ' + PRESET_CONF };
+
+			return { code: 0 };
+		}
+	},
+
+	preset_list: {
+		args: { url: '', prefix: '' },
+		call: function(request) {
+			let a = (request.args != null) ? request.args : {};
+			let url = (a.url != null) ? trim(a.url) : '';
+			let api = github_tree_to_api((url == null) ? '' : url);
+
+			// not a directory URL: caller falls back to single-file fetch
+			if (api == null)
+				return { code: 10, is_dir: false, files: [] };
+
+			let final_url = apply_prefix(api, a.prefix);
+			let data = http_get(final_url);
+
+			if (data == null)
+				return { code: 2, error: 'Directory listing failed: ' + final_url, url: final_url };
+
+			let doc = json(data);
+
+			if (doc == null || type(doc) != 'array')
+				return { code: 3, error: 'Unexpected directory listing from ' + final_url + ' (GitHub rate limit?)', url: final_url };
+
+			let files = [];
+
+			for (let i = 0; i < length(doc); i++) {
+				let item = doc[i];
+
+				if (item == null || item.type != 'file' || item.name == null)
+					continue;
+
+				if (match(item.name, /\.conf$/) == null)
+					continue;
+
+				push(files, {
+					name: item.name,
+					size: (item.size != null) ? item.size : 0,
+					url: (item.download_url != null) ? item.download_url : ''
+				});
+			}
+
+			if (length(files) == 0)
+				return { code: 3, error: 'Directory contains no .conf files: ' + final_url, url: final_url };
+
+			return { code: 0, is_dir: true, files: files, url: final_url };
+		}
+	},
+
+	file_view: {
+		args: { path: '' },
+		call: function(request) {
+			let a = (request.args != null) ? request.args : {};
+			let p = trim(a.path);
+
+			if (p == null || !editable_path(p))
+				return { code: 1, error: 'Path not allowed: ' + ((p != null) ? p : ''), editable: false };
+
+			return {
+				code: 0,
+				path: p,
+				editable: true,
+				entries: decorate(parse_conf(p))
+			};
+		}
+	},
+
+	file_set: {
+		args: { path: '', key: '', value: '', disabled: false },
+		call: function(request) {
+			let a = (request.args != null) ? request.args : {};
+			let p = trim(a.path);
+			let key = trim(a.key);
+			let value = (a.value == null) ? '' : trim(a.value);
+			let disabled = (a.disabled == true);
+
+			if (p == null || !editable_path(p))
+				return { code: 1, error: 'Path not allowed' };
+
+			if (key == null || match(key, KEY_RE) == null)
+				return { code: 1, error: 'Invalid key' };
+
+			if (match(value, /[\r\n]/) != null)
+				return { code: 1, error: 'Invalid value' };
+
+			return file_rewrite(p, key, value, disabled);
+		}
+	},
+
+	file_delete: {
+		args: { path: '', key: '' },
+		call: function(request) {
+			let a = (request.args != null) ? request.args : {};
+			let p = trim(a.path);
+			let key = trim(a.key);
+
+			if (p == null || !editable_path(p))
+				return { code: 1, error: 'Path not allowed' };
+
+			if (key == null || length(key) == 0)
+				return { code: 1, error: 'Invalid key' };
+
+			return file_delete_key(p, key);
+		}
+	}
+};
+
+return { 'luci.sysctl': methods };

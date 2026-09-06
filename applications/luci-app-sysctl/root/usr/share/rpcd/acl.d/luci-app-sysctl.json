@@ -1,0 +1,33 @@
+{
+	"luci-app-sysctl": {
+		"description": "Grant access to kernel sysctl parameters",
+		"read": {
+			"ubus": {
+				"luci.sysctl": [
+					"status",
+					"list",
+					"browse",
+					"search",
+					"preset_status",
+					"preset_fetch",
+					"preset_check",
+					"file_view",
+					"preset_list"
+				]
+			}
+		},
+		"write": {
+			"ubus": {
+				"luci.sysctl": [
+					"set",
+					"remove",
+					"apply",
+					"preset_import",
+					"preset_remove",
+					"file_set",
+					"file_delete"
+				]
+			}
+		}
+	}
+}
