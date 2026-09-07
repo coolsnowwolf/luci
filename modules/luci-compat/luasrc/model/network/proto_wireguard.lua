@@ -22,7 +22,8 @@ function proto.package_name(self)
 end
 
 function proto.is_installed(self)
-  return nixio.fs.access("/lib/netifd/proto/wireguard.sh")
+  return nixio.fs.access("/lib/netifd/proto/wireguard.uc") or
+         nixio.fs.access("/lib/netifd/proto/wireguard.sh")
 end
 
 function proto.is_floating(self)
