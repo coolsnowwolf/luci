@@ -9,7 +9,7 @@ LUCI_TITLE:=LuCI support for Time Control
 LUCI_DEPENDS:=+luci-base @(PACKAGE_firewall||PACKAGE_firewall4)
 LUCI_PKGARCH:=all
 PKG_VERSION:=1.1
-PKG_RELEASE:=1
+PKG_RELEASE:=3
 
 include ../../luci.mk
 

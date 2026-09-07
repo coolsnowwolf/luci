@@ -54,4 +54,9 @@ e.rmempty = true
 e = t:option(Flag, "z7", translate("Sunday"))
 e.rmempty = true
 
+a.apply_on_parse = true
+a.on_after_apply = function(self)
+	luci.sys.call("/etc/init.d/timecontrol reload >/dev/null 2>&1")
+end
+
 return a

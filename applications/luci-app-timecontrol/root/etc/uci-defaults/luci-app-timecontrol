@@ -17,12 +17,14 @@ fi
 
 uci -q commit firewall
 
-uci -q batch <<-EOF >/dev/null
-	delete ucitrack.@timecontrol[-1]
-	add ucitrack timecontrol
-	set ucitrack.@timecontrol[-1].init=timecontrol
-	commit ucitrack
-EOF
+[ -f "/etc/config/ucitrack" ] && {
+	uci -q batch <<-EOF >/dev/null
+		delete ucitrack.@timecontrol[-1]
+		add ucitrack timecontrol
+		set ucitrack.@timecontrol[-1].init=timecontrol
+		commit ucitrack
+	EOF
+}
 
 rm -rf /tmp/luci-*cache
 exit 0
