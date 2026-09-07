@@ -1196,7 +1196,7 @@ function gen_config(var)
 							format = format,
 							path = _type == "local" and w or nil,
 							url = _type == "remote" and w or nil,
-							http_client = _type == "remote" and "remote_http_client" or nil,
+							http_client = (_type == "remote" and version_ge_1_14_0) and "remote_http_client" or nil,
 							--update_interval = _type == "remote" and "1d" or nil,
 						}
 					end
@@ -2281,7 +2281,7 @@ function gen_config(var)
 			-- 实验性
 			experimental = experimental,
 			-- HTTP Client
-			http_clients = http_clients
+			http_clients = version_ge_1_14_0 and http_clients or nil,
 		}
 		table.insert(outbounds, {
 			type = "direct",
