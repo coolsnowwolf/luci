@@ -27,6 +27,13 @@ assert.equal(view.renderRate(lease,hints,rates,'upload')[0],400);
 assert.equal(view.renderRate(lease,hints,rates,'download')[0],600);
 assert.equal(view.renderRate(lease,hints,{},'upload')[1],'-');
 assert.deepEqual(view.clientAddresses({ipaddr:'invalid'}, {hosts:{}}),[]);
+const mac = 'AA:BB:CC:DD:EE:FF';
+const totals = {...rates, totals:{[mac]:123456}};
+assert.equal(view.rateValue(view.clientAddresses(lease,hints),totals,'total',mac)[0],123456);
+assert.equal(view.rateValue(['192.168.0.2'],totals,'total',mac)[0],123456);
+assert.equal(view.rateValue([],totals,'total',mac.toLowerCase())[0],123456);
+assert.equal(view.rateValue([],{},'total',mac)[1],'-');
+assert.equal(view.rateValue([], {totals:{[mac]:0}}, 'total',mac)[0],0);
 console.log('traffic UI: address normalization, no double-counting, directions and warm-up passed');
 
 (async () => {

@@ -58,6 +58,7 @@
 
 
 int rpc_luci_traffic_init(struct ubus_context *ctx);
+void rpc_luci_traffic_discover(void (*add)(int, const void *, const unsigned char *));
 
 static struct blob_buf blob;
 
@@ -1423,6 +1424,41 @@ out:
 
 	if (msg)
 		nlmsg_free(msg);
+}
+
+/* Discover accounting identities without DNS lookups or browser requests. */
+void rpc_luci_traffic_discover(void (*add)(int, const void *, const unsigned char *))
+{
+	struct reply_context rctx = {0};
+	struct host_hint *hint, *next;
+	struct host_hint_addr *addr, *anext;
+	struct lease_entry *lease;
+	avl_init(&rctx.avl, avl_strcmp, false, NULL);
+	rpc_luci_get_host_hints_nl(&rctx);
+	avl_for_each_element_safe(&rctx.avl, hint, avl, next) {
+		struct ether_addr *mac = ether_aton(hint->avl.key);
+		avl_for_each_element_safe(&hint->ipaddrs, addr, avl, anext) {
+			if (mac) add(AF_INET, &addr->addr.in, mac->ether_addr_octet);
+			avl_delete(&hint->ipaddrs, &addr->avl);
+			free(addr);
+		}
+		avl_for_each_element_safe(&hint->ip6addrs, addr, avl, anext) {
+			if (mac) add(AF_INET6, &addr->addr.in6, mac->ether_addr_octet);
+			avl_delete(&hint->ip6addrs, &addr->avl);
+			free(addr);
+		}
+		avl_delete(&rctx.avl, &hint->avl);
+		free(hint->hostname);
+		free(hint);
+	}
+	/* Current leases take precedence over stale neighbour cache entries. */
+	lease_open();
+	while ((lease = lease_next()) != NULL) {
+		if (lease->expire == 0 || ea_empty(&lease->mac)) continue;
+		for (int i = 0; i < lease->n_addr; i++)
+			add(lease->af, &lease->addr[i], lease->mac.ether_addr_octet);
+	}
+	lease_close();
 }
 
 static void

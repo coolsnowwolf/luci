@@ -1,6 +1,9 @@
 /* SPDX-License-Identifier: Apache-2.0 */
 #include <assert.h>
+#define STATE_FILE "/tmp/luci-client-traffic.test.state"
 #include "../src/traffic.c"
+
+void rpc_luci_traffic_discover(void (*add)(int, const void *, const unsigned char *)) {}
 
 static void put(struct nlmsghdr *msg, int type, const void *data, size_t len)
 {
@@ -74,6 +77,9 @@ static struct client *client(const char *ip)
 {
 	struct client *c = calloc(1, sizeof(*c));
 	assert(parse_address(ip, &c->address));
+	c->mac[0] = 2;
+	c->mac[5] = c->address.bytes[c->address.family == AF_INET ? 3 : 15];
+	get_host(c->mac, true);
 	c->avl.key = &c->address;
 	avl_insert(&clients, &c->avl);
 	return c;
@@ -83,11 +89,14 @@ int main(void)
 {
 	avl_init(&clients, address_cmp, false, NULL);
 	avl_init(&flows, flow_cmp, false, NULL);
+	avl_init(&hosts, mac_cmp, false, NULL);
+	started = now_ms();
 	struct client *a = client("192.168.0.100"), *b = client("192.168.0.101"), *v6 = client("fd00::2");
 	feed(AF_INET, "192.168.0.100", "8.8.8.8", "8.8.8.8", 1, 1000, 2000, false);
 	assert(a->bytes[0] == 0 && a->bytes[1] == 0); /* First sample is a baseline. */
 	finish_dump();
 	assert(a->warm && !a->ready);
+	assert(get_host(a->mac, false)->total[0] == 0);
 	generation++;
 	feed(AF_INET, "192.168.0.100", "8.8.8.8", "8.8.8.8", 1, 3000, 7000, false);
 	assert(a->bytes[0] == 2000 && a->bytes[1] == 5000);
@@ -128,11 +137,45 @@ int main(void)
 	update_rate(&rolling, 2000);
 	assert(rolling.rate[0] == 1000);
 
+	/* Total bytes use exact deltas, never the rolling average. */
+	struct host *ha = get_host(a->mac, false);
+	assert(ha->total[0] == 2080 && ha->total[1] == 5200);
+	uint64_t before = ha->total[0] + ha->total[1];
+	save_state();
+	struct client *c, *cn;
+	struct host *h, *hn;
+	clear_flows();
+	avl_for_each_element_safe(&clients, c, avl, cn) { avl_delete(&clients, &c->avl); free(c); }
+	avl_for_each_element_safe(&hosts, h, avl, hn) { avl_delete(&hosts, &h->avl); free(h); }
+	load_state();
+	struct address address;
+	parse_address("192.168.0.100", &address);
+	a = avl_find_element(&clients, &address, a, avl);
+	assert(a && !a->warm);
+	ha = get_host(a->mac, false);
+	assert(ha->total[0] + ha->total[1] == before);
+	/* Restored baselines only count the increment across an rpcd reload. */
+	feed(AF_INET, "192.168.0.100", "8.8.8.8", "8.8.8.8", 1, 120, 230, false);
+	assert(ha->total[0] + ha->total[1] == before + 300);
+	/* An IP reassignment must not transfer the old connection to a new MAC. */
+	unsigned char newmac[6] = {2, 1, 2, 3, 4, 5};
+	bind_client(AF_INET, address.bytes, newmac);
+	feed(AF_INET, "192.168.0.100", "8.8.8.8", "8.8.8.8", 1, 220, 330, false);
+	assert(ha->total[0] + ha->total[1] == before + 500);
+	assert(get_host(newmac, false)->total[0] == 0);
+	/* Recovery preserves totals and the flow baselines, preventing replay. */
 	reset_sampler("test_overrun");
-	assert(!a->ready && !a->warm && flows.count == 0);
-	last_request = now_ms() - IDLE_MS - 1;
+	assert(!a->ready && !a->warm && flows.count > 0);
+	feed(AF_INET, "192.168.0.100", "8.8.8.8", "8.8.8.8", 1, 220, 330, false);
+	assert(ha->total[0] + ha->total[1] == before + 500);
+	/* Collection is scheduled even when no browser has ever requested data. */
+	uloop_init();
 	sample_timer(&timer);
-	assert(ct_fd.fd == -1 && clients.count == 0 && flows.count == 0);
-	puts("traffic: NAT, IPv6, baseline, short flows, reset, rolling window and rate checks passed");
+	assert(timer.pending);
+	uloop_timeout_cancel(&timer);
+	reset_sampler("test_end");
+	uloop_done();
+	unlink(STATE_FILE);
+	puts("traffic: NAT, IPv6, rolling rates, exact totals, restart recovery, IP reassignment and continuous sampling passed");
 	return 0;
 }

@@ -14154,3 +14154,7 @@ msgstr "下载总带宽"
 #: modules/luci-mod-status/htdocs/luci-static/resources/view/status/include/30_network.js
 msgid "Total upload bandwidth"
 msgstr "上传总带宽"
+
+#: modules/luci-mod-status/htdocs/luci-static/resources/view/status/include/40_dhcp.js
+msgid "Total traffic"
+msgstr "总流量"
