@@ -57,6 +57,8 @@
 #endif
 
 
+int rpc_luci_traffic_init(struct ubus_context *ctx);
+
 static struct blob_buf blob;
 
 struct reply_context {
@@ -2049,7 +2051,10 @@ rpc_luci_api_init(const struct rpc_daemon_ops *o, struct ubus_context *ctx)
 		.n_methods = ARRAY_SIZE(luci_methods),
 	};
 
-	return ubus_add_object(ctx, &obj);
+	int ret = ubus_add_object(ctx, &obj);
+	if (!ret)
+		ret = rpc_luci_traffic_init(ctx);
+	return ret;
 }
 
 struct rpc_plugin rpc_plugin = {

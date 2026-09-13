@@ -4,6 +4,7 @@
 'require uci';
 'require network';
 'require validation';
+'require poll';
 
 const callLuciDHCPLeases = rpc.declare({
 	object: 'luci-rpc',
@@ -11,6 +12,13 @@ const callLuciDHCPLeases = rpc.declare({
 	expect: { '': {} }
 });
  
+const callClientRates = rpc.declare({
+	object: 'luci.client-rates',
+	method: 'get',
+	params: [ 'addresses' ],
+	expect: { '': {} }
+});
+
 const callUfpList = rpc.declare({
 	object: 'fingerprint',
 	method: 'fingerprint',
@@ -50,6 +58,64 @@ return baseclass.extend({
 	isDUIDStatic: {},
 	isDUIDIAIDStatic: {},
 
+	normalizeRateAddress(ip) {
+		ip = ip.replace(/\/\d+$/, '');
+		const v4 = validation.parseIPv4(ip);
+		if (v4)
+			return v4.join('.');
+		const v6 = validation.parseIPv6(ip);
+		return v6 ? v6.map(word => word.toString(16)).join(':') : null;
+	},
+
+	clientAddresses(lease, hints) {
+		const host = hints.hosts?.[lease.macaddr?.toUpperCase()] || {};
+		return Array.from(new Set([
+			lease.ipaddr, lease.ip6addr, ...L.toArray(lease.ip6addrs),
+			...L.toArray(host.ipaddrs || host.ipv4), ...L.toArray(host.ip6addrs || host.ipv6)
+		].filter(Boolean).map(ip => this.normalizeRateAddress(ip)).filter(Boolean)));
+	},
+
+	renderRate(lease, hints, data, direction) {
+		return this.rateValue(this.clientAddresses(lease, hints), data, direction);
+	},
+
+	rateValue(addresses, data, direction) {
+		let total = 0;
+		for (const ip of addresses) {
+			const rate = data?.rates?.[ip];
+			if (!rate?.ready)
+				return [ -1, '-' ];
+			total += Number(rate[direction] || 0);
+		}
+		return addresses.length ? [ total, '%1024.1mB/s'.format(total) ] : [ -1, '-' ];
+	},
+
+	rateCell(lease, hints, direction) {
+		const addresses = this.clientAddresses(lease, hints);
+		const value = this.rateValue(addresses, this.rateData, direction);
+		return [ value[0], E('span', {
+			'class': 'luci-client-rate',
+			'data-addresses': JSON.stringify(addresses),
+			'data-direction': direction
+		}, value[1]) ];
+	},
+
+	refreshRates() {
+		const cells = Array.from(document.querySelectorAll('.luci-client-rate'));
+		const addresses = Array.from(new Set(cells.flatMap(cell => JSON.parse(cell.dataset.addresses))));
+		if (!addresses.length)
+			return Promise.resolve();
+		return L.resolveDefault(callClientRates(addresses.slice(0, 1024)), {}).then(data => {
+			this.rateData = data;
+			// Query again: the normal overview refresh may have replaced the rows.
+			document.querySelectorAll('.luci-client-rate').forEach(cell => {
+				const value = this.rateValue(JSON.parse(cell.dataset.addresses), data, cell.dataset.direction);
+				cell.textContent = value[1];
+				cell.closest('td')?.setAttribute('data-value', value[0]);
+			});
+		});
+	},
+
 	load() {
 		return Promise.all([
 			callLuciDHCPLeases(),
@@ -60,6 +126,10 @@ return baseclass.extend({
 	},
 
 	render([dhcp_leases, host_hints, ufp_list]) {
+		if (!this.ratePoll) {
+			this.ratePoll = L.bind(this.refreshRates, this);
+			poll.add(this.ratePoll, 2);
+		}
 		if (L.hasSystemFeature('dnsmasq') || L.hasSystemFeature('odhcpd'))
 			return this.renderLeases(dhcp_leases, host_hints, ufp_list);
 
@@ -137,8 +207,8 @@ return baseclass.extend({
 				E('th', { 'class': 'th', 'style': 'text-align:left' }, _('Hostname')),
 				E('th', { 'class': 'th' }, _('IPv4 address')),
 				E('th', { 'class': 'th' }, _('MAC address')),
-				E('th', { 'class': 'th' }, _('DUID')),
-				E('th', { 'class': 'th' }, _('IAID')),
+				E('th', { 'class': 'th' }, _('Upload')),
+				E('th', { 'class': 'th' }, _('Download')),
 				E('th', { 'class': 'th' }, _('Remaining time')),
 				isReadonlyView ? E([]) : E('th', { 'class': 'th cbi-section-actions' }, _('Static Lease'))
 			])
@@ -170,8 +240,8 @@ return baseclass.extend({
 				this.renderHostname(host, lease.macaddr),
 				lease.ipaddr,
 				vendor ? lease.macaddr + ` (${vendor})` : lease.macaddr,
-				lease.duid || '-',
-				lease.iaid || '-',
+				this.rateCell(lease, host_hints, 'upload'),
+				this.rateCell(lease, host_hints, 'download'),
 				exp,
 			];
 
@@ -195,8 +265,8 @@ return baseclass.extend({
 				L.hasSystemFeature('odhcpd', 'dhcpv6') ? E('th', { 'class': 'th' }, _('Interface')) : E([]),
 				E('th', { 'class': 'th', 'style': 'text-align:left' }, _('Hostname')),
 				E('th', { 'class': 'th' }, _('IPv6 addresses')),
-				E('th', { 'class': 'th' }, _('DUID')),
-				E('th', { 'class': 'th' }, _('IAID')),
+				E('th', { 'class': 'th' }, _('Upload')),
+				E('th', { 'class': 'th' }, _('Download')),
 				E('th', { 'class': 'th' }, _('Remaining time')),
 				isReadonlyView ? E([]) : E('th', { 'class': 'th cbi-section-actions' }, _('Static Lease'))
 			])
@@ -237,8 +307,8 @@ return baseclass.extend({
 			const columns = [
 				this.renderHostname(host, lease.macaddr),
 				lease.ip6addrs ? lease.ip6addrs.join('<br />') : lease.ip6addr,
-				duid || '-',
-				iaid || '-',
+				this.rateCell(lease, host_hints, 'upload'),
+				this.rateCell(lease, host_hints, 'download'),
 				exp
 			];
 

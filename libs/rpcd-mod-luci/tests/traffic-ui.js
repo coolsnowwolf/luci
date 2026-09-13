@@ -1,0 +1,60 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+const assert = require('assert');
+const fs = require('fs');
+const path = require('path');
+const luci = path.resolve(__dirname, '../../..');
+const baseclass = { extend: o => o };
+const validation = new Function('baseclass', fs.readFileSync(path.join(luci, 'modules/luci-base/htdocs/luci-static/resources/validation.js'), 'utf8'))(baseclass);
+const source = fs.readFileSync(path.join(luci, 'modules/luci-mod-status/htdocs/luci-static/resources/view/status/include/40_dhcp.js'), 'utf8');
+const L = { bind: (fn, ctx) => fn.bind(ctx), hasSystemFeature: () => false, resolveDefault: (p, fallback) => Promise.resolve(p).catch(() => fallback), toArray: x => x == null ? [] : Array.isArray(x) ? x : [x] };
+let cells = [], calls = 0, polls = [], reply;
+const document = {querySelectorAll: () => cells};
+const poll = {add: (fn, interval) => polls.push({fn, interval})};
+const rpc = {declare: spec => addresses => {
+ assert.equal(spec.object, 'luci.client-rates');
+ assert.deepEqual(addresses, ['192.168.0.2']);
+ calls++;
+ return reply;
+}};
+const view = new Function('baseclass','rpc','L','_','validation','poll','document', source)(baseclass, rpc, L, s=>s, validation, poll, document);
+// Formatting is supplied by LuCI; check its numeric sorting key separately.
+String.prototype.format = function(value) { return String(value) + ' B/s'; };
+const lease = {ipaddr:'192.168.0.2', macaddr:'aa:bb:cc:dd:ee:ff',ip6addrs:['2001:db8::2/128']};
+const hints = {hosts: {'AA:BB:CC:DD:EE:FF':{ipaddrs:['192.168.0.2'],ip6addrs:['2001:0db8:0:0:0:0:0:2']}}};
+assert.deepEqual(view.clientAddresses(lease,hints), ['192.168.0.2','2001:db8:0:0:0:0:0:2']);
+const rates={rates:{'192.168.0.2':{ready:true,upload:100,download:200},'2001:db8:0:0:0:0:0:2':{ready:true,upload:300,download:400}}};
+assert.equal(view.renderRate(lease,hints,rates,'upload')[0],400);
+assert.equal(view.renderRate(lease,hints,rates,'download')[0],600);
+assert.equal(view.renderRate(lease,hints,{},'upload')[1],'-');
+assert.deepEqual(view.clientAddresses({ipaddr:'invalid'}, {hosts:{}}),[]);
+console.log('traffic UI: address normalization, no double-counting, directions and warm-up passed');
+
+(async () => {
+ view.render([{}, {}]);
+ view.render([{}, {}]);
+ assert.equal(polls.length, 1);
+ assert.equal(polls[0].interval, 2);
+ await view.refreshRates();
+ assert.equal(calls, 0); // No mounted table means no background requests.
+ function cell(direction) {
+  return {dataset:{addresses:'["192.168.0.2"]', direction},
+   closest() {return {setAttribute: (name, value) => {this.sort = value;}};}};
+ }
+ cells = [cell('upload'), cell('download')];
+ reply = new Promise(resolve => {global.resolveRates = resolve;});
+ const pending = view.refreshRates();
+ // Simulate the normal status poll replacing the table during the RPC.
+ const oldCells = cells;
+ cells = [cell('upload'), cell('download')];
+ global.resolveRates({rates:{'192.168.0.2':{ready:true,upload:100,download:200}}});
+ await pending;
+ assert.equal(calls, 1);
+ assert.equal(cells[0].textContent, '100 B/s');
+ assert.equal(cells[1].sort, 200);
+ assert.equal(oldCells[0].textContent, undefined);
+ reply = Promise.reject(new Error('unavailable'));
+ await view.refreshRates();
+ assert.equal(cells[0].textContent, '-');
+ assert.equal(cells[0].sort, -1);
+ console.log('traffic UI: independent polling, deduplication, row replacement and error fallback passed');
+})().catch(e => {console.error(e); process.exitCode = 1;});

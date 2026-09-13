@@ -16,7 +16,7 @@ IF (NOT DEFINED LIBNL_LIBS)
   SET(LIBNL_LIBS ${libnl})
 ENDIF()
 
-ADD_LIBRARY(rpcd-mod-luci MODULE luci.c)
+ADD_LIBRARY(rpcd-mod-luci MODULE luci.c traffic.c)
 TARGET_LINK_LIBRARIES(rpcd-mod-luci ubox ubus uci dl ${LIBNL_LIBS})
 SET_TARGET_PROPERTIES(rpcd-mod-luci PROPERTIES OUTPUT_NAME luci PREFIX "")
 

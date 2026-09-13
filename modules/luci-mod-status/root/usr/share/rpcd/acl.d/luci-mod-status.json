@@ -8,6 +8,7 @@
 			"ubus": {
 				"luci": [ "getConntrackList", "getRealtimeStats", "getCPUBench", "getCPUUsage", "getOnlineUsers" ],
 				"luci-rpc": [ "getHostHints", "getNetworkDevices", "getDHCPLeases" ],
+				"luci.client-rates": [ "get" ],
 				"network.rrdns": [ "lookup" ]
 			}
 		}
