@@ -1,0 +1,38 @@
+{
+	"luci-app-easytier": {
+		"description": "Allow user access to EasyTier",
+		"read": {
+			"ubus": {
+				"easytier": [
+					"get_status",
+					"get_peers",
+					"get_topology",
+					"get_config",
+					"get_logs",
+					"get_subroutes",
+					"get_web_status",
+					"get_version_info"
+				]
+			},
+			"uci": [ "easytier" ],
+			"file": {
+				"/etc/easytier/config.toml": [ "read" ]
+			}
+		},
+		"write": {
+			"ubus": {
+				"easytier": [
+					"set_config",
+					"clear_logs",
+					"service_action",
+					"toggle_service",
+					"reset_web_db"
+				]
+			},
+			"uci": [ "easytier" ],
+			"file": {
+				"/etc/easytier/config.toml": [ "write" ]
+			}
+		}
+	}
+}
