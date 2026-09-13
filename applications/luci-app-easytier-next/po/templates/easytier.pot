@@ -1,0 +1,383 @@
+msgid "(Drag to pan, scroll to zoom)"
+msgstr ""
+
+msgid "50 ~ 150ms (Good)"
+msgstr ""
+
+msgid "< 50ms (Optimal)"
+msgstr ""
+
+msgid "> 150ms (Fair)"
+msgstr ""
+
+msgid "Absolute path to the TOML configuration file (Corresponding flag: -c, --config-file). Ensure the file exists with valid EasyTier configuration."
+msgstr ""
+
+msgid "Action"
+msgstr ""
+
+msgid "Additional command-line parameters appended to easytier-core."
+msgstr ""
+
+msgid "Advanced Options"
+msgstr ""
+
+msgid "Allow WAN Access"
+msgstr ""
+
+msgid "Allow other peers in the network to route their Internet traffic through this node (Corresponding flag: --enable-exit-node)."
+msgstr ""
+
+msgid "Allow resolving peer node domain names (such as hostname.et.net) without memorizing virtual IP addresses (Corresponding flag: --accept-dns). Automatically forwards DNS queries via dnsmasq. Note: If third-party DNS tools (e.g. MosDNS, AdGuard Home, SmartDNS) are active, ensure this domain zone is excluded from hijacking."
+msgstr ""
+
+msgid "Automatically determine and assign a virtual IP address (Corresponding flag: -d, --dhcp)."
+msgstr ""
+
+msgid "Automatically open and manage firewall traffic rules on WAN zone to allow incoming connections for external peers."
+msgstr ""
+
+msgid "Clear Logs"
+msgstr ""
+
+msgid "Client Version"
+msgstr ""
+
+msgid "Cloud Web Config"
+msgstr ""
+
+msgid "Collecting data ..."
+msgstr ""
+
+msgid "Collecting logs..."
+msgstr ""
+
+msgid "Command-line"
+msgstr ""
+
+msgid "Configuration File"
+msgstr ""
+
+msgid "Configuration File Path"
+msgstr ""
+
+msgid "Connected Peer Nodes"
+msgstr ""
+
+msgid "Core Service Status"
+msgstr ""
+
+msgid "Core Settings"
+msgstr ""
+
+msgid "Cost"
+msgstr ""
+
+msgid "Custom Command Parameters"
+msgstr ""
+
+msgid "Directory to store SQLite database for easytier-web."
+msgstr ""
+
+msgid "EasyTier"
+msgstr ""
+
+msgid "EasyTier is a simple, secure, decentralized mesh VPN for intranet penetration, implemented in Rust."
+msgstr ""
+
+msgid "Enable Core Service"
+msgstr ""
+
+msgid "Enable DHCP IP Allocation"
+msgstr ""
+
+msgid "Enable Exit Node"
+msgstr ""
+
+msgid "Enable Magic DNS"
+msgstr ""
+
+msgid "Enable Tunnel Traffic SNAT"
+msgstr ""
+
+msgid "Enable Web Console Service"
+msgstr ""
+
+msgid "Enable multi-threaded packet processing for higher throughput (Corresponding flag: --multi-thread)."
+msgstr ""
+
+msgid "Encryption Algorithm"
+msgstr ""
+
+msgid "Failed to load logs: %s"
+msgstr ""
+
+msgid "Failed to load peers: %s"
+msgstr ""
+
+msgid "Failed to load topology: %s"
+msgstr ""
+
+msgid "HTTP listen port for easytier-web embedded web dashboard."
+msgstr ""
+
+msgid "Hostname"
+msgstr ""
+
+msgid "Initial connection peer node URLs (Corresponding flag: -p, --peers)."
+msgstr ""
+
+msgid "Interface IPv4 Address"
+msgstr ""
+
+msgid "Interface IPv6 Address"
+msgstr ""
+
+msgid "Invalid URL format, must start with tcp://, udp://, ws://, wss://, wg://, or quic://"
+msgstr ""
+
+msgid "Invalid UUID format (e.g. %s)"
+msgstr ""
+
+msgid "Invalid username format, only letters, digits, and _ - . @ are allowed."
+msgstr ""
+
+msgid "Latency"
+msgstr ""
+
+msgid "Local Node Information"
+msgstr ""
+
+msgid "Local service is not running."
+msgstr ""
+
+msgid "Log Actions"
+msgstr ""
+
+msgid "Logs"
+msgstr ""
+
+msgid "Logs cleared."
+msgstr ""
+
+msgid "Loss Rate"
+msgstr ""
+
+msgid "Machine ID (UUID)"
+msgstr ""
+
+msgid "Magic DNS Domain Zone"
+msgstr ""
+
+msgid "Multi-threaded Mode"
+msgstr ""
+
+msgid "NAT Type"
+msgstr ""
+
+msgid "Network Name"
+msgstr ""
+
+msgid "Network Secret"
+msgstr ""
+
+msgid "Network Topology"
+msgstr ""
+
+msgid "No connected remote peers found."
+msgstr ""
+
+msgid "No logs available."
+msgstr ""
+
+msgid "No topology data available."
+msgstr ""
+
+msgid "None"
+msgstr ""
+
+msgid "Not Installed"
+msgstr ""
+
+msgid "Open Console"
+msgstr ""
+
+msgid "Peer Nodes"
+msgstr ""
+
+msgid "Port for local CLI and RPC management portal (Corresponding flag: --rpc-portal)."
+msgstr ""
+
+msgid "Proxy Network"
+msgstr ""
+
+msgid "Proxy Networks"
+msgstr ""
+
+msgid "Public Discovery Node"
+msgstr ""
+
+msgid "Public discovery node URL (Corresponding flag: -e, --external-node)."
+msgstr ""
+
+msgid "RPC Management Port"
+msgstr ""
+
+msgid "RX"
+msgstr ""
+
+msgid "Refresh"
+msgstr ""
+
+msgid "Refresh Logs"
+msgstr ""
+
+msgid "Refresh Topology"
+msgstr ""
+
+msgid "Remote web configuration server address or username (Corresponding flag: -w, --web-config). Supports complete URL (e.g. udp://127.0.0.1:22020/admin) or username only (e.g. admin, connecting to official cloud server)."
+msgstr ""
+
+msgid "Reset View"
+msgstr ""
+
+msgid "Restart"
+msgstr ""
+
+msgid "Restarting service..."
+msgstr ""
+
+msgid "Running"
+msgstr ""
+
+msgid "Running (Unmanaged)"
+msgstr ""
+
+msgid "Service Status"
+msgstr ""
+
+msgid "Settings"
+msgstr ""
+
+msgid "Specify the top-level domain zone for Magic DNS (Corresponding flag: --tld-dns-zone). Default is et.net. (FQDN ending with dot)."
+msgstr ""
+
+msgid "Startup Method"
+msgstr ""
+
+msgid "Stopped"
+msgstr ""
+
+msgid "Subnet CIDRs to proxy and announce through this node (Corresponding flag: -n, --proxy-networks). Select from the detected local subnets below or enter custom CIDRs."
+msgstr ""
+
+msgid "TUN Device Name"
+msgstr ""
+
+msgid "TX"
+msgstr ""
+
+msgid "The VPN network name to identify this virtual network (Corresponding flag: --network-name)."
+msgstr ""
+
+msgid "The secret phrase used to authorize and encrypt traffic (Corresponding flag: --network-secret)."
+msgstr ""
+
+msgid "The static IPv4 address of this node (Corresponding flag: -i, --ipv4). Ignored when DHCP is enabled."
+msgstr ""
+
+msgid "The static IPv6 address of this node (Corresponding flag: --ipv6)."
+msgstr ""
+
+msgid "The web console may consume significant memory, please enable as needed."
+msgstr ""
+
+msgid "Topology Actions"
+msgstr ""
+
+msgid "Tunnel"
+msgstr ""
+
+msgid "Unique device identifier UUID in the cloud management console (Corresponding flag: --machine-id). Automatically generated on initial install. Changing UUID will automatically clear local cloud cache."
+msgstr ""
+
+msgid "Use OpenWrt system firewall to manage NAT for EasyTier tunnel and subnet traffic. Disabling this option disables source address masquerading to preserve real source IPs of remote peers and subnets in the local network."
+msgstr ""
+
+msgid "Version"
+msgstr ""
+
+msgid "Virtual IP"
+msgstr ""
+
+msgid "Virtual Interface"
+msgstr ""
+
+msgid "Virtual TUN network interface name (Corresponding flag: --dev-name)."
+msgstr ""
+
+msgid "Web Config Server URL"
+msgstr ""
+
+msgid "Web Config Server URL cannot be empty."
+msgstr ""
+
+msgid "Web Console"
+msgstr ""
+
+msgid "Web Console Port"
+msgstr ""
+
+msgid "Web Console Status"
+msgstr ""
+
+msgid "Web Data Directory"
+msgstr ""
+
+msgid "Zoom In"
+msgstr ""
+
+msgid "Zoom Out"
+msgstr ""
+
+msgid "Reset Layout"
+msgstr ""
+
+msgid "(Hover to highlight link, drag nodes/canvas to adjust)"
+msgstr ""
+
+msgid "All Links"
+msgstr ""
+
+msgid "Local Only"
+msgstr ""
+
+msgid "Show All Peer Links"
+msgstr ""
+
+msgid "Show Local Links Only"
+msgstr ""
+
+msgid "Next Hop: %s (%s)"
+msgstr ""
+
+msgid "Next Hop: %s"
+msgstr ""
+
+msgid "Latency / Loss"
+msgstr ""
+
+msgid "RX / TX"
+msgstr ""
+
+msgid "(Hover/click node to trace path, drag to adjust)"
+msgstr ""
+
+msgid "Clear selection"
+msgstr ""
+
+msgid "Local Node: %s"
+msgstr ""
+
+msgid "Path"
+msgstr ""

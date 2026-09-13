@@ -1,0 +1,13 @@
+{
+	"admin/vpn/easytier": {
+		"title": "EasyTier",
+		"order": 92,
+		"action": {
+			"type": "view",
+			"path": "easytier/main"
+		},
+		"depends": {
+			"acl": [ "luci-app-easytier" ]
+		}
+	}
+}

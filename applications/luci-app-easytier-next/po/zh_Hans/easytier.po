@@ -1,0 +1,383 @@
+msgid "(Drag to pan, scroll to zoom)"
+msgstr "（支持拖拽画布平移，滚轮缩放视图）"
+
+msgid "50 ~ 150ms (Good)"
+msgstr "50 ~ 150ms (良)"
+
+msgid "< 50ms (Optimal)"
+msgstr "< 50ms (优)"
+
+msgid "> 150ms (Fair)"
+msgstr "> 150ms (一般)"
+
+msgid "Absolute path to the TOML configuration file (Corresponding flag: -c, --config-file). Ensure the file exists with valid EasyTier configuration."
+msgstr "TOML 格式配置文件的绝对路径 (对应参数：-c, --config-file)。请确保该文件已存在并包含有效的 EasyTier 配置。"
+
+msgid "Action"
+msgstr "操作"
+
+msgid "Additional command-line parameters appended to easytier-core."
+msgstr "附加到 easytier-core 进程末尾的自定义参数。"
+
+msgid "Advanced Options"
+msgstr "高级设置"
+
+msgid "Allow WAN Access"
+msgstr "允许从 WAN 访问"
+
+msgid "Allow other peers in the network to route their Internet traffic through this node (Corresponding flag: --enable-exit-node)."
+msgstr "允许网络中的其他对等节点通过本节点路由外网流量 (对应参数：--enable-exit-node)。"
+
+msgid "Allow resolving peer node domain names (such as hostname.et.net) without memorizing virtual IP addresses (Corresponding flag: --accept-dns). Automatically forwards DNS queries via dnsmasq. Note: If third-party DNS tools (e.g. MosDNS, AdGuard Home, SmartDNS) are active, ensure this domain zone is excluded from hijacking."
+msgstr "允许直接通过主机名解析节点 (对应参数：--accept-dns)。自动通过 dnsmasq 转发解析请求至内置 DNS 服务器 (100.100.100.101)。注意：若启用了第三方 DNS 代理工具（如 MosDNS、AdGuard Home、SmartDNS 或分流插件），请确保将该域名区域加入直连/放行名单以防止被劫持导致解析失败。"
+
+msgid "Automatically determine and assign a virtual IP address (Corresponding flag: -d, --dhcp)."
+msgstr "自动协商并分配虚拟网卡 IP 地址 (对应参数：-d, --dhcp)。"
+
+msgid "Automatically open and manage firewall traffic rules on WAN zone to allow incoming connections for external peers."
+msgstr "自动在 WAN 防火墙区域创建并管理通信规则，放行外部节点连接本节点的入站流量。"
+
+msgid "Clear Logs"
+msgstr "清空日志"
+
+msgid "Client Version"
+msgstr "客户端版本"
+
+msgid "Cloud Web Config"
+msgstr "云端集中配置"
+
+msgid "Collecting data ..."
+msgstr "正在收集数据..."
+
+msgid "Collecting logs..."
+msgstr "正在收集日志..."
+
+msgid "Command-line"
+msgstr "命令行参数"
+
+msgid "Configuration File"
+msgstr "配置文件"
+
+msgid "Configuration File Path"
+msgstr "配置文件路径"
+
+msgid "Connected Peer Nodes"
+msgstr "已连接对等节点"
+
+msgid "Core Service Status"
+msgstr "核心服务状态"
+
+msgid "Core Settings"
+msgstr "基本设置"
+
+msgid "Cost"
+msgstr "开销"
+
+msgid "Custom Command Parameters"
+msgstr "自定义启动参数"
+
+msgid "Directory to store SQLite database for easytier-web."
+msgstr "用于存放 easytier-web SQLite 数据库文件的目录。"
+
+msgid "EasyTier"
+msgstr "EasyTier"
+
+msgid "EasyTier is a simple, secure, decentralized mesh VPN for intranet penetration, implemented in Rust."
+msgstr "EasyTier 是一款基于 Rust 实现的简单、安全、去中心化的网状异地组网工具。"
+
+msgid "Enable Core Service"
+msgstr "启用核心服务"
+
+msgid "Enable DHCP IP Allocation"
+msgstr "启用 DHCP 分配"
+
+msgid "Enable Exit Node"
+msgstr "作为出口节点"
+
+msgid "Enable Magic DNS"
+msgstr "启用魔法 DNS"
+
+msgid "Enable Tunnel Traffic SNAT"
+msgstr "开启隧道流量 SNAT"
+
+msgid "Enable Web Console Service"
+msgstr "启用 Web 控制台服务"
+
+msgid "Enable multi-threaded packet processing for higher throughput (Corresponding flag: --multi-thread)."
+msgstr "启用多线程数据包处理以提升高吞吐性能 (对应参数：--multi-thread)。"
+
+msgid "Encryption Algorithm"
+msgstr "加密算法"
+
+msgid "Failed to load logs: %s"
+msgstr "加载日志失败：%s"
+
+msgid "Failed to load peers: %s"
+msgstr "加载对等节点失败：%s"
+
+msgid "Failed to load topology: %s"
+msgstr "加载拓扑失败：%s"
+
+msgid "HTTP listen port for easytier-web embedded web dashboard."
+msgstr "easytier-web 内置 Web 控制台的 HTTP 监听端口。"
+
+msgid "Hostname"
+msgstr "主机名"
+
+msgid "Initial connection peer node URLs (Corresponding flag: -p, --peers)."
+msgstr "初始连接的对等节点地址 (对应参数：-p, --peers)。"
+
+msgid "Interface IPv4 Address"
+msgstr "虚拟 IPv4 地址"
+
+msgid "Interface IPv6 Address"
+msgstr "虚拟 IPv6 地址"
+
+msgid "Invalid URL format, must start with tcp://, udp://, ws://, wss://, wg://, or quic://"
+msgstr "URL 格式无效，必须以 tcp://、udp://、ws://、wss://、wg:// 或 quic:// 开头"
+
+msgid "Invalid UUID format (e.g. %s)"
+msgstr "UUID 格式无效（示例：%s）"
+
+msgid "Invalid username format, only letters, digits, and _ - . @ are allowed."
+msgstr "用户名格式无效，仅支持字母、数字及 _ - . @"
+
+msgid "Latency"
+msgstr "延迟"
+
+msgid "Local Node Information"
+msgstr "本地节点信息"
+
+msgid "Local service is not running."
+msgstr "本地服务未运行。"
+
+msgid "Log Actions"
+msgstr "日志操作"
+
+msgid "Logs"
+msgstr "运行日志"
+
+msgid "Logs cleared."
+msgstr "日志已清空。"
+
+msgid "Loss Rate"
+msgstr "丢包率"
+
+msgid "Machine ID (UUID)"
+msgstr "设备唯一标识 (UUID)"
+
+msgid "Magic DNS Domain Zone"
+msgstr "魔法 DNS 域名区域"
+
+msgid "Multi-threaded Mode"
+msgstr "多线程模式"
+
+msgid "NAT Type"
+msgstr "NAT 类型"
+
+msgid "Network Name"
+msgstr "网络名称"
+
+msgid "Network Secret"
+msgstr "网络密钥"
+
+msgid "Network Topology"
+msgstr "网络拓扑"
+
+msgid "No connected remote peers found."
+msgstr "未找到已连接的远程对等节点。"
+
+msgid "No logs available."
+msgstr "暂无可用的日志记录。"
+
+msgid "No topology data available."
+msgstr "暂无拓扑数据。"
+
+msgid "None"
+msgstr "无"
+
+msgid "Not Installed"
+msgstr "未安装"
+
+msgid "Open Console"
+msgstr "打开控制台"
+
+msgid "Peer Nodes"
+msgstr "对等节点"
+
+msgid "Port for local CLI and RPC management portal (Corresponding flag: --rpc-portal)."
+msgstr "本地 CLI 与 RPC 交互端口 (对应参数：--rpc-portal)。"
+
+msgid "Proxy Network"
+msgstr "子网代理"
+
+msgid "Proxy Networks"
+msgstr "子网代理"
+
+msgid "Public Discovery Node"
+msgstr "公共发现节点"
+
+msgid "Public discovery node URL (Corresponding flag: -e, --external-node)."
+msgstr "公共发现节点 URL (对应参数：-e, --external-node)。"
+
+msgid "RPC Management Port"
+msgstr "RPC 管理端口"
+
+msgid "RX"
+msgstr "RX"
+
+msgid "Refresh"
+msgstr "刷新"
+
+msgid "Refresh Logs"
+msgstr "刷新日志"
+
+msgid "Refresh Topology"
+msgstr "刷新拓扑"
+
+msgid "Remote web configuration server address or username (Corresponding flag: -w, --web-config). Supports complete URL (e.g. udp://127.0.0.1:22020/admin) or username only (e.g. admin, connecting to official cloud server)."
+msgstr "远程 Web 配置服务器地址或用户名 (对应参数：-w, --web-config)。支持完整 URL（如 udp://127.0.0.1:22020/admin）或仅填用户名/网络名（如 admin，自动连接官方云端服务器）。"
+
+msgid "Reset View"
+msgstr "重置视图"
+
+msgid "Restart"
+msgstr "重启"
+
+msgid "Restarting service..."
+msgstr "正在重启服务..."
+
+msgid "Running"
+msgstr "运行中"
+
+msgid "Running (Unmanaged)"
+msgstr "运行中 (非托管)"
+
+msgid "Service Status"
+msgstr "服务运行状态"
+
+msgid "Settings"
+msgstr "配置"
+
+msgid "Specify the top-level domain zone for Magic DNS (Corresponding flag: --tld-dns-zone). Default is et.net. (FQDN ending with dot)."
+msgstr "指定魔法 DNS 的顶级域名区域 (对应参数：--tld-dns-zone)。默认值为 et.net.（以点结尾的 FQDN 根域）。"
+
+msgid "Startup Method"
+msgstr "启动方式"
+
+msgid "Stopped"
+msgstr "已停止"
+
+msgid "Subnet CIDRs to proxy and announce through this node (Corresponding flag: -n, --proxy-networks). Select from the detected local subnets below or enter custom CIDRs."
+msgstr "通过此节点代理并通告的子网网段 (对应参数：-n, --proxy-networks)。可直接下拉选择探测到的本地网段或手动输入。"
+
+msgid "TUN Device Name"
+msgstr "虚拟网卡名称"
+
+msgid "TX"
+msgstr "TX"
+
+msgid "The VPN network name to identify this virtual network (Corresponding flag: --network-name)."
+msgstr "VPN 虚拟网络名称 (对应参数：--network-name)。"
+
+msgid "The secret phrase used to authorize and encrypt traffic (Corresponding flag: --network-secret)."
+msgstr "用于节点认证与加密的密钥短语 (对应参数：--network-secret)。"
+
+msgid "The static IPv4 address of this node (Corresponding flag: -i, --ipv4). Ignored when DHCP is enabled."
+msgstr "本节点的静态 IPv4 地址 (对应参数：-i, --ipv4)。启用 DHCP 时自动忽略。"
+
+msgid "The static IPv6 address of this node (Corresponding flag: --ipv6)."
+msgstr "本节点的静态 IPv6 地址 (对应参数：--ipv6)。"
+
+msgid "The web console may consume significant memory, please enable as needed."
+msgstr "Web 控制台可能会消耗较多内存，请按需启用。"
+
+msgid "Topology Actions"
+msgstr "拓扑操作"
+
+msgid "Tunnel"
+msgstr "连接方式"
+
+msgid "Unique device identifier UUID in the cloud management console (Corresponding flag: --machine-id). Automatically generated on initial install. Changing UUID will automatically clear local cloud cache."
+msgstr "用于在云端控制台中标识当前设备的唯一 UUID 标识符 (对应参数：--machine-id)。初始化安装时自动生成，修改更换 UUID 时将自动重置并清理云端缓存。"
+
+msgid "Use OpenWrt system firewall to manage NAT for EasyTier tunnel and subnet traffic. Disabling this option disables source address masquerading to preserve real source IPs of remote peers and subnets in the local network."
+msgstr "使用 OpenWrt 系统防火墙接管 EasyTier 虚拟网卡与子网转发流量的 NAT。关闭此选项将禁用源地址伪装，保留远程对等节点及子网在本地局域网中的真实源 IP。"
+
+msgid "Version"
+msgstr "版本"
+
+msgid "Virtual IP"
+msgstr "虚拟 IP"
+
+msgid "Virtual Interface"
+msgstr "虚拟网卡"
+
+msgid "Virtual TUN network interface name (Corresponding flag: --dev-name)."
+msgstr "创建的虚拟 TUN 网卡接口名称 (对应参数：--dev-name)。"
+
+msgid "Web Config Server URL"
+msgstr "云端配置服务器地址"
+
+msgid "Web Config Server URL cannot be empty."
+msgstr "云端配置服务器地址不能为空。"
+
+msgid "Web Console"
+msgstr "Web 控制台"
+
+msgid "Web Console Port"
+msgstr "控制台监听端口"
+
+msgid "Web Console Status"
+msgstr "控制台服务状态"
+
+msgid "Web Data Directory"
+msgstr "控制台数据目录"
+
+msgid "Zoom In"
+msgstr "放大"
+
+msgid "Zoom Out"
+msgstr "缩小"
+
+msgid "Reset Layout"
+msgstr "重置布局"
+
+msgid "(Hover to highlight link, drag nodes/canvas to adjust)"
+msgstr "(悬停高亮链路，拖拽节点/画布以调整)"
+
+msgid "All Links"
+msgstr "全部链路"
+
+msgid "Local Only"
+msgstr "仅本端"
+
+msgid "Show All Peer Links"
+msgstr "显示所有对端连接线"
+
+msgid "Show Local Links Only"
+msgstr "仅聚焦本端连接线"
+
+msgid "Next Hop: %s (%s)"
+msgstr "下一跳中继: %s (%s)"
+
+msgid "Next Hop: %s"
+msgstr "下一跳中继: %s"
+
+msgid "Latency / Loss"
+msgstr "延迟 / 丢包"
+
+msgid "RX / TX"
+msgstr "接收 / 发送"
+
+msgid "(Hover/click node to trace path, drag to adjust)"
+msgstr "（悬停/点击节点追踪路径，支持拖拽调整）"
+
+msgid "Clear selection"
+msgstr "清除选中"
+
+msgid "Local Node: %s"
+msgstr "本地节点: %s"
+
+msgid "Path"
+msgstr "路径"

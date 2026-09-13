@@ -1,0 +1,557 @@
+#!/bin/sh /etc/rc.common
+
+START=90
+USE_PROCD=1
+EXTRA_COMMANDS="update_firewall"
+EXTRA_HELP="	update_firewall	Update WAN firewall inbound rule from live easytier-cli listeners"
+
+NAME="easytier"
+PROG="/usr/bin/easytier-core"
+WEB_PROG="/usr/bin/easytier-web"
+CONF_DIR="/etc/easytier"
+LOG_FILE="/tmp/easytier.log"
+WEB_LOG_FILE="/tmp/easytier-web.log"
+
+setup_firewall_and_network() {
+	local dev_name="$1"
+	[ -z "$dev_name" ] && dev_name="easytier0"
+
+	local changed_net=0
+	local changed_fw=0
+
+	# 1. Ensure network interface exists and is exactly synchronized with dev_name
+	local cur_dev cur_ifname
+	cur_dev=$(uci -q get network.easytier.device)
+	cur_ifname=$(uci -q get network.easytier.ifname)
+
+	if ! uci -q get network.easytier >/dev/null; then
+		uci -q set network.easytier=interface
+		uci -q set network.easytier.proto='none'
+		uci -q set network.easytier.device="$dev_name"
+		uci -q set network.easytier.ifname="$dev_name"
+		changed_net=1
+	else
+		if [ "$cur_dev" != "$dev_name" ] || [ "$cur_ifname" != "$dev_name" ]; then
+			uci -q set network.easytier.proto='none'
+			uci -q set network.easytier.device="$dev_name"
+			uci -q set network.easytier.ifname="$dev_name"
+			changed_net=1
+		fi
+	fi
+
+	# 2. Zone MASQUERADE (controlled by tunnel_snat)
+	local tunnel_snat target_masq="0"
+	tunnel_snat=$(uci -q get easytier.settings.tunnel_snat)
+	[ "$tunnel_snat" = "1" ] && target_masq="1"
+
+	# Ensure firewall zone exists
+	if ! uci -q get firewall.easytier >/dev/null; then
+		uci -q set firewall.easytier=zone
+		uci -q set firewall.easytier.name='easytier'
+		uci -q set firewall.easytier.input='ACCEPT'
+		uci -q set firewall.easytier.output='ACCEPT'
+		uci -q set firewall.easytier.forward='ACCEPT'
+		uci -q set firewall.easytier.masq="$target_masq"
+		uci -q set firewall.easytier.mtu_fix='1'
+		uci -q add_list firewall.easytier.network='easytier'
+		uci -q add_list firewall.easytier.device="$dev_name"
+
+		# Allow forwarding from LAN to EasyTier
+		uci -q set firewall.easytier_fwd_lan=forwarding
+		uci -q set firewall.easytier_fwd_lan.src='lan'
+		uci -q set firewall.easytier_fwd_lan.dest='easytier'
+
+		# Allow forwarding from EasyTier to LAN
+		uci -q set firewall.easytier_fwd_et=forwarding
+		uci -q set firewall.easytier_fwd_et.src='easytier'
+		uci -q set firewall.easytier_fwd_et.dest='lan'
+
+		# Allow forwarding from EasyTier to WAN
+		uci -q set firewall.easytier_fwd_wan=forwarding
+		uci -q set firewall.easytier_fwd_wan.src='easytier'
+		uci -q set firewall.easytier_fwd_wan.dest='wan'
+		changed_fw=1
+	else
+		local cur_masq
+		cur_masq=$(uci -q get firewall.easytier.masq)
+		if [ "$cur_masq" != "$target_masq" ]; then
+			uci -q set firewall.easytier.masq="$target_masq"
+			changed_fw=1
+		fi
+
+		# Cleanly synchronize device list (remove stale devices, enforce single current dev_name)
+		local cur_devices
+		cur_devices=$(uci -q get firewall.easytier.device)
+		if [ "$cur_devices" != "$dev_name" ]; then
+			for d in $cur_devices; do
+				uci -q del_list firewall.easytier.device="$d"
+			done
+			uci -q add_list firewall.easytier.device="$dev_name"
+			changed_fw=1
+		fi
+
+		local has_net=0
+		for n in $(uci -q get firewall.easytier.network); do
+			[ "$n" = "easytier" ] && has_net=1
+		done
+		if [ "$has_net" = "0" ]; then
+			uci -q add_list firewall.easytier.network='easytier'
+			changed_fw=1
+		fi
+	fi
+
+	if [ "$changed_net" = "1" ]; then
+		uci -q commit network
+		/etc/init.d/network reload 2>/dev/null
+	fi
+
+	if [ "$changed_fw" = "1" ]; then
+		uci -q commit firewall
+		/etc/init.d/firewall reload 2>/dev/null
+	fi
+
+	# 3. Kernel forwarding
+	sysctl -w net.ipv4.ip_forward=1 >/dev/null 2>&1
+	sysctl -w net.ipv6.conf.all.forwarding=1 >/dev/null 2>&1
+}
+
+apply_wan_firewall() {
+	local allow_wan
+	allow_wan=$(uci -q get easytier.settings.allow_wan)
+
+	if [ "$allow_wan" != "1" ]; then
+		if uci -q get firewall.easytier_wan_inbound >/dev/null; then
+			uci -q delete firewall.easytier_wan_inbound
+			uci -q commit firewall
+			/etc/init.d/firewall reload 2>/dev/null
+		fi
+		return 0
+	fi
+
+	local rpc_port="$1"
+	[ -z "$rpc_port" ] && rpc_port=$(uci -q get easytier.settings.rpc_port)
+	[ -z "$rpc_port" ] && rpc_port="15888"
+	local rpc_arg="-p 127.0.0.1:${rpc_port}"
+
+	# 纯净原子化探测：从运行态 easytier-core 查询实际生效的 listeners 端口
+	local wan_ports=""
+	if [ -x /usr/bin/easytier-cli ]; then
+		local i=0 json_out=""
+		while [ $i -lt 10 ]; do
+			json_out=$(/usr/bin/easytier-cli $rpc_arg -o json node 2>/dev/null)
+			if [ -n "$json_out" ]; then
+				local extracted_ports=""
+				if command -v jsonfilter >/dev/null 2>&1; then
+					extracted_ports=$(echo "$json_out" | jsonfilter -e '@.listeners[*]' 2>/dev/null | grep -oE ':[0-9]{2,5}/?$' | tr -d ':/' | sort -n -u)
+				else
+					extracted_ports=$(echo "$json_out" | sed -n '/"listeners": \[/,/\]/p' | grep -oE ':[0-9]{2,5}/?$' | tr -d ':/' | sort -n -u)
+				fi
+
+				if [ -n "$extracted_ports" ]; then
+					set -- $extracted_ports
+					wan_ports="$*"
+					break
+				fi
+			fi
+			i=$((i + 1))
+			sleep 1
+		done
+	fi
+
+	# 严格原子化：仅当核心成功运行且实际处于监听状态时才下发放行规则；未启动或无端口绝不下发
+	if [ -n "$wan_ports" ]; then
+		local cur_rule_ports cur_rule_enabled
+		cur_rule_ports=$(uci -q get firewall.easytier_wan_inbound.dest_port)
+		cur_rule_enabled=$(uci -q get firewall.easytier_wan_inbound.enabled)
+
+		if ! uci -q get firewall.easytier_wan_inbound >/dev/null || [ "$cur_rule_ports" != "$wan_ports" ] || [ "$cur_rule_enabled" != "1" ]; then
+			uci -q set firewall.easytier_wan_inbound=rule
+			uci -q set firewall.easytier_wan_inbound.name='Allow-EasyTier-WAN-Inbound'
+			uci -q set firewall.easytier_wan_inbound.src='wan'
+			uci -q set firewall.easytier_wan_inbound.proto='tcp udp'
+			uci -q set firewall.easytier_wan_inbound.dest_port="$wan_ports"
+			uci -q set firewall.easytier_wan_inbound.target='ACCEPT'
+			uci -q set firewall.easytier_wan_inbound.enabled='1'
+			uci -q commit firewall
+			/etc/init.d/firewall reload 2>/dev/null
+			logger -t "$NAME" "WAN firewall inbound rule applied for active listeners: $wan_ports"
+		fi
+	else
+		logger -t "$NAME" "Warning: No active EasyTier listeners detected, keeping WAN firewall closed"
+		if uci -q get firewall.easytier_wan_inbound >/dev/null; then
+			uci -q delete firewall.easytier_wan_inbound
+			uci -q commit firewall
+			/etc/init.d/firewall reload 2>/dev/null
+		fi
+	fi
+}
+
+setup_dnsmasq() {
+	local magic_dns tld_dns_zone
+	config_get_bool magic_dns settings magic_dns 0
+	config_get tld_dns_zone settings tld_dns_zone 'et.net.'
+	[ -z "$tld_dns_zone" ] && tld_dns_zone='et.net.'
+
+	# 防呆机制：无论用户输入是否带点，核心规范为以点结尾的 FQDN
+	case "$tld_dns_zone" in
+		*.) ;;
+		*) tld_dns_zone="${tld_dns_zone}." ;;
+	esac
+	local tld_clean
+	tld_clean=$(echo "$tld_dns_zone" | sed 's/\.$//')
+
+	local changed_dhcp=0
+
+	# 1. Dynamically inspect all server rules pointing to 100.100.100.101, extract old zones, and clean corresponding rebind_domain
+	local cur_servers
+	cur_servers=$(uci -q get dhcp.@dnsmasq[0].server)
+	if [ -n "$cur_servers" ]; then
+		local s
+		for s in $cur_servers; do
+			case "$s" in
+				*100.100.100.101*)
+					local old_zone
+					old_zone=$(echo "$s" | sed -n 's|^/\([^/]*\)/100\.100\.100\.101.*|\1|p')
+					if [ -n "$old_zone" ]; then
+						uci -q del_list dhcp.@dnsmasq[0].rebind_domain="$old_zone"
+						uci -q del_list dhcp.@dnsmasq[0].rebind_domain="${old_zone}."
+					fi
+					uci -q del_list dhcp.@dnsmasq[0].server="$s"
+					changed_dhcp=1
+					;;
+			esac
+		done
+	fi
+
+	# 2. Clean fallback domains
+	uci -q del_list dhcp.@dnsmasq[0].rebind_domain="$tld_dns_zone"
+	uci -q del_list dhcp.@dnsmasq[0].rebind_domain="$tld_clean"
+	uci -q del_list dhcp.@dnsmasq[0].rebind_domain="et.net"
+	uci -q del_list dhcp.@dnsmasq[0].rebind_domain="et.net."
+
+	# 3. Add new Magic DNS forwarding and rebind whitelist if enabled
+	if [ "$magic_dns" -eq 1 ]; then
+		uci -q add_list dhcp.@dnsmasq[0].server="/${tld_clean}/100.100.100.101"
+		uci -q add_list dhcp.@dnsmasq[0].rebind_domain="${tld_clean}"
+		changed_dhcp=1
+	fi
+
+	if [ "$changed_dhcp" -eq 1 ]; then
+		uci -q commit dhcp
+		/etc/init.d/dnsmasq reload 2>/dev/null
+	fi
+}
+
+cleanup_dnsmasq() {
+	local tld_dns_zone
+	config_get tld_dns_zone settings tld_dns_zone 'et.net.'
+	[ -z "$tld_dns_zone" ] && tld_dns_zone='et.net.'
+
+	case "$tld_dns_zone" in
+		*.) ;;
+		*) tld_dns_zone="${tld_dns_zone}." ;;
+	esac
+	local tld_clean
+	tld_clean=$(echo "$tld_dns_zone" | sed 's/\.$//')
+
+	local changed_dhcp=0
+
+	# 1. Dynamically inspect all server rules pointing to 100.100.100.101, extract old zones, and clean corresponding rebind_domain
+	local cur_servers
+	cur_servers=$(uci -q get dhcp.@dnsmasq[0].server)
+	if [ -n "$cur_servers" ]; then
+		local s
+		for s in $cur_servers; do
+			case "$s" in
+				*100.100.100.101*)
+					local old_zone
+					old_zone=$(echo "$s" | sed -n 's|^/\([^/]*\)/100\.100\.100\.101.*|\1|p')
+					if [ -n "$old_zone" ]; then
+						uci -q del_list dhcp.@dnsmasq[0].rebind_domain="$old_zone"
+						uci -q del_list dhcp.@dnsmasq[0].rebind_domain="${old_zone}."
+					fi
+					uci -q del_list dhcp.@dnsmasq[0].server="$s"
+					changed_dhcp=1
+					;;
+			esac
+		done
+	fi
+
+	# 2. Clean fallback domains
+	uci -q del_list dhcp.@dnsmasq[0].rebind_domain="$tld_dns_zone"
+	uci -q del_list dhcp.@dnsmasq[0].rebind_domain="$tld_clean"
+
+	if [ "$changed_dhcp" -eq 1 ]; then
+		uci -q commit dhcp
+		/etc/init.d/dnsmasq reload 2>/dev/null
+	fi
+}
+
+atomic_clean_cloud_dir() {
+	local target_dir="$1"
+	local new_mid="$2"
+
+	# Security boundary guard: strictly disallow root /etc/easytier to protect config.toml and easytier.db
+	case "$target_dir" in
+		/etc/easytier|/etc/easytier/|/etc|/etc/|/tmp|/tmp/)
+			logger -t "$NAME" "Security warning: Cannot clean root directory $target_dir"
+			return 1
+			;;
+		/etc/easytier/*|/tmp/easytier/*) ;;
+		*)
+			logger -t "$NAME" "Security warning: Refusing to clean unsafe path: $target_dir"
+			return 1
+			;;
+	esac
+
+	local pid="$$"
+	local new_tmp="${target_dir}.new.${pid}"
+	local trash_tmp="${target_dir}.trash.${pid}"
+
+	mkdir -p "$new_tmp"
+	[ -n "$new_mid" ] && echo "$new_mid" > "$new_tmp/.machine_id"
+
+	if [ -d "$target_dir" ]; then
+		mv "$target_dir" "$trash_tmp" 2>/dev/null
+	fi
+	mv "$new_tmp" "$target_dir" 2>/dev/null
+	rm -rf "${target_dir}.trash."* 2>/dev/null
+	return 0
+}
+
+start_core() {
+	local enabled etcmd network_name network_secret ip_dhcp ipaddr ip6addr
+	local external_node rpc_port encryption_algorithm dev_name proxy_cidrs
+	local custom_params custom_config_file web_config multi_thread
+	local magic_dns tld_dns_zone
+	local machine_id config_dir
+
+	config_get_bool enabled settings enabled 0
+	[ "$enabled" -eq 1 ] || return 0
+
+	[ -x "$PROG" ] || {
+		logger -t "$NAME" "Core executable $PROG not found"
+		return 1
+	}
+
+	config_get etcmd settings etcmd 'etcmd'
+	config_get network_name settings network_name ''
+	config_get network_secret settings network_secret ''
+	config_get_bool ip_dhcp settings ip_dhcp 1
+	config_get ipaddr settings ipaddr ''
+	config_get ip6addr settings ip6addr ''
+	config_get external_node settings external_node ''
+	config_get rpc_port settings rpc_port '15888'
+	config_get encryption_algorithm settings encryption_algorithm ''
+	config_get dev_name settings dev_name 'easytier0'
+	config_get custom_config_file settings custom_config_file '/etc/easytier/config.toml'
+	config_get web_config settings web_config ''
+	config_get machine_id settings machine_id ''
+	config_get custom_params settings custom_params ''
+	config_get_bool multi_thread settings multi_thread 0
+	config_get_bool magic_dns settings magic_dns 0
+	config_get tld_dns_zone settings tld_dns_zone 'et.net.'
+	[ -z "$tld_dns_zone" ] && tld_dns_zone='et.net.'
+	case "$tld_dns_zone" in
+		*.) ;;
+		*) tld_dns_zone="${tld_dns_zone}." ;;
+	esac
+	config_get_bool enable_exit_node settings enable_exit_node 0
+
+	mkdir -p "$CONF_DIR"
+
+	procd_open_instance "core"
+	procd_set_param command "$PROG"
+
+	if [ "$etcmd" = "config" ]; then
+		[ -f "$custom_config_file" ] || {
+			logger -t "$NAME" "Custom config file $custom_config_file not found"
+			return 1
+		}
+		procd_append_param command -c "$custom_config_file"
+	elif [ "$etcmd" = "web" ]; then
+		[ -n "$web_config" ] || {
+			logger -t "$NAME" "Web config URL is not configured"
+			return 1
+		}
+		procd_append_param command -w "$web_config"
+
+		# Machine ID (ensure unique UUID exists)
+		if [ -z "$machine_id" ]; then
+			if [ -f /proc/sys/kernel/random/uuid ]; then
+				machine_id=$(cat /proc/sys/kernel/random/uuid 2>/dev/null)
+			fi
+			if [ -z "$machine_id" ]; then
+				machine_id=$(tr -dc 'a-f0-9' < /dev/urandom 2>/dev/null | head -c 32 | sed -r 's/(.{8})(.{4})(.{4})(.{4})(.{12})/\1-\2-\3-\4-\5/')
+			fi
+			if [ -n "$machine_id" ]; then
+				uci -q set easytier.settings.machine_id="$machine_id"
+				uci -q commit easytier
+			fi
+		fi
+		[ -n "$machine_id" ] && procd_append_param command --machine-id "$machine_id"
+
+		# Internal cloud config directory (isolated storage)
+		local config_dir='/etc/easytier/cloud'
+
+		# Atomic check & clean for Machine ID change
+		local last_mid_file="$config_dir/.machine_id"
+		local last_mid=""
+		[ -f "$last_mid_file" ] && last_mid=$(cat "$last_mid_file" 2>/dev/null)
+
+		if [ -d "$config_dir" ] && [ -n "$last_mid" ] && [ "$last_mid" != "$machine_id" ]; then
+			logger -t "$NAME" "Machine ID changed from $last_mid to $machine_id, atomically cleaning cloud config cache in $config_dir"
+			atomic_clean_cloud_dir "$config_dir" "$machine_id"
+		else
+			mkdir -p "$config_dir"
+			[ -n "$machine_id" ] && [ ! -f "$last_mid_file" ] && echo "$machine_id" > "$last_mid_file" 2>/dev/null
+		fi
+
+		procd_append_param command --config-dir "$config_dir"
+
+		# System proxy forward & device name
+		procd_append_param command --proxy-forward-by-system
+		[ -n "$dev_name" ] && procd_append_param command --dev-name "$dev_name"
+
+		# Additional custom arguments
+		if [ -n "$custom_params" ]; then
+			for arg in $custom_params; do
+				procd_append_param command "$arg"
+			done
+		fi
+	else
+		# Default command-line configuration
+		[ -n "$network_name" ] && procd_append_param command --network-name "$network_name"
+		[ -n "$network_secret" ] && procd_append_param command --network-secret "$network_secret"
+
+		if [ "$ip_dhcp" -eq 1 ]; then
+			procd_append_param command -d
+		elif [ -n "$ipaddr" ]; then
+			procd_append_param command -i "$ipaddr"
+		fi
+
+		[ -n "$ip6addr" ] && procd_append_param command --ipv6 "$ip6addr"
+		[ -n "$external_node" ] && procd_append_param command -e "$external_node"
+		[ -n "$rpc_port" ] && procd_append_param command --rpc-portal "0.0.0.0:${rpc_port}"
+		[ -n "$encryption_algorithm" ] && procd_append_param command --encryption-algorithm "$encryption_algorithm"
+		[ -n "$dev_name" ] && procd_append_param command --dev-name "$dev_name"
+		[ "$multi_thread" -eq 1 ] && procd_append_param command --multi-thread
+
+		# Always disable user-space built-in NAT and delegate forwarding to Linux kernel
+		procd_append_param command --proxy-forward-by-system
+
+		# Exit Node
+		[ "$enable_exit_node" -eq 1 ] && procd_append_param command --enable-exit-node
+
+		# Magic DNS
+		if [ "$magic_dns" -eq 1 ]; then
+			procd_append_param command --accept-dns true
+			[ -n "$tld_dns_zone" ] && procd_append_param command --tld-dns-zone "$tld_dns_zone"
+		fi
+
+		# Peer nodes
+		append_peer() {
+			[ -n "$1" ] && procd_append_param command -p "$1"
+		}
+		config_list_foreach settings peeradd append_peer
+
+		# Proxy networks / Subnet routes
+		append_proxy() {
+			[ -n "$1" ] && procd_append_param command -n "$1"
+		}
+		config_list_foreach settings proxy_networks append_proxy
+
+		# Additional custom arguments
+		if [ -n "$custom_params" ]; then
+			for arg in $custom_params; do
+				procd_append_param command "$arg"
+			done
+		fi
+	fi
+
+	procd_set_param respawn 3600 5 0
+	procd_set_param stdout 1
+	procd_set_param stderr 1
+	procd_set_param user root
+	procd_close_instance
+
+	setup_firewall_and_network "$dev_name" "$rpc_port"
+	setup_dnsmasq
+	logger -t "$NAME" "EasyTier core service started"
+
+	# 异步触发 WAN 放行策略更新（让 procd 优先 fork 启动核心进程，随后子进程原子联动查询 listeners 并下发规则）
+	local allow_wan
+	config_get_bool allow_wan settings allow_wan 0
+	if [ "$allow_wan" -eq 1 ]; then
+		(
+			apply_wan_firewall "$rpc_port"
+		) >/dev/null 2>&1 &
+	else
+		if uci -q get firewall.easytier_wan_inbound >/dev/null; then
+			uci -q delete firewall.easytier_wan_inbound
+			uci -q commit firewall
+			/etc/init.d/firewall reload 2>/dev/null
+		fi
+	fi
+}
+
+update_firewall() {
+	config_load easytier
+	local dev_name rpc_port
+	config_get dev_name settings dev_name 'easytier0'
+	config_get rpc_port settings rpc_port '15888'
+	setup_firewall_and_network "$dev_name" "$rpc_port"
+	apply_wan_firewall "$rpc_port"
+}
+
+start_web() {
+	local web_enabled web_port web_dir
+
+	config_get_bool web_enabled settings web_enabled 0
+	[ "$web_enabled" -eq 1 ] || return 0
+
+	[ -x "$WEB_PROG" ] || {
+		logger -t "$NAME" "Web console executable $WEB_PROG not found"
+		return 1
+	}
+
+	config_get web_port settings web_html_port '22020'
+	config_get web_dir settings web_dir '/etc/easytier'
+
+	mkdir -p "$web_dir"
+
+	procd_open_instance "web"
+	procd_set_param command "$WEB_PROG" --db "$web_dir/easytier.db" --web-server-port "$web_port" --api-server-port "$web_port" --file-log-dir "$web_dir"
+	procd_set_param respawn 3600 5 0
+	procd_set_param stdout 1
+	procd_set_param stderr 1
+	procd_set_param user root
+	procd_close_instance
+
+	logger -t "$NAME" "EasyTier web console started on port $web_port"
+}
+
+start_service() {
+	config_load easytier
+	start_core
+	start_web
+}
+
+stop_service() {
+	cleanup_dnsmasq
+	# 停止服务联动清理 WAN 防火墙放行，防止离线后端口空置暴露
+	if uci -q get firewall.easytier_wan_inbound >/dev/null; then
+		uci -q delete firewall.easytier_wan_inbound
+		uci -q commit firewall
+		/etc/init.d/firewall reload 2>/dev/null
+	fi
+	logger -t "$NAME" "EasyTier services stopped"
+}
+
+service_triggers() {
+	procd_add_reload_trigger "easytier"
+}
+
+reload_service() {
+	restart
+}

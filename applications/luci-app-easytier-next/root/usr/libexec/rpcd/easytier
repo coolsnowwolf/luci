@@ -1,0 +1,471 @@
+#!/usr/bin/env lua
+
+local json = require "luci.jsonc"
+local nixio = require "nixio"
+local fs = require "nixio.fs"
+
+local function trim(s)
+	if type(s) ~= 'string' then return '' end
+	return s:gsub("^%s+", ""):gsub("%s+$", "")
+end
+
+local function exec_cmd(cmd)
+	local f = io.popen(cmd)
+	if not f then
+		return { code = -1, stdout = {}, raw = "" }
+	end
+	local content = f:read("*a") or ""
+	local success, msg, code = f:close()
+	content = trim(content)
+	local lines = {}
+	for line in string.gmatch(content .. "\n", "(.-)\r?\n") do
+		if line ~= "" then
+			table.insert(lines, line)
+		end
+	end
+	return {
+		code = (type(success) == "number" and success) or (code or 0),
+		stdout = lines,
+		raw = content
+	}
+end
+
+local function get_procd_status(instance_name)
+	local ubus_res = exec_cmd("ubus call service list '{\"name\":\"easytier\"}' 2>/dev/null")
+	if ubus_res.raw and #ubus_res.raw > 0 then
+		local parsed = json.parse(ubus_res.raw)
+		if parsed and parsed.easytier and parsed.easytier.instances then
+			local inst = parsed.easytier.instances[instance_name or 'core']
+			if inst and inst.running then
+				return { running = true, pid = inst.pid }
+			end
+		end
+	end
+	return { running = false }
+end
+
+local function get_rogue_pid(bin_name, managed_pid)
+	local res = exec_cmd("pidof " .. bin_name .. " 2>/dev/null")
+	if res.raw and #res.raw > 0 then
+		for pid in string.gmatch(res.raw, "%d+") do
+			local num_pid = tonumber(pid)
+			if num_pid and (managed_pid == nil or num_pid ~= managed_pid) then
+				return num_pid
+			end
+		end
+	end
+	return nil
+end
+
+local function get_service_state(bin_name, instance_name)
+	local procd_st = get_procd_status(instance_name)
+	local rogue_pid = get_rogue_pid(bin_name, procd_st.pid)
+
+	local state = "stopped"
+	if procd_st.running then
+		state = "managed"
+	elseif rogue_pid then
+		state = "unmanaged"
+	end
+
+	return {
+		state = state,
+		running = (state ~= "stopped"),
+		pid = procd_st.pid or rogue_pid
+	}
+end
+
+local function get_cached_version()
+	local cache_file = '/tmp/easytier_version.cache'
+	local bin_path = '/usr/bin/easytier-core'
+	if not fs.access(bin_path) then return 'Unknown' end
+
+	local bin_st = fs.stat(bin_path)
+	local cache_st = fs.stat(cache_file)
+
+	if cache_st and (cache_st.size or 0) > 0 and bin_st and (cache_st.mtime or 0) >= (bin_st.mtime or 0) then
+		local cached = trim(fs.readfile(cache_file) or '')
+		if cached ~= '' then return cached end
+	end
+
+	local ver_res = exec_cmd(bin_path .. ' --version 2>/dev/null')
+	if ver_res.stdout and #ver_res.stdout > 0 then
+		local ver_line = trim(ver_res.stdout[1])
+		if ver_line ~= '' then
+			fs.writefile(cache_file, ver_line .. '\n')
+			return ver_line
+		end
+	end
+	return 'Unknown'
+end
+
+local function get_route_info_map()
+	local route_map = {}
+	if not fs.access('/usr/bin/easytier-cli') then return route_map end
+	local r_res = exec_cmd('/usr/bin/easytier-cli -o json route 2>/dev/null')
+	if r_res.code == 0 and r_res.raw and #r_res.raw > 0 then
+		local r_data = json.parse(r_res.raw)
+		if r_data and type(r_data) == 'table' and #r_data > 0 then
+			for _, item in ipairs(r_data) do
+				local cidrs = trim(item.proxy_cidrs or '')
+				local ip = trim(item.ipv4 or '')
+				local host = trim(item.hostname or '')
+				local next_hop_host = trim(item.next_hop_hostname_lat_first or item.next_hop_hostname or '')
+				local next_hop_ip = trim(item.next_hop_ipv4_lat_first or item.next_hop_ipv4 or '')
+				local path_len = item.path_len_lat_first ~= nil and item.path_len_lat_first or item.path_len
+				local path_lat = item.path_latency_lat_first ~= nil and item.path_latency_lat_first or item.path_latency
+
+				local entry = {
+					proxy_cidrs = cidrs,
+					next_hop_hostname = next_hop_host,
+					next_hop_ipv4 = next_hop_ip,
+					path_len = path_len,
+					path_latency = path_lat
+				}
+
+				if ip ~= '' then
+					route_map[ip] = entry
+					local ip_clean = ip:match("^([^/]+)") or ip
+					route_map[ip_clean] = entry
+				end
+				if host ~= '' then
+					route_map[host] = entry
+				end
+			end
+		end
+	end
+	return route_map
+end
+
+local methods = {
+	get_status = {
+		args = {},
+		call = function(args)
+			local core_st = get_service_state('/usr/bin/easytier-core', 'core')
+			local web_st = get_service_state('/usr/bin/easytier-web', 'web')
+
+			local data = {
+				installed = fs.access('/usr/bin/easytier-core') and true or false,
+				web_installed = fs.access('/usr/bin/easytier-web') and true or false,
+				version = get_cached_version(),
+				core = core_st,
+				web = web_st,
+				node_info = nil
+			}
+
+			if core_st.running and fs.access('/usr/bin/easytier-cli') then
+				local node_res = exec_cmd('/usr/bin/easytier-cli node 2>/dev/null')
+				if node_res.raw and #node_res.raw > 0 then
+					data.node_info = node_res.raw
+				end
+			end
+
+			return data
+		end
+	},
+
+	get_peers = {
+		args = {},
+		call = function(args)
+			if not fs.access('/usr/bin/easytier-cli') then
+				return { peers = {}, raw = '' }
+			end
+
+			local route_map = get_route_info_map()
+
+			local json_res = exec_cmd('/usr/bin/easytier-cli -o json peer 2>/dev/null')
+			if json_res.code == 0 and json_res.raw and #json_res.raw > 0 then
+				local j_data = json.parse(json_res.raw)
+				if j_data and type(j_data) == 'table' and #j_data > 0 then
+					local peers = {}
+					for _, item in ipairs(j_data) do
+						local p_ip = trim(item.cidr or item.ipv4 or '')
+						local p_host = trim(item.hostname or '')
+						local p_ip_clean = p_ip:match("^([^/]+)") or p_ip
+						local r_entry = route_map[p_ip] or route_map[p_ip_clean] or route_map[p_host] or {}
+						local proxy_cidrs = r_entry.proxy_cidrs or ''
+						local next_hop_hostname = r_entry.next_hop_hostname or ''
+						local next_hop_ipv4 = r_entry.next_hop_ipv4 or ''
+						local path_latency = r_entry.path_latency ~= nil and r_entry.path_latency or ''
+
+						table.insert(peers, {
+							ipv4 = p_ip,
+							hostname = p_host,
+							proxy_cidrs = proxy_cidrs,
+							next_hop_hostname = next_hop_hostname,
+							next_hop_ipv4 = next_hop_ipv4,
+							path_latency = path_latency,
+							cost = trim(item.cost or ''),
+							latency = (item.lat_ms ~= nil and item.lat_ms ~= '-') and tostring(item.lat_ms) or '-',
+							loss_rate = trim(item.loss_rate or '-'),
+							rx = trim(item.rx_bytes or '-'),
+							tx = trim(item.tx_bytes or '-'),
+							tunnel = trim(item.tunnel_proto or '-'),
+							nat = trim(item.nat_type or '-'),
+							version = trim(item.version or '-')
+						})
+					end
+					return { peers = peers, raw = '' }
+				end
+			end
+
+			local peer_res = exec_cmd('/usr/bin/easytier-cli peer 2>/dev/null')
+			local raw_output = peer_res.raw or ''
+			local peers = {}
+
+			if peer_res.stdout and #peer_res.stdout > 0 then
+				for _, line in ipairs(peer_res.stdout) do
+					local trimmed = trim(line)
+					if trimmed ~= '' and not (trimmed:match("[Ii]pv4") and trimmed:match("|")) and not trimmed:match("^[%-%+─━%=| ]+$") then
+						local cols = {}
+						for part in string.gmatch(trimmed, "[^|]+") do
+							table.insert(cols, trim(part))
+						end
+						if #cols >= 2 then
+							local peer_ip = trim(cols[1] or '')
+							local peer_host = trim(cols[2] or '')
+							local peer_ip_clean = peer_ip:match("^([^/]+)") or peer_ip
+							local r_entry = route_map[peer_ip] or route_map[peer_ip_clean] or route_map[peer_host] or {}
+							local proxy_cidrs = r_entry.proxy_cidrs or ''
+							local next_hop_hostname = r_entry.next_hop_hostname or ''
+							local next_hop_ipv4 = r_entry.next_hop_ipv4 or ''
+							local path_latency = r_entry.path_latency ~= nil and r_entry.path_latency or ''
+
+							table.insert(peers, {
+								ipv4 = peer_ip,
+								hostname = peer_host,
+								proxy_cidrs = proxy_cidrs,
+								next_hop_hostname = next_hop_hostname,
+								next_hop_ipv4 = next_hop_ipv4,
+								path_latency = path_latency,
+								cost = cols[3] or '-',
+								latency = cols[4] or '-',
+								loss_rate = cols[5] or '-',
+								rx = cols[6] or '-',
+								tx = cols[7] or '-',
+								tunnel = cols[8] or '-',
+								nat = cols[9] or '-',
+								version = cols[10] or '-'
+							})
+						end
+					end
+				end
+			end
+
+			return { peers = peers, raw = raw_output }
+		end
+	},
+
+	get_topology = {
+		args = {},
+		call = function(args)
+			if not fs.access('/usr/bin/easytier-cli') then
+				return { nodes = {} }
+			end
+
+			local route_map = get_route_info_map()
+			local res = exec_cmd('/usr/bin/easytier-cli -o json peer-center 2>/dev/null')
+			if res.code == 0 and res.raw and #res.raw > 0 then
+				local data = json.parse(res.raw)
+				if data and type(data) == 'table' and #data > 0 then
+					local valid_nodes = {}
+					for _, n in ipairs(data) do
+						local n_ip = trim(n.ipv4 or '')
+						local n_host = trim(n.hostname or '')
+						if n_host ~= '' and not n_host:lower():match("^unknown$") and n_ip ~= '' and n_ip ~= '-' then
+							local n_ip_clean = n_ip:match("^([^/]+)") or n_ip
+							local r_entry = route_map[n_ip] or route_map[n_ip_clean] or route_map[n_host] or {}
+							n.proxy_cidrs = r_entry.proxy_cidrs or ''
+							table.insert(valid_nodes, n)
+						end
+					end
+					return { nodes = valid_nodes }
+				end
+			end
+			return { nodes = {} }
+		end
+	},
+
+	get_subroutes = {
+		args = {},
+		call = function(args)
+			local subnets = {}
+			local seen = {}
+
+			local res = exec_cmd("ip -j route 2>/dev/null")
+			if res.code == 0 and res.raw and #res.raw > 0 then
+				local routes_json = json.parse(res.raw)
+				if routes_json and type(routes_json) == 'table' then
+					for _, r in ipairs(routes_json) do
+						if r.dst and r.dst ~= 'default' and r.scope == 'link' and r.dst:find("%.") and r.dev ~= 'easytier0' and r.dev ~= 'lo' then
+							if not seen[r.dst] then
+								seen[r.dst] = true
+								table.insert(subnets, r.dst)
+							end
+						end
+					end
+				end
+			end
+
+			if #subnets == 0 then
+				local txt_res = exec_cmd("ip route 2>/dev/null")
+				if txt_res.stdout and #txt_res.stdout > 0 then
+					for _, line in ipairs(txt_res.stdout) do
+						line = trim(line)
+						if line ~= '' and not line:lower():match("^default") and not line:find("easytier0") and not line:find("lo") then
+							local subnet, dev = line:match("^(%d+%.%d+%.%d+%.%d+/%d+)%s+dev%s+([^%s]+)")
+							if subnet and dev and dev ~= 'easytier0' and dev ~= 'lo' and not seen[subnet] then
+								seen[subnet] = true
+								table.insert(subnets, subnet)
+							end
+						end
+					end
+				end
+			end
+
+			if #subnets == 0 then
+				local net_res = exec_cmd("ubus call network.interface dump 2>/dev/null")
+				if net_res.raw and #net_res.raw > 0 then
+					local net_data = json.parse(net_res.raw)
+					if net_data and net_data.interface then
+						for _, iface in ipairs(net_data.interface) do
+							if iface.interface ~= 'loopback' and iface.interface ~= 'easytier' and iface['ipv4-address'] then
+								for _, addr in ipairs(iface['ipv4-address']) do
+									local ip_str = addr.address
+									local mask = addr.mask
+									if ip_str and mask then
+										local p1, p2, p3, p4 = ip_str:match("^(%d+)%.(%d+)%.(%d+)%.(%d+)$")
+										if p1 and p2 and p3 and p4 then
+											local subnet = ''
+											if mask == 24 then
+												subnet = string.format("%s.%s.%s.0/24", p1, p2, p3)
+											elseif mask == 16 then
+												subnet = string.format("%s.%s.0.0/16", p1, p2)
+											elseif mask == 8 then
+												subnet = string.format("%s.0.0.0/8", p1)
+											else
+												subnet = string.format("%s/%s", ip_str, mask)
+											end
+											if subnet ~= '' and not seen[subnet] then
+												seen[subnet] = true
+												table.insert(subnets, subnet)
+											end
+										end
+									end
+								end
+							end
+						end
+					end
+				end
+			end
+
+			return { routes = subnets }
+		end
+	},
+
+	get_logs = {
+		args = {},
+		call = function(args)
+			local logs = {}
+			local res = exec_cmd("logread -e easytier 2>/dev/null | tail -n 80")
+			if res.stdout and #res.stdout > 0 then
+				logs = res.stdout
+			elseif fs.access('/tmp/easytier.log') then
+				local f_res = exec_cmd("tail -n 80 /tmp/easytier.log 2>/dev/null")
+				if f_res.stdout then logs = f_res.stdout end
+			end
+			return { logs = logs }
+		end
+	},
+
+	clear_logs = {
+		args = {},
+		call = function(args)
+			fs.writefile('/tmp/easytier.log', '')
+			fs.writefile('/tmp/easytier-web.log', '')
+			return { success = true }
+		end
+	},
+
+	service_action = {
+		args = { action = "action" },
+		call = function(args)
+			local action = args and args.action
+			if not action then return { success = false, error = "Missing action" } end
+
+			if action == "restart" or action == "stop" then
+				os.execute("killall -9 easytier-core easytier-web 2>/dev/null")
+			end
+
+			if action == "start" or action == "restart" then
+				os.execute("/etc/init.d/easytier restart >/dev/null 2>&1")
+			elseif action == "stop" then
+				os.execute("/etc/init.d/easytier stop >/dev/null 2>&1")
+			end
+
+			return { success = true }
+		end
+	}
+}
+
+local function parseInput()
+	local parse = json.new()
+	local done, err
+
+	while true do
+		local chunk = io.read(4096)
+		if not chunk or #chunk == 0 then
+			break
+		end
+		done, err = parse:parse(chunk)
+		if done then
+			break
+		end
+	end
+
+	if not done then
+		print(json.stringify({ error = err or "Incomplete input" }))
+		os.exit(1)
+	end
+
+	return parse:get()
+end
+
+local function validateArgs(func, uargs)
+	local method = methods[func]
+	if not method then
+		print(json.stringify({ error = "Method not found" }))
+		os.exit(1)
+	end
+
+	if type(uargs) ~= "table" then
+		print(json.stringify({ error = "Invalid arguments" }))
+		os.exit(1)
+	end
+
+	uargs.ubus_rpc_session = nil
+
+	local margs = method.args or {}
+	for k, _ in pairs(uargs) do
+		if margs[k] == nil then
+			print(json.stringify({ error = "Invalid argument: " .. tostring(k) }))
+			os.exit(1)
+		end
+	end
+
+	return method
+end
+
+if arg[1] == "list" then
+	local rv = {}
+	for name, method in pairs(methods) do
+		rv[name] = method.args or {}
+	end
+	print((json.stringify(rv):gsub(":%[%]", ":{}")))
+elseif arg[1] == "call" then
+	local args = parseInput()
+	local method = validateArgs(arg[2], args)
+	local result, code = method.call(args)
+	print((json.stringify(result):gsub("^%[%]$", "{}")))
+	os.exit(code or 0)
+end
