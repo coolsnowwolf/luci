@@ -14001,3 +14001,11 @@ msgstr "{example_nx} 返回 {nxdomain}。"
 #: modules/luci-compat/luasrc/view/cbi/delegator.htm:20
 msgid "« Back"
 msgstr "« 返回"
+
+#: modules/luci-mod-status/htdocs/luci-static/resources/view/status/include/30_network.js
+msgid "Total download bandwidth"
+msgstr "下載總頻寬"
+
+#: modules/luci-mod-status/htdocs/luci-static/resources/view/status/include/30_network.js
+msgid "Total upload bandwidth"
+msgstr "上傳總頻寬"

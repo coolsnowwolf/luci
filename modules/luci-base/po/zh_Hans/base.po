@@ -14146,3 +14146,11 @@ msgstr "移远蜂窝网络"
 
 msgid "Temperature"
 msgstr "温度"
+
+#: modules/luci-mod-status/htdocs/luci-static/resources/view/status/include/30_network.js
+msgid "Total download bandwidth"
+msgstr "下载总带宽"
+
+#: modules/luci-mod-status/htdocs/luci-static/resources/view/status/include/30_network.js
+msgid "Total upload bandwidth"
+msgstr "上传总带宽"
