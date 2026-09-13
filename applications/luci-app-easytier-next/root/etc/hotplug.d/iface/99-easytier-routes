@@ -1,0 +1,24 @@
+#!/bin/sh
+
+dev_name=$(uci -q get easytier.settings.dev_name)
+[ -z "$dev_name" ] && dev_name="easytier0"
+
+[ "$DEVICE" = "$dev_name" ] || exit 0
+[ "$ACTION" = "ifup" ] || exit 0
+
+LOCK=/tmp/easytier_hotplug.lock
+
+# Timestamp-based lock: bail out if another check fired within 10 s.
+if [ -f "$LOCK" ]; then
+	ts=$(cat "$LOCK" 2>/dev/null)
+	[ -n "$ts" ] && [ $(( $(date +%s) - ts )) -lt 10 ] && exit 0
+fi
+
+# Skip if easytier is not configured or enabled
+[ "$(uci -q get easytier.settings.enabled)" = "1" ] || exit 0
+
+date +%s > "$LOCK"
+
+logger -t easytier-hotplug "${DEVICE} ifup detected: updating firewall rules"
+
+/etc/init.d/easytier update_firewall >/dev/null 2>&1 &
