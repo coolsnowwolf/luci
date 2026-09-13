@@ -298,7 +298,7 @@ const methods = {
 			let fd = popen('dnsmasq --version 2>/dev/null');
 
 			if (fd) {
-				const m = match(fd.read('all'), /^Compile time options: (.+)$/s);
+				const m = match(fd.read('all'), /Compile time options: ([^\n]+)/);
 
 				for (let opt in split(m?.[1], ' ')) {
 					let f = replace(opt, 'no-', '', 1);
