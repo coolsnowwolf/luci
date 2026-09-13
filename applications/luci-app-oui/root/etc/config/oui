@@ -1,0 +1,4 @@
+# Optional exact device overrides for OEM network modules.
+# config device
+#	option mac '00:11:22:33:44:55'
+#	option vendor 'tcl'

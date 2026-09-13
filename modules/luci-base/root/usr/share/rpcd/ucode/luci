@@ -260,6 +260,7 @@ const methods = {
 				apk:        access('/usr/bin/apk') == true,
 				wifi:       access('/sbin/wifi') == true,
 				ufpd:       access('/usr/sbin/ufpd') == true,
+				oui:        access('/www/luci-static/resources/oui/oui.js') == true,
 				vrf:        access('/sys/module/vrf/refcnt') == true, // vrf.ko is loaded
 				netifd_vrf: false,
 				mptcp:      access('/proc/sys/net/mptcp/enabled'),

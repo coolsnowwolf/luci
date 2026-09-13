@@ -1,0 +1,284 @@
+[
+  {
+    "slug": "apple",
+    "name": "Apple",
+    "patterns": [
+      "^apple(?: computer)?(?: inc)?$"
+    ]
+  },
+  {
+    "slug": "asus",
+    "name": "ASUS",
+    "patterns": [
+      "^(?:asustek|asus)(?: |$)"
+    ]
+  },
+  {
+    "slug": "acer",
+    "name": "Acer",
+    "patterns": [
+      "^acer(?: |$)"
+    ]
+  },
+  {
+    "slug": "msi",
+    "name": "MSI",
+    "patterns": [
+      "^micro star(?: |$)",
+      "^msi(?: |$)"
+    ]
+  },
+  {
+    "slug": "dell",
+    "name": "Dell",
+    "patterns": [
+      "^dell(?: |$)"
+    ]
+  },
+  {
+    "slug": "hp",
+    "name": "HP",
+    "patterns": [
+      "^hewlett packard$",
+      "^hp inc$",
+      "^hp$"
+    ]
+  },
+  {
+    "slug": "lenovo",
+    "name": "Lenovo",
+    "patterns": [
+      "^lenovo(?: |$)"
+    ]
+  },
+  {
+    "slug": "samsung",
+    "name": "Samsung",
+    "patterns": [
+      "^samsung(?: |$)"
+    ]
+  },
+  {
+    "slug": "huawei",
+    "name": "Huawei",
+    "patterns": [
+      "^huawei(?: |$)"
+    ]
+  },
+  {
+    "slug": "honor",
+    "name": "HONOR",
+    "patterns": [
+      "^honor device(?: |$)"
+    ]
+  },
+  {
+    "slug": "xiaomi",
+    "name": "Xiaomi",
+    "patterns": [
+      "^(?:beijing )?xiaomi(?: |$)",
+      "^(?:shanghai )?imilab(?: |$)",
+      "^(?:shanghai )?chuangmi(?: |$)"
+    ]
+  },
+  {
+    "slug": "oppo",
+    "name": "OPPO",
+    "patterns": [
+      "^(?:guangdong )?oppo(?: |$)"
+    ]
+  },
+  {
+    "slug": "vivo",
+    "name": "vivo",
+    "patterns": [
+      "^vivo (?:mobile communication|international corporation)(?: |$)"
+    ]
+  },
+  {
+    "slug": "oneplus",
+    "name": "OnePlus",
+    "patterns": [
+      "^oneplus(?: |$)"
+    ]
+  },
+  {
+    "slug": "motorola",
+    "name": "Motorola",
+    "patterns": [
+      "^motorola(?: |$)"
+    ]
+  },
+  {
+    "slug": "nokia",
+    "name": "Nokia",
+    "patterns": [
+      "^nokia(?: |$)"
+    ]
+  },
+  {
+    "slug": "sony",
+    "name": "Sony",
+    "patterns": [
+      "^sony(?: |$)"
+    ]
+  },
+  {
+    "slug": "lg",
+    "name": "LG",
+    "patterns": [
+      "^lg electronics(?: |$)"
+    ]
+  },
+  {
+    "slug": "google",
+    "name": "Google",
+    "patterns": [
+      "^google(?: |$)"
+    ]
+  },
+  {
+    "slug": "microsoft",
+    "name": "Microsoft",
+    "patterns": [
+      "^microsoft(?: |$)"
+    ]
+  },
+  {
+    "slug": "intel",
+    "name": "Intel",
+    "patterns": [
+      "^intel(?: |$)"
+    ]
+  },
+  {
+    "slug": "nvidia",
+    "name": "NVIDIA",
+    "patterns": [
+      "^nvidia(?: |$)"
+    ]
+  },
+  {
+    "slug": "broadcom",
+    "name": "Broadcom",
+    "patterns": [
+      "^broadcom(?: |$)"
+    ]
+  },
+  {
+    "slug": "mediatek",
+    "name": "MediaTek",
+    "patterns": [
+      "^mediatek(?: |$)"
+    ]
+  },
+  {
+    "slug": "fujitsu",
+    "name": "Fujitsu",
+    "patterns": [
+      "^fujitsu(?: |$)"
+    ]
+  },
+  {
+    "slug": "toshiba",
+    "name": "Toshiba",
+    "patterns": [
+      "^toshiba(?: |$)"
+    ]
+  },
+  {
+    "slug": "panasonic",
+    "name": "Panasonic",
+    "patterns": [
+      "^(?:panasonic|matsushita)(?: |$)"
+    ]
+  },
+  {
+    "slug": "sharp",
+    "name": "Sharp",
+    "patterns": [
+      "^sharp(?: |$)"
+    ]
+  },
+  {
+    "slug": "raspberrypi",
+    "name": "Raspberry Pi",
+    "patterns": [
+      "^raspberry pi(?: |$)"
+    ]
+  },
+  {
+    "slug": "framework",
+    "name": "Framework",
+    "patterns": [
+      "^framework computer(?: |$)"
+    ]
+  },
+  {
+    "slug": "amazon",
+    "name": "Amazon",
+    "patterns": [
+      "^amazon(?: |$)"
+    ]
+  },
+  {
+    "slug": "tplink",
+    "name": "TP-Link",
+    "patterns": [
+      "^tp link(?: |$)",
+      "^tplink(?: |$)"
+    ]
+  },
+  {
+    "slug": "ubiquiti",
+    "name": "Ubiquiti",
+    "patterns": [
+      "^ubiquiti(?: |$)"
+    ]
+  },
+  {
+    "slug": "netgear",
+    "name": "NETGEAR",
+    "patterns": [
+      "^netgear(?: |$)"
+    ]
+  },
+  {
+    "slug": "linksys",
+    "name": "Linksys",
+    "patterns": [
+      "^linksys(?: |$)"
+    ]
+  },
+  {
+    "slug": "synology",
+    "name": "Synology",
+    "patterns": [
+      "^synology(?: |$)"
+    ]
+  },
+  {
+    "slug": "qnap",
+    "name": "QNAP",
+    "patterns": [
+      "^qnap(?: |$)"
+    ]
+  },
+  {
+    "slug": "midea",
+    "name": "Midea",
+    "patterns": [
+      "^(?:gd |guangdong )?midea(?: |$)"
+    ],
+    "supplemental": true
+  },
+  {
+    "slug": "tcl",
+    "name": "TCL",
+    "patterns": [
+      "^(?:shenzhen )?tcl (?:king|technoly|networks|new technology|communication|overseas|electronic|electronics|mobile|smart|technological)(?: |$)",
+      "^(?:hui zhou|huizhou) gaoshengda(?: |$)"
+    ],
+    "supplemental": true
+  }
+]

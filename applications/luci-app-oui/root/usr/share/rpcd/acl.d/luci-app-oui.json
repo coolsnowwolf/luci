@@ -1,0 +1,10 @@
+{
+  "luci-app-oui": {
+    "description": "Read local OUI device brand overrides",
+    "read": {
+      "uci": [
+        "oui"
+      ]
+    }
+  }
+}

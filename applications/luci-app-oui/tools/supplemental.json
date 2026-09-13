@@ -1,0 +1,14 @@
+{
+  "midea": {
+    "source": "https://commons.wikimedia.org/wiki/File:Midea.svg",
+    "sha256": "cd91efe06bdcb95055255d16b6a908e5dfba7530f92d7531f01b9e6f79f4fa6e",
+    "author": "Midea Group",
+    "license": "Public domain simple shape/text logo; trademark retained"
+  },
+  "tcl": {
+    "source": "https://commons.wikimedia.org/wiki/File:Logo_of_the_TCL_Corporation.svg",
+    "sha256": "949117dc99503fe4a382afed3bd7f69fbfe61a6da91236b6842d8a4991df7fa8",
+    "author": "TCL Electronics",
+    "license": "Public domain simple shape/text logo; trademark retained"
+  }
+}

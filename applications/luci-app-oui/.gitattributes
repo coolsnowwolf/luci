@@ -1,0 +1,2 @@
+# Preserve the original supplemental SVG bytes and source SHA256.
+htdocs/luci-static/resources/oui/midea.svg -text whitespace=cr-at-eol

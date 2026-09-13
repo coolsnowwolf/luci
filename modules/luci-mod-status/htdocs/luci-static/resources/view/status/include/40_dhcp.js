@@ -21,6 +21,31 @@ return baseclass.extend({
 	deferFirstLoad: true,
 	disableCache: true,
 
+	// Optional enhancement: never load the helper or query OUIs without the package.
+	renderHostname(host, mac) {
+		const node = E('span', { 'style': 'display:block;text-align:left' }, [ document.createTextNode(host || '-') ]);
+		if (!L.hasSystemFeature('oui'))
+			return node;
+		if (!this.ouiLoader) {
+			this.ouiLoader = Promise.all([L.resolveDefault(uci.load('oui')), new Promise(function(resolve) {
+				const script = document.createElement('script');
+				script.src = L.resource('oui/oui.js') + '?v=4';
+				script.onload = function() { resolve(window.luciOUI); };
+				script.onerror = function() { resolve(null); };
+				document.head.appendChild(script);
+			})]).then(function(results) {
+				if (results[1])
+					results[1].setDevices(uci.sections('oui', 'device'));
+				return results[1];
+			});
+		}
+		this.ouiLoader.then(function(oui) {
+			if (oui)
+				oui.decorate(node, mac);
+		});
+		return node;
+	},
+
 	isMACStatic: {},
 	isDUIDStatic: {},
 	isDUIDIAIDStatic: {},
@@ -109,7 +134,7 @@ return baseclass.extend({
 		const table = E('table', { 'id': 'status_leases', 'class': 'table leases' }, [
 			E('tr', { 'class': 'tr table-titles' }, [
 				L.hasSystemFeature('odhcpd', 'dhcpv4') ? E('th', { 'class': 'th' }, _('Interface')) : E([]),
-				E('th', { 'class': 'th' }, _('Hostname')),
+				E('th', { 'class': 'th', 'style': 'text-align:left' }, _('Hostname')),
 				E('th', { 'class': 'th' }, _('IPv4 address')),
 				E('th', { 'class': 'th' }, _('MAC address')),
 				E('th', { 'class': 'th' }, _('DUID')),
@@ -142,7 +167,7 @@ return baseclass.extend({
 				vendor = macaddr[lease.macaddr.toLowerCase()]?.vendor ?? null;
 
 			const columns = [
-				host || '-',
+				this.renderHostname(host, lease.macaddr),
 				lease.ipaddr,
 				vendor ? lease.macaddr + ` (${vendor})` : lease.macaddr,
 				lease.duid || '-',
@@ -168,7 +193,7 @@ return baseclass.extend({
 		const table6 = E('table', { 'id': 'status_leases6', 'class': 'table leases6' }, [
 			E('tr', { 'class': 'tr table-titles' }, [
 				L.hasSystemFeature('odhcpd', 'dhcpv6') ? E('th', { 'class': 'th' }, _('Interface')) : E([]),
-				E('th', { 'class': 'th' }, _('Hostname')),
+				E('th', { 'class': 'th', 'style': 'text-align:left' }, _('Hostname')),
 				E('th', { 'class': 'th' }, _('IPv6 addresses')),
 				E('th', { 'class': 'th' }, _('DUID')),
 				E('th', { 'class': 'th' }, _('IAID')),
@@ -210,7 +235,7 @@ return baseclass.extend({
 				disabled = true;
 
 			const columns = [
-				host || '-',
+				this.renderHostname(host, lease.macaddr),
 				lease.ip6addrs ? lease.ip6addrs.join('<br />') : lease.ip6addr,
 				duid || '-',
 				iaid || '-',
