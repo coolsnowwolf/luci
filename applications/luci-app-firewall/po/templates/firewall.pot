@@ -260,6 +260,22 @@ msgstr ""
 msgid "Destination zone"
 msgstr ""
 
+#: applications/luci-app-firewall/htdocs/luci-static/resources/view/firewall/zones.js:49
+msgid "Disabled"
+msgstr ""
+
+#: applications/luci-app-firewall/htdocs/luci-static/resources/view/firewall/zones.js:48
+msgid "Broadcom Fullcone NAT1"
+msgstr ""
+
+#: applications/luci-app-firewall/htdocs/luci-static/resources/view/firewall/zones.js:56
+msgid "Running status: %s, TCP congestion control algorithm is %s"
+msgstr ""
+
+#: applications/luci-app-firewall/htdocs/luci-static/resources/view/firewall/zones.js:54
+msgid "Unknown"
+msgstr ""
+
 #: applications/luci-app-firewall/htdocs/luci-static/resources/view/firewall/rules.js:263
 msgid "Device name"
 msgstr ""

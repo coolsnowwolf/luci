@@ -2,8 +2,10 @@
 	"luci-app-firewall": {
 		"description": "Grant access to firewall configuration",
 		"read": {
+			"cgi-io": [ "exec" ],
 			"file": {
-				"/etc/firewall.user": [ "read" ]
+				"/etc/firewall.user": [ "read" ],
+				"/usr/libexec/luci-firewall-status": [ "exec" ]
 			},
 			"ubus": {
 				"file": [ "read" ],

@@ -1,0 +1,22 @@
+#!/bin/sh
+
+tcp_cca="$(cat /proc/sys/net/ipv4/tcp_congestion_control 2>/dev/null)"
+nat_mode="disabled"
+
+rules="$(iptables-save -t nat 2>/dev/null)"
+
+if printf '%s\n' "$rules" | grep -q -- '--mode fullcone'; then
+	nat_mode="nat1"
+elif printf '%s\n' "$rules" | grep -q -- '-j FULLCONENAT'; then
+	nat_mode="fullcone"
+else
+	rules="$(nft list ruleset 2>/dev/null)"
+
+	if printf '%s\n' "$rules" | grep -Eq 'masquerade[[:space:]]+fullcone'; then
+		nat_mode="nat1"
+	elif printf '%s\n' "$rules" | grep -Eq '(^|[[:space:]])fullcone([[:space:]]|$)'; then
+		nat_mode="fullcone"
+	fi
+fi
+
+printf '{"nat_mode":"%s","tcp_cca":"%s"}\n' "$nat_mode" "$tcp_cca"

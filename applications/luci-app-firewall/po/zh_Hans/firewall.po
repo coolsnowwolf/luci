@@ -344,6 +344,18 @@ msgstr "TCP 拥塞控制算法"
 msgid "TCP congestion control algorithm."
 msgstr "TCP 拥塞控制算法。"
 
+msgid "Running status: %s, TCP congestion control algorithm is %s"
+msgstr "当前运行状态：%s，TCP 拥塞控制算法为 %s"
+
+msgid "Broadcom Fullcone NAT1"
+msgstr "Broadcom Fullcone NAT1"
+
+msgid "Disabled"
+msgstr "已禁用"
+
+msgid "Unknown"
+msgstr "未知"
+
 #: applications/luci-app-firewall/htdocs/luci-static/resources/view/firewall/forwards.js:346
 #: applications/luci-app-firewall/htdocs/luci-static/resources/view/firewall/rules.js:463
 #: applications/luci-app-firewall/htdocs/luci-static/resources/view/firewall/snats.js:339

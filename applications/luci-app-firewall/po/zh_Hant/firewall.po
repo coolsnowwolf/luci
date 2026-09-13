@@ -328,6 +328,18 @@ msgstr "啟用"
 msgid "Enable NAT Loopback"
 msgstr "啟用 NAT 回送"
 
+msgid "Running status: %s, TCP congestion control algorithm is %s"
+msgstr "目前執行狀態：%s，TCP 壅塞控制演算法為 %s"
+
+msgid "Broadcom Fullcone NAT1"
+msgstr "Broadcom Fullcone NAT1"
+
+msgid "Disabled"
+msgstr "已停用"
+
+msgid "Unknown"
+msgstr "未知"
+
 #: applications/luci-app-firewall/htdocs/luci-static/resources/view/firewall/zones.js:43
 msgid "Enable SYN-flood protection"
 msgstr "啟用 SYN 洪水保護"
