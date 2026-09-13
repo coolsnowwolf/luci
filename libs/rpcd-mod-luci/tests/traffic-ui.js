@@ -8,7 +8,7 @@ const validation = new Function('baseclass', fs.readFileSync(path.join(luci, 'mo
 const source = fs.readFileSync(path.join(luci, 'modules/luci-mod-status/htdocs/luci-static/resources/view/status/include/40_dhcp.js'), 'utf8');
 const L = { bind: (fn, ctx) => fn.bind(ctx), hasSystemFeature: () => false, resolveDefault: (p, fallback) => Promise.resolve(p).catch(() => fallback), toArray: x => x == null ? [] : Array.isArray(x) ? x : [x] };
 let cells = [], calls = 0, polls = [], reply;
-const document = {querySelectorAll: () => cells};
+const document = {querySelectorAll: selector => selector.startsWith('#status_leases') ? [] : cells};
 const poll = {add: (fn, interval) => polls.push({fn, interval})};
 const rpc = {declare: spec => addresses => {
  assert.equal(spec.object, 'luci.client-rates');
