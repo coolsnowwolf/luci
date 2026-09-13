@@ -58,6 +58,8 @@
 
 
 int rpc_luci_traffic_init(struct ubus_context *ctx);
+int rpc_luci_webprobe_init(struct ubus_context *ctx);
+void rpc_luci_dhcp4_clients(void (*add)(const struct in_addr *, const unsigned char *));
 void rpc_luci_traffic_discover(void (*add)(int, const void *, const unsigned char *));
 
 static struct blob_buf blob;
@@ -1426,6 +1428,17 @@ out:
 		nlmsg_free(msg);
 }
 
+void rpc_luci_dhcp4_clients(void (*add)(const struct in_addr *, const unsigned char *))
+{
+	struct lease_entry *lease;
+	lease_open();
+	while ((lease = lease_next()) != NULL) {
+		if (lease->af == AF_INET && lease->expire != 0 && !ea_empty(&lease->mac))
+			add(&lease->addr[0].in, lease->mac.ether_addr_octet);
+	}
+	lease_close();
+}
+
 /* Discover accounting identities without DNS lookups or browser requests. */
 void rpc_luci_traffic_discover(void (*add)(int, const void *, const unsigned char *))
 {
@@ -2090,6 +2103,8 @@ rpc_luci_api_init(const struct rpc_daemon_ops *o, struct ubus_context *ctx)
 	int ret = ubus_add_object(ctx, &obj);
 	if (!ret)
 		ret = rpc_luci_traffic_init(ctx);
+	if (!ret)
+		ret = rpc_luci_webprobe_init(ctx);
 	return ret;
 }
 

@@ -9,6 +9,7 @@
 				"luci": [ "getConntrackList", "getRealtimeStats", "getCPUBench", "getCPUUsage", "getOnlineUsers" ],
 				"luci-rpc": [ "getHostHints", "getNetworkDevices", "getDHCPLeases" ],
 				"luci.client-rates": [ "get" ],
+				"luci.client-web": [ "get" ],
 				"network.rrdns": [ "lookup" ]
 			}
 		}

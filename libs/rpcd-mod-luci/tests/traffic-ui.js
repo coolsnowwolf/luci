@@ -16,7 +16,7 @@ const rpc = {declare: spec => addresses => {
  calls++;
  return reply;
 }};
-const view = new Function('baseclass','rpc','L','_','validation','poll','document', source)(baseclass, rpc, L, s=>s, validation, poll, document);
+const view = new Function('baseclass','rpc','L','_','validation','poll','document','E', source)(baseclass, rpc, L, s=>s, validation, poll, document, (tag, attrs, text) => ({tag,attrs,text}));
 // Formatting is supplied by LuCI; check its numeric sorting key separately.
 String.prototype.format = function(value) { return String(value) + ' B/s'; };
 const lease = {ipaddr:'192.168.0.2', macaddr:'aa:bb:cc:dd:ee:ff',ip6addrs:['2001:db8::2/128']};
@@ -34,6 +34,25 @@ assert.equal(view.rateValue(['192.168.0.2'],totals,'total',mac)[0],123456);
 assert.equal(view.rateValue([],totals,'total',mac.toLowerCase())[0],123456);
 assert.equal(view.rateValue([],{},'total',mac)[1],'-');
 assert.equal(view.rateValue([], {totals:{[mac]:0}}, 'total',mac)[0],0);
+const web = ports => ({clients:{'192.168.0.2':{mac, ready:true, ports}}});
+assert.equal(view.clientURL(lease, web([4430,443,8080,80])), 'http://192.168.0.2/');
+assert.equal(view.clientURL(lease, web([443,8080])), 'http://192.168.0.2:8080/');
+assert.equal(view.clientURL(lease, web([4430,443])), 'https://192.168.0.2/');
+assert.equal(view.clientURL(lease, web([4430])), 'https://192.168.0.2:4430/');
+assert.equal(view.clientURL(lease, web([5666,443,5667])), 'http://192.168.0.2:5666/');
+assert.equal(view.clientURL(lease, web([5667])), 'https://192.168.0.2:5667/');
+assert.equal(view.clientURL(lease, web([])), null);
+assert.equal(view.clientURL(lease, web([22])), null);
+assert.equal(view.clientURL({...lease,macaddr:'00:11:22:33:44:55'}, web([80])), null);
+assert.equal(view.clientURL({...lease,ipaddr:'javascript:alert(1)'}, web([80])), null);
+assert.equal(view.clientURL(lease, {}), null);
+const link = view.renderClientIP(lease, web([5666,443]));
+assert.equal(link.tag, 'a');
+assert.equal(link.text, lease.ipaddr);
+assert.equal(link.attrs.href, 'http://192.168.0.2:5666/');
+assert.equal(link.attrs.target, '_blank');
+assert.equal(link.attrs.style, 'text-decoration:underline');
+assert.equal(view.renderClientIP(lease, web([])), lease.ipaddr);
 console.log('traffic UI: address normalization, no double-counting, directions and warm-up passed');
 
 (async () => {
