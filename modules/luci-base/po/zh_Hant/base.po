@@ -9393,6 +9393,14 @@ msgctxt "nft redirect"
 msgid "Redirect to local system"
 msgstr "重新導向至本地系統"
 
+#: modules/luci-mod-system/htdocs/luci-static/resources/view/system/system.js
+msgid "Redirect LAN NTP requests to this device."
+msgstr "將區域網路 NTP 請求重新導向至本機。"
+
+#: modules/luci-mod-system/htdocs/luci-static/resources/view/system/system.js
+msgid "Redirect NTP requests"
+msgstr "重新導向區域網路 NTP 請求"
+
 #: modules/luci-mod-status/htdocs/luci-static/resources/view/status/iptables.js:57
 msgid "References"
 msgstr "引用"

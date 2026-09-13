@@ -60,6 +60,27 @@ function formatTime(epoch) {
 	}).format(date);
 }
 
+const ntpRedirectSection = 'ntp_redirect';
+
+function removeNtpRedirect() {
+	if (uci.get('firewall', ntpRedirectSection) != null)
+		uci.remove('firewall', ntpRedirectSection);
+}
+
+function setNtpRedirect() {
+	if (uci.get('firewall', ntpRedirectSection)?.['.type'] != 'redirect') {
+		removeNtpRedirect();
+		uci.add('firewall', 'redirect', ntpRedirectSection);
+	}
+
+	uci.set('firewall', ntpRedirectSection, 'name', 'Redirect NTP requests');
+	uci.set('firewall', ntpRedirectSection, 'src', 'lan');
+	uci.set('firewall', ntpRedirectSection, 'proto', 'udp');
+	uci.set('firewall', ntpRedirectSection, 'src_dport', '123');
+	uci.set('firewall', ntpRedirectSection, 'dest_port', '123');
+	uci.set('firewall', ntpRedirectSection, 'target', 'DNAT');
+}
+
 const CBILocalTime = form.DummyValue.extend({
 	renderWidget(section_id, option_id, cfgvalue) {
 		return E([], [
@@ -99,13 +120,14 @@ return view.extend({
 			callGetUnixtime(),
 			uci.load('luci'),
 			uci.load('system'),
+			uci.load('firewall'),
 			L.hasSystemFeature('zram')
 				? L.resolveDefault(fs.read('/sys/block/zram0/comp_algorithm'), '')
 				: ''
 		]);
 	},
 
-	render([ntpd_enabled, timezones, unixtime, _luci, _system, zram_algorithms]) {
+	render([ntpd_enabled, timezones, unixtime, _luci, _system, _firewall, zram_algorithms]) {
 		let m, s, o;
 		const system_section = uci.sections('system', 'system')[0];
 
@@ -116,6 +138,7 @@ return view.extend({
 		this.systemSid = system_section?.['.name'];
 
 		m.chain('luci');
+		m.chain('firewall');
 
 		s = m.section(form.TypedSection, 'system', _('System Properties'));
 		s.anonymous = true;
@@ -306,8 +329,10 @@ return view.extend({
 					uci.set('system', 'ntp', 'server', default_servers);
 				}
 
-				if (!ntpd_enabled)
+				if (!ntpd_enabled) {
 					uci.set('system', 'ntp', 'enabled', 0);
+					removeNtpRedirect();
+				}
 				else
 					uci.unset('system', 'ntp', 'enabled');
 
@@ -322,6 +347,12 @@ return view.extend({
 			o = s.taboption('timesync', form.Flag, 'enable_server', _('Provide NTP server'));
 			o.ucisection = 'ntp';
 			o.depends('enabled', '1');
+			o.write = function(section_id, value) {
+				uci.set('system', 'ntp', 'enable_server', value);
+
+				if (value != '1')
+					removeNtpRedirect();
+			};
 
 			o = s.taboption('timesync', widgets.NetworkSelect, 'interface',
 				_('Bind NTP server'),
@@ -331,6 +362,21 @@ return view.extend({
 			o.multiple = false;
 			o.nocreate = true;
 			o.optional = true;
+
+			o = s.taboption('timesync', form.Flag, '_redirect', _('Redirect NTP requests'),
+				_('Redirect LAN NTP requests to this device.'));
+			o.ucisection = 'ntp';
+			o.depends({ enabled: '1', enable_server: '1' });
+			o.cfgvalue = function(section_id) {
+				return uci.get('firewall', ntpRedirectSection)?.['.type'] == 'redirect' ? '1' : '0';
+			};
+			o.write = function(section_id, value) {
+				if (value == '1')
+					setNtpRedirect();
+				else
+					removeNtpRedirect();
+			};
+			o.remove = removeNtpRedirect;
 
 			o = s.taboption('timesync', form.Flag, 'use_dhcp', _('Use DHCP advertised servers'));
 			o.ucisection = 'ntp';
