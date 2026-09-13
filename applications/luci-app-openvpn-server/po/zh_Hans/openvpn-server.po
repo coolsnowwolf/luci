@@ -15,6 +15,42 @@ msgstr ""
 msgid "OpenVPN Server"
 msgstr "OpenVPN 服务器"
 
+msgid "User Status"
+msgstr "用户状态"
+
+msgid "User"
+msgstr "用户"
+
+msgid "Remote IP"
+msgstr "远端 IP"
+
+msgid "Assigned IP"
+msgstr "分配 IP"
+
+msgid "Online Time"
+msgstr "在线时间"
+
+msgid "Connected Since"
+msgstr "连接时间"
+
+msgid "Upload"
+msgstr "上传流量"
+
+msgid "Download"
+msgstr "下载流量"
+
+msgid "Connected users: %d"
+msgstr "当前连接用户：%d"
+
+msgid "No clients are currently connected."
+msgstr "当前没有客户端连接。"
+
+msgid "OpenVPN status data is unavailable."
+msgstr "OpenVPN 状态数据不可用。"
+
+msgid "OpenVPN server is not running."
+msgstr "OpenVPN 服务器未运行。"
+
 #: applications/luci-app-openvpn-server/luasrc/model/cbi/openvpn-server/openvpn-server.lua:4
 msgid "An easy config OpenVPN Server Web-UI"
 msgstr "易于使用的 OpenVPN 服务器 Web-UI"

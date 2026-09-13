@@ -48,6 +48,60 @@ function renderStatus(isRunning) {
 	]);
 }
 
+function getClientStatus() {
+	return L.resolveDefault(
+		fs.exec_direct('/usr/libexec/luci-openvpn-server-status', [], 'json'),
+		{ clients: [] });
+}
+
+function renderClientStatus(status) {
+	const clients = Array.isArray(status?.clients) ? status.clients : [];
+	const table = E('div', {
+		'class': 'table cbi-section-table',
+		'style': 'min-width:52rem'
+	}, [
+		E('div', { 'class': 'tr table-titles' }, [
+			E('div', { 'class': 'th' }, _('User')),
+			E('div', { 'class': 'th' }, _('Remote IP')),
+			E('div', { 'class': 'th' }, _('Assigned IP')),
+			E('div', { 'class': 'th' }, _('Online Time')),
+			E('div', { 'class': 'th' }, _('Connected Since')),
+			E('div', { 'class': 'th' }, _('Upload')),
+			E('div', { 'class': 'th' }, _('Download'))
+		])
+	]);
+
+	if (!clients.length) {
+		table.appendChild(E('div', { 'class': 'tr placeholder' }, [
+			E('div', { 'class': 'td' }, [
+				E('em', {}, [ status?.running === false
+					? _('OpenVPN server is not running.')
+					: (status?.available === false
+						? _('OpenVPN status data is unavailable.')
+						: _('No clients are currently connected.')) ])
+			])
+		]));
+	}
+	else {
+		for (const client of clients) {
+			table.appendChild(E('div', { 'class': 'tr' }, [
+				E('div', { 'class': 'td', 'data-title': _('User') }, client.common_name || '-'),
+				E('div', { 'class': 'td', 'data-title': _('Remote IP') }, client.remote_ip || '-'),
+				E('div', { 'class': 'td', 'data-title': _('Assigned IP') }, client.virtual_address || '-'),
+				E('div', { 'class': 'td', 'data-title': _('Online Time') }, '%t'.format(+client.online_seconds || 0)),
+				E('div', { 'class': 'td', 'data-title': _('Connected Since') }, client.connected_since || '-'),
+				E('div', { 'class': 'td', 'data-title': _('Upload') }, '%1024.2mB'.format(+client.bytes_received || 0)),
+				E('div', { 'class': 'td', 'data-title': _('Download') }, '%1024.2mB'.format(+client.bytes_sent || 0))
+			]));
+		}
+	}
+
+	return E('div', { 'style': 'width:100%;min-width:0' }, [
+		E('p', {}, [ _('Connected users: %d').format(clients.length) ]),
+		E('div', { 'style': 'width:100%;overflow-x:auto' }, [ table ])
+	]);
+}
+
 function notifyError(err) {
 	const msg = (err && err.message) ? err.message : String(err || _('Unknown error'));
 	ui.addNotification(null, E('p', {}, msg), 'error');
@@ -217,20 +271,30 @@ return view.extend({
 		const m = new form.Map('openvpn', _('OpenVPN Server'),
 			_('An easy config OpenVPN Server Web-UI'));
 		let s, o;
+		const clientStatusNode = E('div', {
+			'id': 'openvpn_client_status',
+			'style': 'width:100%;min-width:0'
+		}, [
+			E('em', {}, [ _('Collecting data...') ])
+		]);
 
 		s = m.section(form.TypedSection);
 		s.anonymous = true;
 		s.render = function() {
-			poll.add(function() {
+			const statusNode = E('p', { id: 'openvpn_server_status' }, [
+				_('Collecting data...')
+			]);
+			const updateServiceStatus = function() {
 				return getServiceStatus().then(function(running) {
-					const node = document.getElementById('openvpn_server_status');
-					if (node)
-						dom.content(node, renderStatus(running));
+					dom.content(statusNode, renderStatus(running));
 				});
-			});
+			};
+
+			updateServiceStatus();
+			poll.add(updateServiceStatus);
 
 			return E('div', { class: 'cbi-section' }, [
-				E('p', { id: 'openvpn_server_status' }, [ _('Collecting data...') ])
+				statusNode
 			]);
 		};
 
@@ -240,6 +304,7 @@ return view.extend({
 
 		s.tab('basic', _('Base Setting'));
 		s.tab('code', _('Special Code'));
+		s.tab('status', _('User Status'));
 
 		o = s.taboption('basic', form.Flag, 'enabled', _('Enable'));
 		o.rmempty = false;
@@ -305,7 +370,24 @@ return view.extend({
 			return fs.write('/etc/openvpn-addon.conf', '');
 		};
 
-		return m.render();
+		o = s.taboption('status', form.DummyValue, '_client_status');
+		o.renderWidget = function() {
+			return clientStatusNode;
+		};
+
+		return m.render().then(function(mapEl) {
+			const updateClientStatus = function() {
+				return getClientStatus().then(function(status) {
+					dom.content(clientStatusNode, renderClientStatus(status));
+				});
+			};
+
+			poll.add(updateClientStatus, 5);
+
+			return updateClientStatus().then(function() {
+				return mapEl;
+			});
+		});
 	},
 
 	handleDownload(ev) {

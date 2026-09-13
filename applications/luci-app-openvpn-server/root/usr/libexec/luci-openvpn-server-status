@@ -1,0 +1,112 @@
+#!/bin/sh
+
+. /usr/share/libubox/jshn.sh
+
+status_file="$(uci -q get openvpn.myvpn.status)"
+clients_file="$(mktemp /tmp/luci-openvpn-server-status.XXXXXX)" || exit 1
+trap 'rm -f "$clients_file"' EXIT
+running="$(ubus call service list '{"name":"openvpn"}' 2>/dev/null | \
+	jsonfilter -e '@.openvpn.instances.myvpn.running')"
+
+json_init
+
+if [ "$running" != "true" ]; then
+	json_add_boolean running 0
+	json_add_boolean available 0
+	json_add_array clients
+	json_close_array
+	json_dump
+	exit 0
+fi
+
+if [ ! -r "$status_file" ]; then
+	for candidate in /var/run/openvpn.myvpn.status /var/log/openvpn_status.log; do
+		if [ -r "$candidate" ]; then
+			status_file="$candidate"
+			break
+		fi
+	done
+fi
+
+json_add_boolean running 1
+
+if [ ! -r "$status_file" ]; then
+	json_add_boolean available 0
+	json_add_array clients
+	json_close_array
+	json_dump
+	exit 0
+fi
+
+awk -F, '
+	$0 == "OpenVPN CLIENT LIST" { section = "clients"; next }
+	$0 == "ROUTING TABLE" { section = "routes"; next }
+	$0 == "GLOBAL STATS" || $0 == "END" { section = ""; next }
+
+	section == "clients" && $1 != "Updated" && $1 != "Common Name" && NF >= 5 {
+		key = $1 SUBSEP $2
+		order[++count] = key
+		common_name[key] = $1
+		real_address[key] = $2
+		bytes_received[key] = $3
+		bytes_sent[key] = $4
+		connected_since[key] = $5
+		next
+	}
+
+	section == "routes" && $1 != "Virtual Address" && NF >= 3 {
+		key = $2 SUBSEP $3
+		virtual_address[key] = virtual_address[key] \
+			? virtual_address[key] ", " $1 : $1
+	}
+
+	END {
+		for (i = 1; i <= count; i++) {
+			key = order[i]
+			remote_ip = real_address[key]
+
+			if (remote_ip ~ /^\[/) {
+				sub(/^\[/, "", remote_ip)
+				sub(/\]:[0-9]+$/, "", remote_ip)
+			}
+			else {
+				sub(/:[0-9]+$/, "", remote_ip)
+			}
+
+			printf "%s\t%s\t%s\t%s\t%s\t%s\n", \
+				common_name[key], remote_ip, virtual_address[key], \
+				bytes_received[key], bytes_sent[key], connected_since[key]
+		}
+	}
+' "$status_file" > "$clients_file"
+
+json_add_boolean available 1
+json_add_array clients
+
+tab="$(printf '\t')"
+now="$(date +%s)"
+
+while IFS="$tab" read -r common_name remote_ip virtual_address bytes_received bytes_sent connected_since; do
+	[ -n "$common_name" ] || continue
+
+	connected_epoch="$(date -d "$connected_since" +%s 2>/dev/null)"
+	case "$connected_epoch" in
+		''|*[!0-9]*) online_seconds=0 ;;
+		*) online_seconds=$((now - connected_epoch)) ;;
+	esac
+
+	[ "$online_seconds" -ge 0 ] 2>/dev/null || online_seconds=0
+
+	json_add_object ""
+	json_add_string common_name "$common_name"
+	json_add_string remote_ip "$remote_ip"
+	json_add_string virtual_address "${virtual_address:--}"
+	json_add_int bytes_received "${bytes_received:-0}"
+	json_add_int bytes_sent "${bytes_sent:-0}"
+	json_add_string connected_since "$connected_since"
+	json_add_int online_seconds "$online_seconds"
+	json_close_object
+done < "$clients_file"
+
+json_close_array
+json_dump
