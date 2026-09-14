@@ -17,3 +17,17 @@ Run `ucode client-history.uc` on a target with the installed
 restart, IP reassignment, changing IPv6 addresses and boot-ID reset without
 rebooting the device. Run the existing frontend tests with
 `node libs/rpcd-mod-luci/tests/traffic-ui.js` from the LuCI repository.
+
+For unnamed clients in the resolved LAN ARP table, the collector attempts DNS
+PTR lookup, then unicast NetBIOS NBSTAT (UDP 137) when DNS has no answer.
+Positive and negative results are cached for five minutes, keyed by MAC and IP.
+Each pass considers at most 32 due addresses; DNS and NetBIOS each have a
+one-second batch wait budget. Names are retained with the boot-local history;
+DHCP names take precedence. Devices without PTR or NetBIOS service keep their
+existing label. No subnet-wide or broadcast scan is performed.
+
+Run `ucode client-names.uc` with the installed `luci.client_history`,
+`luci.client_names` and `ucode-mod-socket` modules. It checks positive/negative
+caching, retry timing, address reuse, DHCP priority, boot reset and malformed
+NBSTAT responses. For a live check, compare `netbios_names([ip])` with a known
+NetBIOS responder; an unanswered query is not evidence of an offline client.

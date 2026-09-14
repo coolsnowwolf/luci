@@ -165,8 +165,8 @@ return baseclass.extend({
 		const fields = [
 			{ label: _('Active Connections'), value: ct_max ? ct_count : null },
 			{ label: _('Online Users'), value: onlineusers ? onlineusers.onlineusers : null },
-			{ label: _('Total download bandwidth'), value: this.bandwidthBar(download, capacity) },
-			{ label: _('Total upload bandwidth'), value: this.bandwidthBar(upload, capacity) }
+			{ label: _('Total upload bandwidth'), value: this.bandwidthBar(upload, capacity) },
+			{ label: _('Total download bandwidth'), value: this.bandwidthBar(download, capacity) }
 		];
 
 		const ctstatus = E('table', { 'class': 'table' });

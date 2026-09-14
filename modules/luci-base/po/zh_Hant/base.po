@@ -14022,3 +14022,6 @@ msgstr "離線"
 
 msgid "Online Hosts"
 msgstr "在線主機"
+
+msgid "Connection count"
+msgstr "連線數"

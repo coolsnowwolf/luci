@@ -14167,3 +14167,6 @@ msgstr "离线"
 
 msgid "Online Hosts"
 msgstr "在线主机"
+
+msgid "Connection count"
+msgstr "连接数"

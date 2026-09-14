@@ -66,3 +66,10 @@ The integration check should compare conntrack byte deltas with ECM connection
 statistics while the matching connection is accelerated, then check the real
 homepage with traffic. Do not infer accelerated accounting solely from a package
 build or a nonzero interface counter.
+
+`connections` contains the latest completed conntrack dump count per MAC,
+combining IPv4/IPv6 and counting a flow only once when both ends have the same
+MAC. It includes idle tracked entries and counts records even without byte
+counters. It is a two-second snapshot, not a TCP ESTABLISHED-only count.
+Failed or stale snapshots return no counts, rendered as `-`; a valid empty
+snapshot returns zero. Counts are not restored from historical traffic state.

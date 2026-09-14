@@ -73,6 +73,19 @@ static void feed(int family, const char *src, const char *dst, const char *reply
 	assert(process_flow(msg));
 }
 
+static void count_record(int family, const char *src, const char *dst, const char *reply_src)
+{
+	char buffer[2048] = {0};
+	struct nlmsghdr *msg = (void *)buffer;
+	struct nfgenmsg *nf = NLMSG_DATA(msg);
+	msg->nlmsg_len = NLMSG_LENGTH(sizeof(*nf));
+	nf->nfgen_family = family;
+	tuple(msg, CTA_TUPLE_ORIG, src, dst);
+	tuple(msg, CTA_TUPLE_REPLY, reply_src, src);
+	/* Missing byte counters must not prevent connection counting. */
+	count_connection(msg);
+}
+
 static struct client *client(const char *ip)
 {
 	struct client *c = calloc(1, sizeof(*c));
@@ -92,6 +105,19 @@ int main(void)
 	avl_init(&hosts, mac_cmp, false, NULL);
 	started = now_ms();
 	struct client *a = client("192.168.0.100"), *b = client("192.168.0.101"), *v6 = client("fd00::2");
+	unsigned char v6mac[6];
+	memcpy(v6mac, v6->mac, 6);
+	memcpy(v6->mac, a->mac, 6);
+	count_record(AF_INET, "192.168.0.100", "8.8.8.8", "8.8.8.8");
+	count_record(AF_INET6, "fd00::2", "2001:db8::1", "2001:db8::1");
+	count_record(AF_INET, "8.8.8.8", "203.0.113.1", "192.168.0.101");
+	count_record(AF_INET, "192.168.0.100", "203.0.113.1", "192.168.0.100");
+	assert(get_host(a->mac, false)->pending_connections == 3);
+	assert(get_host(b->mac, false)->pending_connections == 1);
+	assert(get_host(a->mac, false)->connections == 0);
+	get_host(a->mac, false)->pending_connections = 0;
+	get_host(b->mac, false)->pending_connections = 0;
+	memcpy(v6->mac, v6mac, 6);
 	feed(AF_INET, "192.168.0.100", "8.8.8.8", "8.8.8.8", 1, 1000, 2000, false);
 	assert(a->bytes[0] == 0 && a->bytes[1] == 0); /* First sample is a baseline. */
 	finish_dump();

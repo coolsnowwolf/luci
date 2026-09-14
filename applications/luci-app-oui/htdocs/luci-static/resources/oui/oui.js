@@ -75,7 +75,7 @@
 		fallback();
 		node.insertBefore(icon, node.firstChild);
 		if (fnos === true) {
-			icon.title = 'fnOS 飞牛OS';
+			icon.title = 'fnOS / FygoOS';
 			icon.onerror = fallback;
 			icon.src = base + 'fnos.svg';
 			return;

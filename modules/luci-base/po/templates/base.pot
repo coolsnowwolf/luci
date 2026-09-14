@@ -13700,3 +13700,6 @@ msgstr ""
 
 msgid "Online Hosts"
 msgstr ""
+
+msgid "Connection count"
+msgstr ""
