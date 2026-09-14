@@ -362,7 +362,9 @@ function refreshWirelessState() {
 
 	const wifiDevices = uci.sections('wireless', 'wifi-device');
 	const configOnly = wifiDevices.length > 0 && wifiDevices.every(function(device) {
-		return (device.type == 'mt_dbdc' || device.type == 'qcawifi' || device.type == 'qcawificfg80211');
+		// Legacy MT7615 DBDC uses ra0/rax0 radio sections; MT798x uses ra/rax.
+		return ((device.type == 'mt_dbdc' && /^ra[xiyez]?0$/.test(device['.name'])) ||
+			device.type == 'qcawifi' || device.type == 'qcawificfg80211');
 	});
 
 	if (configOnly)
@@ -408,7 +410,9 @@ function refreshWirelessState() {
 function waitForWirelessState() {
 	const wifiDevices = uci.sections('wireless', 'wifi-device');
 	const hasConfigOnlyWifi = wifiDevices.some(function(device) {
-		return (device.type == 'mt_dbdc' || device.type == 'qcawifi' || device.type == 'qcawificfg80211');
+		// Legacy MT7615 DBDC uses ra0/rax0 radio sections; MT798x uses ra/rax.
+		return ((device.type == 'mt_dbdc' && /^ra[xiyez]?0$/.test(device['.name'])) ||
+			device.type == 'qcawifi' || device.type == 'qcawificfg80211');
 	});
 	const refresh = refreshWirelessState();
 

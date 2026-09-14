@@ -89,8 +89,11 @@ function getMtDbdcStaIfname(device) {
 	return ifname ? 'apcli0' : null;
 }
 
-function isConfigOnlyWifiHwtype(hwtype) {
-	return (hwtype == 'mt_dbdc' || isQcaWifiHwtype(hwtype));
+function isConfigOnlyWifiDevice(device) {
+	const hwtype = uci.get('wireless', device, 'type');
+
+	// Only legacy MT7615 DBDC radios lack usable runtime wireless RPCs.
+	return ((hwtype == 'mt_dbdc' && /^ra[xiyez]?0$/.test(device)) || isQcaWifiHwtype(hwtype));
 }
 
 function buildIwinfoDeviceLookup(devices) {
@@ -107,13 +110,13 @@ function getIwinfoDevicesFromConfig() {
 	const radios = uci.sections('wireless', 'wifi-device');
 	const devices = [];
 
-	if (!radios.length || !radios.every((radio) => isConfigOnlyWifiHwtype(radio.type)))
+	if (!radios.length || !radios.every((radio) => isConfigOnlyWifiDevice(radio['.name'])))
 		return null;
 
 	for (const iface of uci.sections('wireless', 'wifi-iface')) {
 		const hwtype = uci.get('wireless', iface.device, 'type');
 
-		if (isConfigWifiIfaceDisabled(iface) || !isConfigOnlyWifiHwtype(hwtype))
+		if (isConfigWifiIfaceDisabled(iface) || !isConfigOnlyWifiDevice(iface.device))
 			continue;
 
 		const fallback = isQcaWifiHwtype(hwtype)
@@ -2616,7 +2619,7 @@ return view.extend({
 				return a.getName() > b.getName();
 			});
 			const hasConfigOnlyWifi = configuredRadios.some(function(radio) {
-				return isConfigOnlyWifiHwtype(uci.get('wireless', radio.getName(), 'type'));
+				return isConfigOnlyWifiDevice(radio.getName());
 			});
 
 			if (hasConfigOnlyWifi) {
