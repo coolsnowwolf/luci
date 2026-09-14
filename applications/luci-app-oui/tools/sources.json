@@ -4,8 +4,8 @@
     "url": "https://github.com/WH-2099/macdb",
     "sha256": "dab68f6728825b5e6e894e537ffbc82d2d387eb2ba3d8dd313962dcef8076979"
   },
-  "database": "vendors-2099e76e937c.json",
-  "assignments": 8633,
+  "database": "vendors-451e5311befc.json",
+  "assignments": 8637,
   "supplemental_icons": {
     "midea": {
       "source": "https://commons.wikimedia.org/wiki/File:Midea.svg",
@@ -322,6 +322,9 @@
     "vivo": [
       "Vivo International Corporation Pty Ltd",
       "vivo Mobile Communication Co., Ltd."
+    ],
+    "vmware": [
+      "VMware, Inc."
     ],
     "xiaomi": [
       "Beijing Xiaomi Electronics Co., Ltd.",

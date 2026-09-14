@@ -284,7 +284,7 @@ return view.extend({
 			{ name: 'view.status.include.20_memory' },
 			{ name: 'view.status.include.25_storage' },
 			{ name: 'view.status.include.30_network' },
-			{ name: 'view.status.include.40_dhcp', title: _('DHCP Leases'), deferFirstLoad: true },
+			{ name: 'view.status.include.40_dhcp', title: _('Online Hosts'), deferFirstLoad: true },
 			{ name: 'view.status.include.50_dsl' },
 			{ name: 'view.status.include.60_wifi' }
 		];

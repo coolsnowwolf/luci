@@ -30,6 +30,13 @@ class Aliases(unittest.TestCase):
         self.assertEqual(self.brand('TCL King Electrical Appliances(Huizhou)Co.,Ltd'), 'tcl')
         self.assertEqual(self.brand('Hui Zhou Gaoshengda Technology Co.,LTD'), 'tcl')
 
+    def test_vmware(self):
+        self.assertEqual(self.brand('VMware, Inc.'), 'vmware')
+        self.assertIsNone(self.brand('VMware Unrelated Devices'))
+        data = json.loads(next((ROOT / 'htdocs/luci-static/resources/oui').glob('vendors-*.json')).read_text())
+        for prefix in ['000569', '000C29', '001C14', '005056']:
+            self.assertEqual(data['vendors'][data['prefixes'][prefix]], ['vmware', 'VMware'])
+
     def test_unrelated_names(self):
         for name in ['Pegasus Technologies Inc.', 'Asustor Inc.', 'Vivotek, Inc.',
                      'Invivo Research Inc.', 'Dongguan Koppo Electronic Co.,Ltd',

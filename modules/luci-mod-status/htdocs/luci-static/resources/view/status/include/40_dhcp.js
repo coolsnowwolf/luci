@@ -32,7 +32,7 @@ const callUfpList = rpc.declare({
 });
 
 return baseclass.extend({
-	title: _('DHCP Leases'),
+	title: _('Online Hosts'),
 	deferFirstLoad: true,
 	disableCache: true,
 
@@ -44,7 +44,7 @@ return baseclass.extend({
 		if (!this.ouiLoader) {
 			this.ouiLoader = Promise.all([L.resolveDefault(uci.load('oui')), new Promise(function(resolve) {
 				const script = document.createElement('script');
-				script.src = L.resource('oui/oui.js') + '?v=5';
+				script.src = L.resource('oui/oui.js') + '?v=6';
 				script.onload = function() { resolve(window.luciOUI); };
 				script.onerror = function() { resolve(null); };
 				document.head.appendChild(script);

@@ -288,5 +288,12 @@
       "^giga ?byte technology(?: |$)"
     ],
     "supplemental": true
+  },
+  {
+    "slug": "vmware",
+    "name": "VMware",
+    "patterns": [
+      "^vmware(?: inc)?$"
+    ]
   }
 ]
