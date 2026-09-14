@@ -41,6 +41,15 @@ function setup(fail = false) {
  assert.equal(exact.children[0].title,'Apple');
  assert.equal(other.children[0].title,'Unknown vendor','OEM overrides must not affect other devices in the same OUI');
  assert.equal(unsafe.children[0].title,'Unknown vendor');
+ const fnos=t.node();
+ t.oui.decorate(fnos,'BA:71:BE:00:00:01',true);
+ assert.equal(fnos.children[0].title,'fnOS 飞牛OS');
+ assert(fnos.children[0].src.endsWith('/fnos.svg'));
+ const overridden=t.node();
+ t.oui.decorate(overridden,'00:11:22:00:00:00',true);
+ assert.equal(overridden.children[0].title,'fnOS 飞牛OS');
+ fnos.children[0].onerror();
+ assert(fnos.children[0].src.endsWith('/computer.svg'));
  t=setup(true);
  t.oui.decorate(t.node(),'00:11:22:00:00:00'); await Promise.resolve();
  t.oui.decorate(t.node(),'00:11:22:00:00:00'); await Promise.resolve();
@@ -62,7 +71,7 @@ function setup(fail = false) {
  enabled = true;
  const host = view.renderHostname('<img src=x>', '00:11:22:00:00:00');
  assert.equal(host.children[0].text, '<img src=x>');
- assert.equal(scripts[0].src, '/luci-static/resources/oui/oui.js?v=6');
+ assert.equal(scripts[0].src, '/luci-static/resources/oui/oui.js?v=7');
  view.renderHostname('host2', '00:11:22:00:00:01');
  assert.equal(scripts.length, 1);
  console.log('OUI runtime and optional integration checks passed');

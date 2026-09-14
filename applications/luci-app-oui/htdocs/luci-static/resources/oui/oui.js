@@ -59,7 +59,7 @@
 		return null;
 	}
 
-	function decorate(node, mac) {
+	function decorate(node, mac, fnos) {
 		if (node.querySelector('.luci-oui-icon'))
 			return;
 		var icon = document.createElement('img');
@@ -74,6 +74,12 @@
 		}
 		fallback();
 		node.insertBefore(icon, node.firstChild);
+		if (fnos === true) {
+			icon.title = 'fnOS 飞牛OS';
+			icon.onerror = fallback;
+			icon.src = base + 'fnos.svg';
+			return;
+		}
 		// Random, malformed or absent addresses use the fallback without an OUI request.
 		if (!normalize(mac))
 			return;

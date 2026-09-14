@@ -37,14 +37,14 @@ return baseclass.extend({
 	disableCache: true,
 
 	// Optional enhancement: never load the helper or query OUIs without the package.
-	renderHostname(host, mac) {
+	renderHostname(host, mac, fnos) {
 		const node = E('span', { 'style': 'display:block;text-align:left' }, [ document.createTextNode(host || '-') ]);
 		if (!L.hasSystemFeature('oui'))
 			return node;
 		if (!this.ouiLoader) {
 			this.ouiLoader = Promise.all([L.resolveDefault(uci.load('oui')), new Promise(function(resolve) {
 				const script = document.createElement('script');
-				script.src = L.resource('oui/oui.js') + '?v=6';
+				script.src = L.resource('oui/oui.js') + '?v=7';
 				script.onload = function() { resolve(window.luciOUI); };
 				script.onerror = function() { resolve(null); };
 				document.head.appendChild(script);
@@ -56,7 +56,7 @@ return baseclass.extend({
 		}
 		this.ouiLoader.then(function(oui) {
 			if (oui)
-				oui.decorate(node, mac);
+				oui.decorate(node, mac, fnos);
 		});
 		return node;
 	},
@@ -112,6 +112,16 @@ return baseclass.extend({
 			'data-direction': direction,
 			'data-mac': lease.macaddr || ''
 		}, value[1]) ];
+	},
+
+	isFnosClient(client, data) {
+		return (client.activeAddresses || []).some(address => {
+			const ip = validation.parseIPv4(address)?.join('.');
+			const probe = data?.clients?.[ip];
+			return !!(ip && client.macaddr && probe?.ready &&
+				probe.mac === client.macaddr.toUpperCase() &&
+				[5666, 5667].some(port => probe.ports?.includes(port)));
+		});
 	},
 
 	clientURL(lease, data) {
@@ -425,7 +435,7 @@ return baseclass.extend({
 					'role': 'img', 'aria-label': status, 'title': status,
 					'style': 'display:inline-block;width:10px;height:10px;border-radius:50%;background-color:' + (online ? '#28a745' : '#dc3545')
 				})],
-				this.renderHostname(host, client.macaddr),
+				this.renderHostname(host, client.macaddr, this.isFnosClient(client, web)),
 				client.ipaddrs.length ? E('div', {}, client.ipaddrs.map(ipaddr =>
 					E('div', client.activeAddresses.includes(this.normalizeRateAddress(ipaddr)) ? {} : { 'style': 'opacity:.55', 'title': _('Expired') },
 						client.activeAddresses.includes(this.normalizeRateAddress(ipaddr)) ? this.renderClientIP({ ipaddr, macaddr: client.macaddr }, web) : ipaddr))) : '-',

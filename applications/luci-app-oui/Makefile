@@ -1,9 +1,9 @@
 # SPDX-License-Identifier: GPL-2.0-only
 include $(TOPDIR)/rules.mk
 
-PKG_VERSION:=1.0.5
+PKG_VERSION:=1.0.6
 PKG_RELEASE:=1
-PKG_LICENSE:=GPL-2.0-only AND CC0-1.0 AND MIT AND LicenseRef-Public-Domain
+PKG_LICENSE:=GPL-2.0-only AND CC0-1.0 AND MIT AND LicenseRef-Public-Domain AND LicenseRef-fnOS-Trademark
 LUCI_MAINTAINER:=coolsnowwolf <coolsnowwolf@gmail.com>
 
 LUCI_TITLE:=Local OUI vendor icons for DHCP leases

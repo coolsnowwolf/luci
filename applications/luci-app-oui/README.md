@@ -21,6 +21,12 @@ The icon identifies the registered MAC vendor: a PC using an Intel NIC can show
 Intel rather than the motherboard manufacturer. DHCP hostnames are not used to
 guess brands.
 
+Hosts with an open TCP port 5666 or 5667 in the existing LAN web-probe cache
+show the fnOS logo instead of the OUI icon. The probe must be ready and match
+the current IP and MAC; any active IPv4 address of a merged client can qualify.
+This is a port-based display heuristic, not OS authentication. The vector logo
+was traced from the supplied `fnos.PNG`; see `NOTICE.fnos`.
+
 Most icons are an unmodified subset of
 [Simple Icons 11.15.0](https://github.com/simple-icons/simple-icons/tree/11.15.0),
 pinned to retain brands removed from newer releases (including Microsoft).
