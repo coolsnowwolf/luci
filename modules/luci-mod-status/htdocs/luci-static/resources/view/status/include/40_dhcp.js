@@ -374,8 +374,9 @@ return baseclass.extend({
 	},
 
 	renderLeases(dhcp_leases, host_hints, macaddr, web, arp, history) {
+		const arpClients = this.arpLeases(arp);
 		const leases = [...(Array.isArray(dhcp_leases.dhcp_leases) ? dhcp_leases.dhcp_leases : []),
-			...this.arpLeases(arp),
+			...arpClients,
 			...(Array.isArray(history?.dhcp_leases) ? history.dhcp_leases : []).map(lease => ({ ...lease, _historical: true }))];
 		const leases6 = [...(Array.isArray(dhcp_leases.dhcp6_leases) ? dhcp_leases.dhcp6_leases : []),
 			...(Array.isArray(history?.dhcp6_leases) ? history.dhcp6_leases : []).map(lease => ({ ...lease, _historical: true }))];
@@ -403,9 +404,8 @@ return baseclass.extend({
 		};
 
 		const clients = this.mergeLeases(leases, leases6, host_hints);
-		const onlineMACs = new Set(String(arp || '').trim().split(/\n/).map(line => line.trim().split(/\s+/))
-			.filter(fields => fields.length == 6 && fields[5] == 'br-lan')
-			.map(fields => fields[3].toUpperCase()));
+		// Failed neighbours can retain their MAC in /proc/net/arp with flags 0x0.
+		const onlineMACs = new Set(arpClients.map(client => client.macaddr));
 		const table = E('table', { 'id': 'status_leases', 'class': 'table leases' }, [
 			E('tr', { 'class': 'tr table-titles' }, [
 				E('th', { 'class': 'th' }, _('Online')),
