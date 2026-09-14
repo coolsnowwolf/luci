@@ -14013,3 +14013,9 @@ msgstr "上傳總頻寬"
 #: modules/luci-mod-status/htdocs/luci-static/resources/view/status/include/40_dhcp.js
 msgid "Total traffic"
 msgstr "總流量"
+
+msgid "Online"
+msgstr "在線"
+
+msgid "Offline"
+msgstr "離線"
