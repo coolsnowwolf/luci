@@ -1,6 +1,5 @@
 'use strict';
 'require view';
-'require poll';
 'require request';
 'require network';
 'require fs';
@@ -337,15 +336,6 @@ return view.extend({
 		expect: { results: [] }
 	}),
 
-	callNetworkDevices: rpc.declare({
-		object: 'luci-rpc',
-		method: 'getNetworkDevices',
-		expect: { devices: [] }
-	}),
-
-	cachedNetworkDevices: null,
-	cachedNetworkDevicesPromise: null,
-
 	scanViaIw(scanIfname) {
 		const attempts = [
 			[ 'dev', scanIfname, 'scan' ],
@@ -361,7 +351,7 @@ return view.extend({
 			return L.resolveDefault(fs.exec('/usr/sbin/iw', attempts[index++]), null).then((res) => {
 				const parsed = parseIwScan(res?.stdout);
 
-				if (parsed.length)
+				if (parsed.length || res?.code === 0)
 					return parsed;
 
 				return tryNext();
@@ -384,43 +374,17 @@ return view.extend({
 			.finally(L.bind(this.cleanupTemporaryScanIface, this, tempIfname));
 	},
 
-	loadNetworkDevices(forceReload) {
-		if (forceReload) {
-			this.cachedNetworkDevices = null;
-			this.cachedNetworkDevicesPromise = null;
-		}
-
-		if (this.cachedNetworkDevices)
-			return Promise.resolve(this.cachedNetworkDevices);
-
-		if (this.cachedNetworkDevicesPromise)
-			return this.cachedNetworkDevicesPromise;
-
-		this.cachedNetworkDevicesPromise = this.callNetworkDevices().then((devices) => {
-			this.cachedNetworkDevices = devices || [];
-			this.cachedNetworkDevicesPromise = null;
-
-			return this.cachedNetworkDevices;
-		}).catch((err) => {
-			this.cachedNetworkDevicesPromise = null;
-			throw err;
-		});
-
-		return this.cachedNetworkDevicesPromise;
-	},
-
-	resolveScanDevice(radioDev, forceReload) {
-		return this.loadNetworkDevices(forceReload).then((devices) => {
-			const apDevice = devices.find((dev) => dev.wireless &&
-				dev.wireless.radio == radioDev.getName() &&
-				dev.type !== 'wifi' &&
-				dev.type !== 'radio');
-
-			return apDevice?.device || radioDev.getName();
+	resolveScanDevice(radioDev) {
+		return radioDev.getWifiNetworks().then((networks) => {
+			const ap = networks.find(net => net.getMode() == 'ap') || networks[0];
+			return ap?.getIfname() || radioDev.getName();
 		});
 	},
 
 	getScanResultsForRadio(radioDev) {
+		if (['mtwifi', 'mt_dbdc', 'ralink'].includes(radioDev.get('type')))
+			return radioDev.getScanList();
+
 		return this.resolveScanDevice(radioDev).then((scanIfname) => {
 			const iwDev = this.iwDevMap?.[scanIfname] || this.iwDevMap?.[radioDev.getName()];
 			const scanTasks = [];
@@ -444,6 +408,31 @@ return view.extend({
 
 			return tryNext(0);
 		});
+	},
+
+	updateScanButton() {
+		if (!this.refreshButton) return;
+		const radio = this.radios[this.active_tab];
+		const state = radio && this.scanStates?.[radio.dev.getName()];
+		this.refreshButton.disabled = !radio || !!state?.pending;
+		this.refreshButton.classList.toggle('spinning', !!state?.pending);
+	},
+
+	requestRadioScan(dev) {
+		this.scanStates ||= {};
+		const state = this.scanStates[dev.getName()] ||= {};
+		if (state.pending) return state.pending;
+		// Serialize all radios and share in-flight work between band tabs.
+		state.pending = (this.scanQueue || Promise.resolve())
+			.then(() => this.getScanResultsForRadio(dev))
+			.then(results => state.results = Array.isArray(results) ? results : [])
+			.finally(() => {
+				state.pending = null;
+				this.updateScanButton();
+			});
+		this.scanQueue = state.pending.catch(() => {});
+		this.updateScanButton();
+		return state.pending;
 	},
 
 	render_signal_badge(signalPercent, signalValue) {
@@ -612,9 +601,13 @@ return view.extend({
 
 		chan_analysis.tab.addEventListener('cbi-tab-active', L.bind(function(ev) {
 			this.active_tab = ev.detail.tab;
+			this.updateScanButton();
 			if (!this.radios[this.active_tab].loadedOnce)
 				this.handleScanRefresh();
 		}, this));
+		// Tab activation may precede this animation-frame graph setup.
+		if (this.active_tab == chan_analysis.tab.getAttribute('data-tab'))
+			this.handleScanRefresh();
 	},
 
 	handleScanRefresh() {
@@ -623,8 +616,10 @@ return view.extend({
 
 		const radio = this.radios[this.active_tab];
 		let q;
+		if (radio.refreshPromise) return radio.refreshPromise;
 
-		return this.getScanResultsForRadio(radio.dev).then(L.bind(function(results) {
+		radio.refreshPromise = this.requestRadioScan(radio.dev).then(L.bind(function(results) {
+			results = results.slice();
 			const table = radio.table;
 			const chan_analysis = radio.graph;
 			const scanCache = radio.scanCache;
@@ -773,11 +768,11 @@ return view.extend({
 
 			cbi_update_table(table, rows);
 
-			if (!radio.loadedOnce) {
-				radio.loadedOnce = true;
-				poll.stop();
-			}
-		}, this))
+			radio.loadedOnce = true;
+		}, this)).catch(err => {
+			ui.addNotification(null, E('p', {}, _('Wireless scan failed: %s').format(err.message || err)));
+		}).finally(() => { radio.refreshPromise = null; });
+		return radio.refreshPromise;
 	},
 
 	radios: {},
@@ -820,13 +815,15 @@ return view.extend({
 	},
 
 	render([svg, wifiDevs]) {
+		this.radios = {};
+		this.refreshButton = E('button', {
+			'class': 'cbi-button cbi-button-edit',
+			'click': () => this.handleScanRefresh()
+		}, [ _('Refresh Channels') ]);
 		const h2 = E('div', {'class' : 'cbi-title-section'}, [
 			E('h2', {'class': 'cbi-title-field'}, [ _('Channel Analysis') ]),
 			E('div', {'class': 'cbi-title-buttons'  }, [
-				E('button', {
-					'class': 'cbi-button cbi-button-edit',
-					'click': ui.createHandlerFn(this, 'handleScanRefresh')
-				}, [ _('Refresh Channels') ])])
+				this.refreshButton])
 			]);
 
 		const tabs = E('div', {}, E('div'));
@@ -892,11 +889,7 @@ return view.extend({
 		const activePane = Array.from(tabs.firstElementChild.childNodes).find((pane) => pane.getAttribute('data-tab-active') == 'true');
 		this.active_tab = activePane?.getAttribute('data-tab') || null;
 
-		this.pollFn = L.bind(this.handleScanRefresh, this);
-		poll.add(this.pollFn);
-
-		if (this.active_tab)
-			poll.start();
+		this.updateScanButton();
 
 		return E('div', {}, [h2, tabs]);
 	},

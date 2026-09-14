@@ -14025,3 +14025,6 @@ msgstr "在線主機"
 
 msgid "Connection count"
 msgstr "連線數"
+
+msgid "Wireless scan failed: %s"
+msgstr "無線掃描失敗：%s"

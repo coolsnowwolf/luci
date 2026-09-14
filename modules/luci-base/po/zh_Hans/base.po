@@ -14170,3 +14170,6 @@ msgstr "在线主机"
 
 msgid "Connection count"
 msgstr "连接数"
+
+msgid "Wireless scan failed: %s"
+msgstr "无线扫描失败：%s"

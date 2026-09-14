@@ -31,3 +31,9 @@ Run `ucode client-names.uc` with the installed `luci.client_history`,
 caching, retry timing, address reuse, DHCP priority, boot reset and malformed
 NBSTAT responses. For a live check, compare `netbios_names([ip])` with a known
 NetBIOS responder; an unanswered query is not evidence of an offline client.
+
+Channel analysis scans each band tab on first activation, using iwinfo for
+mtwifi/mt_dbdc/ralink radios. It does not start a repeating scan poll or stop
+LuCI's global poller. The refresh button is enabled immediately on completion or failure;
+requests are coalesced per radio and serialized across radios. Run
+`node modules/luci-mod-status/tests/channel-analysis.js` from the LuCI root.

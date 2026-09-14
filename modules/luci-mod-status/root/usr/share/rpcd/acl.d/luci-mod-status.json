@@ -86,7 +86,7 @@
 			},
 			"ubus": {
 				"file": [ "exec" ],
-				"iwinfo": [ "freqlist" ],
+				"iwinfo": [ "freqlist", "scan" ],
 				"luci-rpc": [ "getNetworkDevices" ]
 			}
 		}
