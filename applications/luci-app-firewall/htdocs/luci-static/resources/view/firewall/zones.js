@@ -55,15 +55,6 @@ return view.extend({
 			runtimeStatusText.textContent =
 				_('Running status: %s, TCP congestion control algorithm is %s').format(natMode, tcpcca);
 		};
-		const addTCPCCAOption = () => {
-			const tcpcca = s.option(form.ListValue, 'tcpcca', _('TCP CCA'),
-				_('TCP congestion control algorithm.'));
-			tcpcca.value('bbr', 'bbr');
-			tcpcca.value('cubic', 'cubic');
-			tcpcca.value('reno', 'reno');
-			tcpcca.default = 'cubic';
-			tcpcca.rmempty = false;
-		};
 
 		updateRuntimeStatus(runtimeStatus);
 
@@ -94,12 +85,8 @@ return view.extend({
 			o.value('0', _('Disable'));
 			o.value('1', _('FULLCONENAT'));
 			o.value('2', _('Broadcom Fullcone NAT1'));
-			addTCPCCAOption();
 			if (fw4)
 				o = s.option(form.Flag, 'fullcone6', _('Enable FullCone NAT6'));
-		}
-		else {
-			addTCPCCAOption();
 		}
 
 		let p = [
