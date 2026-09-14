@@ -44,7 +44,7 @@ return baseclass.extend({
 		if (!this.ouiLoader) {
 			this.ouiLoader = Promise.all([L.resolveDefault(uci.load('oui')), new Promise(function(resolve) {
 				const script = document.createElement('script');
-				script.src = L.resource('oui/oui.js') + '?v=4';
+				script.src = L.resource('oui/oui.js') + '?v=5';
 				script.onload = function() { resolve(window.luciOUI); };
 				script.onerror = function() { resolve(null); };
 				document.head.appendChild(script);

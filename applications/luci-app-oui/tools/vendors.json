@@ -280,5 +280,13 @@
       "^(?:hui zhou|huizhou) gaoshengda(?: |$)"
     ],
     "supplemental": true
+  },
+  {
+    "slug": "gigabyte",
+    "name": "GIGABYTE",
+    "patterns": [
+      "^giga ?byte technology(?: |$)"
+    ],
+    "supplemental": true
   }
 ]

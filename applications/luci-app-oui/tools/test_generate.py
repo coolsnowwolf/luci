@@ -18,6 +18,8 @@ class Aliases(unittest.TestCase):
             self.assertEqual(self.brand(name), 'asus')
         for name in ["MICRO-STAR INT'L CO., LTD.", 'Micro-Star International']:
             self.assertEqual(self.brand(name), 'msi')
+        for name in ['GIGA-BYTE TECHNOLOGY CO.,LTD.', 'GIGA-BYTE TECHNOLOGY CO. , Ltd.']:
+            self.assertEqual(self.brand(name), 'gigabyte')
         self.assertEqual(self.brand('vivo Mobile Communication Co., Ltd.'), 'vivo')
         self.assertEqual(self.brand('TP-Link Systems Inc.'), 'tplink')
         self.assertEqual(self.brand('GD Midea Air-Conditioning Equipment Co.,Ltd.'), 'midea')
@@ -32,13 +34,14 @@ class Aliases(unittest.TestCase):
         for name in ['Pegasus Technologies Inc.', 'Asustor Inc.', 'Vivotek, Inc.',
                      'Invivo Research Inc.', 'Dongguan Koppo Electronic Co.,Ltd',
                      'SHENZHEN HONOR ELECTRONIC CO.,LTD', 'Limidea Concept Pte. Ltd.',
-                     'Unrelated Module Manufacturer']:
+                     'Gigabit Systems Inc.', 'Unrelated Module Manufacturer']:
             self.assertIsNone(self.brand(name))
 
     def test_assets(self):
         data = json.loads(next((ROOT / 'htdocs/luci-static/resources/oui').glob('vendors-*.json')).read_text())
         for slug, _ in data['vendors']:
             self.assertTrue((ROOT / 'htdocs/luci-static/resources/oui' / (slug + '.svg')).exists())
+        self.assertEqual(data['vendors'][data['prefixes']['30560F']][0], 'gigabyte')
         self.assertEqual(data['vendors'][data['prefixes']['E87F95']][0], 'apple')
         self.assertEqual(data['vendors'][data['prefixes']['9C4782']][0], 'tplink')
         self.assertEqual(data['vendors'][data['prefixes']['1841C3']][0], 'midea')

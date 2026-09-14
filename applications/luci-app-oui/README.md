@@ -26,8 +26,9 @@ Most icons are an unmodified subset of
 pinned to retain brands removed from newer releases (including Microsoft).
 The included Simple Icons CC0 license and disclaimer and macdb MIT license travel
 with the package. Not all hardware brands exist in this snapshot: for example,
-ASRock, Gigabyte and Realme have no bundled official Simple Icons asset. They are
-not relabeled as another manufacturer.
+ASRock and Realme have no bundled official Simple Icons asset. They are
+not relabeled as another manufacturer. GIGABYTE uses a supplemental public-domain
+wordmark; its source and attribution are recorded in `NOTICE.supplemental`.
 
 ## Updating the subset
 

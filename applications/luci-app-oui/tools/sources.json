@@ -4,8 +4,8 @@
     "url": "https://github.com/WH-2099/macdb",
     "sha256": "dab68f6728825b5e6e894e537ffbc82d2d387eb2ba3d8dd313962dcef8076979"
   },
-  "database": "vendors-703df9be5d12.json",
-  "assignments": 8608,
+  "database": "vendors-2099e76e937c.json",
+  "assignments": 8633,
   "supplemental_icons": {
     "midea": {
       "source": "https://commons.wikimedia.org/wiki/File:Midea.svg",
@@ -17,6 +17,12 @@
       "source": "https://commons.wikimedia.org/wiki/File:Logo_of_the_TCL_Corporation.svg",
       "sha256": "949117dc99503fe4a382afed3bd7f69fbfe61a6da91236b6842d8a4991df7fa8",
       "author": "TCL Electronics",
+      "license": "Public domain simple shape/text logo; trademark retained"
+    },
+    "gigabyte": {
+      "source": "https://commons.wikimedia.org/wiki/File:Gigabyte_Technology_logo_20080107.svg",
+      "sha256": "49693ef6522f58af4e059afe18c1fb3ddc8e6a5b15ac724d6a7493f47d84d849",
+      "author": "Koman90",
       "license": "Public domain simple shape/text logo; trademark retained"
     }
   },
@@ -72,6 +78,12 @@
       "Fujitsu Softek",
       "Fujitsu Technology Solutions GmbH",
       "Fujitsu component limited"
+    ],
+    "gigabyte": [
+      "GIGA-BYTE TECHNOLOGY CO. , Ltd.",
+      "GIGA-BYTE TECHNOLOGY CO., LTD.",
+      "GIGA-BYTE TECHNOLOGY CO.,LTD.",
+      "Giga-Byte Technology Co., Ltd."
     ],
     "google": [
       "Google, Inc."
