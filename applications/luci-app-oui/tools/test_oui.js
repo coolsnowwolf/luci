@@ -26,6 +26,18 @@ function setup(fail = false) {
  for (const mac of [null, '', '02:11:22:00:00:00', '01:11:22:00:00:00', 'FF:FF:FF:FF:FF:FF', '001122', '00:11-22:33:44:55'])
   t.oui.decorate(t.node(), mac);
  assert.equal(t.requests(), 0, 'invalid or private MACs must not fetch data');
+ for (let octet = 0; octet < 256; octet++) {
+  const mac = octet.toString(16).padStart(2, '0') + ':11:22:33:44:55';
+  if (!(octet & 3)) continue;
+  const n = t.node(); t.oui.decorate(n, mac);
+  assert(n.children[0].src.endsWith((octet & 3) === 2 ? '/phone.svg' : '/computer.svg'));
+ }
+ for (const mac of ['a6-11-22-33-44-55', 'AE1122334455', 'BA:71:BE:00:00:01']) {
+  const n = t.node(); t.oui.decorate(n, mac, true);
+  assert(n.children[0].src.endsWith('/phone.svg'), 'private MAC must take precedence over fnOS');
+  n.children[0].onerror(); assert(n.children[0].src.endsWith('/computer.svg'));
+ }
+ assert.equal(t.requests(), 0, 'phone icons must not fetch the OUI database');
  const cases = [['00:11:22:00:00:00','ASUS'],['00-11-22-35-00-00','Apple'],['001122334455','ASUS'],['00:11:22:40:00:00',null],['00:AB:CD:00:00:00',null]];
  const nodes = cases.map(([mac]) => { const n=t.node(); t.oui.decorate(n,mac); return n; });
  await Promise.resolve(); await Promise.resolve();
@@ -42,7 +54,7 @@ function setup(fail = false) {
  assert.equal(other.children[0].title,'Unknown vendor','OEM overrides must not affect other devices in the same OUI');
  assert.equal(unsafe.children[0].title,'Unknown vendor');
  const fnos=t.node();
- t.oui.decorate(fnos,'BA:71:BE:00:00:01',true);
+ t.oui.decorate(fnos,'B8:71:BE:00:00:01',true);
  assert.equal(fnos.children[0].title,'fnOS / FygoOS');
  assert(fnos.children[0].src.endsWith('/fnos.svg'));
  const overridden=t.node();
@@ -71,7 +83,7 @@ function setup(fail = false) {
  enabled = true;
  const host = view.renderHostname('<img src=x>', '00:11:22:00:00:00');
  assert.equal(host.children[0].text, '<img src=x>');
- assert.equal(scripts[0].src, '/luci-static/resources/oui/oui.js?v=9');
+ assert.equal(scripts[0].src, '/luci-static/resources/oui/oui.js?v=10');
  view.renderHostname('host2', '00:11:22:00:00:01');
  assert.equal(scripts.length, 1);
  console.log('OUI runtime and optional integration checks passed');

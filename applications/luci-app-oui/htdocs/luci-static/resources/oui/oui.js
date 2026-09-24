@@ -7,12 +7,13 @@
 	var base = document.currentScript.src.replace(/[^/]*$/, '');
 	var database, pending, devices = Object.create(null);
 
-	function normalize(mac) {
+	function normalize(mac, allowLocal) {
 		if (typeof mac !== 'string' || !/^(?:[\da-f]{12}|(?:[\da-f]{2}:){5}[\da-f]{2}|(?:[\da-f]{2}-){5}[\da-f]{2})$/i.test(mac))
 			return null;
 		mac = mac.replace(/[:-]/g, '').toUpperCase();
 		// Neither locally administered (randomized) nor multicast addresses have a reliable OUI.
-		return (parseInt(mac.slice(0, 2), 16) & 3) ? null : mac;
+		var flags = parseInt(mac.slice(0, 2), 16);
+		return (flags & 1) || (!allowLocal && (flags & 2)) ? null : mac;
 	}
 
 	function load() {
@@ -74,13 +75,20 @@
 		}
 		fallback();
 		node.insertBefore(icon, node.firstChild);
+		var unicast = normalize(mac, true);
+		if (unicast && (parseInt(unicast.slice(0, 2), 16) & 2)) {
+			icon.title = 'Private MAC';
+			icon.onerror = fallback;
+			icon.src = base + 'phone.svg';
+			return;
+		}
 		if (fnos === true) {
 			icon.title = 'fnOS / FygoOS';
 			icon.onerror = fallback;
 			icon.src = base + 'fnos.svg';
 			return;
 		}
-		// Random, malformed or absent addresses use the fallback without an OUI request.
+		// Malformed or absent addresses use the fallback without an OUI request.
 		if (!normalize(mac))
 			return;
 		function apply() {

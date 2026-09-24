@@ -14,15 +14,19 @@ memory usage; no per-client MAC history is stored. No MAC is sent off-router.
 
 Data comes from [WH-2099/macdb](https://github.com/WH-2099/macdb), which combines
 IEEE MA-L, MA-M and MA-S assignments. Longest-prefix matching supports 24/28/36
-bits. Multicast, locally administered/randomized and malformed MACs are ignored.
-Unknown vendors, absent/random MACs and brands without a bundled icon use a
-small generic desktop SVG. It is an original GPL-2.0-only asset, not a brand logo.
+bits. Locally administered unicast MACs (first octet ending in 2, 6, A or E)
+use a generic phone SVG without an OUI lookup, taking precedence over fnOS
+and vendor icons. This is a display rule for private/randomized MACs, not proof
+that the device is a phone. Multicast and malformed MACs are not looked up.
+Unknown vendors, absent/invalid MACs and brands without a bundled icon use a
+small generic desktop SVG. Both generic SVGs are original GPL-2.0-only assets,
+not brand logos.
 The icon identifies the registered MAC vendor: a PC using an Intel NIC can show
 Intel rather than the motherboard manufacturer. DHCP hostnames are not used to
 guess brands.
 
 Hosts with an open TCP port 5666 or 5667 in the existing LAN web-probe cache
-show the fnOS logo instead of the OUI icon. The probe must be ready and match
+show the fnOS logo instead of the OUI icon, except for private MACs. The probe must be ready and match
 the current IP and MAC; any active IPv4 address of a merged client can qualify.
 This is a port-based display heuristic, not OS authentication. The vector logo
 was traced from the supplied `fnos.PNG`; see `NOTICE.fnos`.
