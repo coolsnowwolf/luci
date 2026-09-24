@@ -30,6 +30,17 @@ class Aliases(unittest.TestCase):
         self.assertEqual(self.brand('TCL King Electrical Appliances(Huizhou)Co.,Ltd'), 'tcl')
         self.assertEqual(self.brand('Hui Zhou Gaoshengda Technology Co.,LTD'), 'tcl')
 
+    def test_haier(self):
+        for name in ['Qingdao Haier Technology Co.,Ltd',
+                     'Qingdao HaierTechnology Co.,Ltd',
+                     'QING DAO HAIER TELECOM CO.,LTD.', 'Haier']:
+            self.assertEqual(self.brand(name), 'haier')
+        self.assertIsNone(self.brand('Unrelated Haier Module Supplier'))
+        data = json.loads(next((ROOT / 'htdocs/luci-static/resources/oui').glob('vendors-*.json')).read_text())
+        mac = '34:29:EF:89:41:3C'.replace(':', '')
+        self.assertEqual(data['vendors'][data['prefixes'][mac[:6]]][0], 'haier')
+        self.assertEqual(data['vendors'][data['prefixes']['0439CB']][0], 'haier')
+
     def test_vmware(self):
         self.assertEqual(self.brand('VMware, Inc.'), 'vmware')
         self.assertIsNone(self.brand('VMware Unrelated Devices'))

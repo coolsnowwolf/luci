@@ -2,10 +2,10 @@
   "simple_icons": "https://github.com/simple-icons/simple-icons/tree/11.15.0",
   "macdb": {
     "url": "https://github.com/WH-2099/macdb",
-    "sha256": "dab68f6728825b5e6e894e537ffbc82d2d387eb2ba3d8dd313962dcef8076979"
+    "sha256": "98c197dd8a59c30b89866de97c1e8833fcb4456c753693c447f7403c5d753eb0"
   },
-  "database": "vendors-451e5311befc.json",
-  "assignments": 8637,
+  "database": "vendors-d337209f8c00.json",
+  "assignments": 8712,
   "supplemental_icons": {
     "midea": {
       "source": "https://commons.wikimedia.org/wiki/File:Midea.svg",
@@ -23,6 +23,12 @@
       "source": "https://commons.wikimedia.org/wiki/File:Gigabyte_Technology_logo_20080107.svg",
       "sha256": "49693ef6522f58af4e059afe18c1fb3ddc8e6a5b15ac724d6a7493f47d84d849",
       "author": "Koman90",
+      "license": "Public domain simple shape/text logo; trademark retained"
+    },
+    "haier": {
+      "source": "https://commons.wikimedia.org/wiki/File:Haier_logo.svg",
+      "sha256": "d71f652fdfb405198761e118e5c4b84fa1de76d9696bb1c13b4980c76ecb6be4",
+      "author": "Haier",
       "license": "Public domain simple shape/text logo; trademark retained"
     }
   },
@@ -87,6 +93,18 @@
     ],
     "google": [
       "Google, Inc."
+    ],
+    "haier": [
+      "Beijing Haier IC Design Co.,Ltd",
+      "Haier",
+      "Haier Group Technologies Ltd",
+      "Haier cloud Health Technology (Qingdao) Co., Ltd",
+      "QING DAO HAIER TELECOM CO.,LTD.",
+      "Qingdao Haier Intelligent Home Appliance Technology Co.,Ltd",
+      "Qingdao Haier Multimedia Limited. ",
+      "Qingdao Haier Technology Co.,Ltd",
+      "Qingdao Haier Technology Co.Ltd",
+      "Qingdao HaierTechnology Co.,Ltd"
     ],
     "honor": [
       "Honor Device Co., Ltd."

@@ -20,7 +20,7 @@
 			// One local request per page; failed requests are cached too, so polling never retries.
 			pending = new Promise(function(resolve) {
 				var xhr = new XMLHttpRequest();
-				xhr.open('GET', base + 'vendors-451e5311befc.json', true);
+				xhr.open('GET', base + 'vendors-d337209f8c00.json', true);
 				xhr.timeout = 5000;
 				xhr.onload = function() {
 					try {

@@ -60,7 +60,7 @@ Run the regression checks with `python3 tools/test_generate.py` and
 
 ## OEM devices and supplemental brands
 
-Midea and TCL SVGs supplement the Simple Icons subset. Their individual sources,
+Midea, TCL and Haier SVGs supplement the Simple Icons subset. Their individual sources,
 authors and hashes are recorded in `tools/supplemental.json` and the packaged
 `NOTICE.supplemental`. These are not claimed to be Simple Icons assets.
 

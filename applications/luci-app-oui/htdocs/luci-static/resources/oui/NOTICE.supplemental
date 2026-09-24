@@ -1,4 +1,4 @@
-Midea, TCL and GIGABYTE are supplemental SVGs, not Simple Icons assets.
+Midea, TCL, GIGABYTE and Haier are supplemental SVGs, not Simple Icons assets.
 Sources and attribution:
 {
   "midea": {
@@ -17,6 +17,12 @@ Sources and attribution:
     "source": "https://commons.wikimedia.org/wiki/File:Gigabyte_Technology_logo_20080107.svg",
     "sha256": "49693ef6522f58af4e059afe18c1fb3ddc8e6a5b15ac724d6a7493f47d84d849",
     "author": "Koman90",
+    "license": "Public domain simple shape/text logo; trademark retained"
+  },
+  "haier": {
+    "source": "https://commons.wikimedia.org/wiki/File:Haier_logo.svg",
+    "sha256": "d71f652fdfb405198761e118e5c4b84fa1de76d9696bb1c13b4980c76ecb6be4",
+    "author": "Haier",
     "license": "Public domain simple shape/text logo; trademark retained"
   }
 }

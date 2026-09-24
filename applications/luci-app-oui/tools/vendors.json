@@ -295,5 +295,13 @@
     "patterns": [
       "^vmware(?: inc)?$"
     ]
+  },
+  {
+    "slug": "haier",
+    "name": "Haier / \u6d77\u5c14",
+    "patterns": [
+      "^(?:(?:qing ?dao|beijing) )?haier(?: |technology|$)"
+    ],
+    "supplemental": true
   }
 ]

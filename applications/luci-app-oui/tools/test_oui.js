@@ -71,7 +71,7 @@ function setup(fail = false) {
  enabled = true;
  const host = view.renderHostname('<img src=x>', '00:11:22:00:00:00');
  assert.equal(host.children[0].text, '<img src=x>');
- assert.equal(scripts[0].src, '/luci-static/resources/oui/oui.js?v=8');
+ assert.equal(scripts[0].src, '/luci-static/resources/oui/oui.js?v=9');
  view.renderHostname('host2', '00:11:22:00:00:01');
  assert.equal(scripts.length, 1);
  console.log('OUI runtime and optional integration checks passed');
