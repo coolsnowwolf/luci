@@ -14173,3 +14173,9 @@ msgstr "连接数"
 
 msgid "Wireless scan failed: %s"
 msgstr "无线扫描失败：%s"
+
+msgid "Export system log to TXT"
+msgstr "导出系统日志到 TXT"
+
+msgid "Export kernel log to TXT"
+msgstr "导出内核日志到 TXT"

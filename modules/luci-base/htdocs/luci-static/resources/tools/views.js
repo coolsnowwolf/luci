@@ -16,6 +16,31 @@ const callLogRead = rpc.declare({
 	expect: { log: [] }
 });
 
+function exportLogButton(filename, label) {
+	return E('button', {
+		'type': 'button',
+		'class': 'cbi-button cbi-button-action',
+		'style': 'margin-left: 10px',
+		'click': function() {
+			const log = document.getElementById('syslog');
+			if (!log)
+				return;
+
+			const blob = new Blob(['\ufeff', log.value], { type: 'text/plain;charset=utf-8' });
+			const url = URL.createObjectURL(blob);
+			const link = E('a', {
+				'href': url,
+				'download': filename + '-' + new Date().toISOString().replace(/[:.]/g, '-') + '.txt',
+				'style': 'display: none'
+			});
+			document.body.appendChild(link);
+			link.click();
+			link.remove();
+			window.setTimeout(function() { URL.revokeObjectURL(url); }, 1000);
+		}
+	}, label);
+}
+
 var CBILogreadBox = function(logtag, name) {
 	return L.view.extend({
 
@@ -271,7 +296,10 @@ var CBILogreadBox = function(logtag, name) {
 						E('label', { 'for': 'logMaxRows', 'style': 'margin: 0 5px' }, _('Max rows:')),
 						filterMaxRows,
 					]),
-					E('div', {'style': 'padding-bottom: 20px'}, [scrollDownButton]),
+					E('div', {'style': 'padding-bottom: 20px'}, [
+						scrollDownButton,
+						!logtag ? exportLogButton('system-log', _('Export system log to TXT')) : null
+					]),
 					E('textarea', {
 						'id': 'syslog',
 						'style': 'font-size:12px',
@@ -292,4 +320,5 @@ var CBILogreadBox = function(logtag, name) {
 
 return L.Class.extend({
 	LogreadBox: CBILogreadBox,
+	exportLogButton: exportLogButton,
 });

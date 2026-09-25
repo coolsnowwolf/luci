@@ -3,6 +3,7 @@
 'require fs';
 'require poll';
 'require ui';
+'require tools.views as views';
 
 return view.extend({
 	logFilterFrom: '0',
@@ -277,7 +278,10 @@ return view.extend({
 					E('label', { 'for': 'logTextFilter', 'style': 'margin: 0 5px' }, _('including:')),
 					filterTextInput,
 				]),
-				E('div', {'style': 'padding-bottom: 20px'}, [scrollDownButton]),
+				E('div', {'style': 'padding-bottom: 20px'}, [
+					scrollDownButton,
+					views.exportLogButton('kernel-log', _('Export kernel log to TXT'))
+				]),
 				E('textarea', {
 					'id': 'syslog',
 					'style': 'font-size:12px',

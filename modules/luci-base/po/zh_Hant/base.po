@@ -14028,3 +14028,9 @@ msgstr "連線數"
 
 msgid "Wireless scan failed: %s"
 msgstr "無線掃描失敗：%s"
+
+msgid "Export system log to TXT"
+msgstr "匯出系統日誌至 TXT"
+
+msgid "Export kernel log to TXT"
+msgstr "匯出核心日誌至 TXT"
