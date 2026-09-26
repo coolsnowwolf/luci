@@ -336,14 +336,6 @@ msgstr "启用 FullCone NAT"
 msgid "Enable FullCone NAT6"
 msgstr "启用 FullCone NAT6"
 
-#: applications/luci-app-firewall/htdocs/luci-static/resources/view/firewall/zones.js:38
-msgid "TCP CCA"
-msgstr "TCP 拥塞控制算法"
-
-#: applications/luci-app-firewall/htdocs/luci-static/resources/view/firewall/zones.js:39
-msgid "TCP congestion control algorithm."
-msgstr "TCP 拥塞控制算法。"
-
 msgid "Running status: %s, TCP congestion control algorithm is %s"
 msgstr "当前运行状态：%s，TCP 拥塞控制算法为 %s"
 
