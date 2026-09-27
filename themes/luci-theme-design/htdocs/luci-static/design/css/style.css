@@ -1248,6 +1248,12 @@ table > tr:last-child {
     text-align: left;
 }
 
+.nft-rules .ifacebadge > em {
+    width: auto;
+    height: auto;
+    padding-left: 0;
+}
+
 .cbi-section-table-row {
     text-align: center;
 }
