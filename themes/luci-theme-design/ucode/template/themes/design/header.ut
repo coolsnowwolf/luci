@@ -18,8 +18,10 @@
 	const request_path = ctx.request_path ?? dispatch_path;
 	const current_path = length(dispatch_path) ? join('-', dispatch_path) : 'main-login';
 	const current_page = length(request_path) ? join('-', request_path) : current_path;
-	const show_proxy_icon = access('/etc/config/google_fu_mode');
-	const theme_rev = `${version?.luciversion ?? 'dev'}-designfix-20260418i`;
+	const show_proxy_icon = access('/etc/config/shadowsocksr') || access('/etc/config/google_fu_mode');
+	const show_openclash_icon = access('/etc/config/openclash');
+	const show_homeproxy_icon = access('/etc/config/homeproxy');
+	const theme_rev = `${version?.luciversion ?? 'dev'}-designfix-20260927`;
 
 	http.prepare_content('text/html; charset=UTF-8');
 -%}
@@ -77,6 +79,10 @@
 	<a href="{{ dispatcher.build_url('admin/status/overview') }}"><img src="{{ media }}/images/home.png"></a>
 	{% if (show_proxy_icon): %}
 	<a href="{{ dispatcher.build_url('admin/services/shadowsocksr') }}"><img src="{{ media }}/images/ssr.png"></a>
+	{% elif (show_homeproxy_icon): %}
+	<a href="{{ dispatcher.build_url('admin/services/homeproxy') }}" title="HomeProxy"><img src="{{ media }}/images/homeproxy.svg" alt="HomeProxy"></a>
+	{% elif (show_openclash_icon): %}
+	<a href="{{ dispatcher.build_url('admin/services/openclash') }}" title="OpenClash"><img src="{{ media }}/images/openclash.png" alt="OpenClash"></a>
 	{% endif %}
 	<a href="{{ dispatcher.build_url('admin/network/network') }}"><img src="{{ media }}/images/link.png"></a>
 	<a href="{{ dispatcher.build_url('admin/status/realtime') }}"><img src="{{ media }}/images/rank.png"></a>

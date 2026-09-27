@@ -4106,6 +4106,7 @@ input[name="nslookup"] {
 
 
 .navbar {
+    display: flex;
     z-index: 200;
 	overflow: hidden;
 	position: fixed;
@@ -4121,10 +4122,9 @@ input[name="nslookup"] {
   }
   
   .navbar a {
-	  float: left;
+	  flex: 1;
 	  text-align: center;
 	  padding: 8px 0;
-	  width: 20%;
 	  text-decoration: none;
 	  max-width: 100px;
   }
