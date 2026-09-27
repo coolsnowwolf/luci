@@ -1243,6 +1243,11 @@ table > tr:last-child {
 	margin: auto 0;
 }
 
+.nft-rules .th,
+.nft-rules .td:not(.center) {
+    text-align: left;
+}
+
 .cbi-section-table-row {
     text-align: center;
 }
