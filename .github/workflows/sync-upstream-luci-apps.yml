@@ -1,0 +1,107 @@
+name: Sync upstream LuCI applications
+
+on:
+  schedule:
+    # Daily at 10:17 Asia/Shanghai (02:17 UTC).
+    - cron: '17 2 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-upstream-luci-apps
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    if: github.ref_type == 'branch'
+    steps:
+      - name: Check out this repository
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          ref: ${{ github.ref_name }}
+
+      - name: Sync application directories
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          work_dir="$(mktemp -d)"
+          trap 'rm -rf "$work_dir"' EXIT
+
+          sync_app() {
+            local repository="$1"
+            local branch="$2"
+            local source_path="$3"
+            local destination="$4"
+            local checkout_dir="$work_dir/$(basename "$destination")"
+
+            if ! git clone --depth 1 --single-branch --branch "$branch" \
+              "https://github.com/${repository}.git" "$checkout_dir"; then
+              echo "::warning::Skipping ${repository}@${branch}: upstream repository or branch is unavailable."
+              return 0
+            fi
+
+            if [[ ! -d "$checkout_dir/$source_path" ]]; then
+              echo "::warning::Skipping ${repository}@${branch}: path ${source_path} does not exist."
+              return 0
+            fi
+
+            if [[ ! -s "$checkout_dir/$source_path/Makefile" ]]; then
+              echo "::warning::Skipping ${repository}@${branch}: package Makefile is missing."
+              return 0
+            fi
+
+            mkdir -p "$destination"
+            rsync --archive --delete --exclude='/.git/' --exclude='/.github/' "$checkout_dir/$source_path/" "$destination/"
+          }
+
+          sync_app "Openwrt-Passwall/openwrt-passwall" "main" \
+            "luci-app-passwall" "applications/luci-app-passwall"
+          sync_app "Openwrt-Passwall/openwrt-passwall2" "main" \
+            "luci-app-passwall2" "applications/luci-app-passwall2"
+          sync_app "nikkinikki-org/OpenWrt-nikki" "main" \
+            "luci-app-nikki" "applications/luci-app-nikki"
+          sync_app "vernesong/OpenClash" "master" \
+            "luci-app-openclash" "applications/luci-app-openclash"
+          sync_app "sbwml/luci-app-mosdns" "v5" \
+            "luci-app-mosdns" "applications/luci-app-mosdns"
+          sync_app "QiuSimons/luci-app-daed" "kix" \
+            "luci-app-daed" "applications/luci-app-daed"
+          sync_app "immortalwrt/homeproxy" "master" \
+            "." "applications/luci-app-homeproxy"
+
+      - name: Commit and push changes
+        env:
+          TARGET_BRANCH: ${{ github.ref_name }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+
+          application_paths=(
+            applications/luci-app-passwall
+            applications/luci-app-passwall2
+            applications/luci-app-nikki
+            applications/luci-app-openclash
+            applications/luci-app-mosdns
+            applications/luci-app-daed
+            applications/luci-app-homeproxy
+          )
+
+          if git diff --quiet -- "${application_paths[@]}" && \
+              test -z "$(git status --porcelain --untracked-files=all -- "${application_paths[@]}")"; then
+            echo 'All upstream applications are already up to date.'
+            exit 0
+          fi
+
+          git add -A -- "${application_paths[@]}"
+          git commit -m 'ci: sync upstream luci applications' \
+            -m 'Signed-off-by: coolsnowwolf <coolsnowwolf@gmail.com>'
+          git push origin "HEAD:refs/heads/$TARGET_BRANCH"
