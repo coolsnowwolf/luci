@@ -1,0 +1,322 @@
+#!/usr/bin/env ucode
+
+'use strict';
+
+import { popen, stat, readfile, open } from 'fs';
+import { cursor } from 'uci';
+
+function to_array(val) {
+	let res =[];
+	if (type(val) == 'array') {
+		for (let i = 0; i < length(val); i++) {
+			if (type(val[i]) == 'string') {
+				let s = replace(val[i], /^\s+|\s+$/g, '');
+				if (s != "") push(res, s);
+			}
+		}
+	} else if (type(val) == 'string') {
+		let parts = split(val, /[ \t\n]+/);
+		for (let i = 0; i < length(parts); i++) {
+			if (parts[i] != "") push(res, parts[i]);
+		}
+	}
+	return res;
+}
+
+function exec_sys(cmd) {
+	let p = popen(cmd + " 2>&1", "r");
+	if (!p) return { code: -1, stdout: "" };
+	let stdout = p.read("all");
+	let code = p.close();
+	if (type(stdout) == 'string') {
+		stdout = replace(stdout, /^\s+|\s+$/g, '');
+	}
+	return { code: code, stdout: stdout || "" };
+}
+
+function get_logfile_path_internal() {
+	let uci_cursor = cursor();
+	uci_cursor.load('mosdns');
+	let configfile = uci_cursor.get('mosdns', 'config', 'configfile');
+
+	if (configfile === '/var/etc/mosdns.json' || !configfile) {
+		return uci_cursor.get('mosdns', 'config', 'log_file');
+	} else {
+		let content = readfile(configfile);
+		if (content) {
+			let m = match(content, /file:\s*([^\r\n]+)/);
+			if (m && m[1]) {
+				let log_path = m[1];
+				log_path = replace(log_path, /^\s+|\s+$/g, '');
+				log_path = replace(log_path, /^["']|["']$/g, '');
+				if (log_path != "") {
+					return log_path;
+				}
+			}
+		}
+		return '/var/log/mosdns.log';
+	}
+}
+
+function parse_json_safe(str) {
+	if (!str || str == "")
+		return null;
+
+	try {
+		return json(str);
+	} catch(e) {
+		return null;
+	}
+}
+
+function call_mosdns_api(endpoint, method) {
+	try {
+		let uci_cursor = cursor();
+		uci_cursor.load('mosdns');
+		let port = uci_cursor.get('mosdns', 'config', 'listen_port_api') || '9091';
+		let http_method = method ? method : 'GET';
+		let post_flag = (http_method === 'POST') ? '--post-data=""' : '';
+		let cmd = `wget -q -O - ${post_flag} "http://127.0.0.1:${port}/plugins/stats_collector${endpoint}"`;
+		let res = exec_sys(cmd);
+		if (res.code === 0 && res.stdout != "") {
+			let json_val = parse_json_safe(res.stdout);
+			if (json_val) return json_val;
+		}
+		return { error: "MosDNS API unreachable" };
+	} catch (e) {
+		return { error: String(e) };
+	}
+}
+
+function get_client_leases() {
+	let leases = {};
+
+	let add_lease = function(ip, name) {
+		if (!ip || !name) return;
+		ip = replace(ip, /^\s+|\s+$/g, '');
+		name = replace(name, /^\s+|\s+$/g, '');
+		if (ip == "" || name == "" || name == "*" || name == "unknown") return;
+
+		ip = replace(ip, /\/[0-9]+$/, '');
+		ip = replace(ip, /^::ffff:/i, '');
+
+		leases[ip] = name;
+		try {
+			if (type(lc) == 'function') {
+				leases[lc(ip)] = name;
+			}
+		} catch (e) {}
+	};
+
+	let parse_hosts_file = function(filepath) {
+		try {
+			if (stat(filepath)) {
+				let content = readfile(filepath);
+				if (content) {
+					let lines = split(content, '\n');
+					for (let i = 0; i < length(lines); i++) {
+						let line = replace(lines[i], /^\s+|\s+$/g, '');
+						if (line == "" || match(line, /^#/)) continue;
+						let parts = split(line, /[ \t]+/);
+						if (length(parts) >= 2) {
+							add_lease(parts[0], parts[1]);
+						}
+					}
+				}
+			}
+		} catch (e) {}
+	};
+
+	try {
+		if (stat('/tmp/dhcp.leases')) {
+			let content = readfile('/tmp/dhcp.leases');
+			if (content) {
+				let lines = split(content, '\n');
+				for (let i = 0; i < length(lines); i++) {
+					let line = replace(lines[i], /^\s+|\s+$/g, '');
+					if (line == "" || match(line, /^#/)) continue;
+					let parts = split(line, /[ \t]+/);
+					if (length(parts) >= 4) {
+						add_lease(parts[2], parts[3]);
+					}
+				}
+			}
+		}
+	} catch (e) {}
+
+	parse_hosts_file('/tmp/hosts/odhcpd');
+
+	parse_hosts_file('/tmp/hosts/dhcp');
+
+	try {
+		if (stat('/tmp/odhcpd.leases')) {
+			let content = readfile('/tmp/odhcpd.leases');
+			if (content) {
+				let lines = split(content, '\n');
+				for (let i = 0; i < length(lines); i++) {
+					let line = replace(lines[i], /^\s+|\s+$/g, '');
+					if (line == "" || match(line, /^#/)) continue;
+					let parts = split(line, /[ \t]+/);
+					if (length(parts) >= 6) {
+						let host = parts[3];
+						for (let j = 5; j < length(parts); j++) {
+							add_lease(parts[j], host);
+						}
+					}
+				}
+			}
+		}
+	} catch (e) {}
+
+	parse_hosts_file('/etc/hosts');
+
+	return leases;
+}
+
+const methods = {
+	get_stats: {
+		call: function() {
+			return call_mosdns_api('/api/v1/stats', 'GET');
+		}
+	},
+
+	get_history: {
+		args: { points: 24 },
+		call: function(request) {
+			let points = request?.args?.points || 24;
+			return call_mosdns_api(`/api/v1/history?points=${points}`, 'GET');
+		}
+	},
+
+	get_top: {
+		args: { limit: 10 },
+		call: function(request) {
+			let limit = request?.args?.limit || 10;
+			let res = call_mosdns_api(`/api/v1/top?limit=${limit}`, 'GET');
+			if (type(res) == 'object' && !res.error) {
+				res.leases = get_client_leases();
+			}
+			return res;
+		}
+	},
+
+	get_leases: {
+		call: function() {
+			return { leases: get_client_leases() };
+		}
+	},
+
+	get_logs: {
+		args: { limit: 50, offset: 0, search: '', filter: 'all' },
+		call: function(request) {
+			let limit = request?.args?.limit || 50;
+			let offset = request?.args?.offset || 0;
+			let search = request?.args?.search || '';
+			let filter = request?.args?.filter || 'all';
+			return call_mosdns_api(`/api/v1/logs?limit=${limit}&offset=${offset}&search=${search}&filter=${filter}`, 'GET');
+		}
+	},
+
+	clear_query_logs: {
+		call: function() {
+			return call_mosdns_api('/api/v1/logs/clear', 'POST');
+		}
+	},
+
+	flush_cache: {
+		call: function() {
+			try {
+				let uci_cursor = cursor();
+				uci_cursor.load('mosdns');
+				let port = uci_cursor.get('mosdns', 'config', 'listen_port_api') || '9091';
+				if (!port) return { error: "API listen port not configured." };
+
+				let res = exec_sys(`wget -q -O - "http://127.0.0.1:${port}/plugins/lazy_cache/flush"`);
+				if (res.code === 0) {
+					return { success: true };
+				} else {
+					return { success: false, error: res.stdout };
+				}
+			} catch (e) {
+				return { error: String(e) };
+			}
+		}
+	},
+
+	print_log: {
+		call: function() {
+			try {
+				let path = get_logfile_path_internal();
+				if (path && stat(path)) {
+					return { log: readfile(path) };
+				} else {
+					return { error: 'Log file not accessible or does not exist.' };
+				}
+			} catch (e) {
+				return { error: String(e) };
+			}
+		}
+	},
+
+	clean_log: {
+		call: function() {
+			try {
+				let path = get_logfile_path_internal();
+				if (path) {
+					let f = open(path, 'w');
+					if (f) {
+						f.close();
+						return { success: true };
+					}
+					return { error: 'Failed to open log file for writing.' };
+				} else {
+					return { error: 'Log file path could not be determined.' };
+				}
+			} catch (e) {
+				return { error: String(e) };
+			}
+		}
+	},
+
+	get_version: {
+		call: function() {
+			let res = exec_sys('mosdns version');
+			if (res.code === 0) {
+				return { version: res.stdout };
+			} else {
+				return { error: res.stdout };
+			}
+		}
+	},
+
+	start_update: {
+		call: function() {
+			try {
+				if (stat('/var/lock/mosdns_update.lock')) {
+					return { success: false, error: 'Another update is already in progress.' };
+				}
+				exec_sys('echo "" > /var/log/mosdns_update.log');
+				exec_sys('/usr/share/mosdns/mosdns.uc update > /var/log/mosdns_update.log 2>&1 &');
+				return { success: true };
+			} catch (e) {
+				return { success: false, error: String(e) };
+			}
+		}
+	},
+
+	get_update_log: {
+		call: function() {
+			try {
+				if (stat('/var/log/mosdns_update.log')) {
+					return { log: readfile('/var/log/mosdns_update.log') };
+				} else {
+					return { log: '' };
+				}
+			} catch (e) {
+				return { error: String(e) };
+			}
+		}
+	}
+};
+
+return { "luci.mosdns": methods };

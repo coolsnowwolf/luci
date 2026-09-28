@@ -118,26 +118,39 @@ function copy_instance(var)
 	local TMP_DNSMASQ_PATH = var["-TMP_DNSMASQ_PATH"]
 	local conf_lines = {}
 	local DEFAULT_DNSMASQ_CFGID = sys.exec("echo -n $(uci -q show dhcp.@dnsmasq[0] | awk 'NR==1 {split($0, conf, /[.=]/); print conf[2]}')")
-	for line in io.lines("/tmp/etc/dnsmasq.conf." .. DEFAULT_DNSMASQ_CFGID) do
-		local filter
-		if line:find("passwall") then filter = true end
-		if line:find("ubus") then filter = true end
-		if line:find("dhcp") then filter = true end
-		if line:find("server=") == 1 then filter = true end
-		if line:find("port=") == 1 then filter = true end
-		if line:find("min%-cache%-ttl") == 1 then filter = true end
-		if line:find("conf%-dir=") == 1 then
-			filter = true
-			if TMP_DNSMASQ_PATH then
-				local tmp_path = line:sub(1 + #"conf-dir=")
-				sys.call(string.format("cp -r %s/* %s/ 2>/dev/null", tmp_path, TMP_DNSMASQ_PATH))
+	local conf_file = "/var/etc/dnsmasq.conf." .. DEFAULT_DNSMASQ_CFGID
+
+	local retry = 5
+	while not fs.access(conf_file) and retry > 0 do
+		api.nixio.nanosleep(1, 0)
+		retry = retry - 1
+	end
+
+	if fs.access(conf_file) then
+		for line in io.lines(conf_file) do
+			local filter
+			if line:find("passwall") then filter = true end
+			if line:find("ubus") then filter = true end
+			if line:find("dhcp") then filter = true end
+			if line:find("server=") == 1 then filter = true end
+			if line:find("port=") == 1 then filter = true end
+			if line:find("min%-cache%-ttl") == 1 then filter = true end
+			if line:find("conf%-dir=") == 1 then
+				filter = true
+				if TMP_DNSMASQ_PATH then
+					local tmp_path = line:sub(1 + #"conf-dir=")
+					sys.call(string.format("cp -r %s/* %s/ 2>/dev/null", tmp_path, TMP_DNSMASQ_PATH))
+				end
+			end
+			if line:find("address=") == 1 or (line:find("server=") == 1 and line:find("/")) then filter = nil end
+			if not filter then
+				tinsert(conf_lines, line)
 			end
 		end
-		if line:find("address=") == 1 or (line:find("server=") == 1 and line:find("/")) then filter = nil end
-		if not filter then
-			tinsert(conf_lines, line)
-		end
+	else
+		sys.call("logger -t passwall 'ERROR: dnsmasq config " .. conf_file .. " not found after 5s wait! DNS hijacking will fail.'")
 	end
+
 	tinsert(conf_lines, "port=" .. LISTEN_PORT)
 	if TMP_DNSMASQ_PATH then
 		sys.call("rm -rf " .. TMP_DNSMASQ_PATH .. "/*passwall*")
@@ -323,6 +336,7 @@ function add_rule(var)
 	local cache_text = ""
 	local nodes_address_md5 = sys.exec("echo -n $(uci show passwall | grep '\\.address') | md5sum")
 	local new_rules = sys.exec("echo -n $(find /usr/share/passwall/rules -type f | xargs md5sum)")
+	new_rules = new_rules .. sys.exec("echo -n $(find /etc/passwall/rules -type f | xargs md5sum)")
 	local new_text = TMP_DNSMASQ_PATH .. DNSMASQ_CONF_FILE .. DEFAULT_DNS .. LOCAL_DNS .. TUN_DNS .. USE_DEFAULT_DNS .. CHINADNS_DNS .. USE_DIRECT_LIST .. USE_PROXY_LIST .. USE_BLOCK_LIST .. USE_GFW_LIST .. CHN_LIST .. DEFAULT_PROXY_MODE .. NO_PROXY_IPV6 .. nodes_address_md5 .. new_rules .. NFTFLAG
 	if fs.access(CACHE_TEXT_FILE) then
 		for line in io.lines(CACHE_TEXT_FILE) do
@@ -367,7 +381,7 @@ function add_rule(var)
 		--屏蔽列表
 		if USE_CHINADNS_NG == "0" and USE_BLOCK_LIST == "1" then
 			local geosite_arg = ""
-			local f = io.open("/usr/share/passwall/rules/block_host")
+			local f = io.open("/etc/passwall/rules/block_host")
 			if f then
 				for line in f:lines() do
 					if not line:find("#") and line:find("geosite:") then
@@ -442,7 +456,7 @@ function add_rule(var)
 				}
 				--始终用国内DNS解析直连（白名单）列表
 				local geosite_arg = ""
-				local f = io.open("/usr/share/passwall/rules/direct_host")
+				local f = io.open("/etc/passwall/rules/direct_host")
 				if f then
 					for line in f:lines() do
 						if not line:find("#") and line:find("geosite:") then
@@ -492,7 +506,7 @@ function add_rule(var)
 				end
 				--始终使用远程DNS解析代理（黑名单）列表
 				local geosite_arg = ""
-				local f = io.open("/usr/share/passwall/rules/proxy_host")
+				local f = io.open("/etc/passwall/rules/proxy_host")
 				if f then
 					for line in f:lines() do
 						if not line:find("#") and line:find("geosite:") then

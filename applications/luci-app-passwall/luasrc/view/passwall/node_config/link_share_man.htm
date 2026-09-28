@@ -1,8 +1,8 @@
 <%+cbi/valueheader%>
 <%
-local api = require "luci.passwall.api"
-local appname = api.appname
 local map = self.map
+local api = map.api
+local config = map.config
 
 local has_ss_rust = api.is_finded("sslocal")
 local has_singbox = api.finded_com("sing-box")
@@ -17,7 +17,7 @@ local hysteria2_type = api.get_core("hysteria2_type", {{has_hysteria2,"hysteria2
 
 local current_node = map:get(section)
 -%>
-<script src="<%=resource%>/view/<%=appname%>/qrcode.min.js"></script>
+<script src="<%=resource%>/view/<%=api.appname%>/qrcode.min.js"></script>
 <script type="text/javascript">//<![CDATA[
 	let has_singbox = "<%=has_singbox%>"
 	let has_xray = "<%=has_xray%>"
@@ -43,19 +43,25 @@ local current_node = map:get(section)
 	}
 
 	function b64DecodeUnicode(str) {
-		return decodeURIComponent(Array.prototype.map.call(atob(str), function (c) {
-			return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-		}).join(''));
+		try {
+			return decodeURIComponent(Array.prototype.map.call(atob(str), function (c) {
+				return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+			}).join(''));
+		} catch (e) {}
+		return str;
 	}
 
 	function b64decutf8safe(str) {
-		var l;
+		const orig = str;
+		let l;
 		str = str.replace(/-/g, "+").replace(/_/g, "/");
 		l = str.length;
 		l = (4 - l % 4) % 4;
 		if (l)
 			str = padright(str, l, "=");
-		return b64DecodeUnicode(str);
+		const text = b64DecodeUnicode(str);
+		if (text !== str) return text;
+		return orig;
 	}
 
 	function b64encsafe(str) {
@@ -79,6 +85,15 @@ local current_node = map:get(section)
 		if (typeof (v) === 'undefined' || v === '')
 			return '';
 		return b64decsafe(v);
+	}
+
+	function is_json(str) {
+		try {
+			const result = JSON.parse(str);
+			return typeof result === 'object' && result !== null;
+		} catch (e) {
+			return false;
+		}
 	}
 
 	function parseNodeUrl(url) {
@@ -112,8 +127,7 @@ local current_node = map:get(section)
 
 	function buildUrl(btn, urlname, sid) {
 		var opt = {
-			base: "cbid.<%=appname%>",
-			client: true,
+			base: "cbid.<%=config%>",
 			get: function (opt) {
 				var id = this.base + "." + opt;
 				var obj = document.getElementsByName(id)[0] || document.getElementsByClassName(id)[0] || document.getElementById(id)
@@ -158,7 +172,6 @@ local current_node = map:get(section)
 			}
 		}
 		opt.base = "cbid." + urlname + "." + sid;
-		opt.client = urlname.indexOf("server") === -1;
 		var v_type = opt.get("type").value;
 		var v_alias = opt.get("remarks");
 
@@ -251,10 +264,6 @@ local current_node = map:get(section)
 				if (v_transport === "ws") {
 					params += opt.query("host", dom_prefix + "ws_host");
 					params += opt.query("path", dom_prefix + "ws_path");
-					if (v_type == "sing-box" && opt.get(dom_prefix + "ws_enableEarlyData").checked) {
-						var ws_maxEarlyData = opt.get(dom_prefix + "ws_maxEarlyData").value;
-						params += "?ed=" + ws_maxEarlyData;
-					}
 				} else if (v_transport === "http") {
 					params += opt.query("host", dom_prefix + "http_host");
 					params += opt.query("path", dom_prefix + "http_path");
@@ -373,10 +382,6 @@ local current_node = map:get(section)
 			if (v_transport === "ws") {
 				info.host = opt.get(dom_prefix + "ws_host").value;
 				info.path = opt.get(dom_prefix + "ws_path").value;
-				if (v_type == "sing-box" && opt.get(dom_prefix + "ws_enableEarlyData").checked) {
-					var ws_maxEarlyData = opt.get(dom_prefix + "ws_maxEarlyData").value;
-					info.path = info.path + "?ed=" + ws_maxEarlyData;
-				}
 			} else if (v_transport === "http") {
 				info.host = opt.get(dom_prefix + "http_host").value;
 				info.path = opt.get(dom_prefix + "http_path").value;
@@ -433,10 +438,6 @@ local current_node = map:get(section)
 			if (v_transport === "ws") {
 				params += opt.query("host", dom_prefix + "ws_host");
 				params += opt.query("path", dom_prefix + "ws_path");
-				if (v_type == "sing-box" && opt.get(dom_prefix + "ws_enableEarlyData").checked) {
-					var ws_maxEarlyData = opt.get(dom_prefix + "ws_maxEarlyData").value;
-					params += encodeURIComponent("?ed=" + ws_maxEarlyData);
-				}
 			} else if (v_transport === "http") {
 				params += opt.query("host", dom_prefix + "http_host");
 				params += opt.query("path", dom_prefix + "http_path");
@@ -525,10 +526,6 @@ local current_node = map:get(section)
 			if (v_transport === "ws") {
 				params += opt.query("host", dom_prefix + "ws_host");
 				params += opt.query("path", dom_prefix + "ws_path");
-				if (v_type == "sing-box" && opt.get(dom_prefix + "ws_enableEarlyData").checked) {
-					var ws_maxEarlyData = opt.get(dom_prefix + "ws_maxEarlyData").value;
-					params += "?ed=" + ws_maxEarlyData;
-				}
 			} else if (v_transport === "http") {
 				params += opt.query("host", dom_prefix + "http_host");
 				params += opt.query("path", dom_prefix + "http_path");
@@ -652,6 +649,7 @@ local current_node = map:get(section)
 			params += opt.query("congestion_control", dom_prefix + "tuic_congestion_control");
 			params += opt.query("udp_relay_mode", dom_prefix + "tuic_udp_relay_mode");
 			params += opt.query("allowinsecure", dom_prefix + "tls_allowInsecure");
+			params += opt.query("pcs", dom_prefix + "tls_pinSHA256");
 
 			params += "#" + encodeURI(v_alias.value);
 			if (params[0] == "&") {
@@ -682,6 +680,7 @@ local current_node = map:get(section)
 				params += opt.query("alpn", dom_prefix + "alpn");
 				params += opt.query("sni", dom_prefix + "tls_serverName");
 				params += opt.query("insecure", dom_prefix + "tls_allowInsecure");
+				params += opt.query("pcs", dom_prefix + "tls_pinSHA256");
 			}
 
 			params += "#" + encodeURI(v_alias.value);
@@ -714,7 +713,35 @@ local current_node = map:get(section)
 				params = params.substring(1);
 			}
 			url += params;
+		} else if (v_type === "sing-box" && opt.get(dom_prefix + "protocol").value === "snell") {
+			protocol = "snell";
+			var v_userkey = opt.get(dom_prefix + "password");
+			var v_psk = opt.get(dom_prefix + "snell_psk");
+			var v_port = opt.get(dom_prefix + "port");
+			url = encodeURIComponent(v_psk.value) +
+				"@" + _address +
+				":" + v_port.value + "?";
+
+			var params = "psk=" + encodeURIComponent(v_psk.value);
+			if (v_userkey.value !== "") {
+				params += "&userkey=" + encodeURIComponent(v_userkey.value);
+			}
+			params += opt.query("version", dom_prefix + "snell_version");
+			if (opt.get(dom_prefix + "snell_version").value === '4') {
+				params += opt.query("obfs", dom_prefix + "snell_obfs_mode");
+				params += opt.query("obfs-host", dom_prefix + "snell_obfs_host");
+			} else {
+				params += opt.query("mode", dom_prefix + "snell_mode");
+			}
+			params += opt.query("reuse", dom_prefix + "snell_reuse");
+
+			params += "#" + encodeURI(v_alias.value);
+			if (params[0] == "&") {
+				params = params.substring(1);
+			}
+			url += params;
 		}
+
 		if (url) {
 			url = protocol.toLowerCase() + "://" + url;
 			return url;
@@ -753,34 +780,41 @@ local current_node = map:get(section)
 		return server.replace(/^\[/, '').replace(/\]$/, '');
 	}
 
-	function fromUrl(btn, urlname, sid, cacheData) {
-		var opt = {
-			base: 'cbid.<%=appname%>',
-			client: true,
+	function tofromUrl(btn) {
+		let link = prompt('<%:Paste Share URL Here%>', '');
+		if (link === null || link === "") {
+			return false;
+		}
+		return fromUrl(link);
+	}
+
+	function fromUrl(link, from_cache) {
+		if (!link) {
+			return false;
+		}
+		const s = document.getElementById("<%=self.option%>-status");
+		if (!s) {
+			alert("Never");
+			return false;
+		}
+		s.innerHTML = "";
+
+		const current_type = '<%=current_node.type or ""%>';
+		let switch_type = null;
+
+		const opt = {
+			base: "cbid.<%=self.option%>.<%=self.value%>",
 			get: function (opt) {
-				var obj;
-				var id = this.base + '.' + opt;
-				obj = document.getElementsByName(id)[0] || document.getElementById(id);
-				if (obj) {
-					var combobox = document.getElementById('cbi.combobox.' + id);
-					if (combobox) {
-						obj.combobox = combobox;
-					}
-					var div = document.getElementById(id);
-					if (div && div.getElementsByTagName("li").length > 0) {
-						obj = div;
-					}
-					return obj;
-				} else {
-					return null;
-				}
+				return getOption("<%=config%>", "<%=self.value%>", opt);
 			},
 			set: function (opt, val) {
+				if (!switch_type && opt == "type" && current_type != val) {
+					switch_type = val;
+					return;
+				}
 				var obj;
 				obj = this.get(opt);
 				if (obj) {
-					var event = document.createEvent("HTMLEvents");
-					event.initEvent("change", true, true);
 					if (obj.type === 'checkbox') {
 						obj.checked = val;
 					} else {
@@ -814,17 +848,17 @@ local current_node = map:get(section)
 						}
 					}
 					try {
-						obj.dispatchEvent(event);
+						obj.dispatchEvent(new Event("change", { bubbles: true, cancelable: true }));
 					} catch (err) {}
 				} else {
 					//alert('<%:Faltal on set option, please help in debug: %>' + opt + ' = ' + val);
-					// 处理 DynamicList
+					// Processing DynamicList
 					var fullName = this.base + '.' + opt;
 					var lists = document.querySelectorAll('.cbi-dynlist');
 					for (var i = 0; i < lists.length; i++) {
 						var parent = lists[i].closest('.cbi-value');
 						if (!parent) continue;
-						// 尝试从 label 的 for 属性中提取 fullName
+						// Try to extract fullName from the label's for attribute.
 						var label = parent.querySelector('label.cbi-value-title');
 						var labelFor = label?.getAttribute('for');
 						if (labelFor === fullName) {
@@ -838,57 +872,20 @@ local current_node = map:get(section)
 						}
 					}
 				}
-			},
-			setlist: function (opt, vlist) {
-				var id = this.base + "." + opt;
-				var objs = document.getElementsByName(id) || document.getElementsByClassName(id);
-				if (objs) {
-					var values = "";
-					for (var i = 0; i < vlist.length; i++) {
-						values += vlist[i] + ", ";
-					}
-					alert("Manually input the option:\n" + opt + "s:\n[" + values + "]");
-				} else {
-					//alert("<%:Faltal on set option, please help in debug: %>" + opt);
-				}
 			}
 		}
 
-		var s = document.getElementById(urlname + '-status');
-		if (!s) {
-			alert("Never");
-			return false;
-		}
-		opt.base = "cbid." + urlname + "." + sid;
-		opt.client = urlname.indexOf("server") === -1;
-		var ssrurl = null;
-		if (cacheData) {
-			ssrurl = cacheData.ssrurl
-		} else {
-			ssrurl = prompt('<%:Paste Share URL Here%>', '');
-			if (ssrurl === null || ssrurl === "") {
-				return false;
-			}
-			sessionStorage.setItem("fromUrl", JSON.stringify({
-				timestamp: Date.now(),
-				savetime: 60 * 1000,
-				urlname: urlname,
-				sid: sid,
-				ssrurl: ssrurl
-			}));
-		}
-		ssrurl = ssrurl.replace(/&amp;/gi, '&').replace(/\s*#\s*/, '#').trim();  //一些奇葩的链接用"&amp;"当做"&"，"#"前后带空格
-		s.innerHTML = "";
-		var ssu = ssrurl.split('://');
-		var event = document.createEvent("HTMLEvents");
-		event.initEvent("change", true, true);
+		link = link.split(/\r\n|\r|\n/, 1)[0];
+		link = link.replace(/&amp;/gi, '&').replace(/\s*#\s*/, '#').trim();  //一些奇葩的链接用"&amp;"当做"&"，"#"前后带空格
+		const link_split = link.split('://');
+		const link_type = link_split[0];
 
-		var dom_prefix = null
+		let dom_prefix = null;
 
-		if (ssu[0] === "ssr") {
+		if (link_type === "ssr") {
 			dom_prefix = "ssr_"
-			//var b64c = ssu[1].match(/([A-Za-z0-9_-]+)/);
-			var sstr = b64decsafe((ssu[1] || "").replace(/#.*/, "").trim());
+			//var b64c = link_split[1].match(/([A-Za-z0-9_-]+)/);
+			var sstr = b64decsafe((link_split[1] || "").replace(/#.*/, "").trim());
 			var ploc = sstr.indexOf("/?");
 			var url0 = "", param = "";
 			if (ploc > 0) {
@@ -923,8 +920,8 @@ local current_node = map:get(section)
 			if (typeof (rem) !== 'undefined' && rem !== '' && rem.length > 0)
 				opt.set('remarks', b64decutf8safe(rem));
 		}
-		if (ssu[0] === "ss") {
-			var url0 = ssu[1] || "";
+		if (link_type === "ss") {
+			var url0 = link_split[1] || "";
 			param = "";
 
 			var ploc = url0.indexOf("#");
@@ -999,15 +996,15 @@ local current_node = map:get(section)
 					queryParam.type && queryParam.type !== "tcp" &&
 					queryParam.headerType && queryParam.headerType !== "none";
 			if (has_xray && (ss_type == "xray" || needUpgrade || queryParam.type === "xhttp")) {
-				dom_prefix = "xray_"
+				dom_prefix = "xray_";
 				opt.set('type', "Xray");
 				opt.set(dom_prefix + 'protocol', "shadowsocks");
 			} else if (has_singbox && (ss_type == "sing-box" || needUpgrade)) {
-				dom_prefix = "singbox_"
+				dom_prefix = "singbox_";
 				opt.set('type', "sing-box");
 				opt.set(dom_prefix + 'protocol', "shadowsocks");
 			} else {
-				dom_prefix = "ssrust_"
+				dom_prefix = "ssrust_";
 				opt.set('type', "SS-Rust");
 			}
 
@@ -1024,6 +1021,7 @@ local current_node = map:get(section)
 			opt.set(dom_prefix + 'method', method || "");
 			opt.set(dom_prefix + 'ss_method', method || "");
 			opt.set(dom_prefix + 'tcp_fast_open', queryParam.tfo);
+
 			if (plugin && plugin != "none") {
 				plugin = (plugin === "simple-obfs") ? "obfs-local" : plugin;
 				opt.set(dom_prefix + 'plugin_enabled', true);
@@ -1046,9 +1044,29 @@ local current_node = map:get(section)
 						opt.set(dom_prefix + 'tls_allowInsecure', true);
 					}
 				}
+				//部分订阅 ShadowTLS 采用 SIP003
+				if (plugin === "shadow-tls") {
+					pluginOpts = pluginOpts.replace(/(^|;)password=/, '$1passwd=');
+					pluginOpts = pluginOpts.replace(/(^|;)version=([123])(?=;|$)/, '$1v$2=1');
+					if (dom_prefix === "ssrust_") {
+						opt.set(dom_prefix + 'plugin_opts', pluginOpts || "");
+					} else if (dom_prefix === "singbox_") {
+						const opts = Object.fromEntries(pluginOpts.split(';').map(item => item.split('=', 2)));
+						const host = opts.host;
+						const password = opts.passwd;
+						const versionKey = Object.keys(opts).find(key => /^v[123]$/.test(key));
+						const version = versionKey ? versionKey.slice(1) : "1";
+						opt.set(dom_prefix + 'shadowtls', true);
+						opt.set(dom_prefix + 'shadowtls_version', version);
+						opt.set(dom_prefix + 'shadowtls_password', password || "");
+						opt.set(dom_prefix + 'shadowtls_serverName', host || "");
+						opt.set(dom_prefix + 'plugin_enabled', false);
+					}
+				}
 			} else {
 				opt.set(dom_prefix + 'plugin', "none");
 			}
+
 			if (param !== undefined) {
 				opt.set('remarks', decodeURIComponent(param));
 			}
@@ -1117,24 +1135,6 @@ local current_node = map:get(section)
 				} else if (queryParam.type === "ws") {
 					opt.set(dom_prefix + 'ws_host', queryParam.host || "");
 					opt.set(dom_prefix + 'ws_path', queryParam.path || "");
-					if (dom_prefix == "singbox_" && queryParam.path && queryParam.path.length > 1) {
-						var ws_path_params = {};
-						var ws_path_dat = queryParam.path.split('?');
-						var ws_path = ws_path_dat[0];
-						var ws_path_params = {};
-						var ws_path_params_array = (ws_path_dat[1] || '').split('&');
-						for (i = 0; i < ws_path_params_array.length; i++) {
-							var kv = ws_path_params_array[i].split('=');
-							ws_path_params[decodeURIComponent(kv[0]).toLowerCase()] = decodeURIComponent(kv[1] || '');
-						}
-
-						if (ws_path_params.ed) {
-							opt.set(dom_prefix + 'ws_path', ws_path);
-							opt.set(dom_prefix + 'ws_enableEarlyData', true);
-							opt.set(dom_prefix + 'ws_maxEarlyData', ws_path_params.ed);
-							opt.set(dom_prefix + 'ws_earlyDataHeaderName', 'Sec-WebSocket-Protocol');
-						}
-					}
 				} else if (queryParam.type === "http") {
 					if (dom_prefix == "xray_") {
 						opt.set(dom_prefix + 'xhttp_mode', "stream-one");
@@ -1167,7 +1167,7 @@ local current_node = map:get(section)
 				opt.set(dom_prefix + 'finalmask', queryParam.fm || "");
 
 				if (queryParam["shadow-tls"]) {
-					//解析SS Shadow-TLS 插件参数
+					//解析SS Shadow-TLS 专用参数
 					const parseShadowTLSParams = function(base64Str, outObj) {
 						try {
 							let obj = JSON.parse(b64decsafe(base64Str));
@@ -1207,17 +1207,17 @@ local current_node = map:get(section)
 				}
 			}
 		}
-		if (ssu[0] === "trojan") {
+		if (link_type === "trojan") {
 			if (trojan_type == "sing-box" && has_singbox) {
-				dom_prefix = "singbox_"
+				dom_prefix = "singbox_";
 				opt.set('type', "sing-box");
 				opt.set(dom_prefix + 'protocol', "trojan");
 			} else if (trojan_type == "xray" && has_xray) {
-				dom_prefix = "xray_"
+				dom_prefix = "xray_";
 				opt.set('type', "Xray");
 				opt.set(dom_prefix + 'protocol', "trojan");
 			}
-			var m = parseNodeUrl(ssrurl);
+			var m = parseNodeUrl(link);
 			var password = m.passwd;
 			if (password === "") {
 				s.innerHTML = "<font color='red'><%:Invalid Share URL Format%></font>";
@@ -1264,24 +1264,6 @@ local current_node = map:get(section)
 			} else if (queryParam.type === "ws") {
 				opt.set(dom_prefix + 'ws_host', queryParam.host || "");
 				opt.set(dom_prefix + 'ws_path', queryParam.path || "");
-				if (dom_prefix == "singbox_" && queryParam.path && queryParam.path.length > 1) {
-					var ws_path_params = {};
-					var ws_path_dat = queryParam.path.split('?');
-					var ws_path = ws_path_dat[0];
-					var ws_path_params = {};
-					var ws_path_params_array = (ws_path_dat[1] || '').split('&');
-					for (i = 0; i < ws_path_params_array.length; i++) {
-						var kv = ws_path_params_array[i].split('=');
-						ws_path_params[decodeURIComponent(kv[0]).toLowerCase()] = decodeURIComponent(kv[1] || '');
-					}
-
-					if (ws_path_params.ed) {
-						opt.set(dom_prefix + 'ws_path', ws_path);
-						opt.set(dom_prefix + 'ws_enableEarlyData', true);
-						opt.set(dom_prefix + 'ws_maxEarlyData', ws_path_params.ed);
-						opt.set(dom_prefix + 'ws_earlyDataHeaderName', 'Sec-WebSocket-Protocol');
-					}
-				}
 			} else if (queryParam.type === "http") {
 				if (dom_prefix == "xray_") {
 					opt.set(dom_prefix + 'xhttp_mode', "stream-one");
@@ -1345,30 +1327,75 @@ local current_node = map:get(section)
 				opt.set('remarks', decodeURIComponent(m.hash.substr(1)));
 			}
 		}
-		if (ssu[0] === "vmess") {
-			var sstr = b64DecodeUnicode((ssu[1] || "").replace(/#.*/, "").trim());
-			var ploc = sstr.indexOf("/?");
+		if (link_type === "vmess") {
+			var sstr = b64DecodeUnicode((link_split[1] || "").replace(/#.*/, "").trim());
 			if (vmess_type == "sing-box" && has_singbox) {
-				dom_prefix = "singbox_"
+				dom_prefix = "singbox_";
 				opt.set('type', "sing-box");
 			} else if (has_xray) {
-				dom_prefix = "xray_"
+				dom_prefix = "xray_";
 				opt.set('type', "Xray");
 			}
 			opt.set(dom_prefix + 'protocol', "vmess");
-			var url0, param = "";
-			if (ploc > 0) {
-				url0 = sstr.substr(0, ploc);
-				param = sstr.substr(ploc + 2);
+
+			let ssm = {};
+			if (is_json(sstr)) {
+				// vmess://base64(json)
+				ssm = JSON.parse(sstr);
+			} else if (sstr.indexOf("?") > 0) {
+				// vmess://base64(auto:uuid@host:port)?tfo=1&remark=xxx&&alterId=0&obfs=websocket&path=%2F&obfsParam=host (obfs ~= ws obfsParam={})
+				sstr = sstr.replace("/?", "?");
+				const ploc = sstr.indexOf("?");
+				let url0 = sstr.substr(0, ploc);
+				let paramStr = sstr.substr(ploc + 2);
+
+				const m = new URL("http://" + b64decsafe(url0));
+				if (m.username !== "") {
+					ssm.security = m.username;
+					ssm.id = m.password || m.username;
+				} else {
+					ssm.security = "auto";
+					ssm.id = m.password || m.username;
+				}
+				ssm.add = unbracketIP(m.hostname);
+				ssm.port = m.port || "443";
+
+				const params = {};
+				const pairs = paramStr.split("&");
+				for (let i = 0; i < pairs.length; i++) {
+					const v = pairs[i];
+					const s = v.indexOf("=");
+					if (s > 0) {
+						params[v.substring(0, s)] = decodeURIComponent(v.substring(s + 1));
+					}
+				}
+				ssm.ps = params.remark || params.remarks;
+				ssm.net = (params.obfs === "websocket") ? "ws" : (params.obfs || "tcp");
+				ssm.path = params.path;
+				ssm.aid = params.alterId || "0";
+				ssm.tls = params.tls;
+				ssm.sni = params.peer;
+				ssm.tfo = params.tfo;
+				if (is_json(params.obfsParam)) {
+					const op_info = JSON.parse(params.obfsParam);
+					if (op_info.header) ssm.type = op_info.header;
+					if (op_info.Host) ssm.host = op_info.Host;
+				} else {
+					ssm.host = params.obfsParam;
+				}
+				ssm.allowinsecure = params.allowInsecure;
+			} else {
+				s.innerHTML = "<font color='red'><%:Invalid Share URL Format%></font>";
+				return false;
 			}
-			var ssm = JSON.parse(sstr);
+
 			opt.set('remarks', ssm.ps);
 			opt.set(dom_prefix + 'address', unbracketIP(ssm.add));
 			opt.set(dom_prefix + 'port', ssm.port);
 			opt.set(dom_prefix + 'uuid', ssm.id);
 			opt.set(dom_prefix + 'security', ssm.security || ssm.scy || "auto");
-			opt.set(dom_prefix + 'tls', ssm.tls === "tls");
-			if (ssm.tls === "tls") {
+			opt.set(dom_prefix + 'tls', ssm.tls === "tls" || ssm.tls === "1");
+			if (ssm.tls === "tls" || ssm.tls === "1") {
 				opt.set(dom_prefix + 'tls_serverName', ssm.sni || ssm.host);
 				opt.set(dom_prefix + 'alpn', ssm.alpn || "default");
 				if (ssm.fp && ssm.fp !== "") {
@@ -1406,24 +1433,6 @@ local current_node = map:get(section)
 			} else if (ssm.net === "ws") {
 				opt.set(dom_prefix + 'ws_host', ssm.host);
 				opt.set(dom_prefix + 'ws_path', ssm.path);
-				if (dom_prefix == "singbox_" && ssm.path && ssm.path.length > 1) {
-					var ws_path_params = {};
-					var ws_path_dat = ssm.path.split('?');
-					var ws_path = ws_path_dat[0];
-					var ws_path_params = {};
-					var ws_path_params_array = (ws_path_dat[1] || '').split('&');
-					for (i = 0; i < ws_path_params_array.length; i++) {
-						var kv = ws_path_params_array[i].split('=');
-						ws_path_params[decodeURIComponent(kv[0]).toLowerCase()] = decodeURIComponent(kv[1] || '');
-					}
-
-					if (ws_path_params.ed) {
-						opt.set(dom_prefix + 'ws_path', ws_path);
-						opt.set(dom_prefix + 'ws_enableEarlyData', true);
-						opt.set(dom_prefix + 'ws_maxEarlyData', ws_path_params.ed);
-						opt.set(dom_prefix + 'ws_earlyDataHeaderName', 'Sec-WebSocket-Protocol');
-					}
-				}
 			} else if (ssm.net === "http") {
 				if (dom_prefix == "xray_") {
 					opt.set(dom_prefix + 'xhttp_mode', "stream-one");
@@ -1446,14 +1455,14 @@ local current_node = map:get(section)
 			opt.set(dom_prefix + 'use_finalmask', !!ssm.fm);
 			opt.set(dom_prefix + 'finalmask', ssm.fm || "");
 		}
-		if (ssu[0] === "vless") {
+		if (link_type === "vless") {
 			if (vless_type == "sing-box" && has_singbox) {
 				dom_prefix = "singbox_";
 			} else if (has_xray) {
 				dom_prefix = "xray_";
 			}
 
-			var m = parseNodeUrl(ssrurl);
+			var m = parseNodeUrl(link);
 			var password = m.passwd;
 			if (password === "") {
 				s.innerHTML = "<font color='red'><%:Invalid Share URL Format%></font>";
@@ -1475,7 +1484,7 @@ local current_node = map:get(section)
 			if (["xhttp", "kcp", "mkcp"].includes(queryParam.type) && vless_type !== "xray" && has_xray) {
 				dom_prefix = "xray_";
 			}
-			opt.set("type", dom_prefix === "singbox_" ? "sing-box" : "Xray");
+			opt.set('type', dom_prefix == "singbox_" ? "sing-box" : "Xray");
 
 			opt.set(dom_prefix + 'protocol', "vless");
 			opt.set(dom_prefix + 'uuid', password);
@@ -1549,24 +1558,6 @@ local current_node = map:get(section)
 			} else if (queryParam.type === "ws") {
 				opt.set(dom_prefix + 'ws_host', queryParam.host || "");
 				opt.set(dom_prefix + 'ws_path', queryParam.path || "");
-				if (dom_prefix == "singbox_" && queryParam.path && queryParam.path.length > 1) {
-					var ws_path_params = {};
-					var ws_path_dat = queryParam.path.split('?');
-					var ws_path = ws_path_dat[0];
-					var ws_path_params = {};
-					var ws_path_params_array = (ws_path_dat[1] || '').split('&');
-					for (i = 0; i < ws_path_params_array.length; i++) {
-						var kv = ws_path_params_array[i].split('=');
-						ws_path_params[decodeURIComponent(kv[0]).toLowerCase()] = decodeURIComponent(kv[1] || '');
-					}
-
-					if (ws_path_params.ed) {
-						opt.set(dom_prefix + 'ws_path', ws_path);
-						opt.set(dom_prefix + 'ws_enableEarlyData', true);
-						opt.set(dom_prefix + 'ws_maxEarlyData', ws_path_params.ed);
-						opt.set(dom_prefix + 'ws_earlyDataHeaderName', 'Sec-WebSocket-Protocol');
-					}
-				}
 			} else if (queryParam.type === "h2" || queryParam.type === "http") {
 				if (dom_prefix == "xray_") {
 					opt.set(dom_prefix + 'xhttp_mode', "stream-one");
@@ -1605,8 +1596,8 @@ local current_node = map:get(section)
 				opt.set('remarks', decodeURIComponent(m.hash.substr(1)));
 			}
 		}
-		if (ssu[0] === "hysteria2" || ssu[0] === "hy2") {
-			var m = parseNodeUrl(ssrurl);
+		if (link_type === "hysteria2" || link_type === "hy2") {
+			var m = parseNodeUrl(link);
 			var password = m.passwd;
 			if (password === "") {
 				s.innerHTML = "<font color='red'><%:Invalid Share URL Format%></font>";
@@ -1671,13 +1662,13 @@ local current_node = map:get(section)
 				opt.set('remarks', decodeURIComponent(m.hash.substr(1)));
 			}
 		}
-		if (ssu[0] === "tuic") {
+		if (link_type === "tuic") {
 			if (has_singbox) {
-				dom_prefix = "singbox_"
+				dom_prefix = "singbox_";
 				opt.set('type', "sing-box");
 			}
 			opt.set(dom_prefix + 'protocol', "tuic");
-			var _parsedUrl = new URL("http://" + ssu[1]);
+			var _parsedUrl = new URL("http://" + link_split[1]);
 			var username = _parsedUrl.username;
 			var password = _parsedUrl.password;
 			var hostname = _parsedUrl.hostname;
@@ -1716,17 +1707,18 @@ local current_node = map:get(section)
 				dom_prefix + 'tls_allowInsecure',
 				!((queryParam.allowinsecure ?? '0') === '0' && (queryParam.insecure ?? '0') === '0' && (queryParam.allow_insecure ?? '0') === '0')
 			);
+			opt.set(dom_prefix + 'tls_pinSHA256', queryParam.pcs || queryParam.pinSHA256 || '');
 			if (hash) {
 				opt.set('remarks', decodeURIComponent(hash.substr(1)));
 			}
 		}
-		if (ssu[0] === "anytls") {
+		if (link_type === "anytls") {
 			if (has_singbox) {
-				dom_prefix = "singbox_"
+				dom_prefix = "singbox_";
 				opt.set('type', "sing-box");
 			}
 			opt.set(dom_prefix + 'protocol', "anytls");
-			var m = parseNodeUrl(ssrurl);
+			var m = parseNodeUrl(link);
 			var password = m.passwd;
 			if (password === "") {
 				s.innerHTML = "<font color='red'><%:Invalid Share URL Format%></font>";
@@ -1748,41 +1740,35 @@ local current_node = map:get(section)
 			}
 			queryParam.security = queryParam.security || "tls";
 			if (queryParam.security) {
+				opt.set(dom_prefix + 'tls', true);
 				if (queryParam.security == "tls") {
-					opt.set(dom_prefix + 'tls', true);
 					opt.set(dom_prefix + 'reality', false);
-					opt.set(dom_prefix + 'alpn', queryParam.alpn || 'default');
-					opt.set(dom_prefix + 'tls_serverName', queryParam.sni || queryParam.peer || '');
-					opt.set(dom_prefix + 'tls_allowInsecure', !((queryParam.allowinsecure ?? '0') === '0' && (queryParam.insecure ?? '0') === '0'));
-					if (queryParam.fp && queryParam.fp.trim() != "") {
-						opt.set(dom_prefix + 'utls', true);
-						opt.set(dom_prefix + 'fingerprint', queryParam.fp);
-					}
 				}
 				if (queryParam.security == "reality") {
-					opt.set(dom_prefix + 'tls', true);
 					opt.set(dom_prefix + 'reality', true);
-					opt.set(dom_prefix + 'alpn', queryParam.alpn || 'default');
-					opt.set(dom_prefix + 'tls_serverName', queryParam.sni || queryParam.peer || '');
-					if (queryParam.fp && queryParam.fp.trim() != "") {
-						opt.set(dom_prefix + 'utls', true);
-						opt.set(dom_prefix + 'fingerprint', queryParam.fp);
-					}
 					opt.set(dom_prefix + 'reality_publicKey', queryParam.pbk || '');
 					opt.set(dom_prefix + 'reality_shortId', queryParam.sid || '');
 				}
+				opt.set(dom_prefix + 'alpn', queryParam.alpn || 'default');
+				opt.set(dom_prefix + 'tls_serverName', queryParam.sni || queryParam.peer || '');
+				if (queryParam.fp && queryParam.fp.trim() != "") {
+					opt.set(dom_prefix + 'utls', true);
+					opt.set(dom_prefix + 'fingerprint', queryParam.fp);
+				}
+				opt.set(dom_prefix + 'tls_allowInsecure', !((queryParam.allowinsecure ?? '0') === '0' && (queryParam.insecure ?? '0') === '0'));
+				opt.set(dom_prefix + 'tls_pinSHA256', queryParam.pcs || queryParam.pinSHA256 || '');
 			}
 			if (m.hash) {
 				opt.set('remarks', decodeURIComponent(m.hash.substr(1)));
 			}
 		}
-		if (ssu[0] === "naive+https" || ssu[0] === "naive+quic") {
+		if (link_type === "naive+https" || link_type === "naive+quic") {
 			if (has_singbox) {
-				dom_prefix = "singbox_"
+				dom_prefix = "singbox_";
 				opt.set('type', "sing-box");
 			}
 			opt.set(dom_prefix + 'protocol', "naive");
-			var _parsedUrl = new URL("http://" + ssu[1]);
+			var _parsedUrl = new URL("http://" + link_split[1]);
 			var username = _parsedUrl.username;
 			var password = _parsedUrl.password;
 			var hostname = _parsedUrl.hostname;
@@ -1817,7 +1803,7 @@ local current_node = map:get(section)
 			opt.set(dom_prefix + 'tls_serverName', queryParam.sni || '');
 			opt.set(dom_prefix + 'ech', !!queryParam.ech);
 			opt.set(dom_prefix + 'ech_config', queryParam.ech || '');
-			if (ssu[0] === "naive+quic") {
+			if (link_type === "naive+quic") {
 				opt.set(dom_prefix + 'naive_quic', true);
 				opt.set(dom_prefix + 'naive_congestion_control', queryParam.congestion_control || 'bbr');
 			}
@@ -1825,15 +1811,55 @@ local current_node = map:get(section)
 				opt.set('remarks', decodeURIComponent(hash.substr(1)));
 			}
 		}
-		if (dom_prefix && dom_prefix != null) {
-			if (opt.get(dom_prefix + 'port').value) {
-				opt.get(dom_prefix + 'port').focus();
-				opt.get(dom_prefix + 'port').blur();
+		if (link_type === "snell") {
+			if (has_singbox) {
+				dom_prefix = "singbox_";
+				opt.set('type', "sing-box");
 			}
-		} else {
+			opt.set(dom_prefix + 'protocol', "snell");
+			var m = parseNodeUrl(link);
+			opt.set(dom_prefix + 'address', unbracketIP(m.hostname));
+			opt.set(dom_prefix + 'port', m.port || "443");
+			var queryParam = {};
+			if (m.search.length > 1) {
+				var query = m.search.replace('/?', '?').split('?')
+				var queryParams = query[1];
+				var queryArray = queryParams.split('&');
+				var params;
+				for (i = 0; i < queryArray.length; i++) {
+					params = queryArray[i].split('=');
+					queryParam[decodeURIComponent(params[0]).toLowerCase()] = decodeURIComponent(params[1] || '');
+				}
+			}
+			opt.set(dom_prefix + 'password', queryParam.userkey || '');
+			opt.set(dom_prefix + 'snell_psk', queryParam.psk || m.passwd || '');
+			opt.set(dom_prefix + 'snell_version', queryParam.version || '4');
+			opt.set(dom_prefix + 'snell_reuse', queryParam.reuse === '1');
+			opt.set(dom_prefix + 'snell_obfs_mode', queryParam.obfs || 'none');
+			opt.set(dom_prefix + 'snell_obfs_host', queryParam['obfs-host'] || queryParam.obfs_host || '');
+			opt.set(dom_prefix + 'snell_mode', queryParam.mode || 'default');
+			if (m.hash) {
+				opt.set('remarks', decodeURIComponent(m.hash.substr(1)));
+			}
+		}
+
+		if (switch_type) {
+			sessionStorage.setItem("fromUrl", JSON.stringify({
+				timestamp: Date.now(),
+				savetime: 60 * 1000,
+				link: link
+			}));
+			opt.set("type", switch_type);
+			return
+		}
+		if (!dom_prefix) {
 			s.innerHTML = "<font color='red'><%:Invalid Share URL Format%></font>";
 			sessionStorage.removeItem("fromUrl");
 			return false;
+		}
+		if (opt.get(dom_prefix + 'port')) {
+			opt.get(dom_prefix + 'port').focus();
+			opt.get(dom_prefix + 'port').blur();
 		}
 		s.innerHTML = "<font color='green'><%:Import Finished %></font>";
 		sessionStorage.removeItem("fromUrl");
@@ -1843,17 +1869,6 @@ local current_node = map:get(section)
 	function exportConfigFile(btn, sid) {
 		window.open('<%=api.url("gen_client_config")%>?id=' + sid, "_blank")
 	}
-
-	document.addEventListener("DOMContentLoaded", function () {
-		setTimeout(function () {
-			const fromUrlCache = JSON.parse(sessionStorage.getItem("fromUrl"));
-			if (fromUrlCache && fromUrlCache.savetime && (Date.now() - fromUrlCache.timestamp) < fromUrlCache.savetime) {
-				fromUrl(null, fromUrlCache.urlname, fromUrlCache.sid, fromUrlCache)
-			} else {
-				sessionStorage.removeItem("fromUrl");
-			}
-		}, 500);
-	})
 
 //]]></script>
 <style>
@@ -1887,7 +1902,7 @@ local current_node = map:get(section)
 <div class="share-toolbar">
 	<div class="toolbar-buttons">
 		<% if not current_node.protocol or not current_node.protocol:find("^_") then -%>
-		<input id="fromUrlBtn" type="button" class="btn cbi-button cbi-button-apply" value='<%:From Share URL%>' onclick="return fromUrl(this, '<%=self.option%>', '<%=self.value%>')" />
+		<input id="fromUrlBtn" type="button" class="btn cbi-button cbi-button-apply" value='<%:From Share URL%>' onclick="return tofromUrl()" />
 		<input id="exportUrlBtn" type="button" class="btn cbi-button cbi-button-apply" value='<%:Build Share URL%>' onclick="return exportUrl(this, '<%=self.option%>', '<%=self.value%>')" />
 		<input id="genQrcodeBtn" type="button" class="btn cbi-button cbi-button-apply" value='<%:Generate QRCode%>' onclick="return genQrcode(this, '<%=self.option%>', '<%=self.value%>')" />
 		<% end -%>

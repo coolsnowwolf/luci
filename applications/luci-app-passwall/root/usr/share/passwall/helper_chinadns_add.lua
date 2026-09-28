@@ -26,6 +26,7 @@ local datatypes = api.datatypes
 local TMP_PATH = api.TMP_PATH
 local TMP_ACL_PATH = TMP_PATH .. "/acl"
 local RULES_PATH = "/usr/share/passwall/rules"
+local USER_RULES_PATH = "/etc/passwall/rules"
 local FLAG_PATH = TMP_ACL_PATH .. "/" .. FLAG
 local config_lines = {}
 local tmp_lines = {}
@@ -130,7 +131,7 @@ local file_block_host = TMP_ACL_PATH .. "/block_host"
 if USE_BLOCK_LIST == "1" and not fs.access(file_block_host) then
 	local block_domain, lookup_block_domain = {}, {}
 	local geosite_arg = ""
-	local f = io.open(RULES_PATH .. "/block_host")
+	local f = io.open(USER_RULES_PATH .. "/block_host")
 	if f then
 		for line in f:lines() do
 			if not line:find("#") and line:find("geosite:") then
@@ -217,7 +218,7 @@ local file_direct_host = TMP_ACL_PATH .. "/direct_host"
 if USE_DIRECT_LIST == "1" and not fs.access(file_direct_host) then
 	local direct_domain, lookup_direct_domain = {}, {}
 	local geosite_arg = ""
-	local f = io.open(RULES_PATH .. "/direct_host")
+	local f = io.open(USER_RULES_PATH .. "/direct_host")
 	if f then
 		for line in f:lines() do
 			if not line:find("#") and line:find("geosite:") then
@@ -267,7 +268,7 @@ local file_proxy_host = TMP_ACL_PATH .. "/proxy_host"
 if USE_PROXY_LIST == "1" and not fs.access(file_proxy_host) then
 	local proxy_domain, lookup_proxy_domain = {}, {}
 	local geosite_arg = ""
-	local f = io.open(RULES_PATH .. "/proxy_host")
+	local f = io.open(USER_RULES_PATH .. "/proxy_host")
 	if f then
 		for line in f:lines() do
 			if not line:find("#") and line:find("geosite:") then
@@ -491,7 +492,6 @@ if IS_SHUNT_NODE then
 			}
 			insert_array_after(config_lines, tmp_lines, "#--4")
 		end
-
 	end
 
 	if is_file_nonzero(file_shunt_host) then
@@ -516,7 +516,7 @@ if CHNLIST == "proxy" then DEFAULT_TAG = "chn" end
 --全局模式，默认使用远程DNS
 if only_global then
 	DEFAULT_TAG = "gfw"
-	if NO_IPV6_TRUST == "1" and not IS_SHUNT_NODE then
+	if NO_IPV6_TRUST == "1" and not IS_SHUNT_NODE then 
 		table.insert(config_lines, "no-ipv6")
 	end
 end

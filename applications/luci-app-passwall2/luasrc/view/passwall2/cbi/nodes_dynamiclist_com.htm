@@ -1,0 +1,654 @@
+<%
+--	Template Developers:
+--		- lwb1978
+--		- snowie2000
+--	Copyright: copyright(c)2025–2027
+--	Description: Passwall(2) UI template
+-- It is the common part of the template and cannot be used independently
+%>
+<script src="<%=resource%>/view/passwall2/Sortable.min.js"></script>
+<style>
+/* 主下拉按钮的下箭头 */
+.dl-arrow-down {
+	width: 0;
+	height: 0;
+	border-left: 5px solid transparent;
+	border-right: 5px solid transparent;
+	border-top: 6px solid #666;
+	margin-left: 6px;
+	display: inline-block;
+	vertical-align: middle;
+}
+/* 组标题的右箭头（折叠） */
+.dl-arrow-right {
+	width: 0;
+	height: 0;
+	border-top: 4px solid transparent;
+	border-bottom: 4px solid transparent;
+	border-left: 5px solid #555;
+	display: inline-block;
+	vertical-align: middle;
+}
+/* 组标题的下箭头（展开） */
+.dl-arrow-down-small {
+	width: 0;
+	height: 0;
+	border-left: 4px solid transparent;
+	border-right: 4px solid transparent;
+	border-top: 5px solid #555;
+	display: inline-block;
+	vertical-align: middle;
+}
+/* 基础列表项样式 */
+.cbi-dynamiclist-panel li[data-key] {
+	padding: 6px;
+	border-radius: 4px;
+	cursor: pointer;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	transition: background-color 0.15s ease;
+}
+/* 鼠标悬停效果 - 使用透明度避免覆盖问题 */
+.cbi-dynamiclist-panel li[data-key]:hover {
+	background-color: rgba(0, 123, 255, 0.1);
+}
+
+.dl-dropdown-container {
+	display: inline-block;
+	position: relative;
+	min-width: 220px;
+	white-space: nowrap;
+}
+@media (max-width: 1152px) {
+	.dl-dropdown-container {
+		white-space: normal;
+	}
+}
+@media (max-width: 600px) {
+	.dl-dropdown-container {
+		display: block;
+		white-space: normal;
+	}
+}
+
+.dl-dropdown-display {
+	cursor: pointer;
+	display: inline-flex;
+	align-items: center;
+	justify-content: space-between;
+	box-sizing: border-box;
+}
+.dl-dropdown-label,
+.dl-selected-label {
+	display: inline-block;
+	overflow: hidden;
+	white-space: nowrap;
+	width: 100%;
+	text-align: left;
+}
+.dl-dropdown-panel {
+	position: fixed;
+	top: 0;
+	left: 0;
+	z-index: 2147483647;
+	border: 1px solid #dcdcdc;
+	border-radius: 4px;
+	box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+	max-height: 50vh;
+	overflow: auto;
+	overscroll-behavior: contain;
+}
+.dl-dropdown-search {
+	width: 100%;
+	max-width: 100% !important;
+	min-width: 0 !important;
+	box-sizing: border-box;
+	padding: 6px;
+	border: 1px solid #e0e0e0;
+	border-radius: 4px;
+}
+.dl-group-title {
+	cursor: pointer;
+	padding: 6px;
+	border-radius: 4px;
+	display: flex;
+	align-items: center;
+	line-height: normal;
+	white-space: nowrap;
+}
+.dl-group-list {
+	list-style: none;
+	margin: 6px 0 0 8px;
+	padding: 0;
+}
+.dl-group-item {
+	padding: 6px;
+	border-radius: 4px;
+	cursor: pointer;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	text-align: left !important;
+}
+.dl-selected-list {
+	display: flex;
+	flex-direction: column;
+	gap: 5px;
+}
+.dl-remove {
+	margin-left: 8px;
+	cursor: pointer;
+	color: red;
+}
+.dragging-row {
+	background-color: rgba(131, 191, 255, 0.7) !important;
+	box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+</style>
+
+<script type="text/javascript">
+//<![CDATA[
+	// css helper functions
+	function dl_camelToKebab(str) {
+		return str.replace(/([a-z0-9]|(?=[A-Z]))([A-Z])/g, '$1-$2').toLowerCase()
+	}
+
+	function dl_style2Css(styleDeclaration, properties) {
+		const cssRules = properties.map(prop => {
+			const kebabCaseProp = dl_camelToKebab(prop);[1, 5]
+			const value = styleDeclaration[prop]
+			if (value) {
+				return `${kebabCaseProp}: ${value};`
+			}
+			return ''
+		})
+		// Filter out any empty strings and join the rules
+		return cssRules.filter(Boolean).join(' ')
+	}
+
+	const dl_parseColorToRgba = (function() {
+		// Create canvas and context once (Closure)
+		const canvas = document.createElement('canvas');
+		canvas.width = 1;
+		canvas.height = 1;
+		const ctx = canvas.getContext('2d', { willReadFrequently: true });
+		return function(colorStr) {
+			if (!colorStr)
+			   return null;
+			ctx.clearRect(0, 0, 1, 1);
+			// 2. Apply the color
+			ctx.fillStyle = colorStr;
+			// 3. Fill a single pixel
+			ctx.fillRect(0, 0, 1, 1);
+			// 4. Extract pixel data [R, G, B, A]
+			const data = ctx.getImageData(0, 0, 1, 1).data;
+			return {
+				r: data[0],
+				g: data[1],
+				b: data[2],
+				// Convert alpha from 0-255 to 0-1 (rounded to 3 decimal places)
+				a: Math.round((data[3] / 255) * 1000) / 1000
+			};
+		};
+	})();
+
+	// Helper to convert back to Hex (for output consistency)
+	function dl_rgbToHex(r, g, b) {
+		const toHex = (n) => {
+			const hex = Math.max(0, Math.min(255, n)).toString(16)
+			return hex.length === 1 ? '0' + hex : hex
+		}
+		return `#${toHex(r)}${toHex(g)}${toHex(b)}`
+	}
+
+	function dl_isTransparent(color) {
+		const cleanColor = dl_parseColorToRgba(color);
+		// check #RRGGBBAA for transparency
+		return !cleanColor || (cleanColor.a !== undefined && !cleanColor.a);
+	}
+
+	function dl_getColorSchema(color) {
+		const rgb = dl_parseColorToRgba(color);
+		if (!rgb) return 'unknown'; // Handle invalid colors
+		// Calculate YIQ brightness (human eye perception)
+		const brightness = ((rgb.r * 299) + (rgb.g * 587) + (rgb.b * 114)) / 1000;
+		
+		return brightness > 128 ? 'light' : 'dark';
+	}
+
+	function dl_lighter(color, amount) {
+		const rgb = dl_parseColorToRgba(color);
+		if (!rgb) return color;
+		// Add amount to each channel
+		const r = rgb.r + amount;
+		const g = rgb.g + amount;
+		const b = rgb.b + amount;
+		// Convert back to Hex (clamping happens inside rgbToHex)
+		return dl_rgbToHex(r, g, b);
+	}
+
+	function dl_darker(color, amount) {
+		const rgb = dl_parseColorToRgba(color);
+		if (!rgb) return color;
+		// Subtract amount from each channel
+		const r = rgb.r - amount;
+		const g = rgb.g - amount;
+		const b = rgb.b - amount;
+
+		return dl_rgbToHex(r, g, b);
+	}
+
+	// copy select styles
+	function dl_adaptiveStyle(cbid) {
+		const display = document.getElementById(cbid + ".display");
+		const hiddenRef = document.getElementById(cbid + ".ref");
+		const panel = document.getElementById(cbid + ".panel");
+		if (hiddenRef && display) {
+			const elOption = hiddenRef.getElementsByTagName("option")[0]
+			const styleSelect = window.getComputedStyle(hiddenRef)
+			const styleOption = window.getComputedStyle(elOption)
+			const styleBody = window.getComputedStyle(document.body)
+
+			const styleNode = document.createElement('style')
+			const styleNames = ["width", "color", "height", "padding", "margin", "lineHeight", "border", "borderRadius", "minWidth", "minHeight"]
+			if (styleSelect.borderBottomStyle !== "none") {
+				styleNames.push("borderBottomWidth", "borderBottomStyle", "borderBottomColor");
+			}
+			document.head.appendChild(styleNode)
+			// trace back from option -> select -> body for background color
+			const panelRadius = styleSelect.borderRadius;
+			const optionColor = !dl_isTransparent(styleOption.backgroundColor) ? styleOption.backgroundColor : !dl_isTransparent(styleSelect.backgroundColor) ? styleSelect.backgroundColor : styleBody.backgroundColor
+			const titleColor = dl_getColorSchema(optionColor) === "light" ? dl_darker(optionColor, 30) : dl_lighter(optionColor, 30)
+			const selectStyleCSS = [`#${CSS.escape(cbid + ".display")}, .dl-selected-item {`, dl_style2Css(styleSelect, styleNames), dl_style2Css(styleSelect, ["backgroundColor"]), "}"]
+			const optionStyleCSS = [`#${CSS.escape(cbid + ".panel")}  {`, dl_style2Css(styleOption, styleNames), `background-color: ${optionColor};`, `border-radius: ${panelRadius};`, "}"]
+			const titleStyleCSS = [`#${CSS.escape(cbid + ".panel")} .dl-group-title  {`, `background-color: ${titleColor} !important;`, "}"]
+			styleNode.textContent = [].concat(selectStyleCSS, optionStyleCSS, titleStyleCSS).join("\n")
+		}
+	}
+
+	function dl_idSafe(id) {
+		return id
+			.trim()
+			.replace(/\s+/g, "-")
+			.replace(/[\x00-\x1F\x7F]/g, "");
+	}
+
+	// 更新组内选中计数
+	function dl_updateGroupCounts(cbid, listContainer, searchInput) {
+		const groups = listContainer.querySelectorAll(".dl-group");
+		const isSearching = searchInput.value.trim() !== "";
+		groups.forEach(group => {
+			const gname = group.getAttribute("data-group");
+			const items = group.querySelectorAll("li[data-key]");
+			const span = document.getElementById("group-count-" + cbid + "-" + gname);
+			if (!span) return;
+			if (isSearching) {
+				// 搜索状态：显示匹配数量
+				let matchCount = 0;
+				items.forEach(li => {
+					if (li.style.display !== "none") matchCount++;
+				});
+				span.textContent = "(" + matchCount + "/" + items.length + ")";
+				if (matchCount > 0) {
+					span.style.color = "#28a745";
+					span.style.fontWeight = "600";
+				} else {
+					span.style.color = "#dc3545";
+					span.style.fontWeight = "normal";
+				}
+			} else {
+				// 默认状态
+				span.textContent = "(" + items.length + ")";
+				span.style.color = "";
+				span.style.fontWeight = "normal";
+			}
+		});
+	}
+
+	//搜索过滤器：按 name 或 label 做模糊匹配，搜索时自动展开所有组并隐藏不匹配条目
+	function dl_filterList(keyword, cbid, listContainer, searchInput) {
+		keyword = (keyword || "").toLowerCase().trim();
+		const topItems = listContainer.querySelectorAll("ul li[data-key]");
+		topItems.forEach(li=>{
+			const name = (li.getAttribute("data-node-name") || "").toLowerCase();
+			if (!keyword || name.indexOf(keyword) !== -1) {
+				li.style.display = "block";
+			} else {
+				li.style.display = "none";
+			}
+		});
+		const groups = listContainer.querySelectorAll(".dl-group");
+		groups.forEach(group=>{
+			const items = group.querySelectorAll("li[data-key]");
+			let matchCount = 0;
+			items.forEach(li=>{
+				const name = (li.getAttribute("data-node-name") || "").toLowerCase();
+				if (!keyword || name.indexOf(keyword) !== -1) {
+					li.style.display = "block";
+					matchCount++;
+				} else {
+					li.style.display = "none";
+				}
+			});
+			group.style.display = (matchCount === 0 && keyword !== "") ? "none" : "block";
+			const ul = group.querySelector(".dl-group-list");
+			const gname = group.getAttribute("data-group");
+			const arrow = document.getElementById("arrow-" + cbid + "-" + gname);
+			if (keyword) {
+				if (ul) ul.style.display = (matchCount > 0 ? "block" : "none");
+				if (arrow) arrow.className = (matchCount > 0 ? "dl-arrow-down-small" : "dl-arrow-right");
+			} else {
+				if (ul) ul.style.display = "none";
+				if (arrow) arrow.className = "dl-arrow-right";
+			}
+		});
+		dl_updateGroupCounts(cbid, listContainer, searchInput);
+	}
+
+	// 切换单个组（点击组标题）
+	function dl_toggleGroup(listContainer, cbid, g) {
+		g = dl_idSafe(g);
+		const group = listContainer.querySelector(".dl-group[data-group='" + g + "']");
+		if (!group) return;
+		const ul = group.querySelector(".dl-group-list");
+		const arrow = document.getElementById("arrow-" + cbid + "-" + g);
+		if (!ul) return;
+		const searchInput = document.getElementById(cbid + ".search");
+		const isSearching = searchInput?.value.trim() !== "";
+		const isExpanded = ul.style.display !== "none";
+
+		if (isExpanded) {
+			ul.style.display = "none";
+			if (arrow) arrow.className = "dl-arrow-right";
+		} else {
+			ul.style.display = "block";
+			if (arrow) arrow.className = "dl-arrow-down-small";
+
+			if (!isSearching) {
+				const allGroups = listContainer.querySelectorAll(".dl-group");
+				allGroups.forEach(otherGroup => {
+					if (otherGroup !== group) {
+						const otherUl = otherGroup.querySelector(".dl-group-list");
+						const otherGname = otherGroup.getAttribute("data-group");
+						const otherArrow = document.getElementById("arrow-" + cbid + "-" + otherGname);
+						if (otherUl) otherUl.style.display = "none";
+						if (otherArrow) otherArrow.className = "dl-arrow-right";
+					}
+				});
+			}
+		}
+	}
+
+	// 计算panel位置
+	function dl_repositionPanel(panel, display) {
+		if (!panel || panel.style.display === "none") return;
+		const rect = display.getBoundingClientRect();
+		const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+		panel.style.visibility = "hidden";
+		panel.style.display = "block";
+		panel.style.minHeight = "100px";
+		panel.style.maxHeight = Math.min(0.5*viewportHeight, 550) + "px";
+		const panelHeight = panel.offsetHeight;
+		const spaceBelow = viewportHeight - rect.bottom;
+		const spaceAbove = rect.top;
+		let top, isUp = false;
+		if (spaceBelow >= panelHeight) {
+			top = rect.bottom + 2;
+			isUp = false;
+		} else if (spaceAbove >= panelHeight) {
+			top = rect.top - panelHeight - 2;
+			isUp = true;
+		} else {
+			if (spaceBelow >= spaceAbove) {
+				top = Math.max(rect.bottom - 2, viewportHeight - panelHeight - 2);
+				isUp = false;
+			} else {
+				top = Math.min(rect.top - panelHeight + 2, 2);
+				isUp = true;
+			}
+		}
+		panel.style.left = rect.left + "px";
+		panel.style.top = top + "px";
+		const panelRect = panel.getBoundingClientRect();
+		const displayWidth = rect.width;
+		const remainingWidth = window.innerWidth - panelRect.left - 12;
+		const maxWidth = Math.max(displayWidth, Math.floor(remainingWidth));
+		panel.style.maxWidth = maxWidth + "px";
+		panel.style.minWidth = displayWidth + "px";
+		panel.style.width = "auto";
+		panel.style.visibility = "";
+	}
+
+	// 打开/关闭面板
+	function dl_openPanel(cbid, display, panel, listContainer, searchInput) {
+		if (!panel._moved) {
+			document.body.appendChild(panel);
+			panel._moved = true;
+		}
+		panel.style.display = "block";
+		dl_repositionPanel(panel, display);
+		// 失焦监听
+		const handler = function(e){
+			const target = e.target;
+			if (panel.style.display !== "none") {
+				if (!panel.contains(target) && !display.contains(target)) {
+					dl_closePanel(cbid, panel, listContainer, searchInput, display);
+				}
+			}
+		}
+		panel._docClickHandler = handler;
+		document.addEventListener("click", handler);
+		// 滚动 / resize 自动 reposition
+		let ticking = false;
+		const repositionHandler = function () {
+			if (ticking) return;
+			ticking = true;
+			requestAnimationFrame(function () {
+				ticking = false;
+				dl_repositionPanel(panel, display);
+			});
+		};
+		panel._repositionHandler = repositionHandler;
+		window.addEventListener("scroll", repositionHandler, true);
+		window.addEventListener("resize", repositionHandler);
+	}
+	function dl_closePanel(cbid, panel, listContainer, searchInput) {
+		panel.style.display = "none";
+		searchInput.value = "";
+		dl_filterList("", cbid, listContainer, searchInput);
+		// document click
+		if (panel._docClickHandler) {
+			document.removeEventListener("click", panel._docClickHandler);
+			panel._docClickHandler = null;
+		}
+		// scroll / resize
+		if (panel._repositionHandler) {
+			window.removeEventListener("scroll", panel._repositionHandler, true);
+			window.removeEventListener("resize", panel._repositionHandler);
+			panel._repositionHandler = null;
+		}
+	}
+
+	function dl_add_item(cbid, key, label) {
+		const container = document.getElementById(cbid + ".selected");
+		const hidden = document.getElementById(cbid + ".hidden");
+		if (container.querySelector(`[data-key="${key}"]`)) return;
+		const item = document.createElement("div");
+		item.className = "cbi-input-value cbi-input-select dl-dropdown-display dl-selected-item";
+		item.setAttribute("data-key", key);
+		item.innerHTML = `
+			<span class="dl-selected-label" style="cursor:grab;" title="${label}">${label}</span>
+			<span class="dl-remove">×</span>
+		`;
+		item.querySelector(".dl-remove").onclick = function(){
+			item.remove();
+			dl_update_hidden(cbid);
+		};
+		container.appendChild(item);
+		dl_update_hidden(cbid);
+	}
+
+	function dl_update_hidden(cbid) {
+		const main = document.getElementById(cbid + ".main");
+		const container = document.getElementById(cbid + ".selected");
+		main.querySelectorAll(`input[type="hidden"][name="${cbid}"]`).forEach(el => el.remove());
+		let items = container.querySelectorAll(".dl-selected-item");
+		items.forEach(el => {
+			let key = el.getAttribute("data-key");
+			let input = document.createElement("input");
+			input.type = "hidden";
+			input.name = cbid;
+			input.value = key;
+			main.insertBefore(input, container);
+		});
+	}
+
+	// 动态生成下拉框
+	window.dl_dropdown_rendered = {};
+	function dl_escape_html(s) {
+		return s.replace(/[&<>"']/g, c => ({
+			"&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;"
+		}[c]));
+	}
+
+	function dl_render_dropdown_list(cbid, panel, listContainer, labelSpan, searchInput, display) {
+		if (window.dl_dropdown_rendered[cbid]) return;
+		const data = window.dl_dropdown_data[cbid];
+		if (!data) return;
+		if (!listContainer) return;
+
+		let html = "";
+
+		// 无组项
+		if (data.ungrouped && data.ungrouped.length > 0) {
+			html += `<ul style="list-style:none;padding:0;margin:0 0 8px 0;">`;
+
+			data.ungrouped.forEach(item => {
+				html += `
+					<li data-key="${item.key}"
+						data-node-name="${dl_escape_html(item.label.toLowerCase())}"
+						class="list-item">
+						<span class="dl-item-label" style="margin-left:12px;">
+							${dl_escape_html(item.label)}
+						</span>
+					</li>`;
+			});
+
+			html += `</ul>`;
+		}
+
+		// 分组项
+		data.group_order.forEach(gname => {
+			const items = data.groups[gname];
+
+			html += `
+			<div class="dl-group" data-group="${dl_idSafe(gname)}" style="margin-bottom:8px;">
+				<div class="dl-group-title" data-group-name="${dl_idSafe(gname)}">
+					<span class="dl-arrow-right" id="arrow-${cbid}-${dl_idSafe(gname)}"></span>
+					<b style="margin-left:6px;">${dl_escape_html(gname)}</b>
+					<span id="group-count-${cbid}-${dl_idSafe(gname)}"
+						style="margin-left:8px;">(${items.length})</span>
+				</div>
+				<ul id="group-${cbid}-${dl_idSafe(gname)}" class="dl-group-list" style="display:none">
+			`;
+
+			items.forEach(item => {
+				html += `
+				<li data-key="${item.key}"
+					data-node-name="${dl_escape_html(item.label.toLowerCase())}"
+					class="dl-group-item">
+					<span class="dl-item-label" title="${dl_escape_html(item.label)}">
+						${dl_escape_html(item.label)}
+					</span>
+				</li>`;
+			});
+
+			html += `
+				</ul>
+			</div>
+			`;
+		});
+
+		listContainer.innerHTML = html;
+
+		window.dl_dropdown_rendered[cbid] = true;
+
+		dl_adaptiveStyle(cbid);
+
+		// 点击项（无组与组内项都使用 li[data-key]）
+		listContainer.addEventListener("click", function(e){
+			let li = e.target;
+			while(li && li !== listContainer && !li.hasAttribute('data-key')) li = li.parentNode;
+			if(!li || li === listContainer) return;
+			const key = li.getAttribute('data-key') || "";
+			const text = li.querySelector(".dl-item-label")?.textContent || li.textContent || key;
+			//改值
+			dl_add_item(cbid, key, text);
+			labelSpan.innerText = "<%=translate("-- Please choose --")%>";
+			dl_closePanel(cbid,panel,listContainer,searchInput);
+		});
+
+		// 搜索功能
+		searchInput.addEventListener("input", function() {
+			dl_filterList(this.value, cbid, listContainer, searchInput);
+			dl_repositionPanel(panel, display);
+		});
+		searchInput.addEventListener('keydown', function(e) {
+			const isEnter = e.key === "Enter" || e.keyCode === 13;
+			if (!isEnter) return;
+			e.stopPropagation();
+			e.preventDefault();
+			searchInput.blur();
+		});
+
+		// 切换组
+		listContainer.querySelectorAll(".dl-group-title").forEach(title => {
+			title.addEventListener("click", function() {
+				const g = this.closest(".dl-group")?.getAttribute("data-group");
+				if (g) {
+					dl_toggleGroup(listContainer, cbid, g);
+					dl_repositionPanel(panel, display);
+				}
+			});
+		});
+
+		// 防止 panel 惯性滚动穿透
+		panel.addEventListener('wheel', function (e) {
+			const deltaY = e.deltaY;
+			const scrollTop = panel.scrollTop;
+			const scrollHeight = panel.scrollHeight;
+			const clientHeight = panel.clientHeight;
+			const isAtTop = scrollTop === 0;
+			const isAtBottom = scrollTop + clientHeight >= scrollHeight;
+			if (deltaY < 0 && isAtTop) {
+				e.preventDefault();
+				return;
+			}
+			if (deltaY > 0 && isAtBottom) {
+				e.preventDefault();
+				return;
+			}
+			e.stopPropagation();
+		}, { passive: false });
+	}
+
+	const dl_adaptiveControls = new Set();
+	function dl_registerAdaptive(cbid) {
+		dl_adaptiveControls.add(cbid);
+		dl_adaptiveStyle(cbid);
+	}
+	let dl_adaptiveTicking = false;
+	window.addEventListener("resize", () => {
+		if (!dl_adaptiveTicking) {
+			dl_adaptiveTicking = true;
+			requestAnimationFrame(() => {
+				dl_adaptiveControls.forEach(cbid => {
+					dl_adaptiveStyle(cbid);
+				});
+				dl_adaptiveTicking = false;
+			});
+		}
+	});
+//]]>
+</script>

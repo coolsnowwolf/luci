@@ -1,0 +1,1088 @@
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8"
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:222
+msgid "360 Public DNS (DNS over HTTPS)"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:385
+msgid "ADblock Source"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:424
+msgid "API Listen port"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:138
+msgid "API Options"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/statistics.js:728
+msgid "Add domain to the blocklist to block DNS resolution:"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/statistics.js:727
+msgid "Add domain to the whitelist to permit DNS resolution:"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/statistics.js:720
+msgid "Add to Blocklist"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/statistics.js:720
+msgid "Add to Whitelist"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/rules.js:26
+msgid ""
+"Added domain names always permit resolution using 'local DNS' with the "
+"highest priority (one domain per line, supports domain matching rules)."
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/rules.js:50
+msgid ""
+"Added domain names will always use 'Local DNS' for resolution, with a forced "
+"TTL of 5 seconds, and results will not be cached (one domain per line, "
+"supports domain matching rules)."
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/rules.js:42
+msgid ""
+"Added domain names will always use 'Remote DNS' for resolution (one domain "
+"per line, supports domain matching rules)."
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/rules.js:34
+msgid ""
+"Added domain names will block DNS resolution (one domain per line, supports "
+"domain matching rules)."
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/rules.js:74
+msgid ""
+"Added domain names will block PTR requests (one domain per line, supports "
+"domain matching rules)."
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:136
+msgid "Advanced Options"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:211
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:259
+msgid "Aliyun Public DNS (223.5.5.5)"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:212
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:260
+msgid "Aliyun Public DNS (223.6.6.6)"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:221
+msgid "Aliyun Public DNS (DNS over HTTP/3)"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:220
+msgid "Aliyun Public DNS (DNS over HTTPS)"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:219
+msgid "Aliyun Public DNS (DNS over QUIC)"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/statistics.js:1088
+msgid "All Queries"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/update.js:68
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/update.js:90
+msgid "Another update is already in progress."
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/statistics.js:815
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/statistics.js:957
+msgid "Answers"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:203
+msgid "Apple domains optimization"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/statistics.js:1115
+msgid ""
+"Are you sure you want to clear all real-time query logs and top rankings?"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:359
+msgid "Auto Save Cache Interval"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:447
+msgid "Auto Save Stats Interval"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/update.js:117
+msgid ""
+"Automatically update GeoIP and GeoSite databases as well as ad filtering "
+"rules through scheduled tasks."
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/statistics.js:488
+msgid "Average Processing Time"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/statistics.js:548
+msgid "Avg Processing"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:217
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:263
+msgid "Baidu Public DNS (180.76.76.76)"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:135
+msgid "Basic Options"
+msgstr ""
+
+#: luci-app-mosdns/root/usr/share/luci/menu.d/luci-app-mosdns.json:14
+msgid "Basic Setting"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:377
+msgid ""
+"Block DNS RR Type 65 records (HTTPS/SVCB, used for HTTP/3, ECH, etc.), force "
+"using only A/AAAA records."
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/rules.js:31
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/statistics.js:643
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/statistics.js:645
+msgid "Block Lists"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/rules.js:71
+msgid "Block PTR"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/statistics.js:1089
+msgid "Blocked Only"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/statistics.js:466
+msgid "Blocked by Filters"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:255
+msgid "Bootstrap DNS servers"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:256
+msgid ""
+"Bootstrap DNS servers are used to resolve IP addresses of the DoH/DoT "
+"resolvers you specify as upstreams"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:352
+msgid "Cache Dump"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:328
+msgid "Cache Prefetching"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/statistics.js:1090
+msgid "Cached Only"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/statistics.js:477
+msgid "Cached Queries"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/statistics.js:740
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/statistics.js:1120
+msgid "Cancel"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/update.js:161
+msgid "Check And Update"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/update.js:159
+msgid "Check And Update GeoData."
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:189
+msgid "China DNS prefer IPv4"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:208
+msgid "China DNS server"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:234
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:251
+msgid "Cisco Public DNS (208.67.220.220)"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:233
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:250
+msgid "Cisco Public DNS (208.67.222.222)"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/statistics.js:1140
+msgid "Clear"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/logs.js:65
+msgid "Clear logs"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/statistics.js:1111
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/statistics.js:1114
+msgid "Clear query logs"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/statistics.js:871
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/statistics.js:888
+msgid "Click to view full details"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/statistics.js:797
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/statistics.js:954
+msgid "Client IP"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/statistics.js:842
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/update.js:35
+msgid "Close"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:228
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:245
+msgid "CloudFlare Public DNS (1.0.0.1)"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:227
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:244
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:265
+msgid "CloudFlare Public DNS (1.1.1.1)"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:409
+msgid "Cloudflare IP Ranges"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:137
+msgid "Cloudflare Options"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:129
+msgid "Collecting data..."
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:270
+msgid "Concurrent"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:146
+msgid "Config File"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:478
+msgid "Configuration Editor"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/statistics.js:744
+msgid "Confirm"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:199
+msgid "Custom China DNS"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:148
+msgid "Custom Config"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/rules.js:58
+msgid ""
+"Custom Hosts rewrite, for example: baidu.com 10.0.0.1 (one rule per line, "
+"supports domain matching rules)."
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:404
+msgid "Custom IP"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:238
+msgid "Custom Stream Media DNS"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/rules.js:47
+msgid "DDNS Lists"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:317
+msgid "DNS Cache Size"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:180
+msgid "DNS Forward"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/statistics.js:454
+msgid "DNS Queries Total"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:271
+msgid ""
+"DNS query request concurrency, The number of upstream DNS servers that are "
+"allowed to initiate requests at the same time"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:184
+msgid "DNS redirect"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/update.js:160
+msgid "Database Update"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:162
+msgid "Debug"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:147
+msgid "Default Config"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:376
+msgid "Disable RR Type 65 (HTTPS/SVCB)"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:288
+msgid "Disable TLS Certificate"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:289
+msgid ""
+"Disable TLS Servers certificate validation, Can be useful if system CA "
+"certificate expires or the system time is out of order"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:277
+msgid "DoH/TCP/DoT Connection Multiplexing idle timeout (default 30 seconds)"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/statistics.js:955
+msgid "Domain & Record"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/statistics.js:637
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/statistics.js:665
+msgid "Domain name cannot be empty."
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/statistics.js:730
+msgid "Domain:"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/statistics.js:958
+msgid "Elapsed"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/update.js:122
+msgid "Enable Auto Database Update"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:381
+msgid "Enable DNS ADblock"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:312
+msgid "Enable DNS Cache"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:295
+msgid "Enable EDNS client subnet"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:429
+msgid "Enable Stats Collector"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:283
+msgid ""
+"Enable TCP/DoT RFC 7766 new Query Pipelining connection multiplexing mode"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:307
+msgid "Enable this option fallback policy forces forwarding to remote DNS"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:142
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:397
+msgid "Enabled"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/statistics.js:908
+msgid "Enter page number and press Enter to jump"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:505
+msgid "Enter the GeoIP.dat category to be exported, Allow add multiple tags"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:500
+msgid "Enter the GeoSite.dat category to be exported, Allow add multiple tags"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:165
+msgid "Error"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/update.js:126
+msgid "Every Day"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/update.js:131
+msgid "Every Friday"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/update.js:127
+msgid "Every Monday"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/update.js:132
+msgid "Every Saturday"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/update.js:133
+msgid "Every Sunday"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/update.js:130
+msgid "Every Thursday"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/update.js:128
+msgid "Every Tuesday"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/update.js:129
+msgid "Every Wednesday"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:501
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:506
+msgid "Export directory: /var/mosdns"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/logs.js:43
+msgid "Failed to clean logs."
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/statistics.js:1134
+msgid "Failed to clear query logs:"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/update.js:99
+msgid "Failed to start update."
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/statistics.js:1032
+msgid "Failed to update query logs:"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/statistics.js:709
+msgid "Failed to update rule file: %s"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/statistics.js:1106
+msgid "First Page / Resume"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:455
+msgid "Flush DNS Cache"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:97
+msgid "Flushing DNS Cache Failed, Please check if MosDNS is running."
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:95
+msgid "Flushing DNS Cache Success."
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:453
+msgid ""
+"Flushing DNS Cache will clear any IP addresses or DNS records from MosDNS "
+"cache."
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:199
+msgid "Follow WAN interface DNS if not enabled"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:204
+msgid ""
+"For Apple domains equipped with Chinese mainland CDN, always responsive to "
+"Chinese CDN IP addresses"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:184
+msgid "Force redirect all local DNS queries to MosDNS, a.k.a. DNS Hijacking"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:180
+msgid "Forward Dnsmasq Domain Name resolution requests to MosDNS"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/update.js:147
+msgid "Full"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/update.js:145
+msgid "Full: includes all Countries and Private IP addresses."
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:139
+msgid "GeoData Export"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:504
+msgid "GeoIP Tags"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/update.js:142
+msgid "GeoIP Type"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:499
+msgid "GeoSite Tags"
+msgstr ""
+
+#: luci-app-mosdns/root/usr/share/luci/menu.d/luci-app-mosdns.json:30
+msgid "Geodata Update"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/update.js:152
+msgid "GitHub Proxy"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:230
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:247
+msgid "Google Public DNS (8.8.4.4)"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:229
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:246
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:264
+msgid "Google Public DNS (8.8.8.8)"
+msgstr ""
+
+#: luci-app-mosdns/root/usr/share/rpcd/acl.d/luci-app-mosdns.json:3
+msgid "Grant UCI access for luci-app-mosdns"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/rules.js:39
+msgid "Grey Lists"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/rules.js:55
+msgid "Hosts"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:300
+msgid "IP Address"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:410
+msgid ""
+"IPv4 CIDR: <a href=\"https://www.cloudflare.com/ips-v4\" target=\"_blank"
+"\">https://www.cloudflare.com/ips-v4</a> <br /> IPv6 CIDR: <a href=\"https://"
+"www.cloudflare.com/ips-v6\" target=\"_blank\">https://www.cloudflare.com/ips-"
+"v6</a>"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:190
+msgid ""
+"IPv4 is preferred for China DNS resolution of dual-stack addresses, and is "
+"not affected when the destination is IPv6 only"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:195
+msgid ""
+"IPv4 is preferred for Remote / Streaming Media DNS resolution of dual-stack "
+"addresses, and is not affected when the destination is IPv6 only"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:276
+msgid "Idle Timeout"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:163
+msgid "Info"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/statistics.js:838
+msgid "Intercept"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:347
+msgid ""
+"Interval for the background thread to scan the cache for prefetching (in "
+"seconds)."
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/statistics.js:489
+msgid "Latency"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:322
+msgid "Lazy Cache TTL"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:323
+msgid ""
+"Lazy cache survival time (in second). To disable Lazy Cache, please set to 0."
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:157
+msgid "Listen Address"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:152
+msgid "Listen Port"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/update.js:148
+msgid "Little"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/update.js:143
+msgid "Little: only include Mainland China and Private IP addresses."
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/logs.js:70
+msgid "Log Data"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:169
+msgid "Log File"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:175
+msgid "Log File Size"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:161
+msgid "Log Level"
+msgstr ""
+
+#: luci-app-mosdns/root/usr/share/luci/menu.d/luci-app-mosdns.json:46
+msgid "Logs"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:398
+msgid ""
+"Match the parsing result with the Cloudflare IP ranges, and when there is a "
+"successful match, use the 'Custom IP' as the parsing result (experimental "
+"feature)"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:370
+msgid "Maximum TTL"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:364
+msgid "Minimum TTL"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:341
+msgid ""
+"Minimum cache hits required since the last refresh to trigger a prefetch."
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:371
+msgid ""
+"Modify the Maximum TTL value (seconds) for DNS answer results, 0 indicating "
+"no modification"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:365
+msgid ""
+"Modify the Minimum TTL value (seconds) for DNS answer results, 0 indicating "
+"no modification"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:31
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:33
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:106
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/logs.js:70
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/statistics.js:1156
+#: luci-app-mosdns/root/usr/share/luci/menu.d/luci-app-mosdns.json:3
+msgid "MosDNS"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/statistics.js:520
+msgid ""
+"MosDNS API is unreachable. Please ensure MosDNS is running and stats_api "
+"plugin is enabled."
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:107
+msgid "MosDNS is a plugin-based DNS forwarder/traffic splitter."
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:33
+msgid "NOT RUNNING"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:239
+msgid "Netflix, Disney+, Hulu and streaming media rules list will use this DNS"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/statistics.js:989
+msgid "Next"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/statistics.js:778
+msgid "No DNS answer records returned."
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/statistics.js:570
+msgid "No data available"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/logs.js:27
+msgid "No log data."
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/statistics.js:896
+msgid "No query log entries found."
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/statistics.js:941
+msgid "Page %d / %d (%d entries)"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/statistics.js:448
+msgid "Per-query speed"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/statistics.js:831
+msgid "Permit"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:301
+msgid ""
+"Please provide the IP address you use when accessing foreign websites. This "
+"IP subnet (0/24) will be used as the ECS address for Remote / Streaming "
+"Media DNS requests"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/update.js:22
+msgid "Please wait, this may take a few moments..."
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:334
+msgid "Prefetch Before Expire"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:340
+msgid "Prefetch Min Hits"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:346
+msgid "Prefetch Scan Interval"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:335
+msgid "Prefetch when the remaining TTL is less than this value (in seconds)."
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:306
+msgid "Prevent DNS Leaks"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/statistics.js:978
+msgid "Previous"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:329
+msgid ""
+"Proactively refresh hot cache entries in the background before they expire."
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:232
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:249
+msgid "Quad9 Public DNS (149.112.112.112)"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:231
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:248
+msgid "Quad9 Public DNS (9.9.9.9)"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/statistics.js:821
+msgid "Query Log Details"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:435
+msgid ""
+"Query log ring buffer capacity (FIFO overwrite, default 2000, larger values "
+"consume more memory)"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/statistics.js:1129
+msgid "Query logs cleared successfully."
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:31
+msgid "RUNNING"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/statistics.js:1160
+msgid "Real-time Query Logs"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/rules.js:63
+msgid "Redirect"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/rules.js:66
+msgid ""
+"Redirecting requests for domain names. Request domain A, but return records "
+"for domain B, for example: baidu.com qq.com (one rule per line)."
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/logs.js:75
+msgid "Refresh every %s seconds."
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:194
+msgid "Remote DNS prefer IPv4"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:226
+msgid "Remote DNS server"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:434
+msgid "Ring Buffer Capacity"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/statistics.js:809
+msgid "Rule Hit"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/rules.js:9
+msgid "Rule Settings"
+msgstr ""
+
+#: luci-app-mosdns/root/usr/share/luci/menu.d/luci-app-mosdns.json:22
+msgid "Rules"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:441
+msgid "Save query statistics and logs locally and reload on next startup."
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:353
+msgid "Save the cache locally and reload the cache dump on the next startup"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/statistics.js:1077
+msgid "Search domain or client IP..."
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:175
+msgid "Set the maximum size of the log file (in MB)."
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/update.js:28
+msgid "Starting update..."
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/statistics.js:1156
+#: luci-app-mosdns/root/usr/share/luci/menu.d/luci-app-mosdns.json:38
+msgid "Statistics"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:440
+msgid "Stats Dump"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/statistics.js:956
+msgid "Status"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/rules.js:79
+msgid "Streaming Media"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:243
+msgid "Streaming Media DNS server"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:388
+msgid "Support for local files, such as: file:///var/mosdns/example.txt"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:282
+msgid "TCP/DoT Connection Multiplexing"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/statistics.js:733
+msgid "Target file: %s (supports domain matching rules)"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:210
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:258
+msgid "Tencent Public DNS (119.28.28.28)"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:209
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:257
+msgid "Tencent Public DNS (119.29.29.29)"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:218
+msgid "Tencent Public DNS (DNS over HTTPS)"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/rules.js:10
+msgid "The list of rules only apply to 'Default Config' profiles."
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:302
+msgid ""
+"This feature is typically used when using a self-built DNS server as an "
+"Remote / Streaming Media DNS upstream (requires support from the upstream "
+"server)"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:479
+msgid ""
+"This is the content of the file '/etc/mosdns/config_custom.yaml' from which "
+"your MosDNS configuration will be generated. Only accepts configuration "
+"content in yaml format."
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/statistics.js:801
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/statistics.js:953
+msgid "Time"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/statistics.js:609
+msgid "Top Blocked Domains"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/statistics.js:616
+msgid "Top Clients"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/statistics.js:602
+msgid "Top Queried Domains"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:213
+msgid "TrafficRoute Public DNS (180.184.1.1)"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:214
+msgid "TrafficRoute Public DNS (180.184.2.2)"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:494
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/rules.js:17
+msgid "Unable to save contents: %s"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/update.js:125
+msgid "Update Cycle"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/update.js:116
+msgid "Update GeoIP & GeoSite databases"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/update.js:136
+msgid "Update Time"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/update.js:153
+msgid ""
+"Update data files with GitHub Proxy, leave blank to disable proxy downloads."
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/update.js:59
+msgid "Update failed"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/update.js:106
+msgid "Update failed: %s"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/update.js:50
+msgid "Update success"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/update.js:37
+msgid "Updating Database..."
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/statistics.js:805
+msgid "Upstream"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:164
+msgid "Warning"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/rules.js:82
+msgid ""
+"When enabling 'Custom Stream Media DNS', added domains will always use the "
+"'Streaming Media DNS server' for resolution (one domain per line, supports "
+"domain matching rules)."
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:386
+msgid ""
+"When using custom rule sources, please use rule types supported by MosDNS "
+"(domain list or AdGuardHome rules)."
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/rules.js:23
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/statistics.js:643
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/statistics.js:645
+msgid "White Lists"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:215
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:261
+msgid "Xinfeng Public DNS (114.114.114.114)"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:216
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/basic.js:262
+msgid "Xinfeng Public DNS (114.114.115.115)"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/update.js:154
+msgid "https://gh-proxy.com"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/statistics.js:437
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/statistics.js:550
+msgid "● Live"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/statistics.js:233
+msgid "● Live Auto-refresh"
+msgstr ""
+
+#: luci-app-mosdns/htdocs/luci-static/resources/view/mosdns/statistics.js:237
+msgid "❚❚ Paused (Page %d)"
+msgstr ""

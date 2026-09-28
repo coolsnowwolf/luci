@@ -1,567 +1,8 @@
 <%+cbi/valueheader%>
-<style>
-.sub_div {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex-wrap: nowrap;
-    width: calc(100% - 24px);
-    box-sizing: border-box;
-    min-width: 280px;
-    max-width: 350px;
-    margin: 0 auto;
-}
-
-.sub_div > span:first-child {
-    flex: 1;
-    min-width: 0;
-}
-
-.sub_tab {
-    display: block;
-    white-space: nowrap;
-    font-size: 12px;
-    margin: 0;
-    opacity: 0;
-    width: 100%;
-    max-width: 100%;
-    overflow: hidden;
-    box-sizing: border-box;
-}
-
-.sub_tab_show {
-    display: block;
-    white-space: nowrap;
-    font-size: 12px;
-    margin: 0;
-    -webkit-transition: all 1s;
-    -moz-transition: all 1s;
-    -ms-transition: all 1s;
-    -o-transition: all 1s;
-    transition: all 1s;
-    opacity: 1;
-    width: 100%;
-    max-width: 100%;
-    overflow: hidden;
-    box-sizing: border-box;
-}
-
-.sub_setting {
-    display: inline-block;
-    white-space: nowrap;
-    margin: 0;
-    opacity: 1;
-    vertical-align: middle;
-    line-height: 0;
-    flex-shrink: 0;
-    cursor: pointer;
-    background-color: unset;
-    border: unset;
-}
-
-.sub_setting svg {
-    vertical-align: middle;
-    display: inline-block;
-    width: 18px;
-    height: 18px;
-    color: #414c5c;
-    padding-left: 2px;
-}
-
-.sub_setting:hover svg {
-    opacity: 0.7;
-}
-
-.text_show {
-    color: #333333;
-    line-height: 1.2;
-}
-
-.progress_bar_bg {
-    border: 1px solid #999999;
-    background-color: #f5f5f5;
-    width: 100% !important;
-    max-width: 100% !important;
-    min-width: 220px;
-    box-sizing: border-box;
-    border-radius: 6px;
-    height: 36px;
-}
-
-.progress_bar_high {
-    background-color: #9edd9e;
-}
-
-.progress_bar_medium {
-    background-color: #ffc99f;
-}
-
-.progress_bar_low {
-    background-color: #ffb9b9;
-}
-
-.sub-info-url-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 10000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    backdrop-filter: blur(2px);
-}
-
-.sub-info-url-model {
-    background: var(--bg-white, white);
-    border-radius: var(--radius-lg, 8px);
-    box-shadow: var(--shadow-md, 0 4px 12px rgba(0,0,0,0.15));
-    width: 90vw;
-    max-width: 550px;
-    min-width: 400px;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    border: 1px solid var(--border-light, #e5e7eb);
-    max-height: 85vh;
-    transition: all var(--transition-fast, 0.2s);
-}
-
-.sub-info-url-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 20px;
-    border-bottom: 1px solid var(--border-light, #e5e7eb);
-    background: var(--bg-gray, #f9fafb);
-    flex-shrink: 0;
-}
-
-.sub-info-url-title {
-    font-size: 16px;
-    font-weight: 600;
-    color: var(--text-primary, #1f2937);
-}
-
-.sub-info-url-footer {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    padding: 20px;
-    border-top: 1px solid var(--border-light, #e5e7eb);
-    background: var(--bg-gray, #f9fafb);
-    flex-shrink: 0;
-    gap: 12px;
-}
-
-.sub-info-url-content {
-    padding: 24px;
-    flex: 1;
-    overflow-y: auto;
-}
-
-.sub-info-url-form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.sub-info-url-form-group label {
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--text-primary, #1f2937);
-}
-
-.sub-info-url-form-textarea {
-    width: 100%;
-    min-height: 120px;
-    padding: 10px 12px;
-    border: 1px solid var(--border-light, #e5e7eb);
-    border-radius: var(--radius-sm, 4px);
-    background: var(--bg-white, white);
-    color: var(--text-primary, #1f2937);
-    font-size: 14px;
-    font-family: inherit;
-    resize: vertical;
-    transition: all var(--transition-fast, 0.2s);
-    box-sizing: border-box;
-}
-
-.sub-info-url-form-textarea:focus {
-    outline: none;
-    border-color: var(--primary-color, #3b82f6);
-    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
-}
-
-.sub-info-url-form-textarea::placeholder {
-    color: var(--text-secondary, #6b7280);
-}
-
-.sub-info-url-btn {
-    padding: 8px 16px;
-    border: 1px solid var(--border-light, #e5e7eb);
-    border-radius: var(--radius-sm, 4px);
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all var(--transition-fast, 0.2s);
-    white-space: nowrap;
-}
-
-.sub-info-url-cancel-btn {
-    background: var(--bg-white, white);
-    color: var(--text-secondary, #6b7280);
-    border-color: var(--border-light, #e5e7eb);
-}
-
-.sub-info-url-cancel-btn:hover {
-    background: var(--hover-bg, #f3f4f6);
-    color: var(--text-primary, #1f2937);
-}
-
-.sub-info-url-submit-btn {
-    background: var(--primary-color, #3b82f6);
-    color: white;
-    border-color: var(--primary-color, #3b82f6);
-}
-
-.sub-info-url-submit-btn:hover:not(:disabled) {
-    background: var(--primary-color, #3b82f6);
-    opacity: 0.9;
-}
-
-.sub-info-url-submit-btn:disabled {
-    background: var(--bg-gray, #f9fafb);
-    color: var(--text-secondary, #6b7280);
-    border-color: var(--border-light, #e5e7eb);
-    cursor: not-allowed;
-}
-
-:root[data-darkmode="true"] .sub_setting svg {
-    color: #e0e0e0;
-}
-
-:root[data-darkmode="true"] .text_show {
-    color: #e0e0e0;
-    line-height: 1.2;
-}
-
-:root[data-darkmode="true"] .progress_bar_bg {
-    border: 1px solid #666666;
-    background-color: #333333;
-}
-
-:root[data-darkmode="true"] .progress_bar_high {
-    background-color: #5da05d;
-}
-
-:root[data-darkmode="true"] .progress_bar_medium {
-    background-color: #cc8550;
-}
-
-:root[data-darkmode="true"] .progress_bar_low {
-    background-color: #cc6262;
-}
-
-:root[data-darkmode="true"] .sub-info-url-model {
-    background: var(--bg-white, #1f2937);
-    border-color: var(--border-light, #374151);
-}
-
-:root[data-darkmode="true"] .sub-info-url-header,
-:root[data-darkmode="true"] .sub-info-url-footer {
-    background: var(--bg-gray, #111827);
-    border-color: var(--border-light, #374151);
-}
-
-:root[data-darkmode="true"] .sub-info-url-title {
-    color: var(--text-primary, #f3f4f6);
-}
-
-:root[data-darkmode="true"] .sub-info-url-form-group label {
-    color: var(--text-primary, #f3f4f6);
-}
-
-:root[data-darkmode="true"] .sub-info-url-form-textarea {
-    background: var(--bg-gray, #374151);
-    border-color: var(--border-light, #4b5563);
-    color: var(--text-primary, #f3f4f6);
-}
-
-:root[data-darkmode="true"] .sub-info-url-form-textarea:focus {
-    border-color: var(--primary-color, #60a5fa);
-    box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.1);
-}
-
-:root[data-darkmode="true"] .sub-info-url-form-textarea::placeholder {
-    color: var(--text-secondary, #9ca3af);
-}
-
-:root[data-darkmode="true"] .sub-info-url-cancel-btn {
-    background: var(--bg-white, #374151);
-    color: var(--text-secondary, #9ca3af);
-    border-color: var(--border-light, #4b5563);
-}
-
-:root[data-darkmode="true"] .sub-info-url-cancel-btn:hover {
-    background: var(--hover-bg, #4b5563);
-    color: var(--text-primary, #f3f4f6);
-}
-
-:root[data-darkmode="true"] .sub-info-url-submit-btn {
-    background: var(--primary-color, #3b82f6);
-    border-color: var(--primary-color, #3b82f6);
-}
-
-:root[data-darkmode="true"] .sub-info-url-submit-btn:disabled {
-    background: var(--bg-gray, #4b5563);
-    color: var(--text-secondary, #9ca3af);
-    border-color: var(--border-light, #374151);
-}
-
-@media (max-width: 1024px) {
-    .sub_tab, .sub_tab_show {
-        font-size: 11px;
-    }
-
-    .progress_bar_bg {
-        min-width: 220px;
-    }
-
-    .sub_div {
-        gap: 6px;
-        width: calc(100% - 20px);
-        margin: 0 10px;
-    }
-}
-
-@media (max-width: 768px) {
-    .sub_tab, .sub_tab_show {
-        font-size: 10px;
-    }
-
-    .progress_bar_bg {
-        min-width: 200px;
-    }
-
-    .sub_div {
-        gap: 4px;
-        width: calc(100% - 16px);
-        margin: 0 8px;
-    }
-}
-
-@media (max-width: 480px) {
-    .sub_tab, .sub_tab_show {
-        font-size: 9px;
-    }
-
-    .progress_bar_bg {
-        min-width: 180px !important;
-    }
-
-    .sub_div {
-        gap: 2px;
-        width: calc(100% - 12px);
-        margin: 0 6px;
-    }
-}
-
-@media (max-width: 320px) {
-    .sub_tab, .sub_tab_show {
-        font-size: 8px;
-    }
-
-    .progress_bar_bg {
-        min-width: 160px !important;
-    }
-
-    .sub_div {
-        width: calc(100% - 8px);
-        margin: 0 4px;
-    }
-}
-
-/* Multiple providers container */
-.sub_providers_container {
-    display: flex;
-    gap: 4px;
-    flex: 1;
-    min-width: 0;
-    overflow-x: auto;
-    scrollbar-width: thin;
-    cursor: grab;
-    user-select: none;
-}
-
-.sub_providers_container.no-scroll {
-    overflow-x: hidden;
-    cursor: default;
-}
-
-.sub_providers_container::-webkit-scrollbar {
-    height: 4px;
-}
-
-.sub_providers_container::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 2px;
-}
-
-.sub_providers_container::-webkit-scrollbar-thumb {
-    background: #888;
-    border-radius: 2px;
-}
-
-.sub_providers_container::-webkit-scrollbar-thumb:hover {
-    background: #555;
-}
-
-.sub_providers_container.dragging {
-    cursor: grabbing;
-}
-
-.sub_provider_item {
-    flex: 0 0 auto;
-    width: 100px;
-    position: relative;
-    min-height: 36px;
-    background-color: #f5f5f5;
-    border: 1px solid #999999;
-    border-radius: 6px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    box-sizing: border-box;
-    gap: 2px;
-}
-
-.sub_provider_fill {
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    transition: width 0.3s ease;
-    border-radius: 5px;
-}
-
-.sub_provider_name {
-    position: relative;
-    z-index: 1;
-    font-size: 12px;
-    color: #333;
-    font-weight: 500;
-    text-align: center;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 100%;
-    padding: 0 4px;
-    line-height: 1;
-}
-
-.sub_provider_percent {
-    position: relative;
-    z-index: 1;
-    font-size: 12px;
-    color: #333;
-    font-weight: 400;
-    text-align: center;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 100%;
-    padding: 0 4px;
-    line-height: 1;
-}
-
-/* Dark mode support */
-:root[data-darkmode="true"] .sub_provider_item {
-    background-color: #333333;
-    border-color: #666666;
-}
-
-:root[data-darkmode="true"] .sub_provider_name {
-    color: #e0e0e0;
-}
-
-:root[data-darkmode="true"] .sub_provider_percent {
-    color: #e0e0e0;
-}
-
-/* Responsive adjustments for multiple providers */
-@media (max-width: 1024px) {
-    .sub_providers_container {
-        gap: 3px;
-    }
-
-    .sub_provider_item {
-        width: 90px;
-    }
-
-    .sub_provider_name {
-        font-size: 11px;
-    }
-
-    .sub_provider_percent {
-        font-size: 11px;
-    }
-}
-
-@media (max-width: 768px) {
-    .sub_providers_container {
-        gap: 2px;
-    }
-
-    .sub_provider_item {
-        width: 80px;
-        min-height: 32px;
-    }
-
-    .sub_provider_name {
-        font-size: 10px;
-    }
-
-    .sub_provider_percent {
-        font-size: 10px;
-    }
-}
-
-@media (max-width: 480px) {
-    .sub_provider_item {
-        width: 70px;
-        min-height: 30px;
-        padding: 0 2px;
-    }
-
-    .sub_provider_name {
-        font-size: 9px;
-    }
-
-    .sub_provider_percent {
-        font-size: 9px;
-    }
-}
-
-@media (max-width: 320px) {
-    .sub_provider_item {
-        width: 60px;
-        min-height: 28px;
-    }
-
-    .sub_provider_name {
-        font-size: 8px;
-    }
-
-    .sub_provider_percent {
-        font-size: 8px;
-    }
-}
-</style>
-
+<%
+    local fs = require "luci.openclash"
+    local plugin_version = fs.oc_version()
+%>
 <%
 	local fs = require "luci.openclash"
 	local val = self:cfgvalue(section)
@@ -569,22 +10,20 @@
 	local idname = math.random(1000)..(string.match(filename, "[%w_]+") or "")
 %>
 
-<div class="sub_div">
-    <span id='<%=idname%>' class="sub_tab"></span>
-    <button type="button" class="sub_setting" title='<%:Refresh%>' alt='<%:Refresh%>' onclick='return sub_info_refresh_<%=idname%>(true)'>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M23 4v6h-6"></path>
-            <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
-        </svg>
-    </button>
-    <button type="button" class="sub_setting" title='<%:Specify URL%>' alt='<%:Specify URL%>' onclick='return set_subinfo_url_<%=idname%>(this,"<%=filename%>")'>
-        <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="4">
-            <path d="M4 6H44V36H29L24 41L19 36H4V6Z"/>
-            <path d="M23 21H25.0025" />
-            <path d="M33.001 21H34.9999"/>
-            <path d="M13.001 21H14.9999"/>
-        </svg>
-    </button>
+<script src="/luci-static/resources/openclash/js/oc-icons.js?v=<%=plugin_version%>"></script>
+<div class="oc">
+    <div class="sub_div">
+        <span id='<%=idname%>' class="sub_tab"></span>
+        <button type="button" class="sub_setting" title='<%:Refresh%>' alt='<%:Refresh%>' onclick='return sub_info_refresh_<%=idname%>(true)'>
+            <svg viewBox="0 0 24 24"><use href="#oc-icon-refresh"/></svg>
+        </button>
+        <button type="button" class="sub_setting" title='<%:Specify URL%>' alt='<%:Specify URL%>' onclick='return setUrlConfig_<%=idname%>()'>
+            <svg viewBox="0 0 48 48"><use href="#oc-icon-chat"/></svg>
+        </button>
+        <button type="button" class="sub_setting" title='<%:Edit Subscription%>' alt='<%:Edit Subscription%>' onclick='return uploadConfig_<%=idname%>()'>
+            <svg width="14" height="14"><use href="#oc-icon-settings"/></svg>
+        </button>
+    </div>
 </div>
 
 <script type="text/javascript">//<![CDATA[
@@ -593,45 +32,18 @@ var retry_<%=idname%> = 0;
 var s_<%=idname%>;
 sub_info_refresh_<%=idname%>(false);
 
-setTimeout(function(){
-    initDarkMode();
-}, 200);
-
-function initDarkMode() {
-    if (typeof isDarkBackground === 'undefined') {
-        setTimeout(function() {
-            initDarkMode();
-        }, 100);
-        return;
-    }
-    
-    if (isDarkBackground(document.body)) {
-        document.documentElement.setAttribute('data-darkmode', 'true');
-    }
-}
-
 function progressbar_<%=idname%>(v, m, pc, np, f, t, tr) {
     var screenWidth = window.innerWidth || document.documentElement.clientWidth;
     var fontSize = '12px';
-    var minWidth = '220px';
-    var topPosition = tr == "null" ? '6px' : '2px';
 
     if (screenWidth <= 320) {
         fontSize = '8px';
-        minWidth = '160px';
-        topPosition = tr == "null" ? '8px' : '4px';
     } else if (screenWidth <= 480) {
         fontSize = '9px';
-        minWidth = '180px';
-        topPosition = tr == "null" ? '7px' : '3px';
     } else if (screenWidth <= 768) {
         fontSize = '10px';
-        minWidth = '200px';
-        topPosition = tr == "null" ? '6px' : '3px';
     } else if (screenWidth <= 1024) {
         fontSize = '11px';
-        minWidth = '220px';
-        topPosition = tr == "null" ? '6px' : '2px';
     }
 
     // Build title for native tooltip (format: "v / m (pc%)\nt (Remaining tr days)")
@@ -641,18 +53,18 @@ function progressbar_<%=idname%>(v, m, pc, np, f, t, tr) {
     }
 
     return String.format(
-        '<div class="progress_bar_bg" title="' + titleText + '" style="position:relative; border-radius: 6px; min-width: %s; display: flex; align-items: center;">' +
-        (pc >= 50 ? '<div class="progress_bar_high" style="width:%d%%; height:34px; border-radius: 6px">' :
-        (pc < 50 && pc >= 20 ? '<div class="progress_bar_medium" style="width:%d%%; height:34px; border-radius: 6px">' :
-        '<div class="progress_bar_low" style="width:%d%%; height:34px; border-radius: 6px">')) +
-        '<div style="position:absolute; left:0; top:50%%; transform: translateY(-50%%); text-align:center; width:100%%; padding:0 4px; box-sizing:border-box; line-height:1.2;">' +
-        '<small class="text_show" style="font-size:%s; line-height:1.2;">%s '+ (f ? f : '/') +' %s ' + (np ? "" : '(%s%%)') +
-        (tr == "null" ? '<div style="visibility: hidden; line-height:1.2;">' : '<div style="visibility: visible; line-height:1.2;">') +
+        '<div class="progress_bar_bg" title="' + titleText + '">' +
+        (pc >= 50 ? '<div class="progress_bar_fill progress_bar_high" style="width:%d%%">' :
+        (pc < 50 && pc >= 20 ? '<div class="progress_bar_fill progress_bar_medium" style="width:%d%%">' :
+        '<div class="progress_bar_fill progress_bar_low" style="width:%d%%">')) +
+        '<div class="progress_bar_text">' +
+        '<small class="text_show" style="font-size:%s;">%s '+ (f ? f : '/') +' %s ' + (np ? "" : '(%s%%)') +
+        (tr == "null" ? '<div class="progress_bar_expire" style="visibility: hidden;">' : '<div class="progress_bar_expire" style="visibility: visible;">') +
         '%s (<%:Remaining%> %s <%:days%>)</small>' +
         '</div>' +
         '</div>' +
         '</div>',
-        minWidth, pc, fontSize, v, m, pc, t, tr
+        pc, fontSize, v, m, pc, t, tr
     );
 };
 
@@ -772,6 +184,14 @@ function dispaly_progressbar(id, status) {
                 (provider.expire),
                 (provider.day_left)
             );
+            var textShow = document.getElementById(id).querySelector('.text_show');
+            if (textShow && textShow.scrollWidth > textShow.clientWidth) {
+                var size = parseFloat(window.getComputedStyle(textShow).fontSize) || 12;
+                while (textShow.scrollWidth > textShow.clientWidth && size > 6) {
+                    size -= 1;
+                    textShow.style.fontSize = size + 'px';
+                }
+            }
         } else {
             document.getElementById(id).innerHTML = window["progressbar_multi_" + id](status.providers);
         }
@@ -789,9 +209,9 @@ function sub_info_refresh_<%=idname%>(force) {
 
     var save_info = (localStorage.getItem("sub_info_<%=filename%>")) ? JSON.parse(localStorage.getItem("sub_info_<%=filename%>")) : null;
     var shouldFetchNew = true;
-    if (save_info && !force) {
+    if (!force) {
         dispaly_progressbar('<%=idname%>', save_info);
-        if (save_info.get_time) {
+        if (save_info && save_info.get_time) {
             var currentTime = Math.floor(Date.now() / 1000);
             var cacheTime = parseInt(save_info.get_time);
             var timeDiff = currentTime - cacheTime;
@@ -801,12 +221,6 @@ function sub_info_refresh_<%=idname%>(force) {
                 shouldFetchNew = false;
             }
         }
-    }
-
-    if (retry_<%=idname%> >= 3) {
-        localStorage.removeItem("sub_info_<%=filename%>");
-        retry_<%=idname%> = 0;
-        shouldFetchNew = false;
     }
 
     if (!shouldFetchNew) {
@@ -821,16 +235,16 @@ function sub_info_refresh_<%=idname%>(force) {
 
 	XHR.get('<%=luci.dispatcher.build_url("admin", "services", "openclash", "sub_info_get")%>', {filename: "<%=filename%>"}, function(x, status) {
         var needsErrorHandling = false;
-        if (x && x.status == 200 && status.providers) {
+        if (x && x.status == 200 && status.providers.length > 0) {
             var save_info_length = (save_info && save_info.providers) ? save_info.providers.length : 0;
-            var newProvidersLength = (status && status.providers) ? status.providers.length : 0;
+            var newProvidersLength = status.providers.length;
             if (save_info_length !== newProvidersLength && save_info_length > newProvidersLength) {
                 needsErrorHandling = true;
             }
 
             if (!needsErrorHandling) {
                 retry_<%=idname%> = 0;
-                localStorage.setItem("sub_info_<%=filename%>", JSON.stringify(status));
+                (window.requestIdleCallback || function(cb) { setTimeout(cb, 1); })(function() { localStorage.setItem("sub_info_<%=filename%>", JSON.stringify(status)); });
                 dispaly_progressbar('<%=idname%>', status);
             }
 		} else {
@@ -839,120 +253,40 @@ function sub_info_refresh_<%=idname%>(force) {
 
         if (needsErrorHandling && retry_<%=idname%> <= 2) {
             retry_<%=idname%>++;
-            s_<%=idname%> = setTimeout("sub_info_refresh_<%=idname%>(false)", 15000);
+            s_<%=idname%> = setTimeout("sub_info_refresh_<%=idname%>(false)", 5000);
         } else {
+            retry_<%=idname%> = 0;
+            dispaly_progressbar('<%=idname%>', status);
+            if (status && status.providers) {
+                (window.requestIdleCallback || function(cb) { setTimeout(cb, 1); })(function() { localStorage.setItem("sub_info_<%=filename%>", JSON.stringify(status)); });
+            }
             s_<%=idname%> = setTimeout("sub_info_refresh_<%=idname%>(false)", 60000*15);
         };
 	});
 };
 
-function set_subinfo_url_<%=idname%>(btn, filename) {
-    if (filename == null || filename == "") {
-        return false;
-    }
+function setUrlConfig_<%=idname%>() {
+    SubscriptionUrlSetter.show("<%=filename%>", "sub_info_refresh_<%=idname%>(true)");
+    return false;
+}
 
-    var dialogDiv = document.createElement('div');
-    dialogDiv.className = 'sub-info-url-overlay';
+function uploadConfig_<%=idname%>() {
+    if (typeof ConfigUploader === 'undefined') return false;
 
-    var contentDiv = document.createElement('div');
-    contentDiv.className = 'sub-info-url-model';
-
-    var headerDiv = document.createElement('div');
-    headerDiv.className = 'sub-info-url-header';
-
-    var titleDiv = document.createElement('div');
-    titleDiv.className = 'sub-info-url-title';
-    titleDiv.innerHTML = '<%:Paste the new url of subscribe infos sources here:%>';
-    headerDiv.appendChild(titleDiv);
-
-    var bodyDiv = document.createElement('div');
-    bodyDiv.className = 'sub-info-url-content';
-
-    var formGroup = document.createElement('div');
-    formGroup.className = 'sub-info-url-form-group';
-
-    var textarea = document.createElement('textarea');
-    textarea.className = 'sub-info-url-form-textarea';
-    textarea.placeholder = '<%:Enter URLs, one per line, use #name=example end for specifing display name%> (https://example.com#name=example)';
-    formGroup.appendChild(textarea);
-
-    bodyDiv.appendChild(formGroup);
-
-    var footerDiv = document.createElement('div');
-    footerDiv.className = 'sub-info-url-footer';
-
-    var cancelBtn = document.createElement('button');
-    cancelBtn.className = 'sub-info-url-btn sub-info-url-cancel-btn';
-    cancelBtn.type = 'button';
-    cancelBtn.innerHTML = '<%:Cancel%>';
-
-    var confirmBtn = document.createElement('button');
-    confirmBtn.className = 'sub-info-url-btn sub-info-url-submit-btn';
-    confirmBtn.type = 'button';
-    confirmBtn.innerHTML = '<%:Submit%>';
-
-    confirmBtn.onclick = function() {
-        var new_url = textarea.value.trim();
-        document.body.removeChild(dialogDiv);
-
-        XHR.get('<%=luci.dispatcher.build_url("admin", "services", "openclash", "set_subinfo_url")%>', {filename: filename, url: new_url}, function(x, status) {
-            if (x && x.status == 200 && status.info == "Success") {
-                sub_info_refresh_<%=idname%>(true);
-                alert("<%:Specify subscribe infos sources url successfully!%>");
-            } else if (x && x.status == 200 && status.info == "Delete success") {
-                sub_info_refresh_<%=idname%>(true);
-                alert("<%:Delete Specify Subscribe infos sources url successfully!%>");
-            } else {
-                alert("<%:Specify subscribe infos sources url failed:%>\n" + status.info);
-            }
-        });
-    };
-
-    cancelBtn.onclick = function() {
-        document.body.removeChild(dialogDiv);
-    };
-
-    footerDiv.appendChild(cancelBtn);
-    footerDiv.appendChild(confirmBtn);
-
-    contentDiv.appendChild(headerDiv);
-    contentDiv.appendChild(bodyDiv);
-    contentDiv.appendChild(footerDiv);
-    dialogDiv.appendChild(contentDiv);
-    document.body.appendChild(dialogDiv);
-
-    textarea.focus();
-
-    var handleSubURL = function(urlresult) {
-        var urls = '';
-        if (urlresult.type && urlresult.type === "multiple") {
-            for (var data in urlresult.providers) {
-                urls += urlresult.providers[data].url + '#name=' + urlresult.providers[data].name + '\n';
-            }
-        }
-        if (urlresult.type && urlresult.type === "single") {
-            urls = urlresult.url;
-        }
-        textarea.value = urls;
-    };
-
-    var existingData = localStorage.getItem('sub_info_' + filename);
-    if (existingData) {
-        existingData = JSON.parse(existingData);
-        if (existingData.url_result) {
-            handleSubURL(existingData.url_result);
-            return;
-        }
-    };
-
-    XHR.get('<%=luci.dispatcher.build_url("admin", "services", "openclash", "get_subscribe_info_data")%>', {
+    var filename = "<%=filename%>";
+    var cb = "sub_info_refresh_<%=idname%>(true)";
+    XHR.get('<%=luci.dispatcher.build_url("admin", "services", "openclash", "get_subscribe_data")%>', {
         filename: filename
     }, function(x, status) {
-        if (x && x.status == 200 && status) {
-            handleSubURL(status);
+        if (ConfigUploader.showEditSubscribe) {
+            ConfigUploader.showEditSubscribe((x && x.status == 200) ? status : null, filename, cb);
+        } else {
+            ConfigUploader.show(cb);
         }
     });
-};
+    return false;
+}
 
 //]]></script>
+</div>
 <%+cbi/valuefooter%>

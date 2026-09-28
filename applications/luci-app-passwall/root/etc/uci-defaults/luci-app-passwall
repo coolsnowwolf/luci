@@ -2,7 +2,7 @@
 
 if [ -e "/etc/config/ucitrack" ]; then
 	uci -q batch <<-EOF
-		delete ucitrack.@passwall[-1]
+ 		delete ucitrack.@passwall[-1]
 		add ucitrack passwall
 		set ucitrack.@passwall[-1].init=passwall
 		commit ucitrack
@@ -30,6 +30,21 @@ fi
 uci commit firewall
 
 [ ! -s "/etc/config/passwall" ] && cp -f /usr/share/passwall/0_default_config /etc/config/passwall
+
+mkdir -p /etc/passwall/rules
+for file in \
+	direct_host \
+	direct_ip \
+	proxy_host \
+	proxy_ip \
+	block_host \
+	block_ip \
+	lanlist_ipv4 \
+	lanlist_ipv6 \
+	domains_excluded
+do
+	[ -f "/etc/passwall/rules/$file" ] || cp "/usr/share/passwall/rules/$file" "/etc/passwall/rules/$file"
+done
 
 chmod +x /usr/share/passwall/*.sh
 

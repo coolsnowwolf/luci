@@ -1,0 +1,89 @@
+#!/bin/sh /etc/rc.common
+# Copyright (C) 2023 Tianling Shen <cnsztl@immortalwrt.org>
+
+USE_PROCD=0
+START=98
+
+CONF="daed"
+PROG="/usr/bin/daed"
+LOG="/var/log/daed/daed.log"
+RESOLV_DAED="/tmp/resolv.conf.daed"
+
+update_cron() {
+  local temp_cron="/tmp/root.cron"
+
+  if [ -f /etc/crontabs/root ]; then
+    grep -v '/etc/daed/daed_sub.sh' /etc/crontabs/root > "$temp_cron" 2>/dev/null
+  fi
+  : >> "$temp_cron"
+
+  local auto_update
+  auto_update=$(uci -q get daed.config.subscribe_auto_update)
+  if [ "$1" = "add" ] && [ "${auto_update:-0}" -eq 1 ]; then
+    local min=$((RANDOM % 60))
+    local hr=$(uci -q get daed.config.subscribe_update_day_time)
+    local wk=$(uci -q get daed.config.subscribe_update_week_time)
+    echo "$min ${hr:-*} * * ${wk:-*} /etc/daed/daed_sub.sh >/dev/null 2>&1" >> "$temp_cron"
+  fi
+
+  crontab "$temp_cron" 2>/dev/null
+  rm -f "$temp_cron"
+}
+
+hijack_resolv_conf() {
+    grep -q ' /tmp/resolv\.conf ' /proc/mounts && return 0
+
+    grep -E '^(search|domain) ' /tmp/resolv.conf > "$RESOLV_DAED" 2>/dev/null
+
+    local dns_list LOGICAL_WAN
+    . /lib/functions/network.sh
+    network_find_wan LOGICAL_WAN 2>/dev/null
+    if [ -n "$LOGICAL_WAN" ]; then
+        dns_list=$(ubus call "network.interface.$LOGICAL_WAN" status 2>/dev/null | \
+            jsonfilter -e '@["dns-server"][*]' 2>/dev/null)
+    fi
+
+    if [ -z "$dns_list" ] && [ -f "/tmp/resolv.conf.d/resolv.conf.auto" ]; then
+        dns_list=$(awk '/^nameserver/{print $2}' "/tmp/resolv.conf.d/resolv.conf.auto")
+    fi
+
+    [ -z "$dns_list" ] && dns_list="119.29.29.29 223.5.5.5"
+
+    for dns in $dns_list; do
+        echo "nameserver $dns" >> "$RESOLV_DAED"
+    done
+
+    mount --bind "$RESOLV_DAED" /tmp/resolv.conf
+    mount -o remount,ro,bind /tmp/resolv.conf
+}
+
+restore_resolv_conf() {
+  grep -q ' /tmp/resolv\.conf ' /proc/mounts || return 0
+  mount -o remount,rw,bind /tmp/resolv.conf 2>/dev/null
+  umount /tmp/resolv.conf 2>/dev/null
+  rm -f "$RESOLV_DAED"
+}
+
+start_service() {
+  [ -f "/etc/init.d/daed" ] && grep -q "DAE_LOCATION_ASSET" "/etc/init.d/daed" || sed -i '/run/i\  procd_set_param env DAE_LOCATION_ASSET="/usr/share/v2ray"' "/etc/init.d/daed"
+  config_load "$CONF"
+
+  local enabled
+  config_get_bool enabled "config" "enabled" "0"
+  if [ "$enabled" -eq 0 ]; then
+    update_cron "remove"
+    restore_resolv_conf
+    return 1
+  fi
+  update_cron "add"
+  hijack_resolv_conf
+}
+
+stop_service() {
+  update_cron "remove"
+  restore_resolv_conf
+}
+
+service_triggers() {
+  procd_add_reload_trigger "$CONF"
+}

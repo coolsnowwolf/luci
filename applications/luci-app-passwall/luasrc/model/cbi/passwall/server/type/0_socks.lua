@@ -15,9 +15,11 @@ if s1.val["type"] and s1.val["type"] ~= type_name then
 	return
 end
 
-local s = NamedSection(m, arg[1], "server")
+local s = NamedSection(m, arg[1], "tmp_" .. s1.sectiontype)
+s.parent = s1
 s.type_name = type_name
 s.option_prefix = "socks_"
+api.set_type_cbi(s)
 
 o = s:option(Value, "port", translate("Listen Port"))
 o.datatype = "port"
@@ -34,7 +36,7 @@ o = s:option(Flag, "firewall_allow", translate("Firewall Allow"))
 o.default = "0"
 
 o = s:option(Value, "firewall_allow_src", translate("Source zone"))
-o.rmempty = false
+o.rmempty = not m.is_js_luci
 o.nocreate = true
 o.allowany = true
 o.default = "wan"
@@ -44,4 +46,4 @@ o:depends({ firewall_allow = true })
 o = s:option(Flag, "log", translate("Log"))
 o.default = "1"
 
-api.luci_types(s1, s)
+api.type_cbi_section(s1, s)

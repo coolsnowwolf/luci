@@ -8,6 +8,7 @@ local ech_domain = {}
 
 local local_version = api.get_app_version("sing-box"):match("[^v]+")
 local version_ge_1_14_0 = api.compare_versions(local_version, ">=", "1.14.0")
+local version_ge_1_15_0 = api.compare_versions(local_version, ">=", "1.15.0")
 
 local GLOBAL = {
 	DNS_SERVER = {},
@@ -93,43 +94,64 @@ function gen_outbound(flag, node, tag, proxy_table)
 		end
 		local remarks = node.remarks
 
-		local proxy_tag = nil
-		local fragment = nil
-		local record_fragment = nil
-		local run_socks_instance = true
+		local proxy_tag, fragment, record_fragment
 		if proxy_table ~= nil and type(proxy_table) == "table" then
 			proxy_tag = proxy_table.tag or nil
 			fragment = (proxy_table.fragment and node.protocol ~= "naive" and not node.hysteria2_realms) and true or nil
 			record_fragment = (proxy_table.record_fragment and node.protocol ~= "naive" and not node.hysteria2_realms) and true or nil
-			run_socks_instance = proxy_table.run_socks_instance
 		end
 
 		if node.type ~= "sing-box" then
-			local relay_port = node.port
-			local new_port = api.get_new_port()
-			local config_file = string.format("%s_%s_%s.json", flag, tag, new_port)
-			if tag and node_id and not tag:find(node_id) then
-				config_file = string.format("%s_%s_%s_%s.json", flag, tag, node_id, new_port)
-			end
-			if run_socks_instance then
-				sys.call(string.format('/usr/share/passwall/app.sh run_socks "%s"> /dev/null',
-					string.format("flag=%s node=%s bind=%s socks_port=%s config_file=%s relay_port=%s",
-						new_port, --flag
-						node_id, --node
-						"127.0.0.1", --bind
-						new_port, --socks port
-						config_file, --config file
-						(proxy_tag and relay_port) and tostring(relay_port) or "" --relay port
+			if node.type == "Socks" then
+				node.protocol = "socks"
+				proxy_tag = "socks <- " .. node_id
+			else
+				local new_port
+				local run_socks_instance = true
+				if NO_RUN then
+					TMP_PORT = TMP_PORT and TMP_PORT + 1 or 3001
+					new_port = TMP_PORT
+					run_socks_instance = nil
+				else
+					local relay_port = (proxy_tag and node.port) and tostring(node.port) or ""
+					if relay_port == "" then
+						local cache = api.get_socks_port_by_cache(node_id)
+						if cache then
+							new_port = cache
+							run_socks_instance = nil
+						end
+					end
+					if run_socks_instance then
+						new_port = api.get_new_port()
+						local config_file = string.format("nodesocks_%s_%s.json", node_id, new_port)
+						if tag and node_id and not tag:find(node_id) then
+							config_file = string.format("nodesocks_%s_%s_%s.json", tag, node_id, new_port)
+						end
+						sys.call(string.format('/usr/share/passwall/app.sh run_socks "%s"> /dev/null',
+							string.format("flag=%s node=%s bind=%s socks_port=%s config_file=%s relay_port=%s",
+								new_port, --flag
+								node_id, --node
+								"127.0.0.1", --bind
+								new_port, --socks port
+								config_file, --config file
+								relay_port --relay port
+								)
+							)
 						)
-					)
-				)
+						if relay_port == "" then
+							api.set_socks_port_to_cache(node_id, new_port)
+						end
+					end
+				end
+				if new_port then
+					node = {
+						protocol = "socks",
+						address = "127.0.0.1",
+						port = new_port
+					}
+					proxy_tag = "socks <- " .. node_id
+				end
 			end
-			node = {
-				protocol = "socks",
-				address = "127.0.0.1",
-				port = new_port
-			}
-			proxy_tag = "socks <- " .. node_id
 		else
 			if proxy_tag then
 				node.detour = proxy_tag
@@ -221,13 +243,13 @@ function gen_outbound(flag, node, tag, proxy_table)
 				enabled = true,
 				disable_sni = (node.tls_disable_sni == "1") and true or false, --不要在 ClientHello 中发送服务器名称.
 				server_name = node.tls_serverName, --用于验证返回证书上的主机名，除非设置不安全。它还包含在 ClientHello 中以支持虚拟主机，除非它是 IP 地址。
-				insecure = node.tls_allowInsecure == "1" or (node.tls_pinSHA256 and node.tls_pinSHA256 ~= ""), --接受任何服务器证书。(兼顾 xray 的 pinnedPeerCertSha256 )
+				insecure = node.tls_allowInsecure == "1", --接受任何服务器证书。
 				alpn = alpn, --支持的应用层协议协商列表，按优先顺序排列。如果两个对等点都支持 ALPN，则选择的协议将是此列表中的一个，如果没有相互支持的协议则连接将失败。
 				--min_version = "1.2",
 				--max_version = "1.3",
 				fragment = fragment,
 				record_fragment = record_fragment,
-				certificate = (node.tls_certificate == "1" and node.tls_certificate_pem ~= "") and api.split(node.tls_certificate_pem, "\n") or nil,
+				certificate = (node.tls_certificate == "1" and node.tls_certificate_pem ~= "") and api.split(node.tls_certificate_pem:gsub("\\n", "\n"), "\n") or nil,
 				cipher_suites = (node.cipherSuites and node.cipherSuites ~= "") and api.split(node.cipherSuites, ":") or nil,
 				ech = (node.ech == "1") and (function()
 					local function get_ech_domain(s) --兼容xray "域名+DNS" 格式ech
@@ -252,7 +274,7 @@ function gen_outbound(flag, node, tag, proxy_table)
 						ech.query_server_name = qname
 						ech_domain[qname] = true
 					elseif config then
-						ech.config = { config }
+						ech.config = api.split(config:gsub("\\n", "\n"), "\n")
 					elseif node.tls_serverName and node.tls_serverName ~= "" then
 						ech_domain[node.tls_serverName] = true
 					end
@@ -268,6 +290,13 @@ function gen_outbound(flag, node, tag, proxy_table)
 					short_id = node.reality_shortId
 				} or nil
 			}
+			if version_ge_1_15_0 then
+				if node.tls_pinSHA256 and node.tls_pinSHA256 ~= "" then
+					tls.certificate_sha256 = { api.sha256_xray_sb(node.tls_pinSHA256) }
+				end
+			else
+				tls.insecure = node.tls_allowInsecure == "1" or (node.tls_pinSHA256 and node.tls_pinSHA256 ~= "")
+			end
 		end
 
 		local mux = nil
@@ -326,9 +355,20 @@ function gen_outbound(flag, node, tag, proxy_table)
 					Host = node.ws_host,
 					["User-Agent"] = node.user_agent
 				} or nil,
-				max_early_data = tonumber(node.ws_maxEarlyData) or nil,
-				early_data_header_name = (node.ws_earlyDataHeaderName) and node.ws_earlyDataHeaderName or nil --要与 Xray-core 兼容，请将其设置为 Sec-WebSocket-Protocol。它需要与服务器保持一致。
 			}
+			local path = api.UrlDecode(node.ws_path)
+			local path_dat = api.split(path, "?")
+			local params = {}
+			for _, v in pairs(api.split(path_dat[2], '&')) do
+				local t = api.split(v, '=')
+				params[t[1]] = t[2]
+			end
+			local ed = tonumber(params.ed)
+			if ed then
+				v2ray_transport.path = path_dat[1]
+				v2ray_transport.max_early_data = ed
+			end
+			v2ray_transport.early_data_header_name = params.eh or "Sec-WebSocket-Protocol"
 		end
 
 		if node.transport == "httpupgrade" then
@@ -481,9 +521,9 @@ function gen_outbound(flag, node, tag, proxy_table)
 				obfs = node.hysteria_obfs,
 				auth = (node.hysteria_auth_type == "base64") and node.hysteria_auth_password or nil,
 				auth_str = (node.hysteria_auth_type == "string") and node.hysteria_auth_password or nil,
-				recv_window_conn = tonumber(node.hysteria_recv_window_conn),  --1.14 将变更为 stream_receive_window
-				recv_window = tonumber(node.hysteria_recv_window),  --1.14 将变更为 connection_receive_window
-				disable_mtu_discovery = (node.hysteria_disable_mtu_discovery == "1") and true or false,  --1.14 将变更为 disable_path_mtu_discovery
+				stream_receive_window = tonumber(node.hysteria_recv_window_conn),
+				connection_receive_window = tonumber(node.hysteria_recv_window),
+				disable_path_mtu_discovery = (node.hysteria_disable_mtu_discovery == "1") and true or false,
 				tls = tls
 			}
 		end
@@ -597,6 +637,7 @@ function gen_outbound(flag, node, tag, proxy_table)
 						realm.address = nil
 						realm.port = nil
 						realm.port_mapping = (node.hysteria2_realm_upnp == "1") and { enabled = true } or nil
+						realm.http_client = "direct_http_client"
 						return realm
 					end
 					return nil
@@ -645,6 +686,19 @@ function gen_outbound(flag, node, tag, proxy_table)
 			}
 		end
 
+		if node.protocol == "snell" then
+			protocol_table = {
+				version = tonumber(node.snell_version),
+				psk = node.snell_psk,
+				userkey = node.password,
+				reuse = node.snell_reuse == "1" and true or false,
+				network = node.snell_network,
+				obfs_mode = node.snell_version == "4" and node.snell_obfs_mode or nil,
+				obfs_host = node.snell_version == "4" and node.snell_obfs_host or nil,
+				mode = node.snell_version == "6" and node.snell_mode or nil,
+			}
+		end
+
 		if protocol_table then
 			for key, value in pairs(protocol_table) do
 				result[key] = value
@@ -663,8 +717,10 @@ function gen_config_server(node)
 
 	local tls = {
 		enabled = true,
-		certificate_path = node.tls_certificateFile,
-		key_path = node.tls_keyFile,
+		certificate_path = (node.tls_use_pem ~= "1") and node.tls_certificateFile or nil,
+		key_path = (node.tls_use_pem ~= "1") and node.tls_keyFile or nil,
+		certificate = (node.tls_use_pem == "1" and node.tls_certificate) and api.split(node.tls_certificate:gsub("\\n", "\n"), "\n") or nil,
+		key = (node.tls_use_pem == "1" and node.tls_key) and api.split(node.tls_key:gsub("\\n", "\n"), "\n") or nil,
 		alpn = (node.alpn and node.alpn ~= "default") and (function()
 			local alpn = {}
 			string.gsub(node.alpn, '[^,]+', function(w)
@@ -678,6 +734,8 @@ function gen_config_server(node)
 	if node.tls == "1" and node.reality == "1" then
 		tls.certificate_path = nil
 		tls.key_path = nil
+		tls.certificate = nil
+		tls.key = nil
 		tls.server_name = node.reality_handshake_server
 		tls.reality = {
 			enabled = true,
@@ -695,7 +753,7 @@ function gen_config_server(node)
 	if node.tls == "1" and node.ech == "1" then
 		tls.ech = {
 			enabled = true,
-			key = node.ech_key and { node.ech_key } or nil
+			key = node.ech_key and api.split(node.ech_key:gsub("\\n", "\n"), "\n") or nil
 		}
 	end
 
@@ -727,7 +785,7 @@ function gen_config_server(node)
 			type = "ws",
 			path = node.ws_path or "/",
 			headers = (node.ws_host ~= nil) and { Host = node.ws_host } or nil,
-			early_data_header_name = (node.ws_earlyDataHeaderName) and node.ws_earlyDataHeaderName or nil --要与 Xray-core 兼容，请将其设置为 Sec-WebSocket-Protocol。它需要与服务器保持一致。
+			early_data_header_name = (node.ws_earlyDataHeaderName) and node.ws_earlyDataHeaderName or "Sec-WebSocket-Protocol"
 		}
 	end
 
@@ -800,6 +858,10 @@ function gen_config_server(node)
 					u.pre_shared_key = user.wireguard_pre_shared_key
 					u.allowed_ips = user.allowed_ips or {}
 					u.persistent_keepalive_interval = 0
+				end
+				if node.protocol == "snell" then
+					u.name = user.username
+					u.userkey = user.password
 				end
 				users[#users + 1] = u
 			end
@@ -892,10 +954,10 @@ function gen_config_server(node)
 			down_mbps = tonumber(node.hysteria_down_mbps),
 			obfs = node.hysteria_obfs,
 			users = users,
-			recv_window_conn = node.hysteria_recv_window_conn and tonumber(node.hysteria_recv_window_conn) or nil, --1.14 to stream_receive_window
-			recv_window_client = node.hysteria_recv_window_client and tonumber(node.hysteria_recv_window_client) or nil, --1.14 to connection_receive_window
-			max_conn_client = node.hysteria_max_conn_client and tonumber(node.hysteria_max_conn_client) or nil,  --1.14 to max_concurrent_streams
-			disable_mtu_discovery = (node.hysteria_disable_mtu_discovery == "1") and true or false,  --1.14 to disable_path_mtu_discover
+			stream_receive_window = node.hysteria_recv_window_conn and tonumber(node.hysteria_recv_window_conn) or nil,
+			connection_receive_window = node.hysteria_recv_window_client and tonumber(node.hysteria_recv_window_client) or nil,
+			max_concurrent_streams = node.hysteria_max_conn_client and tonumber(node.hysteria_max_conn_client) or nil,
+			disable_path_mtu_discovery = (node.hysteria_disable_mtu_discovery == "1") and true or false,
 			tls = tls
 		}
 	end
@@ -953,6 +1015,7 @@ function gen_config_server(node)
 					realm.port = nil
 					realm.stun_domain_resolver = "direct"
 					realm.port_mapping = (node.hysteria2_realm_upnp == "1") and { enabled = true } or nil
+					realm.http_client = { detour = "direct" }
 					return realm
 				end
 				return nil
@@ -979,6 +1042,16 @@ function gen_config_server(node)
 		if users then
 			inbound.peers = users
 		end
+	end
+
+	if node.protocol == "snell" then
+		protocol_table = {
+			users = users,
+			version = tonumber(node.snell_version),
+			psk = node.snell_psk,
+			obfs_mode = node.snell_version == "5" and node.snell_obfs_mode or nil,
+			mode = node.snell_version == "6" and node.snell_mode or nil,
+		}
 	end
 
 	if node.protocol == "direct" then
@@ -1098,8 +1171,10 @@ function gen_config(var)
 	local direct_dns_query_strategy = var["direct_dns_query_strategy"]
 	local remote_dns_udp_server = var["remote_dns_udp_server"]
 	local remote_dns_udp_port = var["remote_dns_udp_port"]
+	local remote_dns_quic = var["remote_dns_quic"]
 	local remote_dns_tcp_server = var["remote_dns_tcp_server"]
 	local remote_dns_tcp_port = var["remote_dns_tcp_port"]
+	local remote_dns_tls = var["remote_dns_tls"]
 	local remote_dns_doh = var["remote_dns_doh"]
 	local remote_dns_http3 = var["remote_dns_http3"]
 	local remote_dns_client_ip = var["remote_dns_client_ip"]
@@ -1109,10 +1184,11 @@ function gen_config(var)
 	local dns_cache = var["dns_cache"]
 	local dns_socks_address = var["dns_socks_address"]
 	local dns_socks_port = var["dns_socks_port"]
-	local no_run = var["no_run"]
 	local use_proxy_list = var["use_proxy_list"]
 	local use_gfw_list = var["use_gfw_list"]
 	local chn_list = var["chn_list"]
+	local run_in_global = var["run_in_global"]
+	NO_RUN = var["no_run"]
 
 	local dns_domain_rules = {}
 	local dns = nil
@@ -1167,8 +1243,8 @@ function gen_config(var)
 							format = format,
 							path = _type == "local" and w or nil,
 							url = _type == "remote" and w or nil,
-							--download_detour = _type == "remote" and "",
-							--update_interval = _type == "remote" and "",
+							http_client = (_type == "remote" and version_ge_1_14_0) and "remote_http_client" or nil,
+							--update_interval = _type == "remote" and "1d" or nil,
 						}
 					end
 				end
@@ -1306,7 +1382,9 @@ function gen_config(var)
 				ut_nodes = _node.urltest_node
 			end
 
-			-- api.log("  - 加载 Sing-Box URLTest 节点【" .. (_node.remarks or "") .. "】，子节点数量：" .. #(ut_nodes or {}))
+			if not NO_RUN and run_in_global then
+				api.log("  - 加载 Sing-Box URLTest 节点【" .. (_node.remarks or "") .. "】，子节点数量：" .. #(ut_nodes or {}))
+			end
 
 			local valid_nodes = {}
 			for i = 1, #(ut_nodes or {}) do
@@ -1321,7 +1399,7 @@ function gen_config(var)
 					end
 				end
 				if is_new_ut_node then
-					local outboundTag = gen_outbound_get_tag(flag, ut_node_id, ut_node_tag, { fragment = singbox_settings.fragment == "1" or nil, record_fragment = singbox_settings.record_fragment == "1" or nil, run_socks_instance = not no_run })
+					local outboundTag = gen_outbound_get_tag(flag, ut_node_id, ut_node_tag, { fragment = singbox_settings.fragment == "1" or nil, record_fragment = singbox_settings.record_fragment == "1" or nil })
 					if outboundTag then
 						valid_nodes[#valid_nodes + 1] = outboundTag
 					end
@@ -1400,6 +1478,10 @@ function gen_config(var)
 					end
 				end
 				if to_node then
+					local chained_tag = outbound.tag .. " -> " .. to_node[".name"] .. (to_node.remarks and ":" .. to_node.remarks or "")
+					for _, o in ipairs(outbounds_table) do
+						if o.tag == chained_tag then return chained_tag, last_insert_outbound end
+					end
 					local to_outbound
 					if to_node.type ~= "sing-box" then
 						local tag = to_node[".name"]
@@ -1424,7 +1506,6 @@ function gen_config(var)
 						to_node.port = new_port
 						to_outbound = gen_outbound(node[".name"], to_node, tag, {
 							tag = tag,
-							run_socks_instance = not no_run
 						})
 					else
 						to_outbound = gen_outbound(node[".name"], to_node)
@@ -1462,7 +1543,7 @@ function gen_config(var)
 				local outbound, exist
 				if node.protocol == "_urltest" then
 					outbound, exist = gen_urltest_outbound(node)
-					if exist then
+					if exist and not node.chain_proxy then
 						return outbound.tag
 					end
 				elseif node.protocol == "_iface" then
@@ -1490,7 +1571,7 @@ function gen_config(var)
 				end
 				if outbound then
 					local default_outbound_tag, last_insert_outbound = set_outbound_detour(node, outbound, outbounds)
-					table.insert(outbounds, outbound)
+					if not exist then table.insert(outbounds, outbound) end
 					if last_insert_outbound then
 						table.insert(outbounds, last_insert_outbound)
 					end
@@ -1517,7 +1598,6 @@ function gen_config(var)
 					local proxy_table = {
 						fragment = singbox_settings.fragment == "1",
 						record_fragment = singbox_settings.record_fragment == "1",
-						run_socks_instance = not no_run,
 					}
 					local preproxy_node_id = node[rule_name .. "_proxy_tag"]
 					if preproxy_node_id == _node_id then preproxy_node_id = nil end
@@ -1563,8 +1643,8 @@ function gen_config(var)
 					return table.concat(list, "\n")
 				end
 
-				local domain_list = read_proxy_list("/usr/share/passwall/rules/proxy_host")
-				local ip_list = read_proxy_list("/usr/share/passwall/rules/proxy_ip")
+				local domain_list = read_proxy_list("/etc/passwall/rules/proxy_host")
+				local ip_list = read_proxy_list("/etc/passwall/rules/proxy_ip")
 
 				local bin = api.finded_com("geoview")
 				if bin then
@@ -1801,7 +1881,6 @@ function gen_config(var)
 			COMMON.default_outbound_tag = gen_outbound_get_tag(flag, node or node_id, nil, {
 				fragment = singbox_settings.fragment == "1" or nil,
 				record_fragment = singbox_settings.record_fragment == "1" or nil,
-				run_socks_instance = not no_run
 			})
 		end
 
@@ -1854,13 +1933,19 @@ function gen_config(var)
 			remote_server.type = "udp"
 			remote_server.server = remote_dns_udp_server
 			remote_server.server_port = server_port
-
+			if remote_dns_quic then
+				remote_server.type = "quic"
+				remote_server.server_port = tonumber(remote_dns_udp_port) or 853
+			end
 		elseif remote_dns_tcp_server then
 			local server_port = tonumber(remote_dns_tcp_port) or 53
 			remote_server.type = "tcp"
 			remote_server.server = remote_dns_tcp_server
 			remote_server.server_port = server_port
-
+			if remote_dns_tls then
+				remote_server.type = "tls"
+				remote_server.server_port = tonumber(remote_dns_tcp_port) or 853
+			end
 		elseif remote_dns_doh then
 			local _a = api.parseDoH(remote_dns_doh)
 			if _a then
@@ -1896,12 +1981,12 @@ function gen_config(var)
 		table.insert(dns.servers, remote_server)
 
 		fakedns_tag = "remote_fakeip"
-		if remote_dns_fake or inner_fakedns == "1" then
+		if remote_dns_fake or inner_fakedns == "1" then		
 			table.insert(dns.servers, {
 				tag = fakedns_tag,
 				type = "fakeip",
 				inet4_range = "198.18.0.0/15",
-				inet6_range = "fc00::/18",
+				inet6_range = "2001:2::/48",
 			})
 
 			if not experimental then
@@ -2179,13 +2264,9 @@ function gen_config(var)
 		})
 	else
 		table.insert(dns.rules, 1, {
-			action = "evaluate",
+			preferred_by = "hosts",
+			action = "route",
 			server = "hosts"
-		})
-		table.insert(dns.rules, 2, {
-			match_response = true,
-			ip_accept_any = true,
-			action = "respond"
 		})
 	end
 
@@ -2201,6 +2282,36 @@ function gen_config(var)
 		for k, v in pairs(rule_set_table) do
 			table.insert(route.rule_set, v)
 		end
+	end
+
+	local http_clients
+	if outbounds then
+		local proxy_tag = COMMON.default_outbound_tag
+		if proxy_tag == "block" or proxy_tag == "direct" then  -- 如默认节点是特殊节点，则选一个可用节点作为出口(urltest优先)
+			local first_node
+			for _, v in ipairs(outbounds) do
+				if not v["_flag_proxy_tag"] and not v.detour and v["_id"] and ((v.server and (v.server_port or v.server_ports)) or v.type == "urltest") then
+					first_node = first_node or v.tag
+					if v.type == "urltest" then
+						proxy_tag = v.tag
+						break
+					end
+				end
+			end
+			if proxy_tag == COMMON.default_outbound_tag then
+				proxy_tag = first_node
+			end
+		end
+		http_clients = {
+			{
+				tag = "remote_http_client",
+				detour = proxy_tag
+			},
+			{
+				tag = "direct_http_client",
+				detour = "direct"
+			}
+		}
 	end
 
 	if inbounds or outbounds then
@@ -2219,8 +2330,10 @@ function gen_config(var)
 			outbounds = outbounds,
 			-- 路由
 			route = route,
-			--实验性
+			-- 实验性
 			experimental = experimental,
+			-- HTTP Client
+			http_clients = version_ge_1_14_0 and http_clients or nil,
 		}
 		table.insert(outbounds, {
 			type = "direct",
@@ -2228,7 +2341,7 @@ function gen_config(var)
 			routing_mark = 255,
 		})
 		for index, value in ipairs(config.outbounds) do
-			if not value["_flag_proxy_tag"] and not value.detour and value["_id"] and value.server and (value.server_port or value.server_ports) and not no_run then
+			if not value["_flag_proxy_tag"] and not value.detour and value["_id"] and value.server and (value.server_port or value.server_ports) and not NO_RUN then
 				sys.call(string.format("echo '%s' >> %s", value["_id"], api.TMP_PATH .. "/direct_node_list"))
 			end
 			if not value.detour and not value.bind_interface and value.server then
@@ -2376,7 +2489,7 @@ if arg[1] then
 			var = jsonc.parse(arg[2])
 		end
 		print(func(var))
-		if (next(GEO_VAR.SITE_TAGS) or next(GEO_VAR.IP_TAGS)) and not no_run then
+		if (next(GEO_VAR.SITE_TAGS) or next(GEO_VAR.IP_TAGS)) and not NO_RUN then
 			convert_geofile()
 		end
 	end

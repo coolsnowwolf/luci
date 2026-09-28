@@ -1,0 +1,31 @@
+#!/bin/sh /etc/rc.common
+
+START=99
+
+boot_func() {
+	sleep 90
+	restart
+}
+
+boot() {
+	boot_func >/dev/null 2>&1 &
+}
+
+start() {
+	lua /usr/lib/lua/luci/passwall2/server_app.lua start
+}
+
+stop() {
+	lua /usr/lib/lua/luci/passwall2/server_app.lua stop
+}
+
+restart() {
+	stop
+	start
+}
+
+reload() {
+	echo "Warning: This service does not support configuration reloading"
+	echo "Performing full restart instead..."
+	restart
+}

@@ -89,11 +89,17 @@ msgstr "检查失败"
 msgid "File Not Exist"
 msgstr "文件不存在"
 
+msgid "Flush DNS Cache"
+msgstr "清理 DNS 缓存"
+
 msgid "Not Set"
 msgstr "未设置"
 
 msgid "Server Logs"
 msgstr "运行日志"
+
+msgid "Core Tests"
+msgstr "内核测试"
 
 msgid "Debug Logs"
 msgstr "调试日志"
@@ -101,8 +107,8 @@ msgstr "调试日志"
 msgid "Generate Logs"
 msgstr "生成日志"
 
-msgid "Click to Generate"
-msgstr "点击生成"
+msgid "Generated Logs"
+msgstr "日志生成结果"
 
 msgid "Enable OpenClash"
 msgstr "启动 OpenClash"
@@ -118,6 +124,12 @@ msgstr "应用配置"
 
 msgid "Download Config"
 msgstr "下载配置"
+
+msgid "Click to Download"
+msgstr "点击下载"
+
+msgid "Failed to get download link"
+msgstr "获取下载链接失败"
 
 msgid "Copy Config"
 msgstr "复制配置"
@@ -151,6 +163,9 @@ msgstr "Fake-IP（TUN-混合）模式【UDP-TUN，TCP-转发】"
 
 msgid "Select Mode For OpenClash Work, Try Flush DNS Cache If Network Error"
 msgstr "选择运行模式，如客户端的网络异常请尝试清除 DNS 缓存"
+
+msgid "Proxy"
+msgstr "代理"
 
 msgid "Proxy Mode"
 msgstr "代理模式"
@@ -325,6 +340,57 @@ msgstr "内核文件"
 
 msgid "Upload"
 msgstr "上传"
+
+msgid "Age Encryption"
+msgstr "Age 加密"
+
+msgid "Age Encryption File"
+msgstr "Age 加密文件"
+
+msgid "Generate Age Key"
+msgstr "生成 Age 密钥"
+
+msgid "Generating..."
+msgstr "生成中..."
+
+msgid "Public Key"
+msgstr "公钥"
+
+msgid "Secret Key"
+msgstr "私钥"
+
+msgid "Age Key Type"
+msgstr "Age 密钥类型"
+
+msgid "x25519"
+msgstr "x25519"
+
+msgid "PQ (mlkem768-x25519)"
+msgstr "PQ (mlkem768-x25519)"
+
+msgid "Failed to generate age key"
+msgstr "生成 Age 密钥失败"
+
+msgid "No public key"
+msgstr "没有公钥"
+
+msgid "No secret key"
+msgstr "没有私钥"
+
+msgid "Age Encryption For Config, Click For More:"
+msgstr "使用 Age 加密配置，点击获取更多信息："
+
+msgid "Age Encryption Introduce"
+msgstr "Age 加密介绍"
+
+msgid "Calculate Public Key"
+msgstr "计算公钥"
+
+msgid "Please enter the Age Secret Key to calculate the public key!"
+msgstr "请先输入私钥来计算公钥！"
+
+msgid "Failed to calculate public key"
+msgstr "公钥计算失败"
 
 msgid "Add"
 msgstr "添加"
@@ -542,9 +608,6 @@ msgstr "设置自定义规则（在上方规则设置中启用本功能后生效
 msgid "Version Update"
 msgstr "版本更新"
 
-msgid "Model Not Found"
-msgstr "处理器架构识别失败"
-
 msgid "Current Core Version"
 msgstr "当前内核版本"
 
@@ -556,9 +619,6 @@ msgstr "查询更新失败"
 
 msgid "<New>"
 msgstr "<可更新>"
-
-msgid "Getting Last Version..."
-msgstr "最新版本获取中..."
 
 msgid "Update Core File"
 msgstr "更新内核"
@@ -807,6 +867,18 @@ msgstr "文件大小"
 msgid "Remove"
 msgstr "移除"
 
+msgid "Add Header"
+msgstr "添加请求头"
+
+msgid "Add Param"
+msgstr "添加参数"
+
+msgid "Add custom HTTP headers to the subscription request"
+msgstr "为订阅请求添加自定义 HTTP 请求头"
+
+msgid "Set environment variables for the overwrite script"
+msgstr "为覆写脚本设置环境变量"
+
 msgid "(Enable or Disable Subscribe)"
 msgstr "（启用或禁用更新）"
 
@@ -1050,6 +1122,12 @@ msgstr "收集 Smart 策略组的连接数据，方便用来分析及模型训�
 msgid "The Priority Of The Nodes, The Higher Than 1, The More Likely It Is To Be Selected, The Default Is 1, Support Regex"
 msgstr "自定义 Smart 策略组内节点的权重加成，大于 1 表示权重加成优先选择，小于 1 表示权重削减降低使用率，默认为 1，支持正则"
 
+msgid "Smart Group Tolerance"
+msgstr "Smart 策略组排序灵敏度"
+
+msgid "Sort When Proxies Delays Within Tolerance are Treated as Equal, Preventing Jitter"
+msgstr "当代理延迟在容差范围内时将其视为相等并排序，从而避免抖动"
+
 msgid "Running Status"
 msgstr "运行状态"
 
@@ -1070,6 +1148,9 @@ msgstr "Zashboard"
 
 msgid "Control Panel"
 msgstr "控制面板"
+
+msgid "If the control panel does not open properly, please try going to Plugin Settings - Dashboard Settings to reset the panel"
+msgstr "如果控制面板打开异常，请尝试前往 [插件设置 - 外部控制] 重置面板"
 
 msgid "Quick Action"
 msgstr "快捷操作"
@@ -1122,9 +1203,6 @@ msgstr "GeoSite 数据库检查更新"
 msgid "You have not installed the core yet, do you want to download and install it now?"
 msgstr "您还未安装内核，是否立即下载安装？"
 
-msgid "No Compiled Version is Selected, Please Select on The Top and Try Again!"
-msgstr "未选择编译版本，请到上方标签选择后重试！"
-
 msgid "Checking..."
 msgstr "正在检查更新..."
 
@@ -1136,6 +1214,15 @@ msgstr "正在还原..."
 
 msgid "Saving..."
 msgstr "正在保存..."
+
+msgid "Save successful"
+msgstr "保存成功"
+
+msgid "Failed to save"
+msgstr "保存失败"
+
+msgid "Failed to save age config"
+msgstr "保存 age 配置失败"
 
 msgid "Firewall Rules Reset Failed"
 msgstr "防火墙规则重置失败"
@@ -1185,50 +1272,17 @@ msgstr "编译版本"
 msgid "Release Branch"
 msgstr "更新分支"
 
-msgid "Note: options will auto-save when you click to update or download"
-msgstr "注意：以下选项在点击更新或下载时将自动保存"
-
-msgid "CPU Architecture"
+msgid "CPU Arch"
 msgstr "处理器架构"
 
 msgid "Last Check Update"
 msgstr "上次检查更新时间"
 
-msgid "Current Core"
-msgstr "当前内核版本"
-
-msgid "Latest Core"
-msgstr "最新内核版本"
-
 msgid "Core path:"
 msgstr "内核路径："
 
-msgid "Update Core"
-msgstr "更新内核"
-
-msgid "Download Latest Core"
-msgstr "下载最新版本内核"
-
-msgid "Client Update"
-msgstr "客户端版本更新"
-
-msgid "Current Client"
-msgstr "当前客户端版本"
-
-msgid "Update Client"
-msgstr "更新客户端"
-
-msgid "Latest Client"
-msgstr "最新客户端版本"
-
-msgid "Download Latest Client"
-msgstr "下载最新版本客户端"
-
 msgid "Restore Default"
 msgstr "还原默认"
-
-msgid "Failed to get the latest version. Please try again later!"
-msgstr "最新版本获取失败，请稍后再试！"
 
 msgid "Are you sure want to restore the default config?"
 msgstr "确定要还原默认配置吗？"
@@ -1239,14 +1293,23 @@ msgstr "还原默认配置成功！"
 msgid "Restore failed!"
 msgstr "还原默认配置失败！"
 
-msgid "Support syntax check, press"
-msgstr "支持语法检查，按钮"
+msgid "Press"
+msgstr "按"
 
-msgid "to control diff option, press"
-msgstr "控制 Diff 显示，按钮"
+msgid "for fullscreen,"
+msgstr "全屏，"
 
-msgid "to enter full screen editing mode"
-msgstr "进入全屏编辑模式"
+msgid "to exit fullscreen,"
+msgstr "退出全屏，"
+
+msgid "to zoom"
+msgstr "缩放"
+
+msgid "Mouse Wheel"
+msgstr "鼠标滚轮"
+
+msgid "to toggle differences,"
+msgstr "切换差异显示，"
 
 msgid "Switch page to Fake-IP mode"
 msgstr "切换页面到 Fake-IP 模式"
@@ -1286,6 +1349,45 @@ msgstr "连接正常"
 
 msgid "Access Denied"
 msgstr "无法访问"
+
+msgid "Connection Failed"
+msgstr "连接失败"
+
+msgid "Invalid Response"
+msgstr "响应异常"
+
+msgid "Installed"
+msgstr "已安装"
+
+msgid "Select Version"
+msgstr "选择版本"
+
+msgid "Latest"
+msgstr "最新"
+
+msgid "Latency"
+msgstr "延迟"
+
+msgid "Plugin"
+msgstr "插件"
+
+msgid "Core"
+msgstr "内核"
+
+msgid "Plugin Version"
+msgstr "插件版本"
+
+msgid "Core Version"
+msgstr "内核版本"
+
+msgid "Date"
+msgstr "日期"
+
+msgid "Failed to get version history"
+msgstr "历史版本获取失败"
+
+msgid "Failed to get data, will retry"
+msgstr "获取数据失败，将自动重试"
 
 msgid "Bind Network Interface"
 msgstr "绑定网络接口"
@@ -1377,6 +1479,9 @@ msgstr "删除内核"
 msgid "Are you sure want to remove all core files?"
 msgstr "确定要删除所有内核文件吗？"
 
+msgid "Removing..."
+msgstr "正在删除..."
+
 msgid "Remove succeeded!"
 msgstr "删除成功！"
 
@@ -1403,6 +1508,9 @@ msgstr "不支持的协议"
 
 msgid "Copy"
 msgstr "复制"
+
+msgid "Copy Debug"
+msgstr "复制调试日志"
 
 msgid "Export"
 msgstr "导出配置信息"
@@ -1432,10 +1540,28 @@ msgid "Start downloading"
 msgstr "开始下载"
 
 msgid "Download successful, start pre update test..."
-msgstr "下载成功，开始进行更新前测试..."
+msgstr "下载成功，开始更新前测试..."
 
-msgid "Pre update test failed..."
-msgstr "更新前测试失败..."
+msgid "opkg update failed or timed out:"
+msgstr "opkg update 失败或超时:"
+
+msgid "apk update failed or timed out:"
+msgstr "apk update 失败或超时:"
+
+msgid "opkg update failed:"
+msgstr "opkg update 失败:"
+
+msgid "apk update failed:"
+msgstr "apk update 失败:"
+
+msgid "Pre update test failed:"
+msgstr "更新前测试失败:"
+
+msgid ", retrying..."
+msgstr "，正在重试..."
+
+msgid ", trying pre update test..."
+msgstr "，尝试进行预安装..."
 
 msgid "Pre update test failed after 3 attempts, the file is saved in /tmp/openclash.ipk, please try to update manually with"
 msgstr "更新前测试失败，文件保存在 /tmp/openclash.ipk，请尝试以下命令手动更新"
@@ -1444,13 +1570,13 @@ msgid "Pre update test failed after 3 attempts, the file is saved in /tmp/opencl
 msgstr "更新前测试失败，文件保存在 /tmp/openclash.apk，请尝试以下命令手动更新"
 
 msgid "Pre update test passed, ready to update and please do not refresh the page and other operations..."
-msgstr "更新前测试通过，准备开始更新，更新过程请不要刷新页面和进行其他操作..."
+msgstr "更新前测试通过，准备开始更新，更新过程请不要刷新页面..."
 
 msgid "Installing the new version, please do not refresh the page or do other operations..."
 msgstr "正在安装新版本，更新过程请不要刷新页面和进行其他操作..."
 
-msgid "Installation failed..."
-msgstr "软件包安装失败..."
+msgid "Installation failed:"
+msgstr "软件包安装失败:"
 
 msgid "OpenClash update failed after 3 attempts, the file is saved in /tmp/openclash.ipk, please try to update manually with"
 msgstr "OpenClash 更新失败，文件保存在 /tmp/openclash.ipk，请尝试以下命令手动更新"
@@ -1479,31 +1605,28 @@ msgstr "版本内核正在下载，如下载失败请尝试手动下载并上传
 msgid "Core Download Successful, Start Update..."
 msgstr "版本内核下载成功，开始更新..."
 
-msgid "Core Download Failed, Please Check The Network or Try Again Later!"
-msgstr "版本内核下载失败，请检查网络情况或稍后再试！"
-
-msgid "Core Update Failed, Please Check The Network or Try Again Later!"
-msgstr "版本内核更新失败，请检查网络或稍后再试！"
-
-msgid "Core Update Successful!"
+msgid "Core Update Successful"
 msgstr "版本内核更新成功！"
 
-msgid "Core Update Failed, Please Make Sure Enough Flash Memory Space or Selected Correct Core Platform And Try Again!"
-msgstr "版本内核更新失败，请确认设备闪存空间足够或内核平台正确后再试！"
+msgid "Core Update Failed:"
+msgstr "版本内核更新失败:"
 
-msgid "Core Update Failed..."
-msgstr "版本内核更新失败..."
+msgid "Core Download Failed, Please Check The Network or Try Again Later..."
+msgstr "版本内核下载失败，请检查网络情况或稍后再试！"
 
-msgid "Core Download Failed..."
-msgstr "版本内核下载失败..."
+msgid "Core Download Failed, Please Check The Network or Try Again Later"
+msgstr "版本内核下载失败，请检查网络情况或稍后再试"
 
-msgid "Core Update Failed, Please Make Sure Enough Flash Memory Space And Try Again!"
-msgstr "版本内核更新失败，请确认设备闪存空间足够后再试！"
+msgid "Core Move Failed:"
+msgstr "内核移动失败:"
+
+msgid "Core Verification Failed:"
+msgstr "内核校验失败:"
 
 msgid "No Compiled Version Selected, Please Select In Update Page And Try Again!"
 msgstr "未选择编译版本，请到升级页面选择后再试！"
 
-msgid "Core Has Not Been Updated, Stop Continuing Operation!"
+msgid "Core Has Not Been Updated, Stop Continuing Operation"
 msgstr "版本内核没有更新，停止继续操作！"
 
 msgid "Update Successful!"
@@ -1560,6 +1683,27 @@ msgstr "开始下载大陆 IP 白名单..."
 msgid "Start Downloading The Chnroute6 Cidr List..."
 msgstr "开始下载大陆 IPv6 白名单..."
 
+msgid "Version info not ready, please wait and try again"
+msgstr "版本信息尚未就绪，请稍后重试"
+
+msgid "Link access timed out, cannot download"
+msgstr "链接访问超时，无法下载"
+
+msgid "Link access failed, cannot download"
+msgstr "链接访问失败，无法下载"
+
+msgid "Failed to get plugin version info from this link, please check again later"
+msgstr "此链接的插件版本信息获取失败，请稍后重试"
+
+msgid "Failed to get core version info from this link, please check again later"
+msgstr "此链接的内核版本信息获取失败，请稍后重试"
+
+msgid "The selected version is the same as the installed version, no need to update"
+msgstr "所选版本与已安装版本相同，无需更新"
+
+msgid "The selected version is not in the version history, please refresh and try again"
+msgstr "所选版本不在版本历史中，请刷新后重试"
+
 msgid "Chnroute Cidr List Download Success, Check Updated..."
 msgstr "大陆 IP 白名单下载成功，检查版本是否更新..."
 
@@ -1590,77 +1734,29 @@ msgstr "大陆 IP 白名单下载失败，请检查网络或稍后再试..."
 msgid "Chnroute6 Cidr List Update Error, Please Try Again Later..."
 msgstr "大陆 IPv6 白名单下载失败，请检查网络或稍后再试..."
 
-msgid "Start Downloading GeoSite Database..."
-msgstr "开始下载 GeoSite 数据库..."
+msgid "Download Failed: HTML Response Detected, Abort Update..."
+msgstr "下载失败：检测到 HTML 响应（可能为 CDN 错误页面），终止更新..."
 
-msgid "GeoSite Database Download Success, Check Updated..."
-msgstr "GeoSite 数据库下载成功，检查数据库版本是否更新..."
+msgid "Download Failed: File Size Too Small, Abort Update..."
+msgstr "下载失败：文件大小过小（可能被截断），终止更新..."
 
-msgid "GeoSite Database Has Been Updated, Starting To Replace The Old Version..."
-msgstr "GeoSite 数据库版本有更新，开始替换数据库版本..."
+msgid "Download Success, Check Updated..."
+msgstr "下载成功，检查数据库是否已更新..."
 
-msgid "GeoSite Database Update Successful!"
-msgstr "GeoSite 数据库更新成功！"
+msgid "Has Been Updated, Starting To Replace The Old Version..."
+msgstr "有新版本，开始替换旧版本..."
 
-msgid "Updated GeoSite Database No Change, Do Nothing..."
-msgstr "GeoSite 数据库版本没有更新，停止继续操作..."
+msgid "Update Successful!"
+msgstr "更新成功！"
 
-msgid "GeoSite Database Update Error, Please Try Again Later..."
-msgstr "GeoSite 数据库下载失败，请检查网络或稍后再试..."
+msgid "No Change, Do Nothing..."
+msgstr "无变化，停止操作..."
 
-msgid "Start Downloading GeoIP Dat..."
-msgstr "开始下载 GeoIP Dat 数据库..."
+msgid "Update Error, Please Try Again Later..."
+msgstr "更新失败，请稍后再试..."
 
-msgid "GeoIP Dat Download Success, Check Updated..."
-msgstr "GeoIP Dat 数据库下载成功，检查数据库版本是否更新..."
-
-msgid "GeoIP Dat Has Been Updated, Starting To Replace The Old Version..."
-msgstr "GeoIP Dat 数据库版本有更新，开始替换数据库版本..."
-
-msgid "GeoIP Dat Update Successful!"
-msgstr "GeoIP Dat 数据库更新成功！"
-
-msgid "Updated GeoIP Dat No Change, Do Nothing..."
-msgstr "GeoIP Dat 数据库版本没有更新，停止继续操作..."
-
-msgid "GeoIP Dat Update Error, Please Try Again Later..."
-msgstr "GeoIP Dat 数据库下载失败，请检查网络或稍后再试..."
-
-msgid "Start Downloading Geoip Database..."
-msgstr "开始下载 GEOIP 数据库..."
-
-msgid "Geoip Database Download Success, Check Updated..."
-msgstr "GEOIP 数据库下载成功，检查数据库版本是否更新..."
-
-msgid "Geoip Database Has Been Updated, Starting To Replace The Old Version..."
-msgstr "GEOIP 数据库版本有更新，开始替换数据库版本..."
-
-msgid "Geoip Database Update Successful!"
-msgstr "GEOIP 数据库更新成功！"
-
-msgid "Updated Geoip Database No Change, Do Nothing..."
-msgstr "GEOIP 数据库版本没有更新，停止继续操作..."
-
-msgid "Geoip Database Update Error, Please Try Again Later..."
-msgstr "GEOIP 数据库下载失败，请检查网络或稍后再试..."
-
-msgid "Start Downloading Geo ASN Database..."
-msgstr "开始下载 GEO ASN 数据库..."
-
-msgid "Geo ASN Database Download Success, Check Updated..."
-msgstr "GEO ASN 数据库下载成功，检查数据库版本是否更新..."
-
-msgid "Geo ASN Database Has Been Updated, Starting To Replace The Old Version..."
-msgstr "GEO ASN 数据库版本有更新，开始替换数据库版本..."
-
-msgid "Geo ASN Database Update Successful!"
-msgstr "GEO ASN 数据库更新成功！"
-
-msgid "Updated Geo ASN Database No Change, Do Nothing..."
-msgstr "GEO ASN 数据库版本没有更新，停止继续操作..."
-
-msgid "Geo ASN Database Update Error, Please Try Again Later..."
-msgstr "GEO ASN 数据库下载失败，请检查网络或稍后再试..."
+msgid "Start Downloading Database..."
+msgstr "开始下载数据库..."
 
 msgid "Start Getting"
 msgstr "开始获取"
@@ -1758,8 +1854,8 @@ msgstr "检测到 GEOSITE 数据库文件不存在，准备开始下载..."
 msgid "Detected that the GEOIP Dat is not Installed, Ready to Download..."
 msgstr "检测到 GEOIP Dat 数据库文件不存在，准备开始下载..."
 
-msgid "Detected that the Core is not Installed, Ready to Download..."
-msgstr "检测到内核文件不存在，准备开始下载..."
+msgid "Core is not Detected installed, Ready to Download..."
+msgstr "内核不存在，准备开始下载..."
 
 msgid "Detected that the Chnroute Cidr is not Installed, Ready to Download..."
 msgstr "检测到大陆白名单列表不存在，准备开始下载..."
@@ -1953,6 +2049,9 @@ msgstr "配置文件解析失败，"
 msgid "Edit Provider Path Failed,"
 msgstr "修改集路径失败，"
 
+msgid "Edit Provider CDN Failed,"
+msgstr "修改集 CDN 地址失败，"
+
 msgid "Edit URL-Test Group Tolerance Option Failed,"
 msgstr "修改 URL-Test 策略组容忍值失败，"
 
@@ -1974,8 +2073,8 @@ msgstr "切换成功！"
 msgid "switching failed!"
 msgstr "切换失败！"
 
-msgid "Current Config File"
-msgstr "当前配置文件"
+msgid "Current Config"
+msgstr "当前配置"
 
 msgid "Up"
 msgstr "上传"
@@ -2016,6 +2115,12 @@ msgstr "点击测试"
 msgid "Connection Test"
 msgstr "连接测试"
 
+msgid "Connection Test Result"
+msgstr "连接测试结果"
+
+msgid "Backing up..."
+msgstr "正在备份..."
+
 msgid "Backup File"
 msgstr "备份文件"
 
@@ -2037,10 +2142,10 @@ msgstr "3. 可能是 DNS 未劫持成功，导致 Clash 无法正确反推出域
 msgid "4. It may be that the filled address cannot be resolved and connected"
 msgstr "4. 可能是所填地址无法进行解析和连接"
 
-msgid "OpenClash Log"
+msgid "Plugin Logs"
 msgstr "插件日志"
 
-msgid "Core Log"
+msgid "Core Logs"
 msgstr "内核日志"
 
 msgid "Append Upstream DNS"
@@ -2063,6 +2168,9 @@ msgstr "被修改，暂停快速启动..."
 
 msgid "Click to Update"
 msgstr "点击更新规则"
+
+msgid "Click to Install"
+msgstr "点击安装"
 
 msgid "Persistence Fake-IP"
 msgstr "Fake-IP 持久化"
@@ -2109,77 +2217,11 @@ msgstr "解锁区域筛选"
 msgid "Unlock Nodes Filter"
 msgstr "解锁节点筛选"
 
-msgid "Start Auto Select Proxy For Netflix Unlock..."
-msgstr "开始自动选择（检测）Netflix 解锁节点..."
+msgid "Start Auto Select Unlock Proxy..."
+msgstr "开始自动选择（检测）解锁节点..."
 
-msgid "Start Auto Select Proxy For Disney Plus Unlock..."
-msgstr "开始自动选择（检测）Disney Plus 解锁节点..."
-
-msgid "Start Auto Select Proxy For HBO Max Unlock..."
-msgstr "开始自动选择（检测）HBO Max 解锁节点..."
-
-msgid "Start Auto Select Proxy For YouTube Premium Unlock..."
-msgstr "开始自动选择（检测）YouTube Premium 解锁节点..."
-
-msgid "Start Auto Select Proxy For TVB Anywhere+ Unlock..."
-msgstr "开始自动选择（检测）TVB Anywhere+ 解锁节点..."
-
-msgid "Start Auto Select Proxy For Amazon Prime Video Unlock..."
-msgstr "开始自动选择（检测）Amazon Prime Video 解锁节点..."
-
-msgid "Start Auto Select Proxy For DAZN Unlock..."
-msgstr "开始自动选择（检测）DAZN 解锁节点..."
-
-msgid "Start Auto Select Proxy For Paramount Plus Unlock..."
-msgstr "开始自动选择（检测）Paramount Plus 解锁节点..."
-
-msgid "Start Auto Select Proxy For Discovery Plus Unlock..."
-msgstr "开始自动选择（检测）Discovery Plus 解锁节点..."
-
-msgid "Start Auto Select Proxy For Bilibili Unlock..."
-msgstr "开始自动选择（检测）Bilibili 解锁节点..."
-
-msgid "Start Auto Select Proxy For Google Not CN Unlock..."
-msgstr "开始自动选择（检测）Google 非送中节点..."
-
-msgid "Start Auto Select Proxy For OpenAI Unlock..."
-msgstr "开始自动选择（检测）OpenAI 解锁节点..."
-
-msgid "Netflix Group:"
-msgstr "Netflix 策略组："
-
-msgid "Disney Plus Group:"
-msgstr "Disney Plus 策略组："
-
-msgid "HBO Max Group:"
-msgstr "HBO Max 策略组："
-
-msgid "TVB Anywhere+ Group:"
-msgstr "TVB Anywhere+ 策略组："
-
-msgid "Amazon Prime Video Group:"
-msgstr "Amazon Prime Video 策略组："
-
-msgid "YouTube Premium Group:"
-msgstr "YouTube Premium 策略组："
-
-msgid "DAZN Group:"
-msgstr "DAZN 策略组："
-
-msgid "Paramount Plus Group:"
-msgstr "Paramount Plus 策略组："
-
-msgid "Discovery Plus Group:"
-msgstr "Discovery Plus 策略组："
-
-msgid "Bilibili Group:"
-msgstr "Bilibili 策略组："
-
-msgid "Google Group:"
-msgstr "Google 策略组："
-
-msgid "OpenAI Group:"
-msgstr "OpenAI 策略组："
+msgid "Group:"
+msgstr "策略组："
 
 msgid "full support"
 msgstr "完整解锁"
@@ -2190,7 +2232,7 @@ msgstr "完整解锁，区域："
 msgid "only support homemade!"
 msgstr "仅支持自制剧！"
 
-msgid "unlock test faild!"
+msgid "unlock test failed!"
 msgstr "解锁检测失败！"
 
 msgid ", the type of group is not select, auto select could not work!"
@@ -2202,13 +2244,13 @@ msgstr "开始进行解锁节点自动选择..."
 msgid "only support homemade! the type of group is not select, auto select could not work!"
 msgstr "仅支持自制剧！当前策略组类型非 Select，无法进行自动选择！"
 
-msgid "unlock test faild! the type of group is not select, auto select could not work!"
+msgid "unlock test failed! the type of group is not select, auto select could not work!"
 msgstr "解锁检测失败！当前策略组类型非 Select，无法进行自动选择！"
 
 msgid "only support homemade! start auto select unlock proxy..."
 msgstr "仅支持自制剧！开始进行解锁节点自动选择..."
 
-msgid "unlock test faild! start auto select unlock proxy..."
+msgid "unlock test failed! start auto select unlock proxy..."
 msgstr "解锁检测失败！开始进行解锁节点自动选择..."
 
 msgid "It Will Be Searched According To The Regex When Auto Search Group Fails"
@@ -2292,11 +2334,14 @@ msgstr "旁路网关（旁路由）模式下网络无法连接时请尝试启用
 msgid "Suggestion: If The Device Does Not Have WLAN, Please Disable The Lan Interface's Bridge Option"
 msgstr "建议：如果设备没有 WLAN，请禁用 Lan 接口的桥接接口选项"
 
-msgid "Github Address Modify"
-msgstr "Github 地址修改"
+msgid "GitHub Address Proxy"
+msgstr "GitHub 地址代理"
 
-msgid "Modify The Github Address In The Config And OpenClash With Proxy(CDN) To Prevent File Download Faild. Format Reference:"
-msgstr "使用指定代理（CDN）反代插件和配置文件中的 Github 地址，以防止文件下载失败，格式参考："
+msgid "Proxy The GitHub Address In The Config And OpenClash With Proxy(CDN) To Prevent File Download Failed."
+msgstr "使用指定代理（CDN）反代插件和配置文件中的 GitHub 地址，以防止文件下载失败。"
+
+msgid "Format Reference:"
+msgstr "格式参考："
 
 msgid "File Edit"
 msgstr "文件编辑"
@@ -2346,6 +2391,15 @@ msgstr "清理"
 msgid "Flush DNS"
 msgstr "清理 DNS 缓存"
 
+msgid "Dnsmasq Fix"
+msgstr "Dnsmasq 修复"
+
+msgid "If DNS is abnormal after stopping the OpenClash, please try to fix"
+msgstr "如果关闭 OpenClash 后 DNS 异常，请尝试修复"
+
+msgid "Fix"
+msgstr "修复"
+
 msgid "No Specify Upload File"
 msgstr "未选择上传文件"
 
@@ -2354,6 +2408,15 @@ msgstr "自定义参数"
 
 msgid "eg: \"rename=match@replace\" , \"rename=\\s+([2-9])[xX]@ (HIGH:$1)\""
 msgstr "格式示例：\"rename=match@replace\" , \"rename=\\s+([2-9])[xX]@ (高倍率:$1)\""
+
+msgid "Custom Headers"
+msgstr "自定义请求头"
+
+msgid "Custom HTTP request headers, one per line, format: Header-Name: value"
+msgstr "自定义 HTTP 请求头，每行一个，格式：Header-Name: value"
+
+msgid "eg: x-hwid: device-001, one header per line, format: Name: value"
+msgstr "例如：x-hwid: device-001，每行一个请求头，格式：Name: value"
 
 msgid "Use Rule Provider"
 msgstr "使用规则集"
@@ -2378,6 +2441,12 @@ msgstr "解锁检测(选择)"
 
 msgid "All Proxies Test"
 msgstr "测试所有节点"
+
+msgid "Unlock Test Result"
+msgstr "解锁检测结果"
+
+msgid "All Proxies Test Result"
+msgstr "所有节点测试结果"
 
 msgid "Something Wrong While Testing..."
 msgstr "发生了一些错误，测试失败..."
@@ -2437,7 +2506,7 @@ msgid "Geodata Loader Mode"
 msgstr "Geodata 数据加载方式"
 
 msgid "Memconservative"
-msgstr "小内存模式"
+msgstr "低内存模式"
 
 msgid "Standard"
 msgstr "标准模式"
@@ -2664,8 +2733,8 @@ msgstr "TUN 接口启动失败，尝试重启内核..."
 msgid "Core Start Failed, Please Check The Log Infos!"
 msgstr "内核启动失败，请查看《内核日志》排查失败原因！"
 
-msgid "Core Status Abnormal, Please Check The Log Infos!"
-msgstr "内核状态异常，请查看《内核日志》排查异常原因！"
+msgid "Core Initial Configuration Timeout, Please Check The Log Infos!"
+msgstr "内核加载配置超时，请查看《内核日志》排查原因！"
 
 msgid "Forced Sniff Pure IP Connections"
 msgstr "强制探测（嗅探）所有纯 IP 的连接"
@@ -2718,18 +2787,6 @@ msgstr "是否启用进程规则，仅能匹配路由器自身进程，在路由
 msgid "Enable Process Rule"
 msgstr "启用进程规则"
 
-msgid "Because there is a port range"
-msgstr "因为端口范围"
-
-msgid "in the firewall rule settings"
-msgstr "存在于防火墙规则设置"
-
-msgid "auto bypassing may cause the normal connection of the client not to reach the core, if necessary, please add your own in the access control!"
-msgstr "自动绕过后可能造成客户端的正常连接无法到达内核，如有需要，请在插件设置-来源流量访问控制中自行添加！"
-
-msgid "Start Add Port Bypassing Rules For Firewall Redirect and Firewall Rules..."
-msgstr "正在根据防火墙端口转发和防火墙通信规则添加端口绕过规则..."
-
 msgid "DNS Hijacking Mode is Dnsmasq Redirect..."
 msgstr "DNS 劫持模式为 Dnsmasq 转发..."
 
@@ -2765,6 +2822,9 @@ msgstr "还原"
 
 msgid "DNS Test"
 msgstr "DNS 测试"
+
+msgid "DNS Test Result"
+msgstr "DNS 测试结果"
 
 msgid "No Response Found!"
 msgstr "结果获取失败！"
@@ -2856,7 +2916,7 @@ msgstr "测试失败..."
 msgid "test is successful"
 msgstr "测试成功..."
 
-msgid "Config File Tested Faild, Please Check The Log Infos!"
+msgid "Config File Tested Failed, Please Check The Log Infos!"
 msgstr "配置文件测试失败，请查看《内核日志》排查失败原因！"
 
 msgid "Test The Config File First..."
@@ -2864,6 +2924,21 @@ msgstr "启动前调用内核测试配置文件..."
 
 msgid "Other Parameters"
 msgstr "其他附加配置"
+
+msgid "Empty URL"
+msgstr "URL 为空"
+
+msgid "Only HTTP/HTTPS URLs are supported"
+msgstr "仅支持 HTTP/HTTPS 链接"
+
+msgid "Invalid URL format"
+msgstr "无效的 URL 格式"
+
+msgid "URL missing hostname"
+msgstr "URL 缺少主机名"
+
+msgid "Invalid URL on line"
+msgstr "无效的 URL"
 
 msgid "Edit Your Other Parameters Here"
 msgstr "请在此编辑您的附加配置"
@@ -2877,14 +2952,26 @@ msgstr "*启用统一延迟"
 msgid "Change The Delay Calculation Method To Remove Extra Delays Such as Handshaking"
 msgstr "更换延迟计算方式，通过去除握手等额外开销来降低延迟数值"
 
-msgid "If the download fails, try setting the CDN in Overwrite Settings - General Settings - Github Address Modify Options"
-msgstr "如果下载失败，您可以尝试在覆写设置 - 常规设置 - Github 地址修改选项中设置 CDN"
+msgid "If the download fails, try setting the CDN in Overwrite Settings - General Settings - GitHub Address Proxy Options"
+msgstr "如果下载失败，您可以尝试在覆写设置 - 常规设置 -  GitHub 地址代理中设置 CDN"
 
-msgid "Used for Downloading Subscriptions, Defaults to Clash"
-msgstr "用于下载订阅时指定 UA，默认为 Clash"
+msgid "Used for Downloading Subscriptions, Defaults to"
+msgstr "用于下载订阅时指定 UA，默认为"
 
-msgid "Set Proxies Address Skip Failed,"
-msgstr "绕过代理服务器地址设置失败，"
+msgid "Set Proxies Address Skip: Bypass"
+msgstr "绕过代理服务器地址设置：跳过"
+
+msgid "Set Proxies Address Skip: Failed"
+msgstr "绕过代理服务器地址设置：失败"
+
+msgid "Failed to parse config file with Lua helper"
+msgstr "绕过代理服务器地址解析失败"
+
+msgid "File is AGE encrypted but no secret key provided"
+msgstr "文件已 Age 加密但未提供密钥"
+
+msgid "File is AGE encrypted, cannot parse with Lua"
+msgstr "文件已 Age 加密，无法使用 Lua 解析"
 
 msgid "Flush Failed"
 msgstr "清理失败"
@@ -3097,16 +3184,13 @@ msgid "Failed to create update script!"
 msgstr "创建插件升级进程失败！"
 
 msgid "Attempting to start update service..."
-msgstr "正在启动插件升级进程..."
+msgstr "正在启动升级进程..."
 
 msgid "Service start failed, retrying in 2 seconds..."
-msgstr "插件升级进程启动失败，将在 2 秒后重试..."
+msgstr "插件升级进程启动失败，将在2秒后重试..."
 
 msgid "Failed to start update service after 3 attempts, please check and try again later..."
-msgstr "插件升级进程启动失败，请检查日志并稍后再试..."
-
-msgid "Core Update"
-msgstr "内核版本更新"
+msgstr "升级进程启动失败，请稍后再试..."
 
 msgid "View core infos that support smart group"
 msgstr "查看支持 smart 策略组的内核信息"
@@ -3228,6 +3312,21 @@ msgstr "下载进度："
 msgid "Downloading..."
 msgstr "下载中..."
 
+msgid "Downloading config..."
+msgstr "正在下载配置..."
+
+msgid "Downloading core..."
+msgstr "正在下载内核..."
+
+msgid "Fetching subscription..."
+msgstr "正在获取订阅..."
+
+msgid "Logging in..."
+msgstr "正在登录..."
+
+msgid "Saving token..."
+msgstr "正在保存令牌..."
+
 msgid "Sniff the domain name of the traffics to avoid rule-based proxy failure"
 msgstr "嗅探流量的域名信息，避免基于规则的代理失败"
 
@@ -3318,6 +3417,9 @@ msgstr "文件名包含无效字符"
 msgid "Uploading..."
 msgstr "上传中..."
 
+msgid "Generating..."
+msgstr "生成中..."
+
 msgid "Upload completed"
 msgstr "上传完成"
 
@@ -3393,12 +3495,6 @@ msgstr "正在加载配置文件..."
 msgid "Ready"
 msgstr "就绪"
 
-msgid "Press F11 for fullscreen, Esc to exit fullscreen, Ctrl+Mouse Wheel to zoom"
-msgstr "按 F11 全屏，Esc 退出全屏，Ctrl+ 鼠标滚轮缩放"
-
-msgid "Press F10 to toggle differences, F11 for fullscreen, Esc to exit fullscreen, Ctrl+Mouse Wheel to zoom"
-msgstr "按 F10 显示 Diff，F11 全屏，Esc 退出全屏，Ctrl+ 鼠标滚轮缩放"
-
 msgid "Compare mode: left(Original Config), right(Runtime Config)"
 msgstr "对比模式：左侧（原始配置），右侧（运行配置）"
 
@@ -3432,9 +3528,6 @@ msgstr "配置文件保存失败："
 msgid "Unknown error"
 msgstr "未知错误"
 
-msgid "Save config failed:"
-msgstr "配置保存失败："
-
 msgid "Editor not ready"
 msgstr "编辑器未准备就绪"
 
@@ -3453,11 +3546,8 @@ msgstr "重启"
 msgid "No Config Selected"
 msgstr "未选择配置"
 
-msgid "Modified: "
-msgstr "修改时间："
-
-msgid "Update Time: "
-msgstr "更新时间："
+msgid "Modified"
+msgstr "修改时间"
 
 msgid "No Config Files Found"
 msgstr "未找到配置文件"
@@ -3528,8 +3618,14 @@ msgstr "获取订阅配置失败"
 msgid "Expire Date"
 msgstr "到期时间"
 
-msgid "RAW address"
-msgstr "原始地址"
+msgid "RAW"
+msgstr "RAW"
+
+msgid "Address"
+msgstr "地址"
+
+msgid "Timeout"
+msgstr "超时"
 
 msgid "Enter custom User-Agent"
 msgstr "输入自定义 User-Agent"
@@ -3584,6 +3680,9 @@ msgstr "高级选项"
 
 msgid "Show more subscription options"
 msgstr "显示更多订阅设置"
+
+msgid "Show more upload options"
+msgstr "显示更多上传设置"
 
 msgid "Overwrite"
 msgstr "覆写"
@@ -3780,6 +3879,12 @@ msgstr "编辑模块信息"
 msgid "Subscription"
 msgstr "订阅"
 
+msgid "HTTP Module"
+msgstr "远程模块"
+
+msgid "File Module"
+msgstr "本地模块"
+
 msgid "Overwrite Module"
 msgstr "覆写模块"
 
@@ -3787,7 +3892,7 @@ msgid "module not found, please check your system depends if something abnormal!
 msgstr "模块未找到，如遇到异常请检查您的固件依赖！"
 
 msgid "Select Nodes Force Lookup and Use Target ASN Info First For More Stable Experience"
-msgstr "选择节点时强制查找并优先使用目标的 ASN 信息，以获得更稳定的体验"
+msgstr "选择节点时强制 DNS 查询并优先使用目标的 ASN 信息，以获得更稳定的体验"
 
 msgid "Prefer-ASN"
 msgstr "ASN 优先"
@@ -3828,9 +3933,6 @@ msgstr "禁止连接复用"
 msgid "Write file failed:"
 msgstr "写入文件失败："
 
-msgid "Fix short-id values type failed:"
-msgstr "修改 short-id 值类型失败："
-
 msgid "Interface"
 msgstr "接口"
 
@@ -3840,5 +3942,420 @@ msgstr "用户"
 msgid "Serial Number"
 msgstr "序号"
 
+msgid "Enter YAML configuration..."
+msgstr "请输入 YAML 配置..."
+
+msgid "Enter shell script..."
+msgstr "请输入 Shell 脚本..."
+
+msgid "Enter configuration..."
+msgstr "请输入配置..."
+
+msgid "Edit original config..."
+msgstr "编辑原始配置..."
+
+msgid "Runtime config (read only)"
+msgstr "运行配置（只读）"
+
 msgid "Set Custom Overwrite Script Failed,"
 msgstr "自定义覆写命令执行失败，"
+
+msgid "Load YAML Override Block"
+msgstr "加载 YAML 覆写模块"
+
+msgid "Invalid YAML Override format, skipped..."
+msgstr "无效的 YAML 覆写格式，跳过..."
+
+msgid "Parse YAML Override failed:"
+msgstr "YAML 覆写模块解析失败："
+
+msgid "files selected"
+msgstr "配置已选择"
+
+msgid "Global User-Agent"
+msgstr "全局 User-Agent"
+
+msgid "depended package reinstalling..."
+msgstr "依赖正在重新安装..."
+
+msgid "failed to install:"
+msgstr "依赖安装失败:"
+
+msgid ", please try to install it manually..."
+msgstr "，请重试手动安装..."
+
+msgid "Decrypted content empty or still encrypted"
+msgstr "解密后内容为空或仍为加密状态"
+
+msgid "Decrypt attempt failed:"
+msgstr "解密尝试失败:"
+
+msgid "Decrypt attempt failed for a found secret:"
+msgstr "使用找到的私钥解密尝试失败:"
+
+msgid "Encrypt attempt failed:"
+msgstr "加密尝试失败:"
+
+msgid "oixCloud Website"
+msgstr "官方网站"
+
+msgid "Login..."
+msgstr "登录中..."
+
+msgid "Logout..."
+msgstr "退出中..."
+
+msgid "Checkin..."
+msgstr "签到中..."
+
+msgid "oixCloud Login Successful"
+msgstr "oixCloud 登录成功"
+
+msgid "Note: oixCloud need a specific core installed, OpenClash will auto download, After the core start, an oixCloud nodes provider will be added, which you can customize as needed"
+msgstr "注意：oixCloud 需要安装专用内核才能使用，插件会自动识别并进行内核下载，专用内核启动后，会添加一个 oixCloud 节点组到配置文件，供您自定义使用"
+
+msgid "oixCloud Login Failed"
+msgstr "oixCloud 登录失败"
+
+msgid "Login Account"
+msgstr "登录账号"
+
+msgid "oixCloud Logout Successful"
+msgstr "oixCloud 已成功退出"
+
+msgid "oixCloud Logout Failed"
+msgstr "oixCloud 退出失败"
+
+msgid "Logout Account"
+msgstr "退出账号"
+
+msgid "Account Login"
+msgstr "账号登录"
+
+msgid "Simple & trustworthy"
+msgstr "简单 & 值得信赖"
+
+msgid "Cross-platform Support"
+msgstr "丰富的第三方应用兼容性"
+
+msgid "Global Acceleration Network"
+msgstr "全球网络基础设施"
+
+msgid "Easy to Use"
+msgstr "操作简易"
+
+msgid "Intelligent Shunting"
+msgstr "智能分流"
+
+msgid "Perfect Technical Support"
+msgstr "完善技术支持"
+
+msgid "Plan Expiration Time"
+msgstr "到期时间"
+
+msgid "Account Balances"
+msgstr "账户余额"
+
+msgid "Aff Balances"
+msgstr "返利余额"
+
+msgid "Account Integral"
+msgstr "账户积分"
+
+msgid "Today Used"
+msgstr "今日已用"
+
+msgid "Plan Used"
+msgstr "本月已用"
+
+msgid "Plan Unused"
+msgstr "剩余流量"
+
+msgid "Plan Traffic"
+msgstr "套餐流量"
+
+msgid "oixCloud Account Login Failed! Please Check And Try Again..."
+msgstr "oixCloud 账户登录失败！请检查账户信息并重试..."
+
+msgid "oixCloud Account Login Failed, The Error Info is"
+msgstr "oixCloud 账户登录失败，错误信息"
+
+msgid "invalid token"
+msgstr "无效的令牌"
+
+msgid "login failed"
+msgstr "登录失败"
+
+msgid "email or passwd is wrong"
+msgstr "邮箱或密码错误"
+
+msgid "oixCloud Checkin Failed! Please Check And Try Again..."
+msgstr "oixCloud 签到失败，请稍后再试！"
+
+msgid "Account Email Address"
+msgstr "账号地址"
+
+msgid "Account Password"
+msgstr "账号密码"
+
+msgid "Checkin Multiple"
+msgstr "签到倍数"
+
+msgid "Optional Parameters"
+msgstr "可选项参数"
+
+msgid "Optional parameters saved"
+msgstr "可选项参数已保存"
+
+msgid "Failed to save optional parameters, please try again"
+msgstr "可选项参数保存失败，请重试"
+
+msgid "For more information, please visit the"
+msgstr "如需查看更多信息，请前往"
+
+msgid "official documentation"
+msgstr "官方文档"
+
+msgid "Must start with &"
+msgstr "必须以 & 开头"
+
+msgid "Params must not contain spaces"
+msgstr "参数不能包含空格"
+
+msgid "Params too long, max 8192 characters"
+msgstr "参数过长，最多 8192 个字符"
+
+msgid "Invalid params format"
+msgstr "参数格式无效"
+
+msgid "Invalid params format, must start with & and use key=value pairs"
+msgstr "参数格式无效，必须以 & 开头并使用 key=value 键值对"
+
+msgid "Params too long"
+msgstr "参数过长"
+
+msgid "Usage Help"
+msgstr "使用帮助"
+
+msgid "Click to get usage help"
+msgstr "点击获取使用帮助"
+
+msgid "Copy the following text to any AI (ChatGPT, DeepSeek, etc.) to get usage help for OpenClash:"
+msgstr "将以下文本复制到任意 AI 工具（ChatGPT、DeepSeek 等），即可获取 OpenClash 的使用帮助："
+
+msgid "OpenClash Expert Assistant"
+msgstr "OpenClash 专家助手"
+
+msgid "The guide is the single source of truth — it covers everything from debug log procedures to external resource queries. Do NOT rely on memory; always verify against the guide."
+msgstr "指南是唯一权威来源 —— 涵盖从调试日志流程到外部资源查询的所有内容。禁止凭记忆回答，必须对照指南验证。"
+
+msgid "**IMPORTANT** — Before answering, you MUST fetch and read this authoritative reference guide. ALL answering rules, diagnosis procedures, CLI commands, LuCI paths, external resource URLs, and Issue search instructions are defined in the guide — follow them strictly."
+msgstr "**重要** —— 在回答之前，你必须获取并阅读这份权威参考指南。所有回答规则、诊断流程、CLI 命令、LuCI 路径、外部资源 URL 和 Issue 搜索指引均在指南中定义 —— 请严格遵守。"
+
+msgid "External Resources (when beyond the guide's scope)"
+msgstr "外部资源（超出指南范围时）"
+
+msgid "Question"
+msgstr "问题"
+
+msgid "You are an OpenClash expert assistant. OpenClash is a LuCI plugin for OpenWrt that manages the Mihomo core."
+msgstr "你是 OpenClash 专家助手。OpenClash 是 OpenWrt 上管理 Mihomo 内核的 LuCI 插件。"
+
+msgid "OpenClash User Guide"
+msgstr "OpenClash 用户指南"
+
+msgid "This guide contains: AI behavior rules with diagnosis priority, complete dependency checklist, error message lookup tables with exact fixes, nftables/iptables firewall chain rules, all LuCI configuration options with UCI paths, CLI commands and API reference, DNS setup and leak prevention, subscription/GEO update procedures, and more."
+msgstr "本指南包含：AI 行为规则与诊断优先级、完整依赖清单、含精确修复方案的错误信息速查表、nftables/iptables 防火墙规则链、所有 LuCI 配置选项及 UCI 路径、命令行与 API 参考、DNS 设置与泄露防护、订阅/GEO 更新流程等。"
+
+msgid "When I report any problem or error (cannot access internet, DNS failure, startup failure, connection timeout, etc.), FIRST ask me to generate a debug log — either via LuCI (**Server Logs → Debug Logs → Generate Logs**) or SSH (`/usr/share/openclash/openclash_debug.sh`). The debug log contains dependency checks, configuration, firewall rules, and system info in one step — do NOT ask me to check things individually. (Note: this rule does NOT apply to feature configuration questions like \"how do I enable X?\" — see rule 3 for those.)"
+msgstr "当我报告任何故障或错误（无法上网、DNS 异常、启动失败、连接超时等）时，**首先**要求我生成调试日志 —— 通过 LuCI（**运行日志 → 调试日志 → 生成日志**）或 SSH（`/usr/share/openclash/openclash_debug.sh`）。调试日志一步包含依赖检查、配置、防火墙规则和系统信息 —— **不要**让我逐项检查。（注意：此规则**不适用**于功能配置类问题如「如何开启 XX？」—— 此类问题请参见规则 3。）"
+
+msgid "If the debug log is insufficient to pinpoint the issue, give me precise diagnostic commands to run on the router and ask me to paste back the output."
+msgstr "如果调试日志不足以定位问题，给我精确的诊断命令在路由器上执行，并让我粘贴输出结果。"
+
+msgid "For feature configuration and post-diagnosis fixes, provide LuCI web UI navigation paths (e.g. **Services → OpenClash → Plugin Settings**). Only give command-line when LuCI is unavailable or I explicitly ask for it."
+msgstr "对于功能配置和诊断后的修复，提供 LuCI Web 界面操作路径（如 **服务 → OpenClash → 插件设置**）。仅在 LuCI 不可用或我明确要求时才提供命令行。"
+
+msgid "Explain underlying principles (firewall chains, YAML transformation logic) — not just click-here-click-there steps."
+msgstr "解释底层原理（防火墙规则链、YAML 转换逻辑）—— 而不只是点击步骤。"
+
+msgid "If the guide does not cover something, actively query these resources — never guess or fabricate information:"
+msgstr "如果指南未覆盖某项内容，请主动查询这些资源 —— 绝不猜测或编造信息："
+
+msgid "Mihomo Wiki"
+msgstr "Mihomo Wiki"
+
+msgid "Meta-Docs"
+msgstr "Meta-Docs"
+
+msgid "OpenClash source"
+msgstr "OpenClash 源码"
+
+msgid "Mihomo core source"
+msgstr "Mihomo 核心源码"
+
+msgid "Smart core source"
+msgstr "Smart 核心源码"
+
+msgid "Fetch Wiki pages to read docs; search repos to find implementation code. Do NOT answer from memory — always verify against the actual source."
+msgstr "抓取 Wiki 页面阅读文档；搜索仓库查找实现代码。禁止凭记忆回答 —— 必须对照实际来源验证。"
+
+msgid "For bug reports or failure scenarios not covered by the guide, search GitHub Issues first:"
+msgstr "对于指南未覆盖的 bug 报告或故障场景，优先搜索 GitHub Issues："
+
+msgid "OpenClash Issues (config/subscribe/firewall/UI)"
+msgstr "OpenClash Issues（配置/订阅/防火墙/UI）"
+
+msgid "Mihomo Issues (proxy protocols/TUN/DNS/rule engine)"
+msgstr "Mihomo Issues（代理协议/TUN/DNS/规则引擎）"
+
+msgid "Prioritize maintainer replies and highly upvoted community answers in Issues."
+msgstr "优先参考 Issues 中维护者的回复和高赞社区答案。"
+
+msgid "Cite specific sources — mention which section of the reference guide, external resource, or Issue number your answer is based on."
+msgstr "注明具体来源 —— 说明你的回答基于参考指南的哪个章节、哪个外部资源或哪个 Issue 编号。"
+
+msgid "If my problem description is incomplete or lacks error messages, ask me to generate a debug log first (**Server Logs → Debug Logs → Generate Logs**) — do NOT speculate about the cause."
+msgstr "如果我的问题描述不完整或缺少错误信息，请先要求我生成调试日志（**运行日志 → 调试日志 → 生成日志**）—— 不要猜测原因。"
+
+msgid "My question is:"
+msgstr "我的问题是："
+
+msgid "Copied!"
+msgstr "已复制！"
+
+msgid "oixCloud Checkin Successful, Result:"
+msgstr "oixCloud 签到成功，结果："
+
+msgid "oixCloud Checkin Failed, Result:"
+msgstr "oixCloud 签到失败，结果："
+
+msgid "Checking backend version..."
+msgstr "正在检测后端版本..."
+
+msgid "Backend Version"
+msgstr "后端版本"
+
+msgid "Please enter backend URL"
+msgstr "请输入后端地址"
+
+msgid "Invalid backend URL"
+msgstr "后端地址格式无效"
+
+msgid "Backend version information not detected"
+msgstr "未识别到后端版本信息"
+
+msgid "Unable to detect backend version"
+msgstr "无法检测后端版本"
+
+msgid "Token Login"
+msgstr "Token 登录"
+
+msgid "Please enter your oixCloud token"
+msgstr "请输入您的 oixCloud Token"
+
+msgid "Show Password"
+msgstr "显示密码"
+
+msgid "Hide Password"
+msgstr "隐藏密码"
+
+msgid "Show Token"
+msgstr "显示 Token"
+
+msgid "Hide Token"
+msgstr "隐藏 Token"
+
+msgid "Token login does not require email and password"
+msgstr "Token 登录无需填写邮箱和密码"
+
+msgid "Please enter email address"
+msgstr "请输入邮箱地址"
+
+msgid "Please enter a valid email address"
+msgstr "请输入有效的邮箱地址"
+
+msgid "Please enter password"
+msgstr "请输入密码"
+
+msgid "Please enter a valid token"
+msgstr "请输入有效的 Token"
+
+msgid "Checkin"
+msgstr "试试手气"
+
+msgid "Auto Checkin"
+msgstr "自动签到"
+
+msgid "Auto check in for oixCloud account daily bonus"
+msgstr "自动签到来获取 oixCloud 每日奖励"
+
+msgid "Auto check-in for traffic rewards and penalties"
+msgstr "自动签到来获取流量奖励（惩罚）"
+
+msgid "Multiple Must Be a Positive Integer and No More Than 100"
+msgstr "倍数必须是正整数且不大于 100"
+
+msgid "Checkin Interval"
+msgstr "签到间隔"
+
+msgid "Hours"
+msgstr "小时"
+
+msgid "Checkin interval must be between 1 and 720"
+msgstr "签到间隔必须为 1 到 720 小时之间的整数"
+
+msgid "Checkin settings saved"
+msgstr "签到设置已保存"
+
+msgid "Failed to save checkin settings, please try again"
+msgstr "签到设置保存失败，请重试"
+
+msgid "Network request failed, please check your connection and try again"
+msgstr "网络请求失败，请检查网络连接后重试"
+
+msgid "Server response error, please try again later"
+msgstr "服务器响应异常，请稍后重试"
+
+msgid "Show on Overview"
+msgstr "主页显示"
+
+msgid "Display oixCloud account info on the overview page"
+msgstr "在概览页面显示 oixCloud 账户信息"
+
+msgid "Display account info on the main page"
+msgstr "在主页显示账户信息"
+
+msgid "Setting saved"
+msgstr "设置已保存"
+
+msgid "Announcement"
+msgstr "公告"
+
+msgid "oixCloud Login Failed:"
+msgstr "oixCloud 登录失败："
+
+msgid "oixCloud Logout Failed:"
+msgstr "oixCloud 退出失败："
+
+msgid "Checkin Failed:"
+msgstr "签到失败："
+
+msgid "Fetching data..."
+msgstr "数据获取中..."
+
+msgid "Click"
+msgstr "点击"
+
+msgid "link"
+msgstr "链接"
+
+msgid "to update all, click"
+msgstr "可同时更新，点击"
+
+msgid "version"
+msgstr "版本号"
+
+msgid "to update individually"
+msgstr "则独立更新"
+

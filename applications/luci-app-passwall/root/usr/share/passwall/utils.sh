@@ -6,7 +6,7 @@ CONFIG=passwall
 APP_PATH=/usr/share/${CONFIG}
 TMP_PATH=/tmp/etc/${CONFIG}
 TMP_PATH2=${TMP_PATH}_tmp
-LOCK_PATH=/tmp/lock
+LOCK_PATH=/var/lock
 LOG_FILE=/tmp/log/${CONFIG}.log
 TMP_ACL_PATH=${TMP_PATH}/acl
 TMP_BIN_PATH=${TMP_PATH}/bin
@@ -14,6 +14,21 @@ TMP_IFACE_PATH=${TMP_PATH}/iface
 TMP_ROUTE_PATH=${TMP_PATH}/route
 TMP_SCRIPT_FUNC_PATH=${TMP_PATH}/script_func
 RULES_PATH=/usr/share/${CONFIG}/rules
+USER_RULES_PATH=/etc/${CONFIG}/rules
+
+IPv6_REGEX="([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|"
+IPv6_REGEX="${IPv6_REGEX}([0-9a-fA-F]{1,4}:){1,7}:|"
+IPv6_REGEX="${IPv6_REGEX}([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|"
+IPv6_REGEX="${IPv6_REGEX}([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|"
+IPv6_REGEX="${IPv6_REGEX}([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|"
+IPv6_REGEX="${IPv6_REGEX}([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|"
+IPv6_REGEX="${IPv6_REGEX}([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|"
+IPv6_REGEX="${IPv6_REGEX}[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|"
+IPv6_REGEX="${IPv6_REGEX}:((:[0-9a-fA-F]{1,4}){1,7}|:)|"
+IPv6_REGEX="${IPv6_REGEX}fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|"
+IPv6_REGEX="${IPv6_REGEX}::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|"
+IPv6_REGEX="${IPv6_REGEX}([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])"
+IPv4_REGEX="((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)"
 
 . /lib/functions/network.sh
 
@@ -40,9 +55,67 @@ config_n_get() {
 	echo "${ret:=$3}"
 }
 
-config_t_set() {
+config_t_get() {
 	local index=${4:-0}
-	local ret=$(uci -q set "${CONFIG}.@${1}[${index}].${2}=${3}" 2>/dev/null)
+	local ret=$(uci -q get "${CONFIG}.@${1}[${index}].${2}" 2>/dev/null)
+	echo "${ret:=${3}}"
+}
+
+eval_set_val() {
+	for i in $@; do
+		for j in $i; do
+			eval $j
+		done
+	done
+}
+
+eval_unset_val() {
+	for i in $@; do
+		for j in $i; do
+			eval unset $j
+		done
+	done
+}
+
+lua_api() {
+	local func=${1}
+	[ -z "${func}" ] && {
+		echo "nil"
+		return
+	}
+	echo $(lua -e "local api = require 'luci.passwall.api' print(api.${func})")
+}
+
+eval_cache_var() {
+	[ -s "$TMP_PATH/var" ] && eval $(cat "$TMP_PATH/var")
+}
+
+del_cache_var() {
+	local key="${1}"
+	[ -n "${key}" ] && [ -f "${TMP_PATH}/var" ] && {
+		sed -i "/${key}=/d" $TMP_PATH/var >/dev/null 2>&1
+	}
+}
+
+set_cache_var() {
+	local key="${1}"
+	shift 1
+	[ -n "${key}" ] && {
+		del_cache_var ${key}
+		local val="$@"
+		[ -n "${val}" ] && {
+			[ ! -d $TMP_PATH ] && mkdir -p $TMP_PATH
+			echo "${key}=\"${val}\"" >> $TMP_PATH/var
+			eval ${key}=\"${val}\"
+		}
+	}
+}
+
+get_cache_var() {
+	local key="${1}"
+	[ -n "${key}" ] && [ -s "$TMP_PATH/var" ] && {
+		echo $(cat $TMP_PATH/var | grep "^${key}=" | awk -F '=' '{print $2}' | tail -n 1 | awk -F'"' '{print $2}')
+	}
 }
 
 first_type() {
@@ -84,12 +157,12 @@ get_host_ip() {
 	local isip=""
 	local ip=""
 	if [ "$1" = "ipv6" ]; then
-		isip=$(echo $host | grep -E "([A-Fa-f0-9]{1,4}::?){1,7}[A-Fa-f0-9]{1,4}")
+		isip=$(echo $host | grep -Eo "$IPv6_REGEX")
 		if [ -n "$isip" ]; then
 			ip=$(echo "$host" | tr -d '[]')
 		fi
 	else
-		isip=$(echo $host | grep -E "([0-9]{1,3}[\.]){3}[0-9]{1,3}")
+		isip=$(echo $host | grep -Eo "$IPv4_REGEX")
 		[ -n "$isip" ] && ip=$isip
 	fi
 	[ -z "$isip" ] && {
@@ -207,31 +280,9 @@ check_host() {
 	return 0
 }
 
-get_first_dns() {
-	local __hosts_val=${1}; shift 1
-	__first() {
-		[ -z "${2}" ] && return 0
-		echo "${2}#${3}"
-		return 1
-	}
-	hosts_foreach "${__hosts_val}" __first "$@"
-}
-
-get_last_dns() {
-	local __hosts_val=${1}; shift 1
-	local __first __last
-	__every() {
-		[ -z "${2}" ] && return 0
-		__last="${2}#${3}"
-		__first=${__first:-${__last}}
-	}
-	hosts_foreach "${__hosts_val}" __first "$@"
-	[ "${__first}" =  "${__last}" ] || echo "${__last}"
-}
-
 normalize_dns() {
 	local s="$1"
-	local addr port
+	local addr port="${2-}"
 	case "$s" in
 		\[*\]:*)
 			# [ip6]:port
@@ -253,18 +304,22 @@ normalize_dns() {
 			# [ip6]
 			addr="${s#\[}"
 			addr="${addr%\]}"
-			port=""
 		;;
 		*)
 			addr="$s"
-			port=""
 		;;
 	esac
-	if [ -n "$port" ]; then
-		echo "${addr}#${port}"
-	else
-		echo "$addr"
-	fi
+	[ -n "$port" ] && echo "${addr}#${port}" || echo "$addr"
+}
+
+format_dns() {
+	local dns="${1%%#*}"
+	local port="${1#*#}"
+	[ "$port" = "$1" ] && port="${2-53}"
+	case "$dns" in
+		*:*) echo "[$dns]:$port" ;;
+		*)   echo "$dns:$port" ;;
+	esac
 }
 
 check_port_exists() {
@@ -286,53 +341,42 @@ get_new_port() {
 	local default_start_port=2001
 	local min_port=1025
 	local max_port=49151
-	local port="$1"
+	local port="$1" # Required parameter; please pass "auto" if you want it to be automatic.
 	local protocol=$(echo "$2" | tr 'A-Z' 'a-z')
-	local LOCK_FILE="${LOCK_PATH}/${CONFIG}_get_prot.lock"
-	while ! mkdir "$LOCK_FILE" 2>/dev/null; do
-		sleep 0.05
-	done
+	local is_auto
 	if [ "$port" = "auto" ]; then
-		local now last_time diff last_port
-		now=$(date +%s 2>/dev/null)
-		last_time=$(get_cache_var "last_get_new_port_time")
-		if [ -n "$now" ] && [ -n "$last_time" ]; then
-			diff=$(expr "$now" - "$last_time")
-			[ "$diff" -lt 0 ] && diff=$(expr 0 - "$diff")
+		is_auto=1
+		local last_get_new_port_auto=$(get_cache_var "last_get_new_port_auto")
+		if [ -n "$last_get_new_port_auto" ]; then
+			port=$(expr "$last_get_new_port_auto" + 1)
 		else
-			diff=999
-		fi
-		if [ "$diff" -gt 10 ]; then
 			port=$default_start_port
-		else
-			last_port=$(get_cache_var "last_get_new_port_auto")
-			if [ -n "$last_port" ]; then
-				port=$(expr "$last_port" + 1)
-			else
-				port=$default_start_port
-			fi
 		fi
 	fi
-	[ "$port" -lt $min_port ] || [ "$port" -gt $max_port ] && port=$default_start_port
-	local start_port="$port"
+	([ "$port" -lt "$min_port" ] || [ "$port" -gt "$max_port" ]) && port=$default_start_port
 	while :; do
-		if [ "$(check_port_exists "$port" "$protocol")" = 0 ]; then
-			break
+		local result=$(check_port_exists "$port" "$protocol")
+		if [ "$is_auto" = "1" ] && [ -n "$(get_cache_var "get_port_${port}")" ]; then
+			# The port has already been allocated, continue to the next port.
+			result=1
 		fi
-		port=$(expr "$port" + 1)
-		if [ "$port" -gt $max_port ]; then
-			port=$min_port
+		[ "$result" = "0" ] && break
+		if [ "$port" -lt "$max_port" ]; then
+			# If the port is smaller than the maximum port, increment by 1 and continue.
+			port=$(expr "$port" + 1)
+		elif [ "$port" -gt "$min_port" ]; then
+			# If the port is greater than the minimum port, decrement by 1 and continue.
+			port=$(expr "$port" - 1)
+		else
+			# Otherwise, reassign the default starting port.
+			port=$default_start_port
 		fi
-		[ "$port" = "$start_port" ] && {
-			rmdir "$LOCK_FILE" 2>/dev/null
-			return 1
-		}
 	done
-	if [ "$1" = "auto" ]; then
+	if [ "$is_auto" = "1" ]; then
+		# Set cache to prevent the port from being allocated again.
+		set_cache_var "get_port_${port}" "1"
 		set_cache_var "last_get_new_port_auto" "$port"
-		[ -n "$now" ] && set_cache_var "last_get_new_port_time" "$now"
 	fi
-	rmdir "$LOCK_FILE" 2>/dev/null
 	echo "$port"
 }
 
@@ -360,54 +404,6 @@ check_ver() {
 	done
 	# $1 等于 $2
 	echo 255
-}
-
-eval_set_val() {
-	for i in $@; do
-		for j in $i; do
-			eval $j
-		done
-	done
-}
-
-eval_unset_val() {
-	for i in $@; do
-		for j in $i; do
-			eval unset $j
-		done
-	done
-}
-
-lua_api() {
-	local func=${1}
-	[ -z "${func}" ] && {
-		echo "nil"
-		return
-	}
-	echo $(lua -e "local api = require 'luci.passwall.api' print(api.${func})")
-}
-
-set_cache_var() {
-	local key="${1}"
-	shift 1
-	local val="$@"
-	[ -n "${key}" ] && [ -n "${val}" ] && {
-		[ ! -d $TMP_PATH ] && mkdir -p $TMP_PATH
-		sed -i "/${key}=/d" $TMP_PATH/var >/dev/null 2>&1
-		echo "${key}=\"${val}\"" >> $TMP_PATH/var
-		eval ${key}=\"${val}\"
-	}
-}
-
-get_cache_var() {
-	local key="${1}"
-	[ -n "${key}" ] && [ -s "$TMP_PATH/var" ] && {
-		echo $(cat $TMP_PATH/var | grep "^${key}=" | awk -F '=' '{print $2}' | tail -n 1 | awk -F'"' '{print $2}')
-	}
-}
-
-eval_cache_var() {
-	[ -s "$TMP_PATH/var" ] && eval $(cat "$TMP_PATH/var")
 }
 
 has_1_65535() {
@@ -473,25 +469,9 @@ ln_run() {
 		echolog "  - 找不到 ${ln_name}，无法启动..."
 		return 1
 	}
-	[ "${output}" != "/dev/null" ] && [ -n "$(echo "${output}" | grep -E "default|socks_")" ] && [ "${ln_name}" != "chinadns-ng" ] && {
-		local persist_log_path=$(config_n_get @global[0] persist_log_path)
-		local sys_log=$(config_n_get @global[0] sys_log "0")
-	}
-	if [ -z "$persist_log_path" ] && [ "$sys_log" != "1" ]; then
-		${file_func:-echolog " - ${ln_name}"} "$@" >${output} 2>&1 &
-	else
-		if [ -n "${persist_log_path}" ]; then
-			mkdir -p ${persist_log_path}
-			local log_file=${persist_log_path}/passwall_global_${ln_name}_$(date '+%F').log
-			echolog "记录到持久性日志文件：${log_file}"
-			${file_func:-echolog " - ${ln_name}"} "$@" >> ${log_file} 2>&1 &
-			sys_log=0
-		fi
-		if [ "${sys_log}" = "1" ]; then
-			echolog "记录 ${ln_name}_global 到系统日志"
-			${file_func:-echolog " - ${ln_name}"} "$@" 2>&1 | logger -t PASSWALL_global_${ln_name} &
-		fi
-	fi
+
+	${file_func:-echolog " - ${ln_name}"} "$@" >${output} 2>&1 &
+
 	[ "$NO_REC_PROCESS" = "1" ] && return
 	process_count=$(ls $TMP_SCRIPT_FUNC_PATH | wc -l)
 	process_count=$((process_count + 1))
@@ -514,11 +494,11 @@ get_subscribe_host(){
 }
 
 gen_lanlist() {
-	cat $RULES_PATH/lanlist_ipv4 | tr -s '\n' | grep -v "^#"
+	cat $USER_RULES_PATH/lanlist_ipv4 | tr -s '\n' | grep -v "^#"
 }
 
 gen_lanlist_6() {
-	cat $RULES_PATH/lanlist_ipv6 | tr -s '\n' | grep -v "^#"
+	cat $USER_RULES_PATH/lanlist_ipv6 | tr -s '\n' | grep -v "^#"
 }
 
 get_wan_ips() {

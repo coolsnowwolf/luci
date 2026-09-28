@@ -20,6 +20,7 @@ function index()
 			luci.sys.call('cp -f /usr/share/passwall/0_default_config /etc/config/passwall')
 		else return end
 	end
+	luci.sys.call("mkdir -p /etc/passwall/rules")
 	local api = require "luci.passwall.api"
 	local appname = api.appname		-- global definitions not available
 	local fs = api.fs
@@ -479,7 +480,21 @@ function add_node()
 		uci_set(uid, "group", group)
 	end
 
-	uci_set(uid, "type", "Socks")
+	if api.is_finded("ipt2socks") then
+		uci_set(uid, "type", "Socks")
+	elseif api.finded_com("sing-box") then
+		uci_set(uid, "type", "sing-box")
+	elseif api.finded_com("xray") then
+		uci_set(uid, "type", "Xray")
+	elseif api.is_finded("sslocal") then
+		uci_set(uid, "type", "SS-Rust")
+	elseif api.is_finded("ssr-local") then
+		uci_set(uid, "type", "SSR")
+	elseif api.finded_com("hysteria") then
+		uci_set(uid, "type", "Hysteria2")
+	elseif api.is_finded("naive") then
+		uci_set(uid, "type", "Naiveproxy")
+	end
 
 	if redirect == "1" then
 		uci_save()
@@ -840,21 +855,27 @@ end
 local backup_files = {
     "/etc/config/passwall",
     "/etc/config/passwall_server",
-    "/usr/share/passwall/rules/block_host",
-    "/usr/share/passwall/rules/block_ip",
-    "/usr/share/passwall/rules/direct_host",
-    "/usr/share/passwall/rules/direct_ip",
-    "/usr/share/passwall/rules/proxy_host",
-    "/usr/share/passwall/rules/proxy_ip",
-    "/usr/share/passwall/rules/domains_excluded"
+    "/etc/passwall/rules/block_host",
+    "/etc/passwall/rules/block_ip",
+    "/etc/passwall/rules/direct_host",
+    "/etc/passwall/rules/direct_ip",
+    "/etc/passwall/rules/proxy_host",
+    "/etc/passwall/rules/proxy_ip",
+    "/etc/passwall/rules/lanlist_ipv4",
+    "/etc/passwall/rules/lanlist_ipv6",
+    "/etc/passwall/rules/domains_excluded"
 }
 
 function create_backup()
 	local date = os.date("%y%m%d%H%M")
 	local tar_file = "/tmp/passwall-" .. date .. "-backup.tar.gz"
+	local version_file = "/tmp/passwall-version"
+	local version = api.get_version()
 	fs.remove(tar_file)
-	local cmd = "tar -czf " .. tar_file .. " " .. table.concat(backup_files, " ")
+	fs.writefile(version_file, version .. "\n")
+	local cmd = "tar -czf " .. tar_file .. " " .. table.concat(backup_files, " ") .. " " .. "-C /tmp passwall-version"
 	luci.sys.call(cmd)
+	fs.remove(version_file)
 	http.header("Content-Disposition", "attachment; filename=passwall-" .. date .. "-backup.tar.gz")
 	http.header("X-Backup-Filename", "passwall-" .. date .. "-backup.tar.gz")
 	http.prepare_content("application/octet-stream")
@@ -895,7 +916,12 @@ function restore_backup()
 			uci:revert(c_config)
 			uci:revert(api.s_config)
 			luci.sys.call("echo '' > /tmp/log/passwall.log")
-			api.log(" * PassWall 配置文件上传成功…")
+			api.log(" * PassWall 备份文件上传成功…")
+			local version_file = "passwall-version"
+			local version = luci.sys.exec("tar -xOf " .. file_path .. " " .. version_file .. " 2>/dev/null"):match("^%s*(.-)%s*$")
+			if version and version ~= "" then
+				api.log(" * 备份文件由 PassWall " .. version .. " 生成。")
+			end
 			local temp_dir = '/tmp/passwall_bak'
 			luci.sys.call("mkdir -p " .. temp_dir)
 			if luci.sys.call("tar -xzf " .. file_path .. " -C " .. temp_dir) == 0 then
@@ -909,8 +935,9 @@ function restore_backup()
 					end
 				end
 				if type == "all" or type == "client" then
-					api.log(" * PassWall 配置还原成功…")
+					api.log(" * PassWall 备份还原成功…")
 					api.log(" * 重启 PassWall 服务中…\n")
+					api.sh_uci_set(c_config, "@global[0]", "flush_set", "1", true)
 					luci.sys.call('/etc/init.d/passwall restart > /dev/null 2>&1 &')
 				end
 				if type == "all" or type == "server" then
@@ -918,7 +945,7 @@ function restore_backup()
 				end
 				result = { status = "success", message = "Upload completed", path = file_path }
 			else
-				api.log(" * PassWall 配置文件解压失败，请重试！")
+				api.log(" * PassWall 备份文件解压失败，请重试！")
 				result = { status = "error", message = "Decompression failed" }
 			end
 			luci.sys.call("rm -rf " .. temp_dir)
@@ -941,6 +968,13 @@ function reset_config()
 		luci.sys.call('/etc/init.d/passwall stop')
 		if luci.sys.call('[ -s "/usr/share/passwall/0_default_config" ]') == 0 then
 			luci.sys.call('cp -f /usr/share/passwall/0_default_config /etc/config/passwall')
+			local files = {
+				"direct_host", "direct_ip", "proxy_host", "proxy_ip", "block_host", "block_ip",
+				"lanlist_ipv4", "lanlist_ipv6", "domains_excluded"
+			}
+			for _, f in ipairs(files) do
+				luci.sys.call("cp -f /usr/share/passwall/rules/" .. f .. " /etc/passwall/rules/" .. f)
+			end
 			api.log(" * 恢复默认配置成功。")
 		else
 			api.log(" * 找不到默认配置文件，重置失败！")
@@ -962,7 +996,7 @@ function geo_view()
 		return
 	end
 	local function get_rules(str, type)
-		local rules_id = {}
+		local rules = {}
 		uci_foreach("shunt_rules", function(s)
 			local list
 			if type == "geoip" then list = s.ip_list else list = s.domain_list end
@@ -971,14 +1005,18 @@ function geo_view()
 					local prefix, main = line:match("^(.-):(.*)")
 					if not main then main = line end
 					if type == "geoip" and (api.datatypes.ipaddr(str) or api.datatypes.ip6addr(str)) then
-						if main:find(str, 1, true) then rules_id[#rules_id + 1] = s[".name"] end
+						if main:find(str, 1, true) then
+							table.insert(rules, {id = s[".name"], group = s.group or i18n.translate("default")})
+						end
 					else
-						if main == str then rules_id[#rules_id + 1] = s[".name"] end
+						if main == str then
+							table.insert(rules, {id = s[".name"], group = s.group or i18n.translate("default")})
+						end
 					end
 				end
 			end
 		end)
-		return rules_id
+		return rules
 	end
 	local geo_dir = (uci_get("@global_rules[0]", "v2ray_location_asset") or "/usr/share/v2ray/"):match("^(.*)/")
 	local geosite_path = geo_dir .. "/geosite.dat"
@@ -999,11 +1037,17 @@ function geo_view()
 			for line in geo_string:gmatch("([^\n]+)") do
 				lines[#lines + 1] = geo_type .. ":" .. line
 				for _, r in ipairs(get_rules(line, geo_type) or {}) do
-					if not seen[r] then seen[r] = true; rules[#rules + 1] = r end
+					if not seen[r.id] then
+						seen[r.id] = true
+						rules[#rules + 1] = string.format("[%s]%s", r.group, r.id)
+					end
 				end
 			end
 			for _, r in ipairs(get_rules(value, geo_type) or {}) do
-				if not seen[r] then seen[r] = true; rules[#rules + 1] = r end
+				if not seen[r.id] then
+					seen[r.id] = true
+					rules[#rules + 1] = string.format("[%s]%s", r.group, r.id)
+				end
 			end
 			geo_string = table.concat(lines, "\n")
 			if #rules > 0 then

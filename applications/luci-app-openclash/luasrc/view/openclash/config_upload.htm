@@ -1,690 +1,10 @@
-<style>
-.oc .config-upload-model-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 10000;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    backdrop-filter: blur(2px);
-}
-
-.oc .config-upload-model-overlay.show {
-    display: flex;
-}
-
-.oc .config-upload-model {
-    background: var(--bg-white);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-md);
-    width: 90vw;
-    max-width: 550px;
-    min-width: 400px;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    border: 1px solid var(--border-light);
-    max-height: 85vh;
-    transition: all var(--transition-fast);
-}
-
-.oc .config-upload-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 20px;
-    border-bottom: 1px solid var(--border-light);
-    background: var(--bg-gray);
-    flex-shrink: 0;
-}
-
-.oc .config-upload-title {
-    font-size: 16px;
-    font-weight: 600;
-    color: var(--text-primary);
-}
-
-.oc .config-upload-footer {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 20px;
-    border-top: 1px solid var(--border-light);
-    background: var(--bg-gray);
-    flex-shrink: 0;
-}
-
-.oc .config-upload-status {
-    font-size: 12px;
-    color: var(--text-secondary);
-}
-
-.oc .config-upload-buttons {
-    display: flex;
-    gap: 12px;
-}
-
-.oc .config-upload-content {
-    padding: 24px;
-    flex: 1;
-    overflow-y: auto;
-}
-
-.oc .upload-mode-selector {
-    margin-bottom: 24px;
-    border-radius: var(--radius-md);
-}
-
-.oc .mode-tabs {
-    display: flex;
-    background: var(--bg-gray);
-    border-radius: var(--radius-md);
-    padding: 4px;
-    gap: 4px;
-}
-
-.oc .mode-tab {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 12px 16px;
-    border: none;
-    border-radius: calc(var(--radius-md) - 2px);
-    background: transparent;
-    color: var(--text-secondary);
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all var(--transition-fast);
-}
-
-.oc .mode-tab:hover {
-    color: var(--text-primary);
-    background: rgba(59, 130, 246, 0.1);
-}
-
-.oc .mode-tab.active {
-    background: var(--primary-color);
-    color: white;
-    box-shadow: var(--shadow-sm);
-}
-
-.oc .mode-tab svg {
-    flex-shrink: 0;
-}
-
-.oc .upload-mode-content {
-    transition: all var(--transition-fast);
-}
-
-.oc .upload-zone {
-    border: 2px dashed var(--border-color);
-    border-radius: var(--radius-md);
-    padding: 40px 20px;
-    text-align: center;
-    cursor: pointer;
-    transition: all var(--transition-fast);
-    background: var(--bg-light);
-}
-
-.oc .upload-zone:hover {
-    border-color: var(--primary-color);
-    background: rgba(59, 130, 246, 0.05);
-}
-
-.oc .upload-zone.dragover {
-    border-color: var(--primary-color);
-    background: rgba(59, 130, 246, 0.1);
-}
-
-.oc .upload-zone.has-file {
-    border-color: var(--success-color);
-    background: rgba(5, 150, 105, 0.05);
-}
-
-.oc .upload-icon {
-    margin-bottom: 16px;
-    color: var(--text-secondary);
-}
-
-.oc .upload-zone.has-file .upload-icon {
-    color: var(--success-color);
-}
-
-.oc .upload-primary {
-    font-size: 16px;
-    font-weight: 500;
-    color: var(--text-primary);
-    margin: 0 0 8px 0;
-}
-
-.oc .upload-secondary {
-    font-size: 12px;
-    color: var(--text-secondary);
-    margin: 0;
-}
-
-.oc .subscribe-form {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-
-.oc .form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    position: relative;
-}
-
-.oc .form-group label {
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--text-primary);
-}
-
-.oc .form-select-wrapper {
-    position: relative;
-}
-
-.oc .form-select-wrapper::after {
-    content: '';
-    position: absolute;
-    right: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 0;
-    height: 0;
-    border-left: 4px solid transparent;
-    border-right: 4px solid transparent;
-    border-top: 4px solid var(--text-secondary);
-    pointer-events: none;
-}
-
-.oc .form-input,
-.oc .form-select {
-    width: 100%;
-    height: 40px;
-    padding: 10px 12px;
-    border: 1px solid var(--border-light);
-    border-radius: var(--radius-sm);
-    background: var(--bg-white);
-    color: var(--text-primary);
-    font-size: 14px;
-    transition: all var(--transition-fast);
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-}
-
-.oc .form-input:focus,
-.oc .form-select:focus {
-    outline: none;
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
-}
-
-.oc .form-input::placeholder {
-    color: var(--text-secondary);
-}
-
-.oc .form-select {
-    cursor: pointer;
-}
-
-.oc .form-textarea {
-    width: 100%;
-    min-height: 80px;
-    padding: 10px 12px;
-    border: 1px solid var(--border-light);
-    border-radius: var(--radius-sm);
-    background: var(--bg-white);
-    color: var(--text-primary);
-    font-size: 14px;
-    font-family: inherit;
-    resize: vertical;
-    transition: all var(--transition-fast);
-}
-
-.oc .form-textarea:focus {
-    outline: none;
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
-}
-
-.oc .form-row {
-    display: flex;
-    gap: 16px;
-    padding-top: 5px;
-}
-
-.oc .form-half {
-    flex: 1;
-}
-
-.oc .form-checkbox {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    cursor: pointer;
-    font-size: 14px;
-    color: var(--text-primary);
-    margin-bottom: 5px;
-}
-
-.oc .form-checkbox input[type="checkbox"] {
-    display: none;
-}
-
-.oc .checkmark {
-    width: 16px;
-    height: 16px;
-    border: 2px solid var(--border-light);
-    border-radius: 3px;
-    background: var(--bg-white);
-    position: relative;
-    transition: all var(--transition-fast);
-    flex-shrink: 0;
-}
-
-.oc .form-checkbox input[type="checkbox"]:checked + .checkmark {
-    background: var(--primary-color);
-    border-color: var(--primary-color);
-}
-
-.oc .form-checkbox input[type="checkbox"]:checked + .checkmark::after {
-    content: '';
-    position: absolute;
-    left: 3px;
-    top: 0px;
-    width: 4px;
-    height: 8px;
-    border: solid white;
-    border-width: 0 2px 2px 0;
-    transform: rotate(45deg);
-}
-
-.oc .form-checkbox-group {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-}
-
-.oc .form-help {
-    font-size: 12px;
-    color: var(--text-secondary);
-    margin-top: 0%;
-    margin-bottom: 10px;
-    line-height: 1.4;
-    display: flex;
-    align-items: flex-start;
-    gap: 6px;
-}
-
-.oc .form-help::before {
-    content: '';
-    display: inline-block;
-    width: 12px;
-    height: 12px;
-    flex-shrink: 0;
-    margin-top: 2px;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2'%3E%3Ccircle cx='12' cy='12' r='10'%3E%3C/circle%3E%3Cpath d='M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3'%3E%3C/path%3E%3Cline x1='12' y1='17' x2='12.01' y2='17'%3E%3C/line%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: contain;
-    opacity: 0.7;
-}
-
-.oc .filename-input-container {
-    margin-top: 20px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.oc .filename-input-container label {
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--text-primary);
-    white-space: nowrap;
-}
-
-.oc .filename-input-container input {
-    flex: 1;
-    height: 36px;
-    padding: 8px 12px;
-    border: 1px solid var(--border-light);
-    border-radius: var(--radius-sm);
-    background: var(--bg-white);
-    color: var(--text-primary);
-    font-size: 14px;
-    transition: all var(--transition-fast);
-}
-
-.oc .filename-input-container input:focus {
-    outline: none;
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
-}
-
-.oc .filename-extension {
-    font-size: 14px;
-    color: var(--text-secondary);
-    font-weight: 500;
-}
-
-.oc .upload-progress {
-    margin-top: 20px;
-}
-
-.oc .progress-bar {
-    height: 8px;
-    background: var(--bg-gray);
-    border-radius: 4px;
-    overflow: hidden;
-    margin-bottom: 8px;
-}
-
-.oc .progress-fill {
-    height: 100%;
-    background: var(--primary-color);
-    border-radius: 4px;
-    transition: width 0.3s ease;
-    width: 0%;
-}
-
-.oc .progress-text {
-    font-size: 12px;
-    color: var(--text-secondary);
-    text-align: center;
-}
-
-.oc .config-upload-buttons .btn {
-    padding: 8px 16px;
-    border: 1px solid var(--border-light);
-    border-radius: var(--radius-sm);
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all var(--transition-fast);
-}
-
-.oc .cancel-btn {
-    background: var(--bg-white);
-    color: var(--text-secondary);
-}
-
-.oc .cancel-btn:hover {
-    background: var(--hover-bg);
-    color: var(--text-primary);
-}
-
-.oc .upload-btn {
-    background: var(--primary-color);
-    color: white;
-    border-color: var(--primary-color);
-}
-
-.oc .upload-btn:hover:not(:disabled) {
-    background: var(--primary-color);
-    opacity: 0.9;
-}
-
-.oc .upload-btn:disabled {
-    background: var(--bg-gray);
-    color: var(--text-secondary);
-    border-color: var(--border-light);
-    cursor: not-allowed;
-}
-
-.oc .advanced-options-container {
-    padding: 16px;
-    background: var(--bg-light);
-    border-radius: var(--radius-sm);
-    border: 1px solid var(--border-light);
-    transition: all var(--transition-fast);
-}
-
-.oc .advanced-options-container .form-group:last-child {
-    margin-bottom: 0;
-}
-
-.oc .advanced-options-container .sub-convert-options {
-    margin: 12px auto;
-    margin-left: 0;
-    background: rgba(59, 130, 246, 0.03);
-    border-color: rgba(59, 130, 246, 0.2);
-    max-width: 100%;
-}
-
-.oc .sub-convert-options {
-    margin: 16px auto;
-    padding: 16px;
-    background: var(--bg-light);
-    border-radius: var(--radius-sm);
-    border: 1px solid var(--border-light);
-    max-width: 95%;
-    width: 100%;
-    box-sizing: border-box;
-}
-
-.oc[data-darkmode="true"] .config-upload-model {
-    background: var(--bg-white);
-    border-color: var(--border-light);
-}
-
-.oc[data-darkmode="true"] .config-upload-header,
-.oc[data-darkmode="true"] .config-upload-footer {
-    background: var(--bg-gray);
-    border-color: var(--border-light);
-}
-
-.oc[data-darkmode="true"] .mode-tab {
-    color: var(--text-secondary);
-}
-
-.oc[data-darkmode="true"] .mode-tab:hover {
-    color: var(--text-primary);
-    background: rgba(96, 165, 250, 0.1);
-}
-
-.oc[data-darkmode="true"] .mode-tab.active {
-    background: var(--primary-color);
-    color: white;
-}
-
-.oc[data-darkmode="true"] .upload-zone {
-    border-color: var(--border-color);
-    background: var(--bg-light);
-}
-
-.oc[data-darkmode="true"] .upload-zone:hover {
-    border-color: var(--primary-color);
-    background: rgba(96, 165, 250, 0.05);
-}
-
-.oc[data-darkmode="true"] .upload-zone.dragover {
-    border-color: var(--primary-color);
-    background: rgba(96, 165, 250, 0.1);
-}
-
-.oc[data-darkmode="true"] .upload-zone.has-file {
-    border-color: var(--success-color);
-    background: rgba(52, 211, 153, 0.05);
-}
-
-.oc[data-darkmode="true"] .upload-zone.has-file .upload-icon {
-    color: var(--success-color);
-}
-
-.oc[data-darkmode="true"] .form-input,
-.oc[data-darkmode="true"] .form-select,
-.oc[data-darkmode="true"] .filename-input-container input {
-    background: var(--bg-white);
-    border-color: var(--border-light);
-    color: var(--text-primary);
-    background-color: var(--bg-gray) !important;
-}
-
-.oc[data-darkmode="true"] .form-input:focus,
-.oc[data-darkmode="true"] .form-select:focus {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.1);
-}
-
-.oc[data-darkmode="true"] .form-input::placeholder {
-    color: var(--text-secondary);
-}
-
-.oc[data-darkmode="true"] .form-textarea {
-    background: var(--bg-gray);
-    border-color: var(--border-light);
-    color: var(--text-primary);
-}
-
-.oc[data-darkmode="true"] .form-textarea:focus {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.1);
-}
-
-.oc[data-darkmode="true"] .checkmark {
-    border-color: var(--border-light);
-    background: var(--bg-gray);
-}
-
-.oc[data-darkmode="true"] .progress-bar {
-    background: var(--bg-gray);
-}
-
-.oc[data-darkmode="true"] .progress-fill {
-    background: var(--primary-color);
-}
-
-.oc[data-darkmode="true"] .cancel-btn {
-    background: var(--bg-white);
-    color: var(--text-secondary);
-    border-color: var(--border-light);
-}
-
-.oc[data-darkmode="true"] .cancel-btn:hover {
-    background: var(--hover-bg);
-    color: var(--text-primary);
-}
-
-.oc[data-darkmode="true"] .upload-btn {
-    background: var(--primary-color);
-    border-color: var(--primary-color);
-}
-
-.oc[data-darkmode="true"] .upload-btn:disabled {
-    background: var(--bg-gray);
-    color: var(--text-secondary);
-    border-color: var(--border-light);
-}
-
-.oc[data-darkmode="true"] .sub-convert-options {
-    background: rgba(96, 165, 250, 0.05);
-    border-color: var(--border-light);
-}
-
-.oc[data-darkmode="true"] .advanced-options-container {
-    background: rgba(96, 165, 250, 0.05);
-    border-color: var(--border-light);
-}
-
-.oc[data-darkmode="true"] .advanced-options-container .sub-convert-options {
-    background: rgba(96, 165, 250, 0.08);
-    border-color: var(--border-light);
-}
-
-.oc[data-darkmode="true"] .form-help::before {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23d0cfcf' stroke-width='2'%3E%3Ccircle cx='12' cy='12' r='10'%3E%3C/circle%3E%3Cpath d='M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3'%3E%3C/path%3E%3Cline x1='12' y1='17' x2='12.01' y2='17'%3E%3C/line%3E%3C/svg%3E");
-    opacity: 0.6;
-}
-
-@media screen and (max-width: 768px) {
-    .oc .form-help {
-        font-size: 11px;
-        margin-bottom: 10px;
-        gap: 5px;
-    }
-
-    .oc .form-help::before {
-        width: 11px;
-        height: 11px;
-        margin-top: 1px;
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2'%3E%3Ccircle cx='12' cy='12' r='10'%3E%3C/circle%3E%3Cpath d='M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3'%3E%3C/path%3E%3Cline x1='12' y1='17' x2='12.01' y2='17'%3E%3C/line%3E%3C/svg%3E");
-    }
-
-    .oc[data-darkmode="true"] .form-help::before {
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 24 24' fill='none' stroke='%23d0cfcf' stroke-width='2'%3E%3Ccircle cx='12' cy='12' r='10'%3E%3C/circle%3E%3Cpath d='M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3'%3E%3C/path%3E%3Cline x1='12' y1='17' x2='12.01' y2='17'%3E%3C/line%3E%3C/svg%3E");
-    }
-
-    .oc .sub-convert-options {
-        margin: 12px auto;
-        padding: 12px;
-        max-width: 98%;
-    }
-}
-
-@media screen and (max-width: 575px) {
-    .oc .form-help {
-        font-size: 10px;
-        margin-bottom: 8px;
-        gap: 4px;
-    }
-
-    .oc .form-help::before {
-        width: 10px;
-        height: 10px;
-        margin-top: 1px;
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2'%3E%3Ccircle cx='12' cy='12' r='10'%3E%3C/circle%3E%3Cpath d='M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3'%3E%3C/path%3E%3Cline x1='12' y1='17' x2='12.01' y2='17'%3E%3C/line%3E%3C/svg%3E");
-    }
-
-    .oc[data-darkmode="true"] .form-help::before {
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%23d0cfcf' stroke-width='2'%3E%3Ccircle cx='12' cy='12' r='10'%3E%3C/circle%3E%3Cpath d='M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3'%3E%3C/path%3E%3Cline x1='12' y1='17' x2='12.01' y2='17'%3E%3C/line%3E%3C/svg%3E");
-    }
-
-    .oc .sub-convert-options {
-        margin: 10px auto;
-        padding: 10px;
-        max-width: 100%;
-    }
-}
-
-@media screen and (max-width: 500px) {
-    .oc .config-upload-model {
-        width: 95vw;
-        min-width: 320px;
-    }
-
-    .oc .config-upload-content {
-        padding: 20px;
-    }
-
-    .oc .upload-zone {
-        padding: 30px 15px;
-    }
-
-    .oc .mode-tab {
-        padding: 10px 12px;
-        font-size: 13px;
-    }
-
-    .oc .mode-tab svg {
-        width: 14px;
-        height: 14px;
-    }
-}
-</style>
-
 <div class="oc">
+<%
+    local fs = require "luci.openclash"
+    local plugin_version = fs.oc_version()
+%>
+    <script src="/luci-static/resources/openclash/js/oc-icons.js?v=<%=plugin_version%>"></script>
+    <script src="/luci-static/resources/openclash/js/subconverter-version.js?v=<%=plugin_version%>"></script>
     <div class="config-upload-model-overlay" id="config-upload-overlay">
         <div class="config-upload-model" id="config-upload-model">
             <div class="config-upload-header">
@@ -693,10 +13,7 @@
                 </div>
                 <div class="config-upload-actions">
                     <button type="button" class="icon-btn" id="config-upload-close" title="<%:Close%>">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <line x1="18" y1="6" x2="6" y2="18"></line>
-                            <line x1="6" y1="6" x2="18" y2="18"></line>
-                        </svg>
+                        <svg width="14" height="14"><use href="#oc-icon-close"/></svg>
                     </button>
                 </div>
             </div>
@@ -704,20 +21,11 @@
                 <div class="upload-mode-selector">
                     <div class="mode-tabs">
                         <button type="button" class="mode-tab active" id="upload-mode-file" data-mode="file">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                                <polyline points="17,11 12,6 7,11"></polyline>
-                                <line x1="12" y1="18" x2="12" y2="6"></line>
-                            </svg>
+                            <svg width="16" height="16"><use href="#oc-icon-upload"/></svg>
                             <%:Upload File%>
                         </button>
                         <button type="button" class="mode-tab" id="upload-mode-subscribe" data-mode="subscribe">
-                            <svg width="15" height="15" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M26.2401 16.373L17.1001 7.23303C14.4388 4.57168 10.0653 4.6303 7.33158 7.36397C4.59791 10.0976 4.53929 14.4712 7.20064 17.1325L15.1359 25.0678" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"></path>
-                                <path d="M32.9027 23.0031L40.838 30.9384C43.4994 33.5998 43.4407 37.9733 40.7071 40.707C37.9734 43.4407 33.5999 43.4993 30.9385 40.8379L21.7985 31.6979" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"></path>
-                                <path d="M26.1093 26.1416C28.843 23.4079 28.9016 19.0344 26.2403 16.373" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"></path>
-                                <path d="M21.7989 21.7984C19.0652 24.5321 19.0066 28.9056 21.6679 31.5669" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"></path>
-                            </svg>
+                            <svg width="15" height="15"><use href="#oc-icon-link"/></svg>
                             <%:Subscribe Link%>
                         </button>
                     </div>
@@ -726,21 +34,29 @@
                 <div class="upload-mode-content" id="mode-file-content">
                     <div class="upload-zone" id="upload-zone">
                         <div class="upload-icon">
-                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
-                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                                <polyline points="17,11 12,6 7,11"></polyline>
-                                <line x1="12" y1="18" x2="12" y2="6"></line>
-                            </svg>
+                            <svg width="48" height="48"><use href="#oc-icon-upload"/></svg>
                         </div>
                         <div class="upload-text">
                             <div class="upload-primary"><%:Click to select file or drag and drop%></div>
                             <div class="upload-secondary"><%:Support YAML file, max size 10MB%></div>
                         </div>
-                        <input type="file" id="config-file-input" accept=".yaml,.yml" style="display: none;">
+                        <input type="file" id="config-file-input" accept=".yaml,.yml" class="oc-hidden">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-checkbox">
+                            <input type="checkbox" id="advanced-options-enable-file" class="advanced-options-enable">
+                            <span class="checkmark"></span>
+                            <%:Advanced Options%>
+                        </label>
+                        <div class="form-help"><%:Show more upload options%></div>
+                    </div>
+
+                    <div class="advanced-options-container oc-hidden" id="advanced-options-container-file">
                     </div>
                 </div>
 
-                <div class="upload-mode-content" id="mode-subscribe-content" style="display: none;">
+                <div class="upload-mode-content oc-hidden" id="mode-subscribe-content">
                     <div class="subscribe-form">
                         <div class="form-group">
                             <label for="subscribe-url-input"><%:Subscription URL%>:</label>
@@ -752,13 +68,20 @@
                             <label for="subscribe-ua-input"><%:User-Agent%> (<%:Optional%>):</label>
                             <div class="form-select-wrapper">
                                 <select id="subscribe-ua-input" class="form-select">
-                                    <option value="clash.meta">clash.meta</option>
-                                    <option value="clash-verge/v1.5.1">clash-verge/v1.5.1</option>
+                                    <option value="clash-verge/v2.4.5">clash-verge/v2.4.5</option>
+                                    <option value="clash.meta/1.19.20">clash.meta/1.19.20</option>
                                     <option value="Clash">clash</option>
                                     <option value="custom"><%:Custom%></option>
                                 </select>
                             </div>
-                            <input type="text" id="subscribe-ua-custom" placeholder="<%:Enter custom User-Agent%>" class="form-input" style="display: none; margin-top: 8px;" />
+                            <input type="text" id="subscribe-ua-custom" placeholder="<%:Enter custom User-Agent%>" class="form-input oc-hidden" style="margin-top: 8px;" />
+                        </div>
+
+                        <div class="form-group">
+                            <label><%:Custom Headers%> (<%:Optional%>):</label>
+                            <div class="form-help" style="margin-bottom:0;"><%:Add custom HTTP headers to the subscription request%></div>
+                            <div id="subscribe-headers-container" class="oc-hidden"></div>
+                            <button type="button" id="subscribe-headers-add" class="add-row-btn"><svg><use href="#oc-icon-add"/></svg><span><%:Add Header%></span></button>
                         </div>
 
                         <div class="form-group">
@@ -770,7 +93,7 @@
                             <div class="form-help"><%:Show more subscription options%></div>
                         </div>
 
-                        <div class="advanced-options-container" id="advanced-options-container" style="display: none;">
+                        <div class="advanced-options-container oc-hidden" id="advanced-options-container">
                             <div class="form-group">
                                 <label class="form-checkbox">
                                     <input type="checkbox" id="sub-convert-enable">
@@ -780,17 +103,21 @@
                                 <div class="form-help"><%:Convert Subscribe Online With Template%></div>
                             </div>
 
-                            <div class="sub-convert-options" id="sub-convert-options" style="display: none;">
+                            <div class="sub-convert-options oc-hidden" id="sub-convert-options">
                                 <div class="form-group">
                                     <label for="convert-address-input"><%:Convert Address%>:</label>
                                     <div class="form-select-wrapper">
                                         <select id="convert-address-input" class="form-select">
-                                            <option value="https://api.wcc.best/sub">api.wcc.best</option>
                                             <option value="https://api.asailor.org/sub">api.asailor.org</option>
+                                            <option value="https://api.wcc.best/sub">api.wcc.best</option>
                                             <option value="custom"><%:Custom%></option>
                                         </select>
                                     </div>
-                                    <input type="text" id="convert-address-custom" placeholder="<%:Enter custom convert address%>" class="form-input" style="display: none; margin-top: 8px;" />
+                                    <input type="text" id="convert-address-custom" placeholder="<%:Enter custom convert address%>" class="form-input oc-hidden" style="margin-top: 8px;" />
+                                    <div id="subconverter-version-status-upload" class="subconverter-version-status" data-state="idle" hidden>
+                                        <span class="subconverter-version-label"></span>
+                                        <span class="subconverter-version-text"></span>
+                                    </div>
                                     <div class="form-help"><%:Note: There is A Risk of Privacy Leakage in Online Convert%></div>
                                 </div>
 
@@ -821,7 +148,7 @@
                                     </div>
                                 </div>
 
-                                <div class="form-group" id="custom-template-group" style="display: none;">
+                                <div class="form-group oc-hidden" id="custom-template-group">
                                     <label for="custom-template-input"><%:Custom Template URL%>:</label>
                                     <input type="text" id="custom-template-input" placeholder="<%:Enter custom template URL%>" class="form-input" />
                                 </div>
@@ -921,17 +248,59 @@
                                     </label>
                                 </div>
                             </div>
+
+                            <div class="form-group" id="age-encryption-group">
+                                <div class="form-group">
+                                    <label style="display:block;margin-bottom:6px;"><%:Age Key Type%></label>
+                                    <div class="oc-flex-center">
+                                        <div class="oc-flex-1">
+                                            <div class="form-select-wrapper">
+                                                <select id="age-algo-select" class="form-select">
+                                                    <option value="keygen">x25519</option>
+                                                    <option value="pq">PQ (mlkem768-x25519)</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <button type="button" id="age-generate-btn" class="icon-btn oc-ml-2" title="<%:Generate Age Key%>">
+                                            <svg width="16" height="16"><use href="#oc-icon-key"/></svg>
+                                        </button>
+                                    </div>
+                                    <div class="form-help"><%:Age Encryption For Config, Click For More:%> <a href="javascript:void(0);" onclick="window.open('https://wiki.metacubex.one/config/proxy-providers/?age-secret-key#age-secret-key', '_blank');" class="help-link"> <%:Age Encryption Introduce%></a></div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="age-secret-input"><%:Secret Key%>:</label>
+                                    <div class="oc-flex-center">
+                                        <input type="text" id="age-secret-input" class="form-input oc-flex-1" />
+                                        <button type="button" id="age-copy-secret" class="icon-btn oc-ml-2" title="<%:Copy%>">
+                                            <svg width="24" height="24"><use href="#oc-icon-copy-bold"/></svg>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="age-public-input"><%:Public Key%>:</label>
+                                    <div class="oc-flex-center">
+                                        <input type="text" id="age-public-input" class="form-input oc-flex-1" />
+                                        <button type="button" id="age-copy-public" class="icon-btn oc-ml-2" title="<%:Copy%>">
+                                            <svg width="24" height="24"><use href="#oc-icon-copy-bold"/></svg>
+                                        </button>
+                                        <button type="button" id="age-calculate-public" class="icon-btn" style="margin-left:8px;" title="<%:Calculate Public Key%>">
+                                            <svg width="16" height="16"><use href="#oc-icon-calculator"/></svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-
                 <div class="filename-input-container">
                     <label for="config-filename-input"><%:Config Name%>:</label>
                     <input type="text" id="config-filename-input" placeholder="<%:Enter config name (without extension)%>" class="form-input"/>
                     <div class="filename-extension">.yaml</div>
                 </div>
 
-                <div class="upload-progress" id="upload-progress" style="display: none;">
+                <div class="upload-progress oc-hidden" id="upload-progress">
                     <div class="progress-bar">
                         <div class="progress-fill" id="upload-progress-fill"></div>
                     </div>
@@ -949,17 +318,17 @@
             </div>
         </div>
     </div>
-    <div class="config-upload-model-overlay" id="subscription-url-overlay" style="display: none;">
+    <div class="config-upload-model-overlay" id="subscription-url-overlay">
         <div class="config-upload-model" id="subscription-url-model">
             <div class="config-upload-header">
                 <div class="config-upload-title"><%:Set Subscription Info URL%></div>
                 <button type="button" class="icon-btn" onclick="SubscriptionUrlSetter.hide()">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    <svg width="14" height="14"><use href="#oc-icon-close"/></svg>
                 </button>
             </div>
             <div class="config-upload-content">
                 <div class="form-group">
-                    <label><%:Paste the new url of subscribe infos sources here:%></label>
+                    <label class="highlight-label"><%:Paste the new url of subscribe infos sources here:%></label>
                     <textarea id="subscription-url-textarea" class="form-textarea" placeholder="<%:Enter URLs, one per line, use #name=example end for specifing display name%> (https://example.com#name=example)" rows="5"></textarea>
                 </div>
             </div>
@@ -975,12 +344,208 @@
 </div>
 
 <script type="text/javascript">
+var UrlValidator = {
+    _httpRe: /^https?:\/\/\S+$/i,
+    _anyProtocolRe: /^[a-zA-Z][a-zA-Z0-9+.-]*:\/\/\S+$/i,
+
+    // Extract individual URLs from input. Supports:
+    //   - Newline-separated: url1\nurl2
+    //   - | -separated:     url1|url2  (| only when followed by protocol)
+    //   - Comma-separated:  node1,https://sub.com
+    //   - URL-encoded comma: node1%2Chttps%3A%2F%2Fsub.com
+    // Correctly preserves | inside query parameters (e.g., ?lv=2|3|5|6.js).
+    extractUrls: function(input, allowNonHttp) {
+        if (!input) return [];
+        var protocolPat = allowNonHttp ? '[a-zA-Z][a-zA-Z0-9+.-]*://' : 'https?://';
+        var protocolRe = new RegExp(protocolPat, 'gi');
+        var urls = [];
+
+        function extractFrom(text) {
+            var positions = [];
+            var m;
+            protocolRe.lastIndex = 0;
+            while ((m = protocolRe.exec(text)) !== null) {
+                positions.push(m.index);
+            }
+            if (positions.length === 0) return false;
+
+            for (var i = 0; i < positions.length; i++) {
+                var start = positions[i];
+                var end = (i + 1 < positions.length) ? positions[i + 1] : text.length;
+                var raw = text.substring(start, end);
+                raw = raw.replace(/[\s|,]+$/, '').trim();
+                if (raw) urls.push(raw);
+            }
+            return true;
+        }
+
+        if (!extractFrom(input)) {
+            if (/%[23][aA]/i.test(input)) {
+                try {
+                    var decoded = decodeURIComponent(input);
+                    if (decoded !== input) extractFrom(decoded);
+                } catch(e) {}
+            }
+        }
+
+        return urls;
+    },
+
+    validateUrl: function(url, allowNonHttp) {
+        var urlPart = url.replace(/#name=.*$/, '');
+        if (!urlPart) return { valid: false, reason: '<%:Empty URL%>' };
+
+        var re = allowNonHttp ? this._anyProtocolRe : this._httpRe;
+        if (!re.test(urlPart)) {
+            if (!allowNonHttp && /^[a-zA-Z][a-zA-Z0-9+.-]*:\/\/\S/.test(urlPart)) {
+                return { valid: false, reason: '<%:Only HTTP/HTTPS URLs are supported%>' };
+            }
+            return { valid: false, reason: '<%:Invalid URL format%>' };
+        }
+
+        var hostMatch = urlPart.match(/^https?:\/\/([^\/\s?#]+)/i);
+        if (!hostMatch || hostMatch[1].length === 0) {
+            return { valid: false, reason: '<%:URL missing hostname%>' };
+        }
+        return { valid: true };
+    },
+
+    anyValid: function(urlList, allowNonHttp) {
+        for (var i = 0; i < urlList.length; i++) {
+            if (this.validateUrl(urlList[i], allowNonHttp).valid) return true;
+        }
+        return false;
+    }
+};
+
+var SubscriptionUrlSetter = {
+    filename: '',
+    onSuccess: '',
+
+    show: function(filename, onSuccess) {
+        this.filename = filename;
+        this.onSuccess = onSuccess || '';
+        var overlay = document.getElementById('subscription-url-overlay');
+        var textarea = document.getElementById('subscription-url-textarea');
+        if (overlay && textarea) {
+            textarea.value = '';
+            overlay.classList.add('show');
+            textarea.focus();
+            this.bindEvents();
+            this.loadUrls();
+        }
+    },
+
+    hide: function() {
+        var overlay = document.getElementById('subscription-url-overlay');
+        if (overlay) {
+            overlay.classList.remove('show');
+        }
+        this.unbindEvents();
+    },
+
+    bindEvents: function() {
+        var textarea = document.getElementById('subscription-url-textarea');
+        if (textarea) {
+            textarea.addEventListener('keydown', this.handleKeyDown.bind(this));
+        }
+    },
+
+    unbindEvents: function() {
+        var textarea = document.getElementById('subscription-url-textarea');
+        if (textarea) {
+            textarea.removeEventListener('keydown', this.handleKeyDown.bind(this));
+        }
+    },
+
+    handleKeyDown: function(event) {
+        if (event.key === 'Enter' && (event.ctrlKey || event.metaKey)) {
+            this.submit();
+        } else if (event.key === 'Escape') {
+            this.hide();
+        }
+    },
+
+    submit: function() {
+        var textarea = document.getElementById('subscription-url-textarea');
+        if (!textarea) return;
+
+        var urls = textarea.value.trim();
+        var urlList = urls.split('\n').map(function(url) {
+            return url.trim();
+        }).filter(function(url) {
+            return url !== '';
+        });
+        var newUrl = urlList.join('\n');
+
+        for (var i = 0; i < urlList.length; i++) {
+            var result = UrlValidator.validateUrl(urlList[i], false);
+            if (!result.valid) {
+                alert('<%:Invalid URL on line %> ' + (i + 1) + ':\n' + urlList[i] + '\n\n' + result.reason);
+                return;
+            }
+        }
+
+        this.hide();
+
+        XHR.get('<%=luci.dispatcher.build_url("admin", "services", "openclash", "set_subinfo_url")%>', {
+            filename: this.filename,
+            url: newUrl
+        }, function(x, status) {
+            if (x && x.status == 200 && (status.info === "Success" || status.info === "Delete success")) {
+                if (SubscriptionUrlSetter.onSuccess) setTimeout(SubscriptionUrlSetter.onSuccess, 0);
+            } else {
+                alert('<%:Specify subscribe infos sources url failed:%>\n' + ((status && status.info) || (x && ('HTTP ' + x.status)) || '<%:Unknown error%>'));
+            }
+        });
+    },
+
+    handleSubURL: function(urlresult) {
+        var textarea = document.getElementById('subscription-url-textarea');
+        if (!textarea) return;
+
+        var urls = '';
+        if (urlresult.type && urlresult.type === "multiple") {
+            for (var data in urlresult.providers) {
+                urls += urlresult.providers[data].url + '#name=' + urlresult.providers[data].name + '\n';
+            }
+        }
+        if (urlresult.type && urlresult.type === "single") {
+            urls = urlresult.url;
+        }
+        textarea.value = urls;
+    },
+
+    loadUrls: function() {
+        var self = this;
+        var existingData = localStorage.getItem('sub_info_' + this.filename);
+        if (existingData) {
+            existingData = JSON.parse(existingData);
+            if (existingData.url_result) {
+                this.handleSubURL(existingData.url_result);
+                return;
+            }
+        }
+
+        XHR.get('<%=luci.dispatcher.build_url("admin", "services", "openclash", "get_subscribe_info_data")%>', {
+            filename: this.filename
+        }, function(x, status) {
+            if (x && x.status == 200 && status) {
+                self.handleSubURL(status);
+            }
+        });
+    }
+};
+
 var ConfigUploader = {
     overlay: null,
     model: null,
     selectedFile: null,
     isProcessing: false,
     currentMode: 'file',
+    onSuccess: '',
+    subconverterVersionChecker: null,
+    _linkRe: null,
 
     init: function() {
         this.overlay = document.getElementById('config-upload-overlay');
@@ -1051,6 +616,28 @@ var ConfigUploader = {
         var customTemplateGroup = document.getElementById('custom-template-group');
         var advancedOptionsEnable = document.getElementById('advanced-options-enable');
         var advancedOptionsContainer = document.getElementById('advanced-options-container');
+        var advancedOptionsEnableFile = document.getElementById('advanced-options-enable-file');
+        var advancedOptionsContainerFile = document.getElementById('advanced-options-container-file');
+        var ageFormNode = document.getElementById('age-encryption-group');
+        var subVersionStatus = document.getElementById('subconverter-version-status-upload');
+
+        if (window.OpenClashSubconverterVersion && subVersionStatus) {
+            this.subconverterVersionChecker = window.OpenClashSubconverterVersion.init({
+                select: convertAddressSelect,
+                customInput: convertAddressCustom,
+                enable: subConvertEnable,
+                status: subVersionStatus,
+                proxyURL: '<%=luci.dispatcher.build_url("admin", "services", "openclash", "subconverter_version")%>',
+                labels: {
+                    checking: '<%:Checking backend version...%>',
+                    versionPrefix: '<%:Backend Version%>',
+                    empty: '<%:Please enter backend URL%>',
+                    invalid: '<%:Invalid backend URL%>',
+                    unrecognized: '<%:Backend version information not detected%>',
+                    failed: '<%:Unable to detect backend version%>'
+                }
+            });
+        }
 
         subscribeUrlInput.addEventListener('input', function() {
             self.autoFillConfigName();
@@ -1060,44 +647,130 @@ var ConfigUploader = {
         filenameInput.addEventListener('input', this.updateSubmitButton.bind(this));
 
         subscribeUaSelect.addEventListener('change', function() {
-            if (this.value === 'custom') {
-                subscribeUaCustom.style.display = 'block';
-            } else {
-                subscribeUaCustom.style.display = 'none';
-            }
+            subscribeUaCustom.classList.toggle('oc-hidden', this.value !== 'custom');
         });
 
         advancedOptionsEnable.addEventListener('change', function() {
             if (this.checked) {
-                advancedOptionsContainer.style.display = 'block';
+                advancedOptionsContainer.classList.remove('oc-hidden');
+                if (ageFormNode && advancedOptionsContainer && ageFormNode.parentNode !== advancedOptionsContainer) {
+                    advancedOptionsContainer.appendChild(ageFormNode);
+                }
             } else {
-                advancedOptionsContainer.style.display = 'none';
+                advancedOptionsContainer.classList.add('oc-hidden');
                 self.resetAdvancedOptions();
+                self.updateSubmitButton();
+                if (ageFormNode && advancedOptionsContainer && ageFormNode.parentNode !== advancedOptionsContainer) {
+                    advancedOptionsContainer.appendChild(ageFormNode);
+                }
             }
         });
 
+        if (advancedOptionsEnableFile) {
+            advancedOptionsEnableFile.addEventListener('change', function() {
+                if (this.checked) {
+                    advancedOptionsContainerFile.classList.remove('oc-hidden');
+                    if (ageFormNode && advancedOptionsContainerFile && ageFormNode.parentNode !== advancedOptionsContainerFile) {
+                        advancedOptionsContainerFile.appendChild(ageFormNode);
+                    }
+                } else {
+                    advancedOptionsContainerFile.classList.add('oc-hidden');
+                    self.resetAdvancedOptions();
+                    self.updateSubmitButton();
+                    if (ageFormNode && advancedOptionsContainer && ageFormNode.parentNode === advancedOptionsContainerFile) {
+                        advancedOptionsContainer.appendChild(ageFormNode);
+                    }
+                }
+            });
+        }
+
         subConvertEnable.addEventListener('change', function() {
-            if (this.checked) {
-                subConvertOptions.style.display = 'block';
-            } else {
-                subConvertOptions.style.display = 'none';
-            }
+            subConvertOptions.classList.toggle('oc-hidden', !this.checked);
+            self.updateSubconverterVersionStatus();
+            self.updateSubmitButton();
         });
 
         convertAddressSelect.addEventListener('change', function() {
-            if (this.value === 'custom') {
-                convertAddressCustom.style.display = 'block';
-            } else {
-                convertAddressCustom.style.display = 'none';
-            }
+            convertAddressCustom.classList.toggle('oc-hidden', this.value !== 'custom');
+            self.updateSubconverterVersionStatus();
         });
 
         templateSelect.addEventListener('change', function() {
-            if (this.value === '0') {
-                customTemplateGroup.style.display = 'block';
-            } else {
-                customTemplateGroup.style.display = 'none';
-            }
+            customTemplateGroup.classList.toggle('oc-hidden', this.value !== '0');
+        });
+
+        var ageGenerateBtn = document.getElementById('age-generate-btn');
+        var ageCopyPublic = document.getElementById('age-copy-public');
+        var ageCopySecret = document.getElementById('age-copy-secret');
+        var agePublicInput = document.getElementById('age-public-input');
+        var ageSecretInput = document.getElementById('age-secret-input');
+        var ageCalPublic = document.getElementById('age-calculate-public');
+
+        if (ageGenerateBtn) {
+            ageGenerateBtn.addEventListener('click', function() {
+                var algo = document.getElementById('age-algo-select') ? document.getElementById('age-algo-select').value : 'keygen';
+                ageGenerateBtn.disabled = true;
+                XHR.get('<%=luci.dispatcher.build_url("admin", "services", "openclash", "generate_age_key")%>', {
+                    algo: algo
+                }, function(x, data) {
+                    ageGenerateBtn.disabled = false;
+                    if (x && x.status == 200 && data.status === 'success') {
+                        if (ageSecretInput) {
+                            ageSecretInput.value = data.secret || '';
+                        }
+                        if (agePublicInput) {
+                            agePublicInput.value = data.public || '';
+                        }
+                        self.updateSubmitButton();
+                    } else {
+                        alert('<%:Failed to generate age key%>');
+                    }
+                });
+            });
+        }
+
+        if (ageCopyPublic) {
+            ageCopyPublic.addEventListener('click', function() {
+                var v = agePublicInput.value || '';
+                if (v === '') { alert('<%:No public key%>'); return; }
+                ocCopyToClipboard(v, ageCopyPublic);
+            });
+        }
+
+        if (ageCopySecret) {
+            ageCopySecret.addEventListener('click', function() {
+                var v = ageSecretInput.value || '';
+                if (v === '') { alert('<%:No secret key%>'); return; }
+                ocCopyToClipboard(v, ageCopySecret);
+            });
+        }
+
+        if (ageCalPublic) {
+            ageCalPublic.addEventListener('click', function() {
+                var secret = ageSecretInput.value || '';
+                if (secret === '') { alert('<%:Please enter the Age Secret Key to calculate the public key!%>'); return; }
+                ageCalPublic.disabled = true;
+                XHR.get('<%=luci.dispatcher.build_url("admin", "services", "openclash", "cal_age_public_key")%>', {
+                    secret: secret
+                }, function(x, data) {
+                    ageCalPublic.disabled = false;
+                    if (x && x.status == 200 && data.status === 'success') {
+                        if (agePublicInput) {
+                            agePublicInput.value = data.public || '';
+                        }
+                        self.updateSubmitButton();
+                    } else {
+                        alert('<%:Failed to calculate public key%>');
+                    }
+                });
+            });
+        }
+
+        if (agePublicInput) agePublicInput.addEventListener('input', self.updateSubmitButton.bind(self));
+        if (ageSecretInput) ageSecretInput.addEventListener('input', self.updateSubmitButton.bind(self));
+
+        document.getElementById('subscribe-headers-add').addEventListener('click', function() {
+            self.addHeaderRow('', '');
         });
 
         document.getElementById('config-upload-submit').addEventListener('click', function() {
@@ -1120,12 +793,6 @@ var ConfigUploader = {
             }
         });
 
-        this.overlay.addEventListener('click', function(e) {
-            if (e.target === self.overlay && !self.isProcessing) {
-                self.hide();
-            }
-        });
-
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape' && !self.isProcessing && self.overlay.classList.contains('show')) {
                 self.hide();
@@ -1133,21 +800,75 @@ var ConfigUploader = {
         });
     },
 
-    show: function() {
+    show: function(onSuccess) {
+        this.onSuccess = onSuccess || '';
         this.overlay.classList.add('show');
         document.getElementById('config-upload-title').textContent = '<%:Add Config%>';
         this.reset();
     },
 
-    showEditSubscribe: function(subscribeData, filename) {
+    showEditSubscribe: function(subscribeData, filename, onSuccess) {
+        this.onSuccess = onSuccess || '';
         this.overlay.classList.add('show');
         this.reset();
-        this.isEditMode = true;
         this.editFilename = filename;
-        this.switchMode('subscribe');
-        document.getElementById('config-upload-title').textContent = '<%:Edit Subscription%>';
-        document.getElementById('config-upload-submit').textContent = '<%:Edit Config%>';
-        this.fillSubscribeForm(subscribeData);
+
+        var isSubscribe = subscribeData && subscribeData.address;
+        var advFileEnable = document.getElementById('advanced-options-enable-file');
+        var advFileContainer = document.getElementById('advanced-options-container-file');
+        var ageNode = document.getElementById('age-encryption-group');
+        var secretEl = document.getElementById('age-secret-input');
+        var publicEl = document.getElementById('age-public-input');
+        var algoSelect = document.getElementById('age-algo-select');
+        this.isEditMode = false;
+
+        if (isSubscribe) {
+            this.switchMode('subscribe');
+            document.getElementById('config-upload-title').textContent = '<%:Edit Subscription%>';
+            document.getElementById('config-upload-submit').textContent = '<%:Edit Config%>';
+            this.fillSubscribeForm(subscribeData);
+        } else {
+            this.switchMode('file');
+            document.getElementById('config-upload-title').textContent = '<%:Edit Config%>';
+            document.getElementById('config-upload-submit').textContent = '<%:Edit Config%>';
+
+            if (this.editFilename) {
+                document.getElementById('config-filename-input').value = this.editFilename;
+            }
+
+            try {
+                if (subscribeData) {
+                    var hasAge = false;
+                    if (subscribeData.config_age_secret) {
+                        if (secretEl) secretEl.value = subscribeData.config_age_secret;
+                        hasAge = true;
+                    }
+                    if (subscribeData.config_age_public) {
+                        if (publicEl) publicEl.value = subscribeData.config_age_public;
+                        hasAge = true;
+                    }
+                    if (subscribeData.config_age_algo) {
+                        if (algoSelect) try { algoSelect.value = subscribeData.config_age_algo; } catch (e) {}
+                        hasAge = true;
+                    }
+
+                    if (hasAge && advFileEnable && advFileContainer) {
+                        advFileEnable.checked = true;
+                        advFileContainer.classList.remove('oc-hidden');
+                        
+                        if (ageNode && ageNode.parentNode !== advFileContainer) advFileContainer.appendChild(ageNode);
+                    }
+                }
+            } catch (e) {}
+        }
+
+        if (subscribeData) {
+            if (subscribeData.config_age_hidden) {
+                advFileEnable.parentNode.parentNode.style.display = 'none';
+                ageNode.style.display = 'none';
+            }
+        }
+
         this.updateSubmitButton();
     },
 
@@ -1156,11 +877,17 @@ var ConfigUploader = {
         this.reset();
     },
 
+    updateSubconverterVersionStatus: function() {
+        if (this.subconverterVersionChecker) {
+            this.subconverterVersionChecker.update();
+        }
+    },
+
     resetAdvancedOptions: function() {
         document.getElementById('sub-convert-enable').checked = false;
-        document.getElementById('sub-convert-options').style.display = 'none';
+        document.getElementById('sub-convert-options').classList.add('oc-hidden');
         document.getElementById('convert-address-input').selectedIndex = 0;
-        document.getElementById('convert-address-custom').style.display = 'none';
+        document.getElementById('convert-address-custom').classList.add('oc-hidden');
         document.getElementById('convert-address-custom').value = '';
 
         var templateSelect = document.getElementById('template-select');
@@ -1168,7 +895,7 @@ var ConfigUploader = {
             templateSelect.selectedIndex = 0;
         }
 
-        document.getElementById('custom-template-group').style.display = 'none';
+        document.getElementById('custom-template-group').classList.add('oc-hidden');
         document.getElementById('custom-template-input').value = '';
 
         document.getElementById('emoji-enable').checked = false;
@@ -1185,6 +912,13 @@ var ConfigUploader = {
         document.getElementById('exclude-traffic').checked = false;
         document.getElementById('exclude-plan').checked = false;
         document.getElementById('exclude-website').checked = false;
+        document.getElementById('age-secret-input').value = '';
+        document.getElementById('age-public-input').value = '';
+        var advFileEnable = document.getElementById('advanced-options-enable-file');
+        if (advFileEnable) advFileEnable.checked = false;
+        var advFileContainer = document.getElementById('advanced-options-container-file');
+        if (advFileContainer) advFileContainer.classList.add('oc-hidden');
+        if (this.subconverterVersionChecker) this.subconverterVersionChecker.hide();
     },
 
     reset: function() {
@@ -1197,11 +931,15 @@ var ConfigUploader = {
         this.switchMode('file');
         document.getElementById('config-filename-input').value = '';
         document.getElementById('subscribe-url-input').value = '';
-        document.getElementById('subscribe-ua-input').value = 'clash.meta';
-        document.getElementById('subscribe-ua-custom').style.display = 'none';
+        document.getElementById('subscribe-ua-input').value = 'clash-verge/v2.4.5';
+        document.getElementById('subscribe-ua-custom').classList.add('oc-hidden');
+        var hdrContainer = document.getElementById('subscribe-headers-container');
+        hdrContainer.innerHTML = '';
+        hdrContainer.classList.add('oc-hidden');
 
         document.getElementById('advanced-options-enable').checked = false;
-        document.getElementById('advanced-options-container').style.display = 'none';
+        document.getElementById('advanced-options-container').classList.add('oc-hidden');
+        document.getElementById('config-upload-cancel').disabled = false;
         this.resetAdvancedOptions();
 
         var templateSelect = document.getElementById('template-select');
@@ -1209,7 +947,7 @@ var ConfigUploader = {
             templateSelect.selectedIndex = 0;
         }
 
-        document.getElementById('upload-progress').style.display = 'none';
+        document.getElementById('upload-progress').classList.add('oc-hidden');
         document.getElementById('config-upload-status-text').textContent = '<%:Ready to add config%>';
         document.getElementById('config-upload-submit').textContent = '<%:Add Config%>';
         this.updateSubmitButton();
@@ -1226,37 +964,52 @@ var ConfigUploader = {
             document.getElementById('subscribe-url-input').value = data.address;
         }
         if (data.sub_ua) {
-            if (data.sub_ua === 'clash.meta' || data.sub_ua === 'clash-verge/v1.5.1' || data.sub_ua === 'Clash' || data.sub_ua === 'custom') {
+            if (data.sub_ua === 'clash.meta/1.19.20' || data.sub_ua === 'clash-verge/v2.4.5' || data.sub_ua === 'Clash' || data.sub_ua === 'custom') {
                 document.getElementById('subscribe-ua-input').value = data.sub_ua;
                 if (data.sub_ua === 'custom') {
-                    document.getElementById('subscribe-ua-custom').style.display = 'block';
+                    document.getElementById('subscribe-ua-custom').classList.remove('oc-hidden');
                     document.getElementById('subscribe-ua-custom').value = data.sub_ua_custom || '';
                 }
             } else {
                 document.getElementById('subscribe-ua-input').value = 'custom';
-                document.getElementById('subscribe-ua-custom').style.display = 'block';
+                document.getElementById('subscribe-ua-custom').classList.remove('oc-hidden');
                 document.getElementById('subscribe-ua-custom').value = data.sub_ua;
             }
         }
 
-        if (data.sub_convert === '1' || data.convert_address || data.template || data.emoji === 'true' || data.udp === 'true' || data.skip_cert_verify === 'true' || data.sort === 'true' || data.node_type === 'true' || data.rule_provider === 'true' || data.custom_params || data.keyword || data.ex_keyword || data.de_ex_keyword) {
+        if (data.sub_headers) {
+            var container = document.getElementById('subscribe-headers-container');
+            container.innerHTML = '';
+            var lines = data.sub_headers.split('\n');
+            for (var i = 0; i < lines.length; i++) {
+                var line = lines[i].trim();
+                if (line) {
+                    var colonIdx = line.indexOf(':');
+                    var name = colonIdx > 0 ? line.substring(0, colonIdx).trim() : line;
+                    var value = colonIdx > 0 ? line.substring(colonIdx + 1).trim() : '';
+                    ConfigUploader.addHeaderRow(name, value);
+                }
+            }
+        }
+
+        if (data.sub_convert === '1' || data.convert_address || data.template || data.custom_template_url || data.emoji === 'true' || data.udp === 'true' || data.skip_cert_verify === 'true' || data.sort === 'true' || data.node_type === 'true' || data.rule_provider === 'true' || data.custom_params || data.keyword || data.ex_keyword || data.de_ex_keyword || data.sub_headers || data.config_age_secret || data.config_age_public || data.config_age_algo) {
             document.getElementById('advanced-options-enable').checked = true;
-            document.getElementById('advanced-options-container').style.display = 'block';
+            document.getElementById('advanced-options-container').classList.remove('oc-hidden');
 
             if (data.sub_convert === '1') {
                 document.getElementById('sub-convert-enable').checked = true;
-                document.getElementById('sub-convert-options').style.display = 'block';
+                document.getElementById('sub-convert-options').classList.remove('oc-hidden');
 
                 if (data.convert_address) {
                     if (data.convert_address === 'https://api.wcc.best/sub' || data.convert_address === 'https://api.asailor.org/sub') {
                         document.getElementById('convert-address-input').value = data.convert_address;
                         if (data.convert_address === 'custom') {
-                            document.getElementById('convert-address-custom').style.display = 'block';
+                            document.getElementById('convert-address-custom').classList.remove('oc-hidden');
                             document.getElementById('convert-address-custom').value = data.convert_address_custom || '';
                         }
                     } else {
                         document.getElementById('convert-address-input').value = 'custom';
-                        document.getElementById('convert-address-custom').style.display = 'block';
+                        document.getElementById('convert-address-custom').classList.remove('oc-hidden');
                         document.getElementById('convert-address-custom').value = data.convert_address;
                     }
                 }
@@ -1273,12 +1026,12 @@ var ConfigUploader = {
                     }
                     if (!found && data.template !== '0') {
                         templateSelect.value = '0';
-                        document.getElementById('custom-template-group').style.display = 'block';
+                        document.getElementById('custom-template-group').classList.remove('oc-hidden');
                         document.getElementById('custom-template-input').value = data.template;
                     } else if (data.template === '0') {
                         templateSelect.value = '0';
-                        document.getElementById('custom-template-group').style.display = 'block';
-                        document.getElementById('custom-template-input').value = data.custom_template || '';
+                        document.getElementById('custom-template-group').classList.remove('oc-hidden');
+                        document.getElementById('custom-template-input').value = data.custom_template_url || data.custom_template || '';
                     }
                 }
 
@@ -1307,7 +1060,20 @@ var ConfigUploader = {
                 document.getElementById('exclude-plan').checked = defaults.indexOf(document.getElementById('exclude-plan').value) !== -1;
                 document.getElementById('exclude-website').checked = defaults.indexOf(document.getElementById('exclude-website').value) !== -1;
             }
+
+            var secretEl = document.getElementById('age-secret-input');
+            var publicEl = document.getElementById('age-public-input');
+            if (secretEl) secretEl.value = data.config_age_secret || '';
+            if (publicEl) publicEl.value = data.config_age_public || '';
+            if (data.config_age_algo) {
+                var algoSelect = document.getElementById('age-algo-select');
+                if (algoSelect) {
+                    try { algoSelect.value = data.config_age_algo; } catch (e) {}
+                }
+            }
         }
+
+        this.updateSubconverterVersionStatus();
     },
 
     switchMode: function(mode) {
@@ -1320,21 +1086,46 @@ var ConfigUploader = {
         var statusText = document.getElementById('config-upload-status-text');
         var uploadZone = document.getElementById('upload-zone');
 
-        modeFileTab.style.display = this.isEditMode ? 'none' : '';
-        modeSubscribeTab.style.display = '';
+        if (this.isEditMode) {
+            modeFileTab.classList.add('oc-hidden');
+        } else {
+            modeFileTab.classList.remove('oc-hidden');
+        }
+        modeSubscribeTab.classList.remove('oc-hidden');
+
+        modeFileTab.classList.remove('active');
+        modeSubscribeTab.classList.remove('active');
+        modeFileContent.classList.add('oc-hidden');
+        modeSubscribeContent.classList.add('oc-hidden');
 
         if (mode === 'file') {
             modeFileTab.classList.add('active');
-            modeSubscribeTab.classList.remove('active');
-            modeFileContent.style.display = 'block';
-            modeSubscribeContent.style.display = 'none';
+            modeFileContent.classList.remove('oc-hidden');
             statusText.textContent = '<%:Ready to upload file%>';
-        } else {
-            modeFileTab.classList.remove('active');
+        } else if (mode === 'subscribe') {
             modeSubscribeTab.classList.add('active');
-            modeFileContent.style.display = 'none';
-            modeSubscribeContent.style.display = 'block';
+            modeSubscribeContent.classList.remove('oc-hidden');
             statusText.textContent = this.isEditMode ? '<%:Ready to edit subscription%>' : '<%:Ready to add subscription%>';
+        }
+
+        var ageNode = document.getElementById('age-encryption-group');
+        var advancedOptionsEnableEl = document.getElementById('advanced-options-enable');
+        var advancedOptionsContainerEl = document.getElementById('advanced-options-container');
+        var advancedOptionsEnableFileEl = document.getElementById('advanced-options-enable-file');
+        var advancedOptionsContainerFileEl = document.getElementById('advanced-options-container-file');
+
+        if (ageNode) {
+            if (mode === 'file') {
+                if (advancedOptionsEnableFileEl && advancedOptionsEnableFileEl.checked && advancedOptionsContainerFileEl) {
+                    if (ageNode.parentNode !== advancedOptionsContainerFileEl) advancedOptionsContainerFileEl.appendChild(ageNode);
+                } else if (advancedOptionsContainerEl) {
+                    if (ageNode.parentNode !== advancedOptionsContainerEl) advancedOptionsContainerEl.appendChild(ageNode);
+                }
+            } else if (mode === 'subscribe') {
+                if (advancedOptionsContainerEl) {
+                    if (ageNode.parentNode !== advancedOptionsContainerEl) advancedOptionsContainerEl.appendChild(ageNode);
+                }
+            }
         }
 
         this.selectedFile = null;
@@ -1390,40 +1181,50 @@ var ConfigUploader = {
     updateSubmitButton: function() {
         var filename = document.getElementById('config-filename-input').value.trim();
         var submitBtn = document.getElementById('config-upload-submit');
-        var isValid = false;
+        var isValidFormat = false;
 
         if (this.currentMode === 'file') {
-            isValid = this.selectedFile && filename;
+            if (this.selectedFile && filename) {
+                isValidFormat = true;
+            } else if (this.editFilename && filename) {
+                isValidFormat = true;
+            } else {
+                isValidFormat = false;
+            }
         } else if (this.currentMode === 'subscribe') {
             var url = document.getElementById('subscribe-url-input').value.trim();
             var advancedEnabled = document.getElementById('advanced-options-enable').checked;
             var subConvert = advancedEnabled && document.getElementById('sub-convert-enable').checked;
+            var agePublic = document.getElementById('age-public-input') ? document.getElementById('age-public-input').value.trim() : '';
+            var ageSecret = document.getElementById('age-secret-input') ? document.getElementById('age-secret-input').value.trim() : '';
 
             if (url && filename) {
                 if (subConvert) {
-                    if (url.indexOf('\n') !== -1 || url.indexOf('|') !== -1) {
-                        var links = url.indexOf('\n') !== -1 ? url.split('\n') : url.split('|');
-                        for (var i = 0; i < links.length; i++) {
-                            var link = links[i].trim();
-                            if (link && (/^https?:\/\//.test(link) || /^[a-zA-Z]+:\/\//.test(link))) {
-                                isValid = true;
-                                break;
-                            }
-                        }
-                    } else {
-                        isValid = /^https?:\/\//.test(url) || /^[a-zA-Z]+:\/\//.test(url);
-                    }
+                    var links = UrlValidator.extractUrls(url, true);
+                    isValidFormat = UrlValidator.anyValid(links, true);
                 } else {
-                    isValid = /^https?:\/\//.test(url) && url.indexOf('\n') === -1 && url.indexOf('|') === -1;
+                    if (/^https?:\/\//.test(url) && url.indexOf('\n') === -1) {
+                        var singleUrls = UrlValidator.extractUrls(url, false);
+                        isValidFormat = singleUrls.length === 1 && UrlValidator.validateUrl(singleUrls[0], false).valid;
+                    }
+                }
+            } else if (filename && (agePublic || ageSecret)) {
+                if (this.isEditMode) {
+                    isValidFormat = true;
+                } else {
+                    isValidFormat = false;
                 }
             }
         }
+        else if (this.currentMode === 'age') {
+            isValidFormat = !!filename;
+        }
 
-        submitBtn.disabled = !isValid || this.isProcessing;
+        submitBtn.disabled = !isValidFormat || this.isProcessing;
     },
 
     uploadFile: function() {
-        if (!this.selectedFile || this.isProcessing) return;
+        if (this.isProcessing) return;
 
         var filename = document.getElementById('config-filename-input').value.trim();
         if (!filename) {
@@ -1434,6 +1235,21 @@ var ConfigUploader = {
         if (!/^[a-zA-Z0-9_\-\s\u4e00-\u9fa5\.]+$/.test(filename)) {
             alert('<%:Filename contains invalid characters%>');
             return;
+        }
+
+        if (this.editFilename || this.selectedFile) {
+            var ageSecret = document.getElementById('age-secret-input').value || '';
+            var agePublic = document.getElementById('age-public-input').value || '';
+            var ageAlgoEl = document.getElementById('age-algo-select'), ageAlgo = ageAlgoEl ? ageAlgoEl.value : '';
+
+            XHR.get('<%=luci.dispatcher.build_url("admin", "services", "openclash", "add_age_config")%>', {
+                name: filename,
+                age_secret: ageSecret,
+                age_public: agePublic,
+                age_algo: ageAlgo
+            }, function(x3, data3) {
+
+            });
         }
 
         var self = this;
@@ -1449,7 +1265,17 @@ var ConfigUploader = {
         submitBtn.disabled = true;
         cancelBtn.disabled = true;
         statusText.textContent = '<%:Uploading...%>';
-        progressContainer.style.display = 'block';
+
+        if (!this.selectedFile) {
+            statusText.textContent = '<%:Upload successful%>';
+            setTimeout(function() {
+                self.hide();
+                if (self.onSuccess) setTimeout(self.onSuccess, 0);
+            }, 2000);
+            return;
+        }
+
+        progressContainer.classList.remove('oc-hidden');
 
         var progress = 0;
         var progressInterval = setInterval(function() {
@@ -1489,9 +1315,7 @@ var ConfigUploader = {
 
                     setTimeout(function() {
                         self.hide();
-                        if (typeof ConfigFileManager !== 'undefined' && ConfigFileManager.refreshConfigList) {
-                            ConfigFileManager.refreshConfigList();
-                        }
+                        if (self.onSuccess) setTimeout(self.onSuccess, 0);
                     }, 2000);
                 } else {
                     throw new Error(data.message || '<%:Upload failed%>');
@@ -1527,10 +1351,12 @@ var ConfigUploader = {
         var sort = false;
         var nodeType = false;
         var ruleProvider = false;
+        var customTemplateUrl = '';
         var customParams = '';
         var keywords = '';
         var excludeKeywords = '';
         var excludeDefaults = [];
+        var customHeaders = ConfigUploader.collectHeaders();
 
         if (advancedEnabled) {
             convertAddress = document.getElementById('convert-address-input').value;
@@ -1557,15 +1383,23 @@ var ConfigUploader = {
             }
 
             if (template === '0') {
-                template = customTemplate.trim();
+                customTemplateUrl = customTemplate.trim();
             }
         }
 
         if (userAgent === 'custom') {
-            userAgent = subscribeUaCustom.value.trim() || 'clash.meta';
+            userAgent = subscribeUaCustom.value.trim();
         }
 
-        if (!url || !filename) {
+        var ageSecretVal = document.getElementById('age-secret-input') ? document.getElementById('age-secret-input').value.trim() : '';
+        var agePublicVal = document.getElementById('age-public-input') ? document.getElementById('age-public-input').value.trim() : '';
+
+        if (!filename) {
+            alert('<%:Please enter subscription config name%>');
+            return;
+        }
+
+        if ((!url || url === '') && !ageSecretVal && !agePublicVal) {
             alert('<%:Please enter subscription URL and config name%>');
             return;
         }
@@ -1573,29 +1407,12 @@ var ConfigUploader = {
         var isValidFormat = false;
 
         if (subConvert) {
-            if (url.indexOf('\n') !== -1 || url.indexOf('|') !== -1) {
-                var links = [];
-                if (url.indexOf('\n') !== -1) {
-                    links = url.split('\n');
-                } else {
-                    links = url.split('|');
-                }
-
-                for (var i = 0; i < links.length; i++) {
-                    var link = links[i].trim();
-                    if (link && (/^https?:\/\//.test(link) || /^[a-zA-Z]+:\/\//.test(link))) {
-                        isValidFormat = true;
-                        break;
-                    }
-                }
-            } else {
-                if (/^https?:\/\//.test(url) || /^[a-zA-Z]+:\/\//.test(url)) {
-                    isValidFormat = true;
-                }
-            }
+            var links = UrlValidator.extractUrls(url, true);
+            isValidFormat = UrlValidator.anyValid(links, true);
         } else {
-            if (/^https?:\/\//.test(url) && url.indexOf('\n') === -1 && url.indexOf('|') === -1) {
-                isValidFormat = true;
+            if (/^https?:\/\//.test(url) && url.indexOf('\n') === -1) {
+                var singleUrls = UrlValidator.extractUrls(url, false);
+                isValidFormat = singleUrls.length === 1 && UrlValidator.validateUrl(singleUrls[0], false).valid;
             }
         }
 
@@ -1620,7 +1437,7 @@ var ConfigUploader = {
         submitBtn.disabled = true;
         cancelBtn.disabled = true;
         statusText.textContent = this.isEditMode ? '<%:Updating subscription...%>' : '<%:Adding subscription...%>';
-        progressContainer.style.display = 'block';
+        progressContainer.classList.remove('oc-hidden');
 
         var progress = 0;
         var progressInterval = setInterval(function() {
@@ -1631,51 +1448,67 @@ var ConfigUploader = {
             }
         }, 100);
 
-        XHR.get('<%=luci.dispatcher.build_url("admin", "services", "openclash", "add_subscription")%>', {
-            name: filename,
-            address: url,
-            sub_ua: userAgent,
-            sub_convert: subConvert ? '1' : '0',
-            convert_address: convertAddress,
-            template: template,
-            emoji: emoji ? 'true' : 'false',
-            udp: udp ? 'true' : 'false',
-            skip_cert_verify: skipCert ? 'true' : 'false',
-            sort: sort ? 'true' : 'false',
-            node_type: nodeType ? 'true' : 'false',
-            rule_provider: ruleProvider ? 'true' : 'false',
-            custom_params: customParams,
-            keyword: keywords,
-            ex_keyword: excludeKeywords,
-            de_ex_keyword: excludeDefaults.join(' ')
-        }, function(x, data) {
-            if (x && x.status == 200 && data.status === 'success') {
-                XHR.get('<%=luci.dispatcher.build_url("admin", "services", "openclash", "update_config")%>', {
-                    filename: filename
-                }, function(x2, data2) {
-                    clearInterval(progressInterval);
-                    if (x2 && x2.status == 200) {
-                        progressFill.style.width = '100%';
-                        if (data2.status === 'success') {
-                            progressText.textContent = (this.isEditMode ? '<%:Subscription updated successfully%>' : '<%:Subscription added successfully%>') + ' 100%';
-                            statusText.textContent = this.isEditMode ? '<%:Subscription updated successfully%>' : '<%:Subscription added successfully%>';
-                            setTimeout(function() {
-                                self.hide();
-                                if (typeof ConfigFileManager !== 'undefined' && ConfigFileManager.refreshConfigList) {
-                                    ConfigFileManager.refreshConfigList();
-                                }
-                            }, 2000);
+        var ageSecret = document.getElementById('age-secret-input').value || '';
+        var agePublic = document.getElementById('age-public-input').value || '';
+        var ageAlgoEl = document.getElementById('age-algo-select'), ageAlgo = ageAlgoEl ? ageAlgoEl.value : '';
+
+        var doAddSubscription = function() {
+            XHR.get('<%=luci.dispatcher.build_url("admin", "services", "openclash", "add_subscription")%>', {
+                name: filename,
+                address: url,
+                sub_ua: userAgent,
+                sub_convert: subConvert ? '1' : '0',
+                convert_address: convertAddress,
+                template: template,
+                custom_template_url: customTemplateUrl,
+                emoji: emoji ? 'true' : 'false',
+                udp: udp ? 'true' : 'false',
+                skip_cert_verify: skipCert ? 'true' : 'false',
+                sort: sort ? 'true' : 'false',
+                node_type: nodeType ? 'true' : 'false',
+                rule_provider: ruleProvider ? 'true' : 'false',
+                custom_params: customParams,
+                keyword: keywords,
+                ex_keyword: excludeKeywords,
+                de_ex_keyword: excludeDefaults.join(' '),
+                sub_headers: customHeaders
+            }, function(x, data) {
+                if (x && x.status == 200 && data.status === 'success') {
+                    XHR.get('<%=luci.dispatcher.build_url("admin", "services", "openclash", "update_config")%>', {
+                        filename: filename
+                    }, function(x2, data2) {
+                        clearInterval(progressInterval);
+                        if (x2 && x2.status == 200) {
+                            progressFill.style.width = '100%';
+                            if (data2.status === 'success') {
+                                progressText.textContent = (this.isEditMode ? '<%:Subscription updated successfully%>' : '<%:Subscription added successfully%>') + ' 100%';
+                                statusText.textContent = this.isEditMode ? '<%:Subscription updated successfully%>' : '<%:Subscription added successfully%>';
+
+                                setTimeout(function() {
+                                    self.hide();
+                                    if (self.onSuccess) setTimeout(self.onSuccess, 0);
+                                }, 2000);
+                            } else {
+                                self.handleError(this.isEditMode ? '<%:Failed to update subscription config%>' : '<%:Failed to download subscription config%>');
+                            }
                         } else {
                             self.handleError(this.isEditMode ? '<%:Failed to update subscription config%>' : '<%:Failed to download subscription config%>');
                         }
-                    } else {
-                        self.handleError(this.isEditMode ? '<%:Failed to update subscription config%>' : '<%:Failed to download subscription config%>');
-                    }
-                });
-            } else {
-                clearInterval(progressInterval);
-                self.handleError(this.isEditMode ? '<%:Failed to update subscription%>' : '<%:Failed to add subscription%>');
-            }
+                    });
+                } else {
+                    clearInterval(progressInterval);
+                    self.handleError(this.isEditMode ? '<%:Failed to update subscription%>' : '<%:Failed to add subscription%>');
+                }
+            });
+        };
+
+        XHR.get('<%=luci.dispatcher.build_url("admin", "services", "openclash", "add_age_config")%>', {
+            name: filename,
+            age_secret: ageSecret,
+            age_public: agePublic,
+            age_algo: ageAlgo
+        }, function(x3, data3) {
+            doAddSubscription();
         });
     },
 
@@ -1685,7 +1518,18 @@ var ConfigUploader = {
 
         if (!filenameInput.value.trim() && url) {
             try {
-                var urlObj = new URL(url);
+                var match = url.match(/https?:\/\/[^,\s|]+/i);
+                if (!match) {
+                    try {
+                        var decoded = decodeURIComponent(url);
+                        match = decoded.match(/https?:\/\/[^,\s|]+/i);
+                    } catch (e) {
+                        match = null;
+                    }
+                }
+
+                var urlToParse = match ? match[0] : url;
+                var urlObj = new URL(urlToParse);
                 var hostname = urlObj.hostname;
 
                 var configName = hostname
@@ -1709,6 +1553,60 @@ var ConfigUploader = {
         }
     },
 
+    addHeaderRow: function(name, value) {
+        var container = document.getElementById('subscribe-headers-container');
+        var row = document.createElement('div');
+        row.className = 'form-row header-row';
+        row.style.cssText = 'align-items: center; gap: 6px; margin-bottom: 6px;';
+
+        var nameInput = document.createElement('input');
+        nameInput.type = 'text';
+        nameInput.className = 'form-input';
+        nameInput.placeholder = 'Header-Name';
+        nameInput.value = name || '';
+        nameInput.style.cssText = 'flex: 1; height: 32px;';
+
+        var valueInput = document.createElement('input');
+        valueInput.type = 'text';
+        valueInput.className = 'form-input';
+        valueInput.placeholder = 'value';
+        valueInput.value = value || '';
+        valueInput.style.cssText = 'flex: 1.5; height: 32px;';
+
+        var removeBtn = document.createElement('button');
+        removeBtn.type = 'button';
+        removeBtn.className = 'icon-btn';
+        removeBtn.title = '<%:Remove%>';
+        removeBtn.style.cssText = 'flex-shrink: 0;';
+        removeBtn.innerHTML = '<svg width="14" height="14"><use href="#oc-icon-close"/></svg>';
+        removeBtn.addEventListener('click', function() {
+            row.parentNode.removeChild(row);
+            if (container.children.length === 0) {
+                container.classList.add('oc-hidden');
+            }
+        });
+
+        row.appendChild(nameInput);
+        row.appendChild(valueInput);
+        row.appendChild(removeBtn);
+        container.appendChild(row);
+        container.classList.remove('oc-hidden');
+    },
+
+    collectHeaders: function() {
+        var rows = document.querySelectorAll('#subscribe-headers-container .header-row');
+        var headers = [];
+        for (var i = 0; i < rows.length; i++) {
+            var inputs = rows[i].querySelectorAll('input');
+            var name = inputs[0].value.trim();
+            var value = inputs[1].value.trim();
+            if (name) {
+                headers.push(name + ': ' + (value || ''));
+            }
+        }
+        return headers.join('\n');
+    },
+
     handleError: function(message) {
         var statusText = document.getElementById('config-upload-status-text');
         var progressText = document.getElementById('upload-progress-text');
@@ -1726,7 +1624,7 @@ var ConfigUploader = {
         this.isProcessing = false;
         submitBtn.disabled = false;
         cancelBtn.disabled = false;
-        progressContainer.style.display = 'none';
+        progressContainer.classList.add('oc-hidden');
     }
 };
 

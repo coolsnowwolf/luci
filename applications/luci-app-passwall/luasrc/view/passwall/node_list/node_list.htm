@@ -5,20 +5,21 @@ local appname = map.config
 local is_js_luci = api.is_js_luci()
 local section_tag = is_js_luci and "div" or "fieldset"
 
-local default_node_type = ""
 local shunt_rule_list = {}
 local node = map:get("@global[0]", "node")
 if node then
-	local node_type = map:get(node, "type")
 	local node_protocol = map:get(node, "protocol")
-	if (node_type == "Xray" or node_type == "sing-box") and node_protocol == "_shunt" then
-		default_node_type = node_protocol
+	if node_protocol == "_shunt" then
 		local node_shunt_group = map:get(node, "shunt_group")
 		map:foreach("shunt_rules", function(e)
 			if e[".name"] and e.remarks and e.group == node_shunt_group then
 				shunt_rule_list[#shunt_rule_list + 1] = e
 			end
 		end)
+		shunt_rule_list[#shunt_rule_list + 1] = {
+			[".name"] = "default_node",
+			remarks = translate("Default")
+		}
 	end
 end
 -%>
@@ -421,10 +422,10 @@ table td, .table .td {
 <%- else %>
 	(function() {
 		if (typeof(cbi_t_switch) === "function") {
-			var old_switch = cbi_t_switch;
+			const ori_cbi_t_switch = cbi_t_switch;
 			cbi_t_switch = function(section, tab) {
 				dechecked_all_node();
-				return old_switch(section, tab);
+				return ori_cbi_t_switch(section, tab);
 			};
 		}
 	})();
@@ -1026,7 +1027,7 @@ table td, .table .td {
 				li.className = "dropdown-item";
 				li.dataset.value = val;
 				li.textContent = val;
-				list.insertBefore(li, input.parentNode);
+				list.insertBefore(li, input.parentNode); 
 			}
 
 			input.value = "";
@@ -1401,6 +1402,7 @@ table td, .table .td {
 					var node_tr_html = "";
 					for (var i = 0; i < group_nodes[group].length; i++) {
 						let o = group_nodes[group][i]
+						let _port = o["port"] || o["hysteria_hop"] || o["hysteria2_hop"];
 						var newDom = node_template.cloneNode(true);
 						newDom.classList.add("cbi-rowstyle-" + (i % 2 + 1));
 						var innerHTML = newDom.innerHTML;
@@ -1414,17 +1416,15 @@ table td, .table .td {
 						} else {
 							innerHTML = innerHTML.split("{{tcping}}").join('<span class="tcping_value" cbiid="{{id}}"><a href="javascript:void(0)" style="color:inherit">---</a></span>');
 						}
-						let is_realm = (o.type === "Hysteria2" || o.protocol === 'hysteria2') && o.hysteria2_realms || false;
-						if (o["protocol"] === '_shunt' || is_realm) {
-							innerHTML = innerHTML.split("{{url_test}}").join('<span class="ping" cbiid="{{id}}">---</span>');
-						} else {
+						if (o["address"] && _port) {
 							innerHTML = innerHTML.split("{{url_test}}").join('<span class="ping"><a href="javascript:void(0)" onclick="javascript:urltest_node(\'{{id}}\', this)" title="<%:TLS handshake test, latency for reference only%>"><%:Test%></a></span>');
+						} else {
+							innerHTML = innerHTML.split("{{url_test}}").join('<span class="ping" cbiid="{{id}}">---</span>');
 						}
 						innerHTML = innerHTML.split("{{id}}").join(o[".name"]);
 						innerHTML = innerHTML.split("{{group}}").join(o["group"] || "");
 						let node_remarks = get_remarks_name(o);
 						if (show_node_info == "1") {
-							let _port = o["port"] || o["hysteria_hop"] || o["hysteria2_hop"];
 							if (_port) _port = _port.replace(/:/g, '-');
 							if (o["address"] && _port) {
 								let _address = o["address"]
@@ -1516,36 +1516,70 @@ table td, .table .td {
 
 	//Node list option saving logic
 	document.addEventListener("DOMContentLoaded", function () {
-		function onChange(option, value) {
+		function onChange(option, value, refresh) {
 			ajax.abortAll();
 			XHR.get('<%=api.url("save_node_list_opt")%>', {
 				option: option,
 				value: value
 			}, function(x) {
 				if (x && x.status == 200) {
-					document.getElementById("node_list").innerHTML = "";
-					loadNodeList();
+					if (refresh) {
+						document.getElementById("node_list").innerHTML = "";
+						loadNodeList();
+					}
 				} else {
 					alert("<%:Error%>");
 				}
 			});
 		}
 
-		waitForElement('input[type="checkbox"][name*="<%=appname%>"][name*="show_node_info"]', function(el) {
-			el.addEventListener("change", () => {
-				el.blur();
-				show_node_info = el.checked ? "1" : "0";
-				onChange("show_node_info", show_node_info);
+		function dom_event() {
+			waitForElement('input[type="checkbox"][name*="<%=appname%>"][name*="show_node_info"]', function(el) {
+				el.addEventListener("change", () => {
+					el.blur();
+					show_node_info = el.checked ? "1" : "0";
+					onChange("auto_detection_time", auto_detection_time, true);
+				});
 			});
-		});
 
-		waitForElement('select[name*="<%=appname%>"][name*="auto_detection_time"]', function(el) {
-			el.addEventListener("change", () => {
-				el.blur();
-				auto_detection_time = el.value;
-				onChange("auto_detection_time", auto_detection_time);
-			});
-		});
+			<% if api.is_js_luci() then -%>
+				waitForElement('div[id*="cbid.<%=appname%>"][id*="url_test_url"]', function(el) {
+					el.addEventListener("cbi-dropdown-change", () => {
+						if (el.value && (!el.new_val || el.new_val != el.value)) {
+							onChange("url_test_url", el.value, false);
+							el.new_val = el.value;
+						}
+					});
+				});
+			<% else -%>
+				waitForElement('select[id*="<%=appname%>"][id*="url_test_url"]', function(el) {
+					el.addEventListener("change", () => {
+						if (el.value && (!el.new_val || el.new_val != el.value)) {
+							onChange("url_test_url", el.value, false);
+							el.new_val = el.value;
+						}
+					});
+				});
+
+				waitForElement('input[id*="<%=appname%>"][id*="url_test_url"]', function(el) {
+					el.addEventListener("change", () => {
+						if (el.value && (!el.new_val || el.new_val != el.value)) {
+							onChange("url_test_url", el.value, false);
+							el.new_val = el.value;
+						}
+					});
+				});
+			<% end -%>
+		}
+
+		<% if not api.is_js_luci() then -%>
+			const ori_cbi_d_update = cbi_d_update;
+			cbi_d_update = function() {
+				ori_cbi_d_update();
+				dom_event();
+			};
+		<% end -%>
+		dom_event();
 
 		const links = document.querySelectorAll('a');
 		links.forEach(link => {
@@ -1637,14 +1671,13 @@ table td, .table .td {
 					<input class="btn cbi-button" type="button" onclick="set_node_div.set('@global[0]', 'node')" value="<%:OK%>" />
 				</div>
 			</div>
-			<% if default_node_type == "_shunt" then %>
+			<% if #shunt_rule_list > 0 then %>
 			<div id="set_node_shunt_div" style="margin: 0.5em 0; padding: 0.5em; background: #f7f7f7; border-radius: 4px;">
 				<div class="cbi-section-descr" style="text-align: left;"><a style="color:#FF8C00"><%:Set as the routing rule node:%></a></div>
 				<div>
 				<% for i, v in ipairs(shunt_rule_list) do %>
 					<input class="btn cbi-button" type="button" onclick="set_node_div.set('<%=node%>', '<%=v[".name"]%>')" value="<%=v.remarks%>" />
 				<% end %>
-					<input class="btn cbi-button" type="button" onclick="set_node_div.set('<%=node%>', 'default_node')" value="<%:Default%>" />
 				</div>
 			</div>
 			<% end %>

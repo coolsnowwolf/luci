@@ -1,0 +1,196 @@
+<%
+local map = self.map
+local api = map.api
+local appname = map.config
+local sid = "@global[0]"
+-%>
+<style>
+ #cbi-<%=appname%>-socks .td.cbi-value-field > div { 
+	white-space: nowrap;
+}
+@media (max-width: 1152px) {
+	 #cbi-<%=appname%>-socks .td.cbi-value-field > div {
+		white-space: normal;
+	}
+}
+
+@media screen and (max-width: 1152px) {
+	#cbi-<%=appname%>-socks .cbi-section-table-titles {
+		display: none !important;
+	}
+}
+
+@media screen and (min-width: 1152px) {
+	#cbi-<%=appname%>-socks input[id*=".<%=appname%>."][id$=".port"],
+	#cbi-<%=appname%>-socks input[id*=".<%=appname%>."][id$=".http_port"] {
+		width: 100px !important;
+		min-width: unset !important;
+		max-width: unset !important;
+		text-align: center !important;
+	}
+}
+</style>
+<script type="text/javascript">
+	//<![CDATA[
+	let global_id = "<%=sid%>";
+
+	function to_edit_node(btn, stype) {
+		if (!btn) return;
+		if (!stype) return;
+		let hidden_select = null;
+		const stype_dom = document.getElementById("cbi-<%=appname%>-" + stype);
+		if (!stype_dom) return;
+		const selects = stype_dom.querySelectorAll('select[id^="cbid."][id*="."][id$="node"]');
+		const idReg = /^cbid\..*\..*node$/;
+		for (const sel of selects) {
+			if ( idReg.test(sel.id) && getComputedStyle(sel).display === "none" && (sel.compareDocumentPosition(btn) & Node.DOCUMENT_POSITION_FOLLOWING)) {
+				hidden_select = sel;
+			}
+		}
+		if (!hidden_select) return;
+		let node_select_value = hidden_select?.options[0]?.value;
+		if (!node_select_value || node_select_value.indexOf("_default") === 0 || node_select_value.indexOf("_direct") === 0 || node_select_value.indexOf("_blackhole") === 0) {
+			return;
+		}
+		let to_url = '<%=api.url("node_config")%>/' + node_select_value;
+		if (node_select_value.indexOf("socks_") === 0) {
+			to_url = '<%=api.url("socks_config")%>/' + node_select_value;
+		}
+		location.href = to_url;
+	}
+
+	const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+	async function go() {
+		const _status = document.getElementsByClassName('_status');
+		for (let i = 0; i < _status.length; i++) {
+			const id = _status[i].getAttribute("socks_id");
+			XHR.get('<%=api.url("socks_status")%>', {
+					index: i,
+					id: id
+				},
+				function(x, result) {
+					const index = result.index;
+					let div = '';
+					const div1 = '<font style="font-weight:bold;" color="green">✓</font>&nbsp';
+					const div2 = '<font style="font-weight:bold;" color="red">X</font>&nbsp';
+
+					if (result.socks_status) {
+						div += div1;
+					} else {
+						div += div2;
+					}
+					if (result.use_http) {
+						if (result.http_status) {
+							div += div1;
+						} else {
+							div += div2;
+						}
+					}
+					_status[index].innerHTML = div;
+				}
+			);
+		}
+
+		const global = document.getElementById("cbi-<%=appname%>-" + global_id);
+		if (global) {
+			// Add an "Edit" placeholder to the routing rule node in advance to ensure left alignment of the node list.
+			document.querySelectorAll('.td[data-widget="nodes_listvalue"][data-name="_node"] > div').forEach(container => {
+				if (!container.querySelector('.shunt-node-placeholder')) {
+					const placeholder = document.createElement('div');
+					placeholder.className = 'shunt-node-placeholder';
+					placeholder.style.cssText = 'display:inline-flex; width:40px; flex-shrink:0;';
+					container.appendChild(placeholder);
+				}
+			});
+
+			await delay(100);
+
+			const all_node = global.querySelectorAll("[id]");
+			const reg1 = /^cbid\..*node\.main$/;
+			//const reg1 = /^cbid\..*\.(node)\.main$/;
+
+			for (let i = 0; i < all_node.length; i++) {
+				const el = all_node[i];
+				if (!reg1.test(el.id)) continue;
+
+				const node_select = el;
+				if (!node_select) continue;
+				const cbid = el.id.replace(/\.main$/, "");
+				const hidden_select = document.getElementById(cbid);
+				const node_select_value = hidden_select?.options[0]?.value;
+				if (!node_select_value || node_select_value.indexOf("_default") === 0 || node_select_value.indexOf("_direct") === 0 || node_select_value.indexOf("_blackhole") === 0) {
+					continue;
+				}
+
+				let html = '<a href="#" onclick="return to_edit_node(this, global_id);"><%:Edit%></a>';
+
+				const m = cbid.match(/\.node$/);
+				if (m) {
+					html += '<a href="#" onclick="window.open(\'' + '<%=api.url("get_redir_log")%>?id=acl_default' + '\', \'_blank\')"><%:Log%></a>';
+				}
+
+				html = '<div class="node-actions" style="display:inline-flex; align-items:center; gap:4px; flex-wrap:wrap; margin-left:4px;">' + html + '</div>'
+
+				const placeholder = node_select.parentElement.querySelector('.shunt-node-placeholder');
+				if (placeholder) {
+					placeholder.innerHTML = html;
+				} else {
+					node_select.insertAdjacentHTML("beforeend", html);
+				}
+			}
+		}
+
+		const socks = document.getElementById("cbi-<%=appname%>-socks");
+		if (socks) {
+			const socks_enabled_dom = document.getElementById("cbi-<%=appname%>-" + global_id + "-socks_enabled");
+			const descr = socks.getElementsByClassName("cbi-section-descr")[0];
+			descr.replaceWith(socks_enabled_dom);
+			const rows = socks.getElementsByClassName("cbi-section-table-row");
+			for (let i = 0; i < rows.length; i++) {
+				try {
+					const row = rows[i];
+					const id = row.id;
+					if (!id) continue;
+					let dom_id = id + "-node";
+					const cbid = dom_id.replace("cbi-", "cbid-").replace(new RegExp("-", 'g'), ".");
+					dom_id = cbid + ".main";
+					const node_select = document.getElementById(dom_id);
+					if (!node_select) continue;
+
+					let html = '<a href="#" onclick="return to_edit_node(this, \'socks\');"><%:Edit%></a>';
+					html += '<a href="#" onclick="window.open(\'' + '<%=api.url("get_socks_log")%>?name=' + id.replace("cbi-<%=appname%>-", "") + '\', \'_blank\')"><%:Log%></a>';
+
+					node_select.insertAdjacentHTML("afterend",
+						'<div class="node-actions" style="display:inline-flex; align-items:center; gap:4px; flex-wrap:wrap; margin-left:4px;">'  
+						+ html + '</div>'
+					);
+				} catch(err) {
+				}
+			}
+		}
+	}
+
+	(function () {
+		let lastCount = 0;
+		let stableTimes = 0;
+		const STABLE_THRESHOLD = 5;
+		function waitStable() {
+			const list = document.querySelectorAll('[id^="cbid.<%=appname%>."][id$="node.main"]');
+			const count = list.length;
+			if (count === lastCount && count > 0) {
+				stableTimes++;
+			} else {
+				stableTimes = 0;
+				lastCount = count;
+			}
+			if (stableTimes >= STABLE_THRESHOLD) {
+				go();
+				return;
+			}
+			requestAnimationFrame(waitStable);
+		}
+		waitStable();
+	})();
+	//]]>
+</script>

@@ -19,9 +19,11 @@ if s1.val["type"] and s1.val["type"] ~= type_name then
 	return
 end
 
-local s = NamedSection(m, arg[1], "server")
+local s = NamedSection(m, arg[1], "tmp_" .. s1.sectiontype)
+s.parent = s1
 s.type_name = type_name
 s.option_prefix = "xray_"
+api.set_type_cbi(s)
 
 local ss_method_list = {
 	"aes-128-gcm", "aes-256-gcm", "chacha20-poly1305", "xchacha20-poly1305", "2022-blake3-aes-128-gcm", "2022-blake3-aes-256-gcm", "2022-blake3-chacha20-poly1305"
@@ -44,13 +46,13 @@ o.validate = function(self, value)
 	if v then return v end
 	return nil, translate("Custom Config") .. " " .. translate("Must be JSON text!")
 end
-o.custom_cfgvalue = function(self, section, value)
+o.cfgvalue = function(self, section)
 	local config_str = m:get(section, "config_str")
 	if config_str then
 		return api.base64Decode(config_str)
 	end
 end
-o.custom_write = function(self, section, value)
+o.write = function(self, section, value)
 	m:set(section, "config_str", api.base64Encode(value) or "")
 end
 
@@ -70,7 +72,8 @@ o = s:option(Value, "port", translate("Listen Port"))
 o.datatype = "port"
 o:depends({ custom = false })
 
-o = s:option(DynamicList, "users", translate("User"))
+o = s:option(MultiValue, "users", translate("User"))
+o.cast = "table"
 for i, v in ipairs(user_list) do
 	o:value(v[".name"], v.username)
 end
@@ -191,12 +194,19 @@ o.default = 0
 o.validate = function(self, value, t)
 	if value then
 		local reality = s.fields["reality"] and s.fields["reality"]:formvalue(t) or nil
+		local use_pem = s.fields["tls_use_pem"] and s.fields["tls_use_pem"]:formvalue(t) or nil
 		if reality and reality == "1" then return value end
-		if value == "1" then
+		if value == "1" and use_pem ~= "1" then
 			local ca = s.fields["tls_certificateFile"] and s.fields["tls_certificateFile"]:formvalue(t) or ""
 			local key = s.fields["tls_keyFile"] and s.fields["tls_keyFile"]:formvalue(t) or ""
 			if ca == "" or key == "" then
-				return nil, translate("Public key and Private key path can not be empty!")
+				return nil, translate("Certificate and Private key path can not be empty!")
+			end
+		elseif value == "1" and use_pem == "1" then
+			local ca = s.fields["tls_certificate"] and s.fields["tls_certificate"]:formvalue(t) or ""
+			local key = s.fields["tls_key"] and s.fields["tls_key"]:formvalue(t) or ""
+			if ca == "" or key == "" then
+				return nil, translate("Certificate and Private key PEM can not be empty!")
 			end
 		end
 		return value
@@ -204,13 +214,18 @@ o.validate = function(self, value, t)
 end
 o:depends({ protocol = "vmess" })
 o:depends({ protocol = "vless" })
+o:depends({ protocol = "http" })
 o:depends({ protocol = "shadowsocks" })
 o:depends({ protocol = "trojan" })
 
 -- [[ REALITY部分 ]] --
 o = s:option(Flag, "reality", translate("REALITY"))
 o.default = 0
-o:depends({ tls = true })
+o:depends({ tls = true, transport = "raw" })
+o:depends({ tls = true, transport = "ws" })
+o:depends({ tls = true, transport = "grpc" })
+o:depends({ tls = true, transport = "httpupgrade" })
+o:depends({ tls = true, transport = "xhttp" })
 
 o = s:option(Value, "reality_private_key", translate("Private Key"))
 o:depends({ reality = true })
@@ -256,11 +271,15 @@ end
 
 -- [[ TLS部分 ]] --
 
-o = s:option(FileUpload, "tls_certificateFile", translate("Public key absolute path"), translate("as:") .. "/etc/ssl/fullchain.pem")
-o.default = m:get(s.section, "tls_certificateFile") or "/etc/config/ssl/" .. arg[1] .. ".pem"
-if o and o:formvalue(arg[1]) then o.default = o:formvalue(arg[1]) end
+o = s:option(Flag, "tls_use_pem", translate("Use PEM"), translate("Use certificate and private key PEM content."))
 o:depends({ tls = true, reality = false })
-o:depends({ protocol = "hysteria2"})
+o:depends({ protocol = "hysteria2" })
+
+o = s:option(FileUpload, "tls_certificateFile", translate("Path to the certificate file"), translate("as:") .. "/etc/ssl/fullchain.crt")
+o.default = m:get(s.section, "tls_certificateFile") or "/etc/config/ssl/" .. s.section .. ".crt"
+if o and o:formvalue(s.section) then o.default = o:formvalue(s.section) end
+o:depends({ tls = true, reality = false, tls_use_pem = false })
+o:depends({ protocol = "hysteria2", tls_use_pem = false })
 o.validate = function(self, value, t)
 	if value and value ~= "" then
 		if not api.fs.access(value) then
@@ -272,11 +291,11 @@ o.validate = function(self, value, t)
 	return nil
 end
 
-o = s:option(FileUpload, "tls_keyFile", translate("Private key absolute path"), translate("as:") .. "/etc/ssl/private.key")
-o.default = m:get(s.section, "tls_keyFile") or "/etc/config/ssl/" .. arg[1] .. ".key"
-if o and o:formvalue(arg[1]) then o.default = o:formvalue(arg[1]) end
-o:depends({ tls = true, reality = false })
-o:depends({ protocol = "hysteria2"})
+o = s:option(FileUpload, "tls_keyFile", translate("Path to the private key file"), translate("as:") .. "/etc/ssl/private.key")
+o.default = m:get(s.section, "tls_keyFile") or "/etc/config/ssl/" .. s.section .. ".key"
+if o and o:formvalue(s.section) then o.default = o:formvalue(s.section) end
+o:depends({ tls = true, reality = false, tls_use_pem = false })
+o:depends({ protocol = "hysteria2", tls_use_pem = false })
 o.validate = function(self, value, t)
 	if value and value ~= "" then
 		if not api.fs.access(value) then
@@ -286,6 +305,32 @@ o.validate = function(self, value, t)
 		end
 	end
 	return nil
+end
+
+o = s:option(TextValue, "tls_certificate", "TLS Certificate (PEM)", translate("Full certificate (chain), PEM format."))
+o.default = ""
+o.rows = 5
+o.wrap = "off"
+o:depends({ tls_use_pem = true })
+o.cfgvalue = function(self, section)
+	return (m:get(section, "tls_certificate") or ""):gsub("\\n", "\n")
+end
+o.validate = function(self, value)
+	value = api.trim(value):gsub("\r\n", "\n"):gsub("\r", "\n"):gsub("[ \t]*\n[ \t]*", "\n"):gsub("\n+", "\n")
+	return value:gsub("\n", "\\n")
+end
+
+o = s:option(TextValue, "tls_key", "TLS Private Key (PEM)", translate("Private key in PEM format."))
+o.default = ""
+o.rows = 5
+o.wrap = "off"
+o:depends({ tls_use_pem = true })
+o.cfgvalue = function(self, section)
+	return (m:get(section, "tls_key") or ""):gsub("\\n", "\n")
+end
+o.validate = function(self, value)
+	value = api.trim(value):gsub("\r\n", "\n"):gsub("\r", "\n"):gsub("[ \t]*\n[ \t]*", "\n"):gsub("\n+", "\n")
+	return value:gsub("\n", "\\n")
 end
 
 o = s:option(Flag, "ech", translate("ECH"))
@@ -396,13 +441,13 @@ o:depends({ use_finalmask = true })
 o.rows = 10
 o.wrap = "off"
 o.datatype = "json"
-o.custom_cfgvalue = function(self, section, value)
+o.cfgvalue = function(self, section, value)
 	local raw = m:get(section, "finalmask")
 	if raw then
 		return api.base64Decode(raw)
 	end
 end
-o.custom_write = function(self, section, value)
+o.write = function(self, section, value)
 	m:set(section, "finalmask", api.base64Encode(value) or "")
 end
 
@@ -477,7 +522,7 @@ o.default = "0"
 o:depends({ custom = false })
 
 o = s:option(Value, "firewall_allow_src", translate("Source zone"))
-o.rmempty = false
+o.rmempty = not m.is_js_luci
 o.nocreate = true
 o.allowany = true
 o.default = "wan"
@@ -549,4 +594,4 @@ o:value("warning")
 o:value("error")
 o:depends({ log = true })
 
-api.luci_types(s1, s)
+api.type_cbi_section(s1, s)

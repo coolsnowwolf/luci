@@ -1,0 +1,1680 @@
+<%
+local map = self.map
+local api = map.api
+local appname = map.config
+
+local shunt_rule_list = {}
+local node = map:get("@global[0]", "node")
+if node then
+	local node_protocol = map:get(node, "protocol")
+	if node_protocol == "_shunt" then
+		local node_shunt_group = map:get(node, "shunt_group")
+		map:foreach("shunt_rules", function(e)
+			if e[".name"] and e.remarks and e.group == node_shunt_group then
+				shunt_rule_list[#shunt_rule_list + 1] = e
+			end
+		end)
+		shunt_rule_list[#shunt_rule_list + 1] = {
+			[".name"] = "default_node",
+			remarks = translate("Default")
+		}
+	end
+end
+-%>
+<script src="<%=resource%>/view/<%=appname%>/Sortable.min.js"></script>
+
+<style>
+table th, .table .th {
+	text-align: center;
+}
+
+table td, .table .td {
+	text-align: center;
+	/* white-space: nowrap; */
+	word-break: keep-all;
+}
+
+#set_node_div {
+	display: none;
+	width: 30rem;
+	position: fixed;
+	top:45%;
+	z-index: 99;
+	text-align: center;
+	background: white;
+	box-shadow: darkgrey 10px 10px 30px 5px;
+	text-align: center;
+	padding: 0.5em;
+}
+
+._now_use_bg {
+	background: #5e72e445 !important;
+}
+
+.ping a,
+.ping_value a,
+.tcping_value a {
+	text-decoration: none;
+	cursor: pointer;
+}
+
+@media (prefers-color-scheme: dark) {
+	._now_use_bg {
+		background: #4a90e2 !important;
+	}
+}
+
+.td.cbi-section-actions {
+	text-align: right !important;
+}
+
+.node-wrapper {
+	align-items: center;
+	display: inline-flex !important;
+	gap: 4px;
+}
+
+.cbi-tabmenu > li {
+	margin-right: 2px !important;
+}
+
+.cbi-tabmenu > li:last-child {
+	margin-right: 0 !important;
+}
+
+.node-wrapper .drag-handle {
+	cursor: grab !important;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 20px;
+	font-weight: 100;
+	padding: 0 !important;
+	line-height: inherit;
+	user-select: none;
+	align-self: stretch;
+	background-color: transparent;
+}
+
+.node-wrapper .drag-handle:hover {
+	background: transparent;
+}
+
+#cbi-<%=appname%>-nodes .pw-checkbox, #cbi-<%=appname%>-nodes th:nth-child(1) {
+	padding-right: 0px;
+}
+
+#select_all_btn {
+	display: none;
+}
+
+/* enable flex for small screens*/
+@media screen and (max-width: 1152px) {
+	.cbi-section-table-row {
+		display: flex;
+		flex-direction: row;
+		flex-wrap: wrap;
+		justify-content: space-between;
+	}
+
+	#cbi-<%=appname%>-nodes-default-fieldset {
+		margin: 0;
+	}
+
+	.cbi-section-table-titles {
+		display: none !important;
+	}
+
+	/* meticulously control how each component occupies the limited space we have */
+	#cbi-<%=appname%>-nodes .pw-checkbox, #cbi-<%=appname%>-nodes th:nth-child(1) {
+		flex: 0 0 40px;
+		min-width: 0;
+	}
+
+	#cbi-<%=appname%>-nodes .pw-remark {
+		flex: 1 1 30%;
+		min-width: 0;
+	}
+
+	#cbi-<%=appname%>-nodes .pw-ping, #cbi-<%=appname%>-nodes .pw-tcping, #cbi-<%=appname%>-nodes .pw-urltest {
+		flex: 0 0 50px;
+		white-space: nowrap;
+		min-width: 0;
+	}
+
+	.pw-actions {
+		padding-top: 0 !important;
+		border-top-width: 0 !important;
+		flex: 1 1 350px;
+	}
+
+	#select_all_btn {
+		display: inline-block !important;
+	}
+}
+
+/* shrink actionbar even further for mobile devices */
+@media screen and (max-width: 500px) {
+	.node-wrapper {
+		gap: 0;
+	}
+
+	.cbi-button {
+		margin-left: 0 !important;
+		margin-right: 1px !important;
+	}
+
+	.pw-actions {
+		padding-left: 5px!important;
+		padding-right: 5px !important;
+	}
+}
+
+.sortable-chosen {
+	background-color: rgba(220, 235, 245, 0.4) !important;
+	opacity: 0.7;
+}
+
+.sortable-ghost {
+	background: #cce5ff !important;
+	height: 3px !important;
+}
+
+.dragging-row {
+	background-color: rgba(131, 191, 255, 0.7) !important;
+	box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+</style>
+
+<style>
+	.pw-toolbar {
+		width: 100%;
+		text-align: center;
+	}
+
+	.pw-toolbar-field {
+		width: 100%;
+		text-align: center;
+		display: inline-block;
+		padding: 5px 0 5px;
+	}
+
+	#modal-mask {
+		display: none;
+		position: fixed;
+		left: 0;
+		top: 0;
+		width: 100vw;
+		height: 100vh;
+		background: rgba(0,0,0,0.4);
+		z-index: 999;
+	}
+
+	body.modal-open {
+		overflow: hidden;
+		pointer-events: none;
+	}
+
+	body.modal-open #add_link_div,
+	body.modal-open #reassign_group_div {
+		pointer-events: auto;
+	}
+
+	#add_link_div, #reassign_group_div {
+		display: none;
+		position: fixed;
+		left: 50%;
+		top: 50%;
+		transform: translate(-50%, -50%);
+		background: white;
+		padding: 20px;
+		border: 2px solid #ccc;
+		box-shadow: 0 0 10px rgba(0,0,0,0.5);
+		z-index: 1000;
+		width: 90%;
+		max-width: 500px;
+	}
+
+	#add_link_modal_container, #reassign_group_modal_container {
+		width: 100%;
+		text-align: center;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		padding-bottom: 20px;
+	}
+
+	#nodes_link {
+		width: 100%;
+		height: 180px;
+		resize: vertical;
+		font-family: monospace;
+		padding: 5px;
+		border: 1px solid #ccc;
+		border-radius: 5px;
+	}
+
+	#add_link_div h3,
+	#reassign_group_div h3 {
+		background: inherit;
+	}
+
+	#nodes_link_text {
+		color: red;
+		font-size: 14px;
+		margin-top: 5px;
+		text-align: center;
+		width: 100%;
+	}
+
+	#add_link_button_container, #reassign_group_button_container {
+		display: flex;
+		justify-content: space-between;
+		width: 100%;
+		max-width: 300px;
+		margin-top: 10px;
+	}
+
+	.value-custom {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		width: 100%;
+		margin: 10px 0;
+		padding: 0px 5px 0px 5px;
+	}
+
+	.value-field-custom {
+		display: inline-flex;
+		align-items: center;
+		gap: 10px;
+	}
+
+	.value-title-custom {
+		font-size: 13px;
+		line-height: 28px;
+		white-space: nowrap;
+		text-align: right;
+	}
+
+	.custom-dropdown {
+		position: relative;
+		border: 1px solid #d9d9d9;
+		border-radius: 2px;
+		width: 180px;
+		height: 28px;
+		font-size: 13px;
+		background: #fff;
+		cursor: pointer;
+		box-sizing: border-box;
+		display: block;
+	}
+
+	.selected-display {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: 0 8px;
+		width: 100%;
+		height: 100%;
+		box-sizing: border-box;
+		font-size: 12px;
+		color: #666;
+	}
+
+	.selected-display:hover {
+		background-color: #f7f7f7;
+	}
+
+	.dropdown-list {
+		position: absolute;
+		top: calc(100% + 2px);
+		left: -1px;
+		width: calc(100% + 2px);
+		border: 1px solid #d9d9d9;
+		border-radius: 2px;
+		border-top: none;
+		box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+		background: #fff;
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		max-height: 200px;
+		overflow-y: auto;
+		overflow-x: hidden;
+		z-index: 100;
+		box-sizing: border-box;
+		color: #666;
+	}
+
+	.dropdown-item {
+		padding: 4px 8px;
+		line-height: 20px;
+		cursor: pointer;
+	}
+
+	.dropdown-item.selected {
+		background-color: #1e90ff;
+		color: #fff;
+	}
+
+	.create-item-input::placeholder {
+		text-align: center;
+	}
+
+	.dropdown-item.custom-input input {
+		width: 100%;
+		box-sizing: border-box;
+		padding: 3px;
+		font-size: 13px;
+		line-height: 20px;
+		border: 1px solid #ccc;
+		text-align: left;
+	}
+
+	.arrow-down-small {
+		width: 0;
+		height: 0;
+		border-left: 4px solid transparent;
+		border-right: 4px solid transparent;
+		border-top: 5px solid #555;
+		display: inline-block;
+		vertical-align: middle;
+	}
+</style>
+
+<script type="text/javascript">
+<% if api.is_js_luci() then -%>
+	var cbi_t = [];
+	function cbi_t_add(section, tab) {
+		var t = document.getElementById('tab.' + section + '.' + tab);
+		var c = document.getElementById('container.' + section + '.' + tab);
+
+		if( t && c ) {
+			cbi_t[section] = (cbi_t[section] || [ ]);
+			cbi_t[section][tab] = { 'tab': t, 'container': c, 'cid': c.id };
+		}
+	}
+
+	function cbi_t_switch(section, tab) {
+		if( cbi_t[section] && cbi_t[section][tab] ) {
+			// Before switching tabs, first deselect all currently active tabs.
+			dechecked_all_node();
+			var o = cbi_t[section][tab];
+			var h = document.getElementById('tab.' + section);
+			for( var tid in cbi_t[section] ) {
+				var o2 = cbi_t[section][tid];
+				if( o.tab.id != o2.tab.id ) {
+					o2.tab.className = o2.tab.className.replace(/(^| )cbi-tab( |$)/, " cbi-tab-disabled ");
+					o2.container.style.display = 'none';
+				}
+				else {
+					if(h) h.value = tab;
+					o2.tab.className = o2.tab.className.replace(/(^| )cbi-tab-disabled( |$)/, " cbi-tab ");
+					o2.container.style.display = 'block';
+				}
+			}
+		}
+		return false
+	}
+<%- else %>
+	(function() {
+		if (typeof(cbi_t_switch) === "function") {
+			const ori_cbi_t_switch = cbi_t_switch;
+			cbi_t_switch = function(section, tab) {
+				dechecked_all_node();
+				return ori_cbi_t_switch(section, tab);
+			};
+		}
+	})();
+<%- end %>
+</script>
+
+<script type="text/javascript">
+	//<![CDATA[
+	let auto_detection_time = "<%=map:get("@global_other[0]", "auto_detection_time") or "0"%>"
+	let show_node_info = "<%=map:get("@global_other[0]", "show_node_info") or "0"%>"
+
+	var ajax = {
+		list: [],
+		post: function(url, data, fn_success, timeout, fn_timeout) {
+			var xhr = new XMLHttpRequest();
+			var code = ajax.encode(data);
+			xhr.open("POST", url, true);
+			xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+			
+			if (timeout && timeout > 1000) {
+				xhr.timeout = timeout;
+			}
+			if (fn_timeout) {
+				xhr.ontimeout = function() {
+					fn_timeout(xhr);
+				}
+			}
+			xhr.onreadystatechange = function() {
+				if(xhr.readyState == 4 && (xhr.status == 200 || xhr.status == 304)) {
+					var json = null;
+					if (xhr.getResponseHeader("Content-Type") == "application/json") {
+						try {
+							json = eval('(' + xhr.responseText + ')');
+						}
+						catch(e) {
+							json = null;
+						}
+					}
+					fn_success(xhr, json);
+				}
+			};
+			this.list.push(xhr);
+			xhr.send(code);
+		},
+		encode: function(obj) {
+			obj = obj ? obj : { };
+			obj['_'] = Math.random();
+
+			if (typeof obj == 'object')
+			{
+				var code = '';
+				var self = this;
+
+				for (var k in obj)
+					code += (code ? '&' : '') +
+						k + '=' + encodeURIComponent(obj[k]);
+
+				return code;
+			}
+
+			return obj;
+		},
+		abortAll: function() {
+			this.list.forEach(xhr => xhr.abort());
+			this.list = [];
+		}
+	}
+
+	function node_action(action, cbi_id, a) {
+		ajax.abortAll();
+		switch (action) {
+			case "add":
+				const master = document.getElementById("node_list");
+				const dom = master.getElementsByClassName("cbi-tab")[0];
+				const current_group = dom ? (dom.getAttribute("group_name") || "default") : "default";
+				window.location.href='<%=api.url("add_node")%>?redirect=1&group=' + current_group;
+				break;
+			case "copy":
+				window.location.href = '<%=api.url("copy_node")%>' + "?section=" + cbi_id;
+				break;
+			case "edit":
+				window.location.href='<%=api.url("node_config")%>/' + cbi_id;
+				break;
+			case "del":
+				window.location.href = '<%=api.url("delete_select_nodes")%>' + "?redirect=1&ids=" + cbi_id;
+				break;
+			case "row_top":
+				let btn = a.btn;
+				let group = a.group;
+				const row = btn.closest("tr");
+				if (!row) return;
+				const parent = row.parentNode;
+				let firstDataRow = parent.querySelector("tr:not(.cbi-section-table-titles)");
+				if (firstDataRow && firstDataRow !== row) {
+					parent.insertBefore(row, firstDataRow);
+					set_order(group);
+				}
+				break;
+			case "del_all":
+				if (confirm('<%:Are you sure to clear all nodes?%>') == true){
+					XHR.get('<%=api.url("clear_all_nodes")%>', null,
+					function(x, data) {
+						if(x && x.status == 200) {
+							window.location.href = '<%=api.url("node_list")%>';
+						} else {
+							alert("<%:Error%>");
+						}
+					});
+				}
+				break;
+			default:
+		}
+	}
+
+	function set_select_all_state(sectionChecked) {
+		var visibleContainer = document.querySelector('#cbi-<%=appname%>-nodes > .cbi-tabcontainer[style*="display:block"], #cbi-<%=appname%>-nodes > .cbi-tabcontainer[style*="display: block"]');
+		if (!visibleContainer) return;
+		var nodes = visibleContainer.getElementsByClassName("nodes_select");
+		var selectAllChk = visibleContainer.querySelector(".nodes_select_all");
+		var selectAllBtn = document.getElementById("select_all_btn");
+		for (var i = 0; i < nodes.length; i++) {
+			nodes[i].checked = sectionChecked;
+		}
+		if (selectAllChk) {
+			selectAllChk.checked = sectionChecked;
+			selectAllChk.title = sectionChecked ? "<%:DeSelect all%>" : "<%:Select all%>";
+			selectAllChk.setAttribute("onclick", sectionChecked ? "dechecked_all_node(this)" : "checked_all_node(this)");
+		}
+		if (selectAllBtn) {
+			selectAllBtn.value = sectionChecked ? "<%:DeSelect all%>" : "<%:Select all%>";
+			selectAllBtn.setAttribute("onclick", sectionChecked ? "dechecked_all_node(this)" : "checked_all_node(this)");
+		}
+	}
+
+	function checked_all_node(btn) {
+		set_select_all_state(true);
+	}
+
+	function dechecked_all_node(btn) {
+		set_select_all_state(false);
+	}
+
+	function update_select_state() {
+		var visibleContainer = document.querySelector('#cbi-<%=appname%>-nodes > .cbi-tabcontainer[style*="display:block"], #cbi-<%=appname%>-nodes > .cbi-tabcontainer[style*="display: block"]');
+		if (!visibleContainer) return;
+		var nodes = visibleContainer.getElementsByClassName("nodes_select");
+		if (!nodes.length) return;
+		var selectAllChk = visibleContainer.querySelector(".nodes_select_all");
+		var selectAllBtn = document.getElementById("select_all_btn");
+		var checkedCount = 0;
+		for (var i = 0; i < nodes.length; i++) {
+			if (nodes[i].checked) checkedCount++;
+		}
+		var allChecked = checkedCount === nodes.length;
+		var title = allChecked ? "<%:DeSelect all%>" : "<%:Select all%>";
+		var onclickFunc = allChecked ? "dechecked_all_node(this)" : "checked_all_node(this)";
+
+		function updateElement(el) {
+			if (!el) return;
+			if ("checked" in el) el.checked = allChecked;
+			if ("title" in el) el.title = title;
+			if ("value" in el) el.value = title;
+			el.setAttribute("onclick", onclickFunc);
+		}
+
+		updateElement(selectAllChk);
+		updateElement(selectAllBtn);
+	}
+	
+	function delete_select_nodes() {
+		var ids = [];
+		var visibleContainer = document.querySelector('#cbi-<%=appname%>-nodes > .cbi-tabcontainer[style*="display:block"], #cbi-<%=appname%>-nodes > .cbi-tabcontainer[style*="display: block"]');
+		if (!visibleContainer) return;
+		var doms = visibleContainer.getElementsByClassName("nodes_select");
+		if (doms && doms.length > 0) {
+			for (var i = 0 ; i < doms.length; i++) {
+				if (doms[i].checked) {
+					ids.push(doms[i].getAttribute("cbid"))
+				}
+			}
+			if (ids.length > 0) {
+				const dom = document.getElementById('modal-mask');
+				if (confirm('<%:Are you sure to delete select nodes?%>') == true) {
+					dom.style.display = 'block';
+					dom.innerHTML = '<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:#fff;"><%:Processing, please wait…%></div>';
+					ajax.abortAll();
+					XHR.get('<%=api.url("delete_select_nodes")%>', {
+						ids: ids.join()
+					},
+					function(x, data) {
+						dom.innerHTML = '';
+						dom.style.display = 'none';
+						if (x && x.status == 200) {
+							/*
+							for (var i = 0 ; i < ids.length; i++) {
+								var box = document.getElementById("cbi-<%=appname%>-" + ids[i]);
+								box.remove();
+							}
+							*/
+							ajax.abortAll();
+							window.location.href = '<%=api.url("node_list")%>';
+						} else {
+							alert("<%:Error%>");
+						}
+					});
+				}
+			}
+		}
+		if (ids.length <= 0) {
+			alert("<%:You no select nodes !%>");
+		}
+	}
+
+	function get_address_full(id) {
+		var address = (document.getElementById("cbid.<%=appname%>." + id + ".address") || {}).value || "";
+		var port = (document.getElementById("cbid.<%=appname%>." + id + ".port") || {}).value || "";
+		//Has Chinese characters?
+		var reg = /[\u4E00-\u9FFF]+/;
+		address = !reg.test(address) ? address : "";
+		return { address: address, port: port };
+	}
+	
+	function get_node_order(group) {
+		let table = document.getElementById("cbi-<%=appname%>-nodes-" + group + "-table");
+		if (!table) {
+			return;
+		}
+		let rows = table.querySelectorAll("tr.cbi-section-table-row");
+		if (!rows || rows.length === 0) {
+			return;
+		}
+		var ids = [];
+		rows.forEach(function(row) {
+			var id = row.id.replace("cbi-<%=appname%>-", "");
+			ids.push(id);
+		});
+		return ids;
+	}
+
+	function set_order(group) {
+		let table = document.getElementById("cbi-<%=appname%>-nodes-" + group + "-table");
+		if (!table) {
+			alert("<%:No table!%>");
+			return;
+		}
+		let rows = table.querySelectorAll("tr.cbi-section-table-row");
+		if (!rows || rows.length === 0) {
+			alert("<%:No nodes!%>");
+			return;
+		}
+		let ids = [];
+		rows.forEach(function(row) {
+			let id = row.id.replace("cbi-<%=appname%>-", "");
+			ids.push(id);
+		});
+		const input_order = document.getElementsByName(`group.order.${group}`)[0];
+		input_order.value = ids.join(" ");
+	}
+
+	function get_now_use_node() {
+		XHR.get('<%=api.url("get_now_use_node")%>', null,
+			function(x, result) {
+				var id = result["global"];
+				if (id) {
+					var dom = document.getElementById("cbi-<%=appname%>-" + id);
+					if (dom) {
+						dom.title = "<%:Using...%>";
+						dom.classList.add("_now_use_bg");
+						//var v = "<a style='color: red'><%:Using...%>：</a>" + document.getElementById("cbid.<%=appname%>." + id + ".remarks").value;
+						//document.getElementById("cbi-<%=appname%>-" + id + "-remarks").innerHTML = v;
+						var dom_remarks = dom.querySelector("td.pw-remark");
+						if (dom_remarks) {
+							dom_remarks.style.color = 'red';
+						}
+					}
+				}
+			}
+		);
+	}
+	
+	function urltest_node(cbi_id, dom) {
+		if (dom.dataset.busy == "1" || !cbi_id) return;
+		dom.dataset.busy = "1";
+		dom.style.color = "";
+		dom.innerText = "<%:Check...%>";
+		XHR.get('<%=api.url("urltest_node")%>', {
+				id: cbi_id
+			},
+			function(x, result) {
+				let color = "red";
+				let text = "<%:Error%>";
+				if (x && x.status == 200) {
+					if (result.use_time == null || result.use_time.trim() == "") {
+						text = "<%:Timeout%>";
+					} else {
+						let use_time = parseInt(result.use_time);
+						if (use_time < 1000)
+							color = "green";
+						else if (use_time < 2000)
+							color = "#fb9a05";
+						text = use_time + " ms";
+					}
+				}
+				dom.innerText = text;
+				dom.style.color = color;
+				dom.dataset.busy = "0";
+			}
+		);
+	}
+
+	function ping_node(cbi_id, dom, type) {
+		if (dom.dataset.busy == "1" || !cbi_id) return;
+		const full = get_address_full(cbi_id);
+		if ((type == "icmp" && full.address != "" ) || (type == "tcping" && full.address != "" && full.port != "")) {
+			dom.dataset.busy = "1";
+			dom.style.color = "";
+			dom.innerText = "<%:Check...%>";
+			XHR.get('<%=api.url("ping_node")%>', {
+					address: full.address,
+					port: full.port,
+					type: type
+				},
+				function(x, result) {
+					let color = "red";
+					let text = "<%:Error%>";
+					if(x && x.status == 200) {
+						if (result.ping == null || result.ping.trim() == "") {
+							text = "<%:Timeout%>";
+						} else {
+							var ping = parseInt(result.ping);
+							if (ping < 100)
+								color = "green";
+							else if (ping < 200)
+								color = "#fb9a05";
+							text = result.ping + " ms";
+						}
+					}
+					dom.innerText = text;
+					dom.style.color = color;
+					dom.dataset.busy = "0";
+				}
+			);
+		}
+	}
+
+	/* Auto Ping */
+	function pingAllNodes() {
+		if (auto_detection_time == "icmp" || auto_detection_time == "tcping") {
+			const now = Date.now();
+			const nodes = [];
+			const ping_value = document.getElementsByClassName(auto_detection_time == "tcping" ? 'tcping_value' : 'ping_value');
+			for (let i = 0; i < ping_value.length; i++) {
+				const cbi_id = ping_value[i].getAttribute("cbiid");
+				const full = get_address_full(cbi_id);
+				if ((auto_detection_time == "icmp" && full.address != "" ) || (auto_detection_time == "tcping" && full.address != "" && full.port != "")) {
+					let flag = false;
+					// Merge duplicates
+					for (let j = 0; j < nodes.length; j++) {
+						if (nodes[j].address == full.address && nodes[j].port == full.port) {
+							nodes[j].indexs = nodes[j].indexs + "," + i;
+							flag = true;
+							break;
+						}
+					}
+					if (flag)
+						continue;
+
+					const cacheData = JSON.parse(localStorage.getItem(auto_detection_time + ":" + full.address + ":" + full.port));
+					if (cacheData && cacheData.savetime && (now - cacheData.timestamp) < cacheData.savetime) {
+						const a = ping_value[i].firstElementChild;
+						let color = "red";
+						if (cacheData.value >= 0) {
+							a.innerText = cacheData.value + " ms";
+							if (cacheData.value < 100)
+								color = "green";
+							else if (cacheData.value < 200)
+								color = "#fb9a05";
+						} else {
+							a.innerText = "<%:Timeout%>";
+						}
+						a.style.color = color;
+						a.onclick = function () {
+							ping_node(cbi_id, this, auto_detection_time);
+						};
+					} else {
+						localStorage.removeItem(auto_detection_time + ":" + full.address + ":" + full.port);
+						nodes.push({
+							indexs: i + "",
+							address: full.address,
+							port: full.port
+						});
+					}
+				}
+			}
+
+			const _xhr = (index) => {
+				return new Promise((res) => {
+					const dom = nodes[index];
+					if (!dom) res()
+					ajax.post('<%=api.url("ping_node")%>', {
+						index: dom.indexs,
+						address: dom.address,
+						port: dom.port,
+						type: auto_detection_time
+					},
+					function(x, result) {
+						if (x && x.status == 200) {
+							let strs = dom.indexs.split(",");
+							for (let i = 0; i < strs.length; i++) {
+								const a = ping_value[strs[i]].firstElementChild;
+								const cbi_id = ping_value[strs[i]].getAttribute("cbiid");
+								let color = "red";
+								let text = "<%:Timeout%>";
+								if (result.ping !== null && result.ping.trim() !== "") {
+									let ping = parseInt(result.ping);
+									//save to cache
+									const cache_data = {
+										dom_id: strs[i],
+										timestamp: Date.now(),
+										savetime: 150 * 1000,
+										value: ping
+									};
+									localStorage.setItem(auto_detection_time + ":" + dom.address + ":" + dom.port, JSON.stringify(cache_data));
+									text = result.ping + " ms";
+									if (ping < 100)
+										color = "green";
+									else if (ping < 200)
+										color = "#fb9a05";
+								} else {
+									const cache_data = {
+										dom_id: strs[i],
+										timestamp: Date.now(),
+										savetime: 60 * 1000,
+										value: -1
+									};
+									localStorage.setItem(auto_detection_time + ":" + dom.address + ":" + dom.port, JSON.stringify(cache_data));
+								}
+								a.innerText = text;
+								a.style.color = color;
+								a.onclick = function () {
+									ping_node(cbi_id, this, auto_detection_time);
+								};
+							}
+						}
+						res();
+					},
+					5000,
+					function(x) {
+						let strs = dom.indexs.split(",");
+						for (let i = 0; i < strs.length; i++) {
+							const a = ping_value[strs[i]].firstElementChild;
+							const cbi_id = ping_value[strs[i]].getAttribute("cbiid");
+							a.innerText = "<%:Timeout%>";
+							a.style.color = "red";
+							a.onclick = function () {
+								ping_node(cbi_id, this, auto_detection_time);
+							};
+						}
+						res();
+					}
+				);
+				})
+			}
+
+			let task = -1;
+			const thread = () => {
+				task = task + 1
+				if (nodes[task]) {
+					_xhr(task).then(thread);
+				}
+			}
+			for (let i = 0; i < 20; i++) {
+				thread()
+			}
+		}
+	}
+
+	// List drag and rearrange
+	function initSortableForTable(table) {
+		if (!table) return null;
+		let group = table.id.replace("cbi-<%=appname%>-nodes-", "").replace("-table", "")
+		var root = table.querySelector('tbody') || table;
+		if (root._sortable_initialized) return root._sortable_instance;
+		root._sortable_initialized = true;
+		var opts = {
+			handle: ".drag-handle",
+			draggable: "tr.cbi-section-table-row",
+			animation: 150,
+			ghostClass: "dragging-row",
+			fallbackOnBody: true,
+			forceFallback: false,
+			swapThreshold: 0.65,
+			onEnd: function (evt) {
+				set_order(group);
+			}
+		};
+		try {
+			var instance = Sortable.create(root, opts);
+			root._sortable_instance = instance;
+			return instance;
+		} catch (err) {
+			root._sortable_initialized = false;
+			console.error("Sortable init failed:", err);
+			return null;
+		}
+	}
+
+	function initAllSortable(group_nodes) {
+		if (typeof Sortable === 'undefined') {
+			var retries = 0;
+			var maxRetries = 25;
+			var t = setInterval(function () {
+				retries++;
+				if (typeof Sortable !== 'undefined') {
+					clearInterval(t);
+					for (var group in group_nodes) {
+						var table = document.getElementById("cbi-<%=appname%>-nodes-" + group + "-table");
+						initSortableForTable(table);
+					}
+				} else if (retries >= maxRetries) {
+					clearInterval(t);
+				}
+			}, 200);
+		} else {
+			for (var group in group_nodes) {
+				var table = document.getElementById("cbi-<%=appname%>-nodes-" + group + "-table");
+				initSortableForTable(table);
+			}
+		}
+	}
+
+	function escape_html(s) {
+		return s.replace(/[&<>"']/g, c => ({
+			"&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;"
+		}[c]));
+	}
+</script>
+
+<script type="text/javascript">
+	//<![CDATA[
+	//Pop-up logic
+
+	// Custom group dropdown list events
+	function dropdown_list_fun(div_id) {
+		const dropdown = document.getElementById(div_id);
+		if (!dropdown) return;
+
+		const display = dropdown.querySelector(".selected-display");
+		const displayText = display.querySelector(".text");
+		const list = dropdown.querySelector(".dropdown-list");
+		const hidden = dropdown.querySelector('input[type="hidden"]');
+		const input = dropdown.querySelector(".create-item-input");
+
+		display.addEventListener("click", function() {
+			list.style.display = list.style.display === "none" ? "block" : "none";
+			input.value = "";
+			//input.focus();
+		});
+
+		function selectItem(li) {
+			list.querySelectorAll(".dropdown-item").forEach(function(el){
+				el.classList.remove("selected");
+			});
+			li.classList.add("selected");
+			hidden.value = li.dataset.value;
+			displayText.textContent = li.dataset.value || "<%:default%>";
+			list.style.display = "none";
+		}
+
+		list.addEventListener("click", function(e){
+			const li = e.target.closest(".dropdown-item");
+			if (!li || li.classList.contains("custom-input")) return;
+			selectItem(li);
+		});
+
+		input.addEventListener("keydown", function(e){
+			const isEnter = e.key === "Enter" || e.keyCode === 13;
+			if (!isEnter) return;
+			e.stopPropagation();
+			e.preventDefault();
+
+			const val = input.value.trim();
+			if (!val) return;
+
+			if (val.toLowerCase() === "default") {
+				const emptyLi = Array.from(list.querySelectorAll(".dropdown-item"))
+					.find(function(el){ return !el.dataset.value; });
+				if (emptyLi) selectItem(emptyLi);
+				input.value = "";
+				return;
+			}
+
+			let li = Array.from(list.querySelectorAll(".dropdown-item")).find(function(el){
+				return el.dataset.value && el.dataset.value.toLowerCase() === val.toLowerCase();
+			});
+			if (!li) {
+				li = document.createElement("li");
+				li.className = "dropdown-item";
+				li.dataset.value = val;
+				li.textContent = val;
+				list.insertBefore(li, input.parentNode); 
+			}
+
+			input.value = "";
+			selectItem(li);
+		});
+		// Read group names from tab
+		function InsertGroup(list, input) {
+			const tabs = document.querySelectorAll(".cbi-tabmenu li");
+			if (!tabs.length) {
+				setTimeout(() => InsertGroup(list, input), 50);
+				return;
+			}
+
+			tabs.forEach(function(li){
+				const group = li.id.split('.').pop();
+				if(group === "default") return;
+				if(Array.from(list.querySelectorAll(".dropdown-item")).some(el => el.dataset.value === group)) return;
+				const newLi = document.createElement("li");
+				newLi.className = "dropdown-item";
+				newLi.dataset.value = group;
+				newLi.textContent = group;
+				list.insertBefore(newLi, input.parentNode);
+			});
+		}
+		InsertGroup(list, input);
+
+		// Automatically collapses when clicking on the outside.
+		document.addEventListener("click", function(e) {
+			if (!dropdown.contains(e.target)) {
+				list.style.display = "none";
+			}
+		});
+	}
+
+	function getBg(el) {
+		if (!el) return null;
+		const style = getComputedStyle(el);
+		const bgImage = style.backgroundImage;
+		const bgColor = style.backgroundColor;
+		return (bgImage !== 'none' || !/rgba\([^,]+,[^,]+,[^,]+,\s*0\)/.test(bgColor) && bgColor !== 'transparent')
+			? style.background
+			: null;
+	}
+
+	const add_link_div = {
+		open() {
+			document.body.classList.add('modal-open');
+			document.getElementById('modal-mask').style.display = 'block';
+			const addLinkDiv = document.getElementById("add_link_div");
+			addLinkDiv.style.background = getBg(document.querySelector('.cbi-section')) || getBg(document.body) || '';
+			addLinkDiv.style.display = "block";
+			if (!addLinkDiv._dropdown_inited) {
+				addLinkDiv._dropdown_inited = true;
+				dropdown_list_fun("addlink_group_custom");
+			}
+			document.getElementById("nodes_link").focus();
+		},
+		close() {
+			document.getElementById('modal-mask').style.display = 'none';
+			document.getElementById("add_link_div").style.display = "none";
+			document.body.classList.remove('modal-open');
+		},
+		add_node() {
+			let nodes_link = document.getElementById("nodes_link").value;
+			const group = (document.querySelector('#addlink_group_custom input[type="hidden"]')?.value || "default");
+			nodes_link = nodes_link.replace(/\t/g, "").replace(/\r\n|\r/g, "\n").replace(/<[^>]*>/g, '').trim();
+			if (nodes_link != "") {
+				nodes_link = decodeIfBase64(nodes_link);
+				let s = nodes_link.split('://');
+				if (s.length > 1) {
+					this.close();
+					this.ajax_add_node(nodes_link, group);
+				} else {
+					alert("<%:Please enter the correct link.%>");
+				}
+			} else {
+				document.getElementById("nodes_link").focus();
+			}
+		},
+		ajax_add_node(link, group) {
+			const dom = document.getElementById('modal-mask');
+			dom.style.display = 'block';
+			dom.innerHTML = '<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:#fff;"><%:Processing, please wait…%></div>';
+			
+			const chunkSize = 1000;  // Fragmented sending to overcome uhttpd's limitations, with each fragment containing 1000 characters.
+			const totalChunks = Math.ceil(link.length / chunkSize);
+			let currentChunk = 0;
+
+			function sendNextChunk() {
+				if (currentChunk < totalChunks) {
+					const chunk = link.substring(currentChunk * chunkSize, (currentChunk + 1) * chunkSize);
+					const xhr = new XMLHttpRequest();
+					xhr.open('POST', '<%=api.url("link_add_node")%>', true);
+					xhr.onload = function () {
+						if (xhr.status === 200) {
+							currentChunk++;
+							sendNextChunk();
+						} else {
+							dom.innerHTML = '';
+							dom.style.display = 'none';
+							alert("<%:Error%>");
+							return;
+						}
+					};
+					xhr.onerror = function () {
+						dom.innerHTML = '';
+						dom.style.display = 'none';
+						alert("<%:Network Error%>");
+						return;
+					};
+					const formData = new FormData();
+					formData.append("chunk", chunk);
+					formData.append("chunk_index", currentChunk);
+					formData.append("total_chunks", totalChunks);
+					formData.append("group", group);
+					ajax.abortAll();
+					xhr.send(formData);
+				} else {
+					window.location.href = '<%=api.url("node_list")%>';
+				}
+			}
+			sendNextChunk();
+		}
+	}
+
+	const reassign_group_div = {
+		open() {
+			const ids = [];
+			const visibleContainer = document.querySelector('#cbi-passwall2-nodes > .cbi-tabcontainer[style*="display:block"], #cbi-passwall2-nodes > .cbi-tabcontainer[style*="display: block"]');
+			if (!visibleContainer) return;
+			const doms = visibleContainer.getElementsByClassName("nodes_select");
+			if (doms && doms.length > 0) {
+				for (let i = 0 ; i < doms.length; i++) {
+					if (doms[i].checked) {
+						ids.push(doms[i].getAttribute("cbid"))
+					}
+				}
+				if (ids.length > 0) {
+					document.body.classList.add('modal-open');
+					document.getElementById('modal-mask').style.display = 'block';
+					const reassignGroupDiv = document.getElementById("reassign_group_div");
+					reassignGroupDiv.style.background = getBg(document.querySelector('.cbi-section')) || getBg(document.body) || '';
+					reassignGroupDiv.style.display = "block";
+					if (!reassignGroupDiv._dropdown_inited) {
+						reassignGroupDiv._dropdown_inited = true;
+						dropdown_list_fun("reassign_group_custom");
+					}
+				} else {
+					alert("<%:You no select nodes !%>");
+				}
+			}
+		},
+		close() {
+			document.getElementById('modal-mask').style.display = 'none';
+			document.getElementById("reassign_group_div").style.display = "none";
+			document.body.classList.remove('modal-open');
+		},
+		action() {
+			const ids = [];
+			const group = (document.querySelector('#reassign_group_custom input[type="hidden"]')?.value || "default");
+			const visibleContainer = document.querySelector('#cbi-passwall2-nodes > .cbi-tabcontainer[style*="display:block"], #cbi-passwall2-nodes > .cbi-tabcontainer[style*="display: block"]');
+			if (!visibleContainer) return;
+			const doms = visibleContainer.getElementsByClassName("nodes_select");
+			if (doms && doms.length > 0) {
+				for (let i = 0 ; i < doms.length; i++) {
+					if (doms[i].checked) {
+						ids.push(doms[i].getAttribute("cbid"))
+					}
+				}
+				if (ids.length > 0) {
+					ajax.abortAll();
+					XHR.get('<%=api.url("reassign_group")%>', {
+						group: group,
+						ids: ids.join(",")
+					},
+					function(x, data) {
+						if (x && x.status == 200) {
+							window.location.href = '<%=api.url("node_list")%>';
+						} else {
+							alert("<%:Error%>");
+						}
+					});
+				}
+			}
+		}
+	}
+	
+	const set_node_div = {
+		section: '',
+		open(cbi_id) {
+			this.section = cbi_id;
+			document.getElementById("set_node_div").style.display="block";
+			const node_name = document.getElementById("cbid.<%=appname%>." + cbi_id + ".remarks").value;
+			document.getElementById("set_node_name").textContent = node_name;
+		},
+		close() {
+			document.getElementById("set_node_div").style.display="none";
+			document.getElementById("set_node_name").textContent = "";
+		},
+		set(type, config) {
+			if (confirm('<%:Are you sure set this node?%>') == true){
+				ajax.abortAll();
+				window.location.href = '<%=api.url("set_node")%>?type=' + type + '&config=' + config + '&section=' + this.section;
+			}
+		}
+	}
+	//]]>
+</script>
+
+<div class="pw-toolbar">
+	<div class="pw-toolbar-field">
+		<input class="btn cbi-button cbi-button-add" type="button" onclick="node_action('add')" value="<%:Add%>" />
+		<input class="btn cbi-button cbi-button-add" type="button" onclick="add_link_div.open()" value="<%:Add the node via the link%>" />
+		<input class="btn cbi-button cbi-button-remove" type="button" onclick="node_action('del_all')" value="<%:Clear all nodes%>" />
+		<input class="btn cbi-button cbi-button-remove" type="button" onclick="delete_select_nodes()" value="<%:Delete select nodes%>" />
+		<input class="btn cbi-button cbi-button-edit" type="button" id="select_all_btn" onclick="checked_all_node(this)" value="<%:Select all%>" />
+		<input class="btn cbi-button cbi-button-edit" type="button" onclick="reassign_group_div.open()" value="<%:Reassign Group%>" />
+		<input class="btn cbi-button cbi-button-apply" type="submit" name="cbi.apply" value="<%:Save & Apply%>" />
+		<!--<input class="btn cbi-button cbi-button-save" type="submit" name="cbi.save" value="<%:Save%>" />-->
+		<!--<input class="btn cbi-button cbi-button-reset" type="button" value="<%:Reset%>" onclick="location.href='<%=REQUEST_URI%>'" />-->
+	</div>
+</div>
+
+<script type="text/template" id="nodes-table-template">
+	<fieldset class="cbi-section cbi-tblsection" id="cbi-<%=appname%>-nodes-{{group}}-fieldset">
+		<table class="table cbi-section-table" id="cbi-<%=appname%>-nodes-{{group}}-table" style="">
+			<tr class="tr cbi-section-table-titles anonymous">
+				<th class="th cbi-section-table-cell" style="width:20px">
+					<input class="cbi-input-checkbox nodes_select_all" type="checkbox" onclick="checked_all_node(this)" title="<%:Select all%>"/>
+				</th>
+				<th class="th cbi-section-table-cell" style="width:40%"><%:Remarks%></th>
+				<th class="th cbi-section-table-cell" style="width:8%">Ping</th>
+				<th class="th cbi-section-table-cell" style="width:8%">TCPing</th>
+				<th class="th cbi-section-table-cell" style="width:8%"><%:URL Test%></th>
+				<th class="th cbi-section-table-cell cbi-section-actions"></th>
+			</tr>
+			{{node-tr}}
+		</table>
+		<input type="hidden" name="group.order.{{group}}">
+		<div class="cbi-section-create cbi-tblsection-create">
+			<input class="cbi-button cbi-button-add" type="button" value="<%:Add%>" onclick="node_action('add')">
+		</div>
+	</fieldset>
+</script>
+
+<script type="text/template" id="node-tr-template">
+	<tr class="tr cbi-section-table-row" id="cbi-<%=appname%>-{{id}}">
+		<input class="hidden" id="cbid.<%=appname%>.{{id}}.remarks" value="{{remarks_val}}"/>
+		<input class="hidden" id="cbid.<%=appname%>.{{id}}.address" value="{{address_val}}"/>
+		<input class="hidden" id="cbid.<%=appname%>.{{id}}.port" value="{{port_val}}"/>
+		<td class="td cbi-value-field pw-checkbox">
+			<input class="cbi-input-checkbox nodes_select" type="checkbox" cbid="{{id}}" onclick="update_select_state()"/>
+		</td>
+		<td class="td cbi-value-field pw-remark">{{remarks}}</td>
+		<td class="td cbi-value-field pw-ping">{{ping}}</td>
+		<td class="td cbi-value-field pw-tcping">{{tcping}}</td>
+		<td class="td cbi-value-field pw-urltest">{{url_test}}</td>
+		<td class="td cbi-section-table-cell nowrap cbi-section-actions pw-actions">
+			<div class="node-wrapper">
+				<input class="btn cbi-button cbi-button-edit" type="button" value="<%:To Top%>" onclick="node_action('row_top', null, {btn:this, group:'{{group}}'})" title="<%:To Top%>"/>
+				<input class="btn cbi-button cbi-button-apply" type="button" value="<%:Use%>" id="apply_{{id}}" onclick="set_node_div.open('{{id}}')"/>
+				<input class="btn cbi-button cbi-button-add" type="button" value="<%:Copy%>" onclick="node_action('copy', '{{id}}')"/>
+				<input class="btn cbi-button cbi-button-edit" type="button" value="<%:Edit%>" onclick="node_action('edit', '{{id}}')" alt="<%:Edit%>" title="<%:Edit%>">
+				<input class="btn cbi-button cbi-button-remove" type="button" value="<%:Delete%>" onclick="node_action('del', '{{id}}')" alt="<%:Delete%>" title="<%:Delete%>">
+				<span class="drag-handle center" title="<%:Drag to reorder%>">⠿</span>
+			</div>
+		</td>
+	</tr>
+</script>
+
+<fieldset class="cbi-section" id="node_list">
+</fieldset>
+
+<script type="text/javascript">
+	//init logic
+
+	function get_remarks_name(o) {
+		let str = "";
+		let remarks = o["remarks"] || "";
+		let type = o["type"] || "";
+		str += "<input type='hidden' id='cbid.<%=appname%>." + o[".name"] + ".type' value='" + type + "'/>";
+		if (type == "sing-box" || type == "Xray") {
+			let protocol = o["protocol"]
+			let p = "";
+			if (protocol == "_balancing") {
+				p = "<%:Balancing%>";
+			} else if (protocol == "_urltest") {
+				p = "URLTest";
+			} else if (protocol == "_shunt") {
+				p = "<%:Shunt%>";
+			} else if (protocol == "_iface") {
+				p = "<%:Interface%>";
+			} else if (protocol == "vmess") {
+				p = "VMess";
+			} else if (protocol == "vless") {
+				p = "VLESS";
+			} else if (protocol == "shadowsocks") {
+				p = "SS";
+			} else if (protocol == "shadowsocksr") {
+				p = "SSR";
+			} else if (protocol == "wireguard") {
+				p = "WG";
+			} else if (protocol == "hysteria") {
+				p = "HY";
+			} else if (protocol == "hysteria2") {
+				p = "HY2";
+			} else if (protocol == "anytls") {
+				p = "AnyTLS";
+			} else if (protocol == "ssh") {
+				p = "SSH";
+			} else {
+				if (protocol && protocol.length > 1) {
+					p = protocol.charAt(0).toUpperCase() + protocol.slice(1);
+				}
+			}
+			if (type == "sing-box") {
+				type = "Sing-Box";
+			}
+			type += " " + p;
+		}
+		let address = o["address"] || "";
+		let port = o["port"] || "";
+		let port_s = "";
+		if (port != "") {
+			port_s = port;
+		} else {
+			port_s = o["hysteria_hop"] || o["hysteria2_hop"];
+		}
+		if ((o.type === "Hysteria2" || o.protocol === 'hysteria2') && o.hysteria2_realms) {
+			str += type + " Realm：" + remarks;
+		} else {
+			str += type + "：" + remarks;
+		}
+		return str;
+	}
+
+	function loadNodeList() {
+		XHR.get('<%=api.url("get_node")%>', null, function(x, result) {
+			var node_list = result
+
+			var group_nodes = {}
+			for (let i = 0; i < node_list.length; i++) {
+				let _node = node_list[i]
+				if (!_node.group || _node.group === "") {
+					_node.group = "default"
+				}
+				if (!group_nodes[_node.group]) {
+					group_nodes[_node.group] = []
+				}
+				group_nodes[_node.group].push(_node)
+			}
+
+			var tab_ul_li_html = ''
+			var tab_content_html = ''
+			var nodes_table_template = document.getElementById("nodes-table-template");
+			var node_template = document.getElementById("node-tr-template");
+			var default_group = null
+			for (let group in group_nodes) {
+				if (default_group == null)
+					default_group = group
+
+				var table_html = "";
+				if (true) {
+					//Node List
+					var new_nodes_table_dom = nodes_table_template.cloneNode(true);
+					var _html = new_nodes_table_dom.innerHTML;
+					_html = _html.split("{{group}}").join(group);
+					var node_tr_html = "";
+					for (var i = 0; i < group_nodes[group].length; i++) {
+						let o = group_nodes[group][i]
+						var newDom = node_template.cloneNode(true);
+						newDom.classList.add("cbi-rowstyle-" + (i % 2 + 1));
+						var innerHTML = newDom.innerHTML;
+						if (auto_detection_time != "icmp" && o["address"]) {
+							innerHTML = innerHTML.split("{{ping}}").join('<span class="ping"><a href="javascript:void(0)" onclick="javascript:ping_node(\'{{id}}\', this, \'icmp\')"><%:Test%></a></span>');
+						} else {
+							innerHTML = innerHTML.split("{{ping}}").join('<span class="ping_value" cbiid="{{id}}"><a href="javascript:void(0)" style="color:inherit">---</a></span>');
+						}
+						if (auto_detection_time != "tcping" && o["address"] && o["port"]) {
+							innerHTML = innerHTML.split("{{tcping}}").join('<span class="ping"><a href="javascript:void(0)" onclick="javascript:ping_node(\'{{id}}\', this, \'tcping\')"><%:Test%></a></span>');
+						} else {
+							innerHTML = innerHTML.split("{{tcping}}").join('<span class="tcping_value" cbiid="{{id}}"><a href="javascript:void(0)" style="color:inherit">---</a></span>');
+						}
+						if (o["address"] && o["port"]) {
+							innerHTML = innerHTML.split("{{url_test}}").join('<span class="ping"><a href="javascript:void(0)" onclick="javascript:urltest_node(\'{{id}}\', this)"><%:Test%></a></span>');
+						} else {
+							innerHTML = innerHTML.split("{{url_test}}").join('<span class="ping_value"><a href="javascript:void(0)" style="color:inherit">---</a></span>');
+						}
+						innerHTML = innerHTML.split("{{id}}").join(o[".name"]);
+						innerHTML = innerHTML.split("{{group}}").join(o["group"] || "");
+						let node_remarks = get_remarks_name(o);
+						if (show_node_info == "1") {
+							let _port = o["port"] || o["hysteria_hop"] || o["hysteria2_hop"];
+							if (_port) _port = _port.replace(/:/g, '-');
+							if (o["address"] && _port) {
+								let _address = o["address"]
+								if (o["full_address"])
+									_address = o["full_address"]
+								node_remarks += "<br>" + _address + ":" + _port
+							}
+						}
+						innerHTML = innerHTML.split("{{remarks}}").join(node_remarks);
+						innerHTML = innerHTML.split("{{remarks_val}}").join(o["remarks"]);
+						innerHTML = innerHTML.split("{{address_val}}").join(o["address"] || "");
+						innerHTML = innerHTML.split("{{port_val}}").join(o["port"] || "");
+
+						node_tr_html += innerHTML
+					}
+					_html = _html.split("{{node-tr}}").join(node_tr_html);
+					table_html = _html;
+				}
+
+				var group_name = group
+				if (group === "default") {
+					group_name = "<%:default%>"
+				}
+
+				tab_ul_li_html +=
+					'<li group_name="' + group + '" id="tab.<%=appname%>.nodes.' + group + '" class="cbi-tab">' +
+						'<a onclick="this.blur(); return cbi_t_switch(\'<%=appname%>.nodes\', \'' + group + '\')" href="<%=REQUEST_URI%>?tab.<%=appname%>.nodes=' + group + '">' + escape_html(group_name) + " | " + "<font style='color: red'>" + group_nodes[group].length + '</font></a>' +
+					'</li>'
+				tab_content_html +=
+					'<div class="cbi-tabcontainer" id="container.<%=appname%>.nodes.' + group + '" style="display: none;">' +
+					'' + table_html +
+					'</div>'
+			}
+
+			function addTabDOM(li, content) {
+				let tab_ul_html = '<ul class="cbi-tabmenu">';
+				let tab_content_html = '<fieldset class="cbi-section-shunt_rule cbi-section-shunt_rule-tabbed" id="cbi-<%=appname%>-nodes">';
+				if (li) {
+					tab_ul_html += li;
+				}
+				if (content) {
+					tab_content_html += content;
+				}
+				tab_ul_html += '</ul>';
+				tab_content_html += '</fieldset>';
+				return tab_ul_html + tab_content_html;
+			}
+
+			document.getElementById("node_list").innerHTML = addTabDOM(tab_ul_li_html, tab_content_html);
+
+			for (let group in group_nodes) {
+				cbi_t_add("<%=appname%>.nodes", group)
+			}
+
+			if (default_group) {
+				cbi_t_switch("<%=appname%>.nodes", default_group)
+			}
+
+			origin_group_node_order = {};
+			for (let group in group_nodes) {
+				origin_group_node_order[group] = get_node_order(group);
+			}
+
+			initAllSortable(group_nodes);
+
+			//clear expire data
+			if (localStorage && localStorage.length > 0) {
+				const now = Date.now();
+				for (let i = 0; i < localStorage.length; i++) {
+					let key = localStorage.key(i);
+					if (key && (key.startsWith("icmp") || key.startsWith("tcping"))) {
+						let value_str = localStorage.getItem(key);
+						const value = JSON.parse(value_str);
+						if (!(value && value.savetime && (now - value.timestamp) < value.savetime)) {
+							localStorage.removeItem(key);
+						}
+					}
+				}
+			}
+
+			get_now_use_node();
+			
+			pingAllNodes();
+		});
+	}
+
+	loadNodeList();
+
+	//Node list option saving logic
+	document.addEventListener("DOMContentLoaded", function () {
+		function onChange(option, value, refresh) {
+			ajax.abortAll();
+			XHR.get('<%=api.url("save_node_list_opt")%>', {
+				option: option,
+				value: value
+			}, function(x) {
+				if (x && x.status == 200) {
+					if (refresh) {
+						document.getElementById("node_list").innerHTML = "";
+						loadNodeList();
+					}
+				} else {
+					alert("<%:Error%>");
+				}
+			});
+		}
+		
+		function dom_event() {
+			waitForElement('input[type="checkbox"][name*="<%=appname%>"][name*="show_node_info"]', function(el) {
+				el.addEventListener("change", () => {
+					el.blur();
+					show_node_info = el.checked ? "1" : "0";
+					onChange("show_node_info", show_node_info, true);
+				});
+			});
+
+			waitForElement('select[name*="<%=appname%>"][name*="auto_detection_time"]', function(el) {
+				el.addEventListener("change", () => {
+					el.blur();
+					auto_detection_time = el.value;
+					onChange("auto_detection_time", auto_detection_time, true);
+				});
+			});
+
+			<% if api.is_js_luci() then -%>
+				waitForElement('div[id*="cbid.<%=appname%>"][id*="url_test_url"]', function(el) {
+					el.addEventListener("cbi-dropdown-change", () => {
+						if (el.value && (!el.new_val || el.new_val != el.value)) {
+							onChange("url_test_url", el.value, false);
+							el.new_val = el.value;
+						}
+					});
+				});
+			<% else -%>
+				waitForElement('select[id*="<%=appname%>"][id*="url_test_url"]', function(el) {
+					el.addEventListener("change", () => {
+						if (el.value && (!el.new_val || el.new_val != el.value)) {
+							onChange("url_test_url", el.value, false);
+							el.new_val = el.value;
+						}
+					});
+				});
+
+				waitForElement('input[id*="<%=appname%>"][id*="url_test_url"]', function(el) {
+					el.addEventListener("change", () => {
+						if (el.value && (!el.new_val || el.new_val != el.value)) {
+							onChange("url_test_url", el.value, false);
+							el.new_val = el.value;
+						}
+					});
+				});
+			<% end -%>
+		}
+
+		<% if not api.is_js_luci() then -%>
+			const ori_cbi_d_update = cbi_d_update;
+			cbi_d_update = function() {
+				ori_cbi_d_update();
+				dom_event();
+			};
+		<% end -%>
+		dom_event();
+		
+		const links = document.querySelectorAll('a');
+		links.forEach(link => {
+			link.addEventListener('click', (e) => {
+				if (link.getAttribute('target') !== '_blank') {
+					ajax.abortAll();
+				}
+			});
+		});
+		window.addEventListener('beforeunload', (event) => {
+			ajax.abortAll();
+		});
+	});
+	//]]>
+</script>
+
+<div id="modal-mask"></div>
+
+<div id="add_link_div">
+	<div id="add_link_modal_container">
+		<h3><%:Add the node via the link%></h3>
+		<div class="value-custom">
+			<textarea id="nodes_link" rows="10"></textarea>
+			<p id="nodes_link_text"><%:Enter share links, one per line. Subscription links are not supported!%></p>
+		</div>
+		<div class="value-custom">
+			<div class="value-field-custom">
+				<label class="value-title-custom" for="addlink_group_custom"><%:Group Name%></label>
+				<div id="addlink_group_custom" class="custom-dropdown">
+					<div class="selected-display">
+						<span class="text"><%:default%></span>
+						<span class="arrow-down-small"></span>
+					</div>
+					<ul class="dropdown-list" style="display:none;">
+						<li class="dropdown-item selected" data-value=""><%:default%></li>
+						<li class="dropdown-item custom-input">
+							<input type="text" placeholder="-- <%:custom%> --" class="create-item-input" inputmode="text" enterkeyhint="done">
+						</li>
+					</ul>
+					<input type="hidden" name="addlink_group" value="">
+				</div>
+			</div>
+		</div>
+		<div id="add_link_button_container">
+			<input class="btn cbi-button cbi-button-add" type="button" onclick="add_link_div.add_node()" value="<%:Add%>" />
+			<input class="btn cbi-button cbi-button-remove" type="button" onclick="add_link_div.close()" value="<%:Close%>" />
+		</div>
+	</div>
+</div>
+
+<div id="reassign_group_div">
+	<div id="reassign_group_modal_container">
+		<h3><%:Reassign Node Group%></h3>
+		<div class="value-custom">
+			<div class="value-field-custom">
+				<label class="value-title-custom" for="reassign_group_custom"><%:Group Name%></label>
+				<div id="reassign_group_custom" class="custom-dropdown">
+					<div class="selected-display">
+						<span class="text"><%:default%></span>
+						<span class="arrow-down-small"></span>
+					</div>
+					<ul class="dropdown-list" style="display:none;">
+						<li class="dropdown-item selected" data-value=""><%:default%></li>
+						<li class="dropdown-item custom-input">
+							<input type="text" placeholder="-- <%:custom%> --" class="create-item-input" inputmode="text" enterkeyhint="done">
+						</li>
+					</ul>
+					<input type="hidden" name="to_group" value="">
+				</div>
+			</div>
+		</div>
+		<div id="reassign_group_button_container">
+			<input class="btn cbi-button cbi-button-edit" type="button" onclick="reassign_group_div.action()" value="<%:Save%>" />
+			<input class="btn cbi-button cbi-button-remove" type="button" onclick="reassign_group_div.close()" value="<%:Close%>" />
+		</div>
+	</div>
+</div>
+
+<div style="display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center; -webkit-justify-content: center; justify-content: center;">
+	<div id="set_node_div">
+		<div class="cbi-value" style="display: flex; justify-content: center; align-items: center; margin: 1em 0; height: 2em;">
+			<font color=#666><%:You choose node is:%></font><a style="color: red" id="set_node_name"></a>
+			<div style="position:absolute; right:0.5em; top: 0.5em;"><input class="btn cbi-button" type="button" onclick="set_node_div.close()" value="X" /></div>
+		</div>
+		<div class="cbi-value" style="justify-content: center; gap: 8px; margin: 1em 0;">
+			<%- if #shunt_rule_list > 0 then
+				for i, v in ipairs(shunt_rule_list) do
+			-%>
+				<input class="btn cbi-button" type="button" onclick="set_node_div.set('<%=node%>', '<%=v[".name"]%>')" value="<%=v.remarks%>" />
+			<%-
+				end
+			-%>
+			<% else %>
+				<input class="btn cbi-button" type="button" onclick="set_node_div.set('@global[0]', 'node')" value="<%:Node%>" />
+			<% end %>
+		</div>
+	</div>
+</div>

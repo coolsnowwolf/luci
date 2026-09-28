@@ -17,6 +17,7 @@ uci -q commit firewall
 
 mkdir -p /etc/openclash/config
 mkdir -p /etc/openclash/proxy_provider
+mkdir -p /etc/openclash/rule_provider
 mkdir -p /etc/openclash/core
 mkdir -p /etc/openclash/history
 mkdir -p /usr/share/openclash/backup/overwrite
@@ -80,10 +81,13 @@ case "${DISTRIB_ARCH}" in
 	aarch64_*)
 		CORE_ARCH="linux-arm64"
 		;;
-	arm_*_neon-vfp*)
+	armeb_*)
+		CORE_ARCH="0"
+		;;
+	arm_cortex-a5|arm_cortex-a5[^0-9]*|arm_cortex-a7|arm_cortex-a7[^0-9]*|arm_cortex-a8*|arm_cortex-a9*|arm_cortex-a12*|arm_cortex-a15*|arm_cortex-a17*)
 		CORE_ARCH="linux-armv7"
 		;;
-	arm_*_neon|arm_*_vfp*)
+	arm_arm1176jzf-s*|arm_arm1136*|arm_mpcore*)
 		CORE_ARCH="linux-armv6"
 		;;
 	arm*)
@@ -91,6 +95,9 @@ case "${DISTRIB_ARCH}" in
 		;;
 	i386_*)
 		CORE_ARCH="linux-386"
+		;;
+	mips64el_*)
+		CORE_ARCH="linux-mips64le"
 		;;
 	mips64_*)
 		CORE_ARCH="linux-mips64"
@@ -100,6 +107,12 @@ case "${DISTRIB_ARCH}" in
 		;;
 	mipsel_*)
 		CORE_ARCH="linux-mipsle-softfloat"
+		;;
+	riscv64*)
+		CORE_ARCH="linux-riscv64"
+		;;
+	loongarch64*|loongarch_*)
+		CORE_ARCH="linux-loong64-abi2"
 		;;
 	x86_64)
 		CORE_ARCH="linux-amd64-v1"
@@ -143,6 +156,7 @@ cp -f "/etc/openclash/custom/openclash_custom_overwrite.sh" "/usr/share/openclas
 cp -f "/etc/openclash/china_ip_route.ipset" "/usr/share/openclash/backup/china_ip_route.ipset" >/dev/null 2>&1
 cp -f "/etc/openclash/china_ip6_route.ipset" "/usr/share/openclash/backup/china_ip6_route.ipset" >/dev/null 2>&1
 cp -f "/etc/openclash/overwrite/default" "/usr/share/openclash/backup/overwrite/default" >/dev/null 2>&1
+cp -f "/etc/openclash/rule_provider/oc-cn-domain.mrs" "/usr/share/openclash/backup/oc-cn-domain.mrs" >/dev/null 2>&1
 
 #Restore
 if [ -f "/tmp/openclash.bak" ]; then
@@ -166,8 +180,10 @@ if [ -f "/tmp/openclash.bak" ]; then
 	cp -rf "/tmp/openclash/." "/etc/openclash/" >/dev/null 2>&1
 	#ui
 	if [ -d "/tmp/openclash_ui/" ]; then
-		rm -rf "/usr/share/openclash/ui/" >/dev/null 2>&1
-		cp -rf "/tmp/openclash_ui/." "/usr/share/openclash/ui/" >/dev/null 2>&1
+		if [ -d "/tmp/openclash_ui/metacubexd/" ] || [ -d "/tmp/openclash_ui/zashboard/" ] || [ -d "/tmp/openclash_ui/yacd/" ] || [ -d "/tmp/openclash_ui/dashboard/" ]; then
+			rm -rf "/usr/share/openclash/ui/" >/dev/null 2>&1
+			cp -rf "/tmp/openclash_ui/." "/usr/share/openclash/ui/" >/dev/null 2>&1
+		fi
 		rm -rf "/tmp/openclash_ui/" >/dev/null 2>&1
 	fi
 	#pac
@@ -175,6 +191,10 @@ if [ -f "/tmp/openclash.bak" ]; then
 		rm -rf "/www/luci-static/resources/openclash/pac/" >/dev/null 2>&1
 		cp -rf "/tmp/pac/." "/www/luci-static/resources/openclash/pac/" >/dev/null 2>&1
 		rm -rf "/tmp/pac/" >/dev/null 2>&1
+	fi
+	#oc-domain
+	if [ -f "/etc/openclash/rule_provider/oc-cn-domain.mrs" ]; then
+		cp -f "/usr/share/openclash/backup/oc-cn-domain.mrs" "/etc/openclash/rule_provider/oc-cn-domain.mrs" >/dev/null 2>&1
 	fi
 	rm -rf "/etc/openclash/openclash" >/dev/null 2>&1
 	rm -rf "/tmp/openclash" >/dev/null 2>&1
@@ -256,6 +276,6 @@ sed -i '/.*kB maximum content size*/c\export let HTTP_MAX_CONTENT = 1024*10240;	
 
 /etc/init.d/uhttpd restart >/dev/null 2>&1
 
-rm -f /tmp/luci-indexcache >/dev/null 2>&1
-rm -f /tmp/luci-indexcache.* >/dev/null 2>&1
+rm -rf /tmp/luci-indexcache /tmp/luci-indexcache.* /var/luci-indexcache /var/luci-indexcache.* >/dev/null 2>&1
+rm -rf /tmp/luci-modulecache /var/luci-modulecache >/dev/null 2>&1
 exit 0

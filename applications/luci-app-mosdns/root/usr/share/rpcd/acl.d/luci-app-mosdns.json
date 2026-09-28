@@ -3,44 +3,52 @@
 		"description": "Grant UCI access for luci-app-mosdns",
 		"read": {
 			"file": {
+				"/etc/hosts": [ "read" ],
 				"/etc/init.d/mosdns": [ "exec" ],
 				"/etc/mosdns/config_custom.yaml": [ "read" ],
-				"/etc/mosdns/rule/blocklist.txt": [ "read" ],
-				"/etc/mosdns/rule/cloudflare-cidr.txt": [ "read" ],
-				"/etc/mosdns/rule/ddnslist.txt": [ "read" ],
-				"/etc/mosdns/rule/greylist.txt": [ "read" ],
-				"/etc/mosdns/rule/hosts.txt": [ "read" ],
-				"/etc/mosdns/rule/local-ptr.txt": [ "read" ],
-				"/etc/mosdns/rule/redirect.txt": [ "read" ],
-				"/etc/mosdns/rule/streaming.txt": [ "read" ],
-				"/etc/mosdns/rule/whitelist.txt": [ "read" ],
+				"/etc/mosdns/rule/*": [ "read" ],
+				"/tmp/dhcp.leases": [ "read" ],
+				"/tmp/hosts/*": [ "read" ],
+				"/tmp/odhcpd.leases": [ "read" ],
 				"/usr/bin/mosdns": [ "exec" ],
-				"/usr/share/mosdns/mosdns.sh": [ "exec" ]
+				"/usr/share/mosdns/mosdns.uc": [ "exec" ],
+				"/var/log/*": [ "read" ],
+				"/var/mosdns/*": [ "read" ]
 			},
 			"ubus": {
 				"file": [ "read" ],
-				"service": [ "list" ]
+				"service": [ "list" ],
+				"luci.mosdns": [
+					"clean_log",
+					"clear_query_logs",
+					"flush_cache",
+					"get_history",
+					"get_leases",
+					"get_logs",
+					"get_stats",
+					"get_top",
+					"get_update_log",
+					"get_version",
+					"print_log",
+					"start_update"
+				]
 			},
 			"uci": [ "mosdns" ]
 		},
 		"write": {
 			"file": {
 				"/etc/mosdns/config_custom.yaml": [ "write" ],
-				"/etc/mosdns/rule/blocklist.txt": [ "write" ],
-				"/etc/mosdns/rule/cloudflare-cidr.txt": [ "write" ],
-				"/etc/mosdns/rule/ddnslist.txt": [ "write" ],
-				"/etc/mosdns/rule/greylist.txt": [ "write" ],
-				"/etc/mosdns/rule/hosts.txt": [ "write" ],
-				"/etc/mosdns/rule/local-ptr.txt": [ "write" ],
-				"/etc/mosdns/rule/redirect.txt": [ "write" ],
-				"/etc/mosdns/rule/streaming.txt": [ "write" ],
-				"/etc/mosdns/rule/whitelist.txt": [ "write" ]
+				"/etc/mosdns/rule/*": [ "write" ],
+				"/usr/share/mosdns/*": [ "write" ],
+				"/usr/share/v2ray/*": [ "write" ],
+				"/var/log/*": [ "write" ],
+				"/var/mosdns/*": [ "write" ]
 			},
 			"ubus": {
-				"file": [ "write" ]
+				"file": [ "write" ],
+				"luci.mosdns": [ "clear_query_logs" ]
 			},
 			"uci": [ "mosdns" ]
 		}
 	}
 }
-

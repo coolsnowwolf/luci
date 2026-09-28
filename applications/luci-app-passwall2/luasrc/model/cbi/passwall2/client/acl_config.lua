@@ -1,0 +1,399 @@
+local api = require "luci.passwall2.api"
+api.set_default_cbi()
+
+m = Map()
+m.redirect = api.url("acl")
+
+if not arg[1] or not m:get(arg[1]) then
+	luci.http.redirect(m.redirect)
+end
+
+m:appendTemplate("/cbi/nodes_listvalue_com")
+
+local port_validate = function(self, value, t)
+	return value:gsub("-", ":")
+end
+
+local nodes_table = {}
+for k, e in ipairs(api.get_valid_nodes()) do
+	nodes_table[#nodes_table + 1] = e
+end
+
+local doh_validate = function(self, value, t)
+	if value ~= "" then
+		local flag = 0
+		local util = require "luci.util"
+		local val = util.split(value, ",")
+		local url = val[1]
+		val[1] = nil
+		for i = 1, #val do
+			local v = val[i]
+			if v then
+				if not datatypes.ipmask4(v) then
+					flag = 1
+				end
+			end
+		end
+		if flag == 0 then
+			return value
+		end
+	end
+	return nil, translate("DoH request address") .. " " .. translate("Format must be:") .. " URL,IP"
+end
+
+-- [[ ACLs Settings ]]--
+s = m:section(NamedSection, arg[1], translate("ACLs"), translate("ACLs"))
+
+s:tab("Main", translate("Main"))
+s:tab("Proxy", translate("Proxy"))
+s:tab("DNS", translate("DNS"))
+s:tab("Log", translate("Log"))
+
+o = s:taboption("Main", Flag, "enabled", translate("Enable"))
+o.default = 1
+o.rmempty = false
+
+o = s:taboption("Main", Value, "remarks", translate("Remarks"))
+o.default = arg[1]
+o.rmempty = false
+
+o = s:taboption("Main", Value, "interface", translate("Source Interface"))
+o:value("", translate("All"))
+local iface = api.get_network_devices()
+for _, d in ipairs(iface) do
+	o:value(d.name, d.label)
+end
+o.validate = function(self, value, section)
+	if value == "" or value:match("^[a-zA-Z0-9][a-zA-Z0-9%.%_%-]*$") then
+		return value
+	end
+	return nil, translate("Invalid interface name")
+end
+
+local mac_t = {}
+api.sys.net.mac_hints(function(e, t)
+	mac_t[#mac_t + 1] = {
+		ip = t,
+		mac = e
+	}
+end)
+table.sort(mac_t, function(a,b)
+	if #a.ip < #b.ip then
+		return true
+	elseif #a.ip == #b.ip then
+		if a.ip < b.ip then
+			return true
+		else
+			return #a.ip < #b.ip
+		end
+	end
+	return false
+end)
+
+---- Source
+sources = s:taboption("Main", DynamicList, "sources", translate("Source"))
+sources.description = "<ul><li>" .. translate("Example:")
+.. "</li><li>" .. translate("MAC") .. ": 00:00:00:FF:FF:FF"
+.. "</li><li>" .. translate("IP") .. ": 192.168.1.100"
+.. "</li><li>" .. translate("IP CIDR") .. ": 192.168.1.0/24"
+.. "</li><li>" .. translate("IP range") .. ": 192.168.1.100-192.168.1.200"
+.. "</li><li>" .. translate("IPSet") .. ": ipset:lanlist"
+.. "</li></ul>"
+for _, key in pairs(mac_t) do
+	sources:value(key.mac, "%s (%s)" % {key.mac, key.ip})
+end
+sources.validate = function(self, value, t)
+	local err = {}
+	for _, v in ipairs(value) do
+		local flag = false
+		if v:find("ipset:") and v:find("ipset:") == 1 then
+			local ipset = v:gsub("ipset:", "")
+			if ipset and ipset ~= "" then
+				flag = true
+			end
+		end
+
+		if flag == false and datatypes.macaddr(v) then
+			flag = true
+		end
+
+		if flag == false and datatypes.ip4addr(v) then
+			flag = true
+		end
+
+		if flag == false and api.iprange(v) then
+			flag = true
+		end
+
+		if flag == false then
+			err[#err + 1] = v
+		end
+	end
+
+	if #err > 0 then
+		self:add_error(t, "invalid", translate("Not true format, please re-enter!"))
+		for _, v in ipairs(err) do
+			self:add_error(t, "invalid", v)
+		end
+	end
+
+	return value
+end
+
+local NODE = m:get("@global[0]", "node")
+o = s:taboption("Main", ListValue, "mode", translate("Mode"))
+o:value("0", translate("No Proxy"))
+o:value("1", translate("Proxy"))
+o:value("2", translate("Proxy") .. " " .. translate("Use global config") .. "(" .. api.get_node_name(NODE) .. ")")
+
+o = s:taboption("Proxy", Value, "tcp_no_redir_ports", translate("TCP No Redir Ports"))
+o:value("", translate("No patterns are used"))
+o:value("1:65535", translate("All"))
+o:depends("mode", "1")
+o:depends("mode", "2")
+o.validate = port_validate
+
+o = s:taboption("Proxy", Value, "udp_no_redir_ports", translate("UDP No Redir Ports"))
+o:value("", translate("No patterns are used"))
+o:value("1:65535", translate("All"))
+o:depends("mode", "1")
+o:depends("mode", "2")
+o.validate = port_validate
+
+o = s:taboption("Main", HideValue, "_show_tcp_redir")
+o:depends({ tcp_no_redir_ports = "1:65535",  ['!reverse'] = true })
+
+o = s:taboption("Main", HideValue, "_show_udp_redir")
+o:depends({ udp_no_redir_ports = "1:65535",  ['!reverse'] = true })
+
+o = s:taboption("Proxy", Value, "tcp_redir_ports", translate("TCP Redir Ports"))
+o:value("1:65535", translate("All"))
+o:value("22,25,53,80,143,443,465,587,853,873,993,995,5222,8080,8443,9418", translate("Common Use"))
+o:value("80,443", "80,443")
+o.default = o.keylist[1]
+o.validate = port_validate
+o:depends({ _node = "1",  _show_tcp_redir = "1" })
+o:depends({ mode = "2",  _show_tcp_redir = "1" })
+
+o = s:taboption("Proxy", Value, "udp_redir_ports", translate("UDP Redir Ports"))
+o:value("1:65535", translate("All"))
+o.default = o.keylist[1]
+o.validate = port_validate
+o:depends({ _node = "1",  _show_udp_redir = "1" })
+o:depends({ mode = "2",  _show_udp_redir = "1" })
+
+o = s:taboption("Proxy", DummyValue, "tips", "　")
+o.rawhtml = true
+o.cfgvalue = function(t, n)
+	return string.format('<font color="red">%s</font>',
+	translate("The port settings support single ports and ranges.<br>Separate multiple ports with commas (,).<br>Example: 21,80,443,1000:2000."))
+end
+o:depends("mode", "1")
+o:depends("mode", "2")
+
+o = s:taboption("Main", HideValue, "_no_proxy")
+o:depends("mode", "0")
+o:depends({ tcp_no_redir_ports = "1:65535", udp_no_redir_ports = "1:65535" })
+
+o = s:taboption("Main", HideValue, "_show_node_option")
+o:depends({ mode = "1", _no_proxy = "" })
+
+o = s:taboption("Main", ListValue, "node", "<a style='color: red'>" .. translate("Node") .. "</a>")
+o.group = {}
+o:depends("_show_node_option", "1")
+o.template = m:template_path("/cbi/nodes_listvalue")
+
+current_node_id = m:get(arg[1], "node")
+local node_value = s.fields["node"]:formvalue(s.section)
+if node_value then
+	current_node_id = node_value
+end
+current_node = current_node_id and m:get(current_node_id) or {}
+
+o = s:taboption("Main", HideValue, "node_save_before")
+o.value = current_node[".name"]
+o.cbid = function(self, section) return "node_save_before" end
+
+o = s:taboption("Main", HideValue, "_node")
+o:depends({ node = "",  ['!reverse'] = true })
+
+o = s:taboption("Main", HideValue, "_is_singbox")
+o:depends("_hide", "1")
+
+o = s:taboption("Main", HideValue, "_is_xray")
+o:depends("_hide", "1")
+
+o = s:taboption("Log", Flag, "log", translate("Enable Node Log"))
+o:depends("_node", "1")
+
+o = s:taboption("Log", ListValue, "loglevel", translate("Log Level"))
+o.default = "warn"
+o:value("debug", "Debug")
+o:value("info", "Info")
+o:value("warn", "Warning")
+o:value("error", "Error")
+o:depends("log", "1")
+
+o = s:taboption("Log", DummyValue, "_acl_log", translate("Log File"))
+o.rawhtml = true
+o.cfgvalue = function(t, n)
+	local log_file = api.TMP_PATH .. "/acl/" .. arg[1] .. ".log"
+	local log_url = api.url("get_redir_log") .. "?id=" .. arg[1]
+	local s = "<code>%s</code>&nbsp;&nbsp;" % log_file
+	if api.fs.access(log_file) then
+		local btn = string.format(
+			'<input class="btn cbi-button cbi-button-apply" type="button" value="%s" onclick="window.open(\'%s\', \'_blank\')" />',
+			translate("View Log"),
+			log_url
+		)
+		s = s .. btn
+	end
+	return s
+end
+o:depends("log", "1")
+
+o = s:taboption("DNS", HideValue, "_show_dns_option")
+o:depends({ mode = "1", _node = "1" })
+
+o = s:taboption("DNS", ListValue, "direct_dns_query_strategy", translate("Direct Query Strategy"))
+o.default = "UseIP"
+o:value("UseIP")
+o:value("UseIPv4")
+o:value("UseIPv6")
+o:depends("_show_dns_option", "1")
+
+o = s:taboption("DNS", ListValue, "remote_dns_protocol", translate("Remote DNS Protocol"))
+o:value("tcp", "TCP")
+o:value("doh", "DoH")
+o:value("udp", "UDP")
+if m.is_js_luci then
+	if current_node.type == "sing-box" then
+		o:value("tls", "TLS(DoT)")
+		o:value("quic", "QUIC(DoQ)")
+		o:value("http3", "HTTP3(DoH3)")
+	end
+else
+	o:value("tls", "TLS(DoT)", { _is_singbox = "1" })
+	o:value("quic", "QUIC(DoQ)", { _is_singbox = "1" })
+	o:value("http3", "HTTP3(DoH3)", { _is_singbox = "1" })
+end
+o:depends("_show_dns_option", "1")
+
+---- DNS over TCP or UDP or TLS (DoT) or QUIC (DoQ)
+o = s:taboption("DNS", Value, "remote_dns", translate("Remote DNS"))
+o.datatype = "or(ipaddr,ipaddrport(1))"
+o.default = "1.1.1.1"
+o:value("1.1.1.1", "1.1.1.1 (CloudFlare)")
+o:value("1.1.1.2", "1.1.1.2 (CloudFlare-Security)")
+o:value("8.8.4.4", "8.8.4.4 (Google)")
+o:value("8.8.8.8", "8.8.8.8 (Google)")
+o:value("9.9.9.9", "9.9.9.9 (Quad9-Recommended)")
+o:value("149.112.112.112", "149.112.112.112 (Quad9-Recommended)")
+o:value("208.67.220.220", "208.67.220.220 (OpenDNS)")
+o:value("208.67.222.222", "208.67.222.222 (OpenDNS)")
+o:depends("remote_dns_protocol", "tcp")
+o:depends("remote_dns_protocol", "udp")
+o:depends("remote_dns_protocol", "quic")
+o:depends("remote_dns_protocol", "tls")
+
+---- DNS over HTTP (DoH) or DNS over HTTP3(DoH3)
+o = s:taboption("DNS", Value, "remote_dns_doh", translate("Remote DNS DoH"))
+o:value("https://1.1.1.1/dns-query", "CloudFlare")
+o:value("https://1.1.1.2/dns-query", "CloudFlare-Security")
+o:value("https://8.8.4.4/dns-query", "Google 8844")
+o:value("https://8.8.8.8/dns-query", "Google 8888")
+o:value("https://9.9.9.9/dns-query", "Quad9-Recommended 9.9.9.9")
+o:value("https://149.112.112.112/dns-query", "Quad9-Recommended 149.112.112.112")
+o:value("https://208.67.222.222/dns-query", "OpenDNS")
+o:value("https://dns.adguard.com/dns-query,94.140.14.14", "AdGuard")
+o:value("https://doh.libredns.gr/dns-query,116.202.176.26", "LibreDNS")
+o:value("https://doh.libredns.gr/ads,116.202.176.26", "LibreDNS (No Ads)")
+o.default = "https://1.1.1.1/dns-query"
+o.validate = doh_validate
+o:depends("remote_dns_protocol", "doh")
+o:depends("remote_dns_protocol", "http3")
+
+o = s:taboption("DNS", Value, "remote_dns_client_ip", translate("Remote DNS EDNS Client Subnet"))
+o.description = translate("Notify the DNS server when the DNS query is notified, the location of the client (cannot be a private IP address).") .. "<br />" ..
+				translate("This feature requires the DNS server to support the Edns Client Subnet (RFC7871).")
+o.datatype = "ipaddr"
+o:depends("_show_dns_option", "1")
+
+o = s:taboption("DNS", ListValue, "remote_dns_detour", translate("Remote DNS Outbound"))
+o.default = "remote"
+o:value("remote", translate("Remote"))
+o:value("direct", translate("Direct"))
+o:depends("_show_dns_option", "1")
+
+o = s:taboption("DNS", Flag, "remote_fakedns", "FakeDNS", translate("Use FakeDNS work in the domain that proxy."))
+o.default = "0"
+o.rmempty = false
+o:depends("_hide", "1")
+
+o = s:taboption("DNS", ListValue, "remote_dns_query_strategy", translate("Remote Query Strategy"))
+o.default = "UseIPv4"
+o:value("UseIP")
+o:value("UseIPv4")
+o:value("UseIPv6")
+o:depends("_show_dns_option", "1")
+
+o = s:taboption("DNS", Value, "remote_rewrite_ttl", translate("Remote DNS") .. " TTL")
+o.datatype = "min(1)"
+o.default = "30"
+o:depends({ _show_dns_option = "1", _is_singbox = "1" })
+
+o = s:taboption("DNS", ListValue, "dns_hosts_mode", translate("Domain Override"))
+o:value("default", translate("Use global config"))
+o:value("disable", translate("No patterns are used"))
+o:value("custom", translate("-- custom --"))
+o:depends("_show_dns_option", "1")
+
+o = s:taboption("DNS", TextValue, "dns_hosts", translate("Domain Override"))
+o.rows = 5
+o.wrap = "off"
+o:depends("dns_hosts_mode", "custom")
+o.remove = function(self, section)
+	local node_value = s.fields["node"]:formvalue(arg[1])
+	if node_value then
+		local node_t = m:get(node_value) or {}
+		if node_t.type == "Xray" or node_t.type == "sing-box" then
+			AbstractValue.remove(self, section)
+		end
+	end
+end
+
+local o_node = s.fields["node"]
+
+local shunt_list = {}
+
+for k, v in pairs(nodes_table) do
+	o_node:value(v.id, v["remark"])
+	o_node.group[#o_node.group+1] = (v.group and v.group ~= "") and v.group or translate("default")
+	if v.type == "Xray" then
+		--s.fields["_is_xray"]:depends({ node = v.id })
+	end
+	if v.type == "sing-box" then
+		s.fields["_is_singbox"]:depends({ node = v.id })
+	end
+	if v.node_type == "normal" or v.protocol == "_balancing" or v.protocol == "_urltest" then
+		--Shunt node has its own separate options.
+		s.fields["remote_fakedns"]:depends({ node = v.id, _show_dns_option = "1" })
+	end
+	if v.protocol and v.protocol == "_shunt" then
+		shunt_list[#shunt_list + 1] = v
+	end
+end
+
+if current_node.protocol == "_shunt" then
+	local shunt_lua = loadfile("/usr/lib/lua/luci/model/cbi/passwall2/client/include/shunt_options.lua")
+	setfenv(shunt_lua, getfenv(1))(m, s, {
+		node = current_node,
+		verify_option = s.fields["node"],
+		tab = "Shunt",
+		tab_desc = translate("Shunt Rule"),
+	})
+end
+
+m:appendTemplate("/include/node_change", { verify_option = s.fields["node"], shunt_list = api.jsonc.stringify(shunt_list) })
+
+return api.return_map(m)

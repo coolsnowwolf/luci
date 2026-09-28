@@ -1,520 +1,7 @@
-<style>
-@font-face {
-    font-family: 'Twemoji Mozilla';
-    src: url('/luci-static/resources/openclash/fonts/TwemojiMozilla-flags-B12sb_Bp.woff2') format('woff2');
-}
-.oc[data-darkmode="true"] .config-editor-model .CodeMirror {
-    background: var(--bg-white);
-    color: var(--text-primary);
-}
-.oc[data-darkmode="true"] .config-editor-model .CodeMirror-gutters {
-    background: var(--bg-gray);
-    border-right: 1px solid var(--border-light);
-}
-.oc[data-darkmode="true"] .config-editor-model .CodeMirror-linenumber {
-    color: var(--text-secondary);
-}
-.oc[data-darkmode="true"] .config-editor-model .CodeMirror-scrollbar-filler,
-.oc[data-darkmode="true"] .config-editor-model .CodeMirror-gutter-filler {
-    background: var(--bg-gray);
-}
-.oc[data-darkmode="true"] #config-mode-tabs .mode-tab {
-    color: var(--text-secondary);
-}
-.oc[data-darkmode="true"] #config-mode-tabs .mode-tab:hover {
-    color: var(--text-primary);
-    background: rgba(96, 165, 250, 0.1);
-}
-.oc[data-darkmode="true"] #config-mode-tabs .mode-tab.active {
-    background: var(--primary-color);
-    color: white;
-}
-.oc[data-darkmode="true"] #config-mergeview-container .CodeMirror-merge-gap {
-    background: var(--text-secondary) !important;
-}
-.oc[data-darkmode="true"] .oc .config-editor-content {
-    border-bottom: 1px solid var(--border-light);
-    border-top: 1px solid var(--border-light);
-}
-.oc[data-darkmode="true"] .overwrite-banner {
-    background: rgba(255,80,80,0.18);
-}
-.oc[data-darkmode="true"] .overwrite-banner svg {
-    stroke: var(--error-color);
-}
-.oc[data-darkmode="true"] .overwrite-banner svg circle {
-    stroke: var(--error-color);
-    fill: rgba(255,80,80,0.18);
-}
-
-.oc .config-editor-model-overlay {
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 10000;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    backdrop-filter: blur(2px);
-}
-.oc .config-editor-model-overlay.show {
-    display: flex;
-}
-.oc .config-editor-model {
-    background: var(--bg-white);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-md);
-    width: 90vw;
-    height: 85vh;
-    max-width: 1200px;
-    min-width: 600px;
-    min-height: 400px;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    border: 1px solid var(--border-light);
-    position: relative;
-    transition: all 0.3s ease;
-}
-.oc .config-editor-model.maximized {
-    width: 98vw !important;
-    height: 95vh !important;
-    max-width: none !important;
-}
-.oc .config-editor-model.minimized {
-    width: 70vw !important;
-    height: 70vh !important;
-}
-.oc .config-editor-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 16px 20px;
-    border-bottom: 1px solid var(--border-light);
-    background: var(--bg-gray);
-    flex-shrink: 0;
-    cursor: move;
-    user-select: none;
-    min-width: 0;
-}
-.oc .config-editor-title {
-    font-size: 16px;
-    font-weight: 600;
-    color: var(--text-primary);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    flex: 1 1 auto;
-}
-.oc .config-editor-title .config-file-name {
-    color: var(--primary-color);
-    font-weight: 700;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    display: inline-block;
-    vertical-align: bottom;
-    padding: 0;
-}
-.oc .config-editor-actions {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-.oc .size-btn {
-    width: 24px !important;
-    height: 24px !important;
-    min-width: 24px !important;
-    padding: 0 !important;
-}
-.oc .size-btn svg {
-    width: 12px !important;
-    height: 12px !important;
-}
-#config-mergeview-container {
-    width: 100%;
-    height: 100%;
-    display: block;
-    position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: var(--bg-white);
-    z-index: 2;
-}
-.oc .config-editor-content {
-    flex: 1;
-    position: relative;
-    overflow: hidden;
-    border-bottom: 1px solid var(--border-light);
-    border-top: 1px solid var(--border-light);
-}
-.oc .config-editor-loading {
-    position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-    background: var(--bg-white);
-    color: var(--text-secondary);
-    font-size: 14px;
-}
-.oc .loading-spinner {
-    width: 24px;
-    height: 24px;
-    border: 2px solid var(--border-light);
-    border-top-color: var(--primary-color);
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-}
-@keyframes spin {
-    to { transform: rotate(360deg); }
-}
-.oc .config-editor-footer {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 12px 20px;
-    background: var(--bg-gray);
-    flex-shrink: 0;
-    position: relative;
-}
-.oc .config-editor-status {
-    font-size: 12px;
-    color: var(--text-secondary);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    max-width: 50%;
-}
-.oc .config-editor-help {
-    font-size: 11px;
-    color: var(--text-secondary);
-    opacity: 0.8;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    max-width: 50%;
-}
-.oc .config-editor-resize-handle {
-    position: absolute;
-    bottom: 0; right: 0;
-    width: 20px; height: 20px;
-    cursor: nw-resize;
-    background: linear-gradient(-45deg, 
-        transparent 0%, 
-        transparent 40%, 
-        var(--border-color) 40%, 
-        var(--border-color) 45%, 
-        transparent 45%, 
-        transparent 50%, 
-        var(--border-color) 50%, 
-        var(--border-color) 55%, 
-        transparent 55%, 
-        transparent 60%, 
-        var(--border-color) 60%, 
-        var(--border-color) 65%, 
-        transparent 65%);
-}
-.oc #config-editor-textarea {
-    width: 100%;
-    height: 100%;
-    border: none;
-    outline: none;
-    resize: none;
-    font-size: 14px;
-    line-height: 1.5;
-    padding: 12px;
-    background: var(--bg-white);
-    color: var(--text-primary);
-}
-.oc .config-editor-model .CodeMirror {
-    height: 100%;
-    font-size: 14px;
-    line-height: 1.5;
-}
-.oc #config-mode-tabs {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 8px;
-    background: transparent;
-    border: none;
-    box-shadow: none;
-    border-radius: var(--radius-md);
-}
-.oc #config-mode-tabs .mode-tabs {
-    display: flex;
-    width: 100%;
-    background: var(--bg-gray);
-    border-radius: var(--radius-md);
-    padding: 4px;
-    gap: 4px;
-    margin: 0 auto;
-}
-.oc #config-mode-tabs .mode-tab {
-    flex: 1 1 0;
-    min-width: 0;
-    width: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 12px 0;
-    border: none;
-    border-radius: calc(var(--radius-md) - 2px);
-    background: transparent;
-    color: var(--text-secondary);
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all var(--transition-fast);
-    box-sizing: border-box;
-}
-.oc #config-mode-tabs .mode-tab:hover {
-    color: var(--text-primary);
-    background: rgba(59, 130, 246, 0.1);
-}
-.oc #config-mode-tabs .mode-tab.active {
-    background: var(--primary-color);
-    color: white;
-    box-shadow: var(--shadow-sm);
-}
-.overwrite-banner {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 12px;
-    padding: 10px 20px;
-    background: rgba(255,80,80,0.12);
-    font-size: 14px;
-    text-align: center;
-}
-.overwrite-banner svg {
-    flex-shrink: 0;
-    display: block;
-}
-.overwrite-banner span {
-    flex: unset;
-    text-align: center;
-    display: inline-block;
-    color: var(--error-color);
-    line-height: 1.5;
-    vertical-align: middle;
-}
-.oc .config-editor-model .CodeMirror.zoom-75 { font-size: 10.5px; }
-.oc .config-editor-model .CodeMirror.zoom-90 { font-size: 12.6px; }
-.oc .config-editor-model .CodeMirror.zoom-110 { font-size: 15.4px; }
-.oc .config-editor-model .CodeMirror.zoom-125 { font-size: 17.5px; }
-.oc .config-editor-model .CodeMirror.zoom-150 { font-size: 21px; }
-.oc .config-editor-model .CodeMirror.zoom-200 { font-size: 28px; }
-.oc .config-editor-model .CodeMirror, .oc .config-editor-model .CodeMirror-line {
-	font-family: 'Twemoji Mozilla', "Microsoft Yahei", "sans-serif", "Helvetica Neue", "Helvetica", "Hiragino Sans GB" !important;
-}
-.oc .config-editor-model .CodeMirror-hints.log {
-    font-family: 'Twemoji Mozilla', "Open Sans", "PingFangSC-Regular", "Microsoft Yahei", "WenQuanYi Micro Hei", "Helvetica Neue", "Helvetica", "Hiragino Sans GB", "sans-serif" !important;
-}
-#config-mergeview-container .CodeMirror-merge,
-#config-mergeview-container .CodeMirror-merge-pane,
-#config-mergeview-container .CodeMirror,
-#config-mergeview-container .CodeMirror-scroll {
-    height: 100% !important;
-    min-height: 0 !important;
-    box-sizing: border-box;
-}
-#config-mergeview-container .CodeMirror-merge-gap {
-    height: 100% !important;
-    min-height: 0 !important;
-}
-#config-mergeview-container .CodeMirror-scroll {
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-}
-#config-mergeview-container .CodeMirror-merge-pane {
-    overflow: hidden;
-}
-#config-mergeview-container .CodeMirror-merge-r-chunk {
-    background: #0095ff2e !important;
-}
-#config-mergeview-container .CodeMirror-merge-r-connect {
-    fill: #0095ff2e !important;
-    stroke: #0095ff2e !important;
-}
-#config-mergeview-container  .CodeMirror-merge {
-    border: none !important;
-}
-.oc .update-row {
-    display: flex;
-    gap: 12px;
-    width: 100%;
-    max-width: 100%;
-}
-.oc .update-row > .form-select-wrapper {
-    flex: 1 1 0;
-    min-width: 0;
-}
-.oc .update-row .form-select {
-    width: 100%;
-    min-width: 0;
-    box-sizing: border-box;
-}
-.oc .overwrite-card-row {
-    display: flex;
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    gap: 12px;
-    padding: 8px;
-    max-width: 100%;
-    min-width: 0;
-    align-items: stretch;
-    scrollbar-width: thin;
-    scrollbar-color: var(--primary-color) var(--bg-gray);
-}
-.oc .overwrite-card-row::-webkit-scrollbar {
-    height: 8px;
-}
-.oc .overwrite-card-row::-webkit-scrollbar-thumb {
-    background: var(--primary-color);
-    border-radius: 4px;
-}
-.oc .overwrite-card-row::-webkit-scrollbar-track {
-    background: var(--bg-gray);
-    border-radius: 4px;
-}
-.oc .sub-card.overwrite-item {
-    width: 190px;
-    max-width: 220px;
-    flex: 0 0 auto;
-    box-sizing: border-box;
-    gap: 12px;
-    height: 75px;
-}
-.oc .sub-card.overwrite-item,
-.oc .sub-card.overwrite-item:active,
-.oc .sub-card.overwrite-item:focus {
-    -webkit-tap-highlight-color: transparent;
-}
-.oc .overwrite-drag-line {
-    display: block;
-    min-width: 4px;
-    width: 4px;
-    background: var(--primary-color);
-    border-radius: 2px;
-    margin: 0 2px;
-    align-self: stretch;
-    height: auto;
-}
-.oc .oc-switch {
-  position: relative;
-  display: inline-block;
-  width: 36px;
-  height: 20px;
-  vertical-align: middle;
-}
-.oc .oc-switch input {
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-.oc .oc-switch-slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background-color: #ccc;
-  border-radius: 20px;
-  transition: .2s;
-}
-.oc .oc-switch-slider:before {
-  position: absolute;
-  content: "";
-  height: 16px; width: 16px;
-  left: 2px; bottom: 2px;
-  background-color: white;
-  border-radius: 50%;
-  transition: .2s;
-}
-.oc .oc-switch input:checked + .oc-switch-slider {
-  background-color: var(--primary-color, #2196F3);
-}
-.oc .oc-switch input:checked + .oc-switch-slider:before {
-  transform: translateX(16px);
-}
-.overwrite-add-icon {
-    font-size: 32px;
-    text-align: center;
-    color: var(--primary-color);
-}
-.overwrite-title-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-}
-.overwrite-title {
-    font-weight: bold;
-    font-size: 15px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    max-width: 70%;
-}
-.overwrite-info {
-    font-size: 12px;
-    color: var(--text-secondary);
-}
-.overwrite-refresh-btn {
-    position: absolute;
-    right: 72px;
-    bottom: 8px;
-}
-.overwrite-gear-btn {
-    position: absolute;
-    right: 40px;
-    bottom: 8px;
-}
-.overwrite-del-btn {
-    position: absolute;
-    right: 8px;
-    bottom: 8px;
-}
-.sub-card.overwrite-item.active {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 2px var(--primary-color);
-}
-.sub-card.overwrite-item.dragging {
-    opacity: 0.5;
-    z-index: 1000;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-    transition: none !important;
-}
-@media screen and (max-width: 768px) {
-    .oc .config-editor-model {
-        width: 95vw;
-        height: 80vh;
-        min-width: 320px;
-    }
-    .oc .config-editor-actions {
-        gap: 5px;
-    }
-    .oc .overwrite-card-row {
-        gap: 6px;
-    }
-    .oc .sub-card.overwrite-item {
-        width: 185px;
-        max-width: 200px;
-        gap: 10px;
-    }
-    .oc .overwrite-drag-line {
-        margin: -2px;
-        width: 2px;
-    }
-}
-</style>
-
+<%
+    local fs = require "luci.openclash"
+    local plugin_version = fs.oc_version()
+%>
 <div class="oc">
     <div class="config-editor-model-overlay" id="config-editor-overlay">
         <div class="config-editor-model" id="config-editor-model">
@@ -524,76 +11,47 @@
                     <span class="config-file-name" id="config-file-name"><%:Loading...%></span>
                 </div>
                 <div class="config-editor-actions">
-                    <button type="button" class="icon-btn" id="config-editor-layout" title="<%:Compare%>" style="display:none;">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <rect x="3" y="3" width="8" height="18" rx="2" stroke="currentColor" stroke-width="2" fill="none"/>
-                            <rect x="13" y="3" width="8" height="18" rx="2" stroke="currentColor" stroke-width="2" fill="none"/>
-                        </svg>
+                    <button type="button" class="icon-btn oc-hidden" id="config-editor-layout" title="<%:Compare%>">
+                        <svg width="14" height="14"><use href="#oc-icon-compare"/></svg>
                     </button>
                     <button type="button" class="icon-btn" id="config-editor-download" title="<%:Download%>">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                            <polyline points="7,11 12,16 17,11"></polyline>
-                            <line x1="12" y1="2" x2="12" y2="16"></line>
-                        </svg>
+                        <svg width="14" height="14"><use href="#oc-icon-download"/></svg>
                     </button>
                     <button type="button" class="icon-btn" id="config-editor-save" title="<%:Save%>">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
-                            <polyline points="17,21 17,13 7,13 7,21"></polyline>
-                            <polyline points="7,3 7,8 15,8"></polyline>
-                        </svg>
+                        <svg width="14" height="14"><use href="#oc-icon-save"/></svg>
                     </button>
                     <button type="button" class="icon-btn" id="config-editor-close" title="<%:Close%>">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <line x1="18" y1="6" x2="6" y2="18"></line>
-                            <line x1="6" y1="6" x2="18" y2="18"></line>
-                        </svg>
+                        <svg width="14" height="14"><use href="#oc-icon-close"/></svg>
                     </button>
                 </div>
             </div>
 
-            <div id="overwrite-banner" class="overwrite-banner" style="display:none;">
-                <svg style="flex-shrink:0;" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--error-color)" stroke-width="2">
-                    <circle cx="12" cy="12" r="10" stroke="var(--error-color)" fill="rgba(255,80,80,0.12)"/>
-                    <line x1="12" y1="5" x2="12" y2="13"/>
-                    <circle cx="12" cy="16" r="0.5"/>
-                </svg>
+            <div id="overwrite-banner" class="overwrite-banner oc-hidden">
+                <svg class="oc-svg-inline" width="20" height="20"><use href="#oc-icon-alert-circle"/></svg>
                 <span>
                     <%:You are editing the overwrite script, please note that some settings may cause the abnormal, be careful with the modification!%>
                 </span>
             </div>
 
-            <div id="config-mode-tabs" style="display:none;">
+            <div id="config-mode-tabs" class="oc-hidden">
                 <div class="mode-tabs">
                     <button type="button" class="mode-tab active" id="tab-original-config" data-mode="original">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="vertical-align:middle;margin-right:4px;">
-                            <rect x="4" y="4" width="16" height="16" rx="2" stroke="currentColor" stroke-width="2" fill="none"/>
-                            <line x1="8" y1="8" x2="16" y2="8" stroke="currentColor" stroke-width="2"/>
-                            <line x1="8" y1="12" x2="16" y2="12" stroke="currentColor" stroke-width="2"/>
-                            <line x1="8" y1="16" x2="12" y2="16" stroke="currentColor" stroke-width="2"/>
-                        </svg>
-                        <%:Original Config%>
+                        <svg width="16" height="16"><use href="#oc-icon-list"/></svg>
+                        <span><%:Original Config%></span>
                     </button>
                     <button type="button" class="mode-tab" id="tab-runtime-config" data-mode="runtime">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="vertical-align:middle;margin-right:4px;">
-                            <polygon points="13 2 3 14 12 14 11 22 21 10 13 10 13 2" stroke="currentColor" stroke-width="2" fill="none"/>
-                        </svg>
-                        <%:Runtime Config%>
+                        <svg width="16" height="16"><use href="#oc-icon-zap"/></svg>
+                        <span><%:Runtime Config%></span>
                     </button>
                 </div>
             </div>
 
             <div class="config-editor-content">
-                <div class="config-editor-loading" id="config-editor-loading">
-                    <div class="loading-spinner"></div>
-                    <span><%:Loading config file...%></span>
-                </div>
-                <textarea id="config-editor-textarea" style="display: none;"></textarea>
-                <div id="config-mergeview-container" style="display:none;width:100%;height:100%;"></div>
+                <textarea id="config-editor-textarea" class="oc-hidden"></textarea>
+                <div id="config-mergeview-container" class="oc-hidden" style="width:100%;height:100%;"></div>
             </div>
 
-            <div id="overwrite-card-bar" style="display:none;position:relative;margin:12px;">
+            <div id="overwrite-card-bar" class="oc-hidden" style="position:relative;margin:12px;">
                 <div class="overwrite-card-row" id="overwrite-card-list"></div>
             </div>
 
@@ -602,7 +60,7 @@
                     <span id="config-editor-status-text"><%:Ready%></span>
                 </div>
                 <div class="config-editor-help">
-                    <span id="config-editor-help"><%:Press F11 for fullscreen, Esc to exit fullscreen, Ctrl+Mouse Wheel to zoom%></span>
+                    <span id="config-editor-help"><%:Press%> <b style="color:var(--success-color)">F11</b> <%:for fullscreen,%> <b style="color:var(--success-color)">Esc</b> <%:to exit fullscreen,%> <b style="color:var(--success-color)">Ctrl + <%:Mouse Wheel%></b> <%:to zoom%></span>
                 </div>
                 <div class="config-editor-resize-handle" id="config-editor-resize-handle"></div>
             </div>
@@ -610,52 +68,25 @@
     </div>
 </div>
 
-<link rel="stylesheet" href="/luci-static/resources/openclash/lib/codemirror.css"/>
-<link rel="stylesheet" href="/luci-static/resources/openclash/theme/material.css"/>
-<link rel="stylesheet" href="/luci-static/resources/openclash/addon/fold/foldgutter.css"/>
-<link rel="stylesheet" href="/luci-static/resources/openclash/addon/lint/lint.css">
-<link rel="stylesheet" href="/luci-static/resources/openclash/addon/display/fullscreen.css">
-<link rel="stylesheet" href="/luci-static/resources/openclash/addon/dialog/dialog.css">
-<link rel="stylesheet" href="/luci-static/resources/openclash/addon/search/matchesonscrollbar.css">
-<script src="/luci-static/resources/openclash/lib/codemirror.js"></script>
-<script src="/luci-static/resources/openclash/mode/yaml/yaml.js"></script>
-<script src="/luci-static/resources/openclash/mode/shell/shell.js"></script>
-<script src="/luci-static/resources/openclash/mode/properties/properties.js"></script>
-<script src="/luci-static/resources/openclash/addon/fold/foldcode.js"></script>
-<script src="/luci-static/resources/openclash/addon/fold/foldgutter.js"></script>
-<script src="/luci-static/resources/openclash/addon/fold/indent-fold.js"></script>
-<script src="/luci-static/resources/openclash/addon/edit/matchbrackets.js"></script>
-<script src="/luci-static/resources/openclash/addon/selection/active-line.js"></script>
-<script src="/luci-static/resources/openclash/addon/lint/lint.js"></script>
-<script src="/luci-static/resources/openclash/addon/lint/yaml-lint.js"></script>
-<script src="/luci-static/resources/openclash/addon/lint/js-yaml.min.js"></script>
-<script src="/luci-static/resources/openclash/addon/display/fullscreen.js"></script>
-<script src="/luci-static/resources/openclash/addon/display/autorefresh.js"></script>
-<script src="/luci-static/resources/openclash/addon/dialog/dialog.js"></script>
-<script src="/luci-static/resources/openclash/addon/search/searchcursor.js"></script>
-<script src="/luci-static/resources/openclash/addon/search/search.js"></script>
-<script src="/luci-static/resources/openclash/addon/scroll/annotatescrollbar.js"></script>
-<script src="/luci-static/resources/openclash/addon/search/matchesonscrollbar.js"></script>
-<script src="/luci-static/resources/openclash/addon/search/jump-to-line.js"></script>
-<script src="/luci-static/resources/openclash/addon/merge/diff_match_patch.js"></script>
-<script src="/luci-static/resources/openclash/addon/merge/merge.js"></script>
-<link rel="stylesheet" href="/luci-static/resources/openclash/addon/merge/merge.css">
-
+<script src="/luci-static/resources/openclash/js/common.js?v=<%=plugin_version%>"></script>
+<script src="/luci-static/resources/openclash/js/oc-icons.js?v=<%=plugin_version%>"></script>
+<script src="/luci-static/resources/openclash/js/cm6.min.js?v=<%=plugin_version%>"></script>
 <script type="text/javascript">
-var levelTranslations = {
-    'info': '<%:Info%>',
-    'warning': '<%:Warning%>',
-    'error': '<%:Error%>',
-    'debug': '<%:Debug%>',
-    'tip': '<%:Tip%>',
-    'watchdog': '<%:Watchdog%>',
-	'fatal': '<%:Fatal%>'
+ocRegisterEditorHotkeys();
+
+var _ocIcons = {
+	SVG_COMPARE: '<svg width="24" height="24"><use href="#oc-icon-compare"/></svg>',
+	SVG_RESTORE: '<svg width="24" height="24"><use href="#oc-icon-restore"/></svg>'
 };
+
+// Uses EditorView.updateListener instead of view.dispatch override.
+// dispatch() can receive TransactionSpec objects which lack docChanged.
 
 var ConfigEditor = {
     overlay: null,
     model: null,
     editorInstance: null,
+    _currentEditorMode: null,
     originalContent: '',
     isModified: false,
     currentZoom: 100,
@@ -665,17 +96,9 @@ var ConfigEditor = {
     currentViewMode: 'original',
     runtimeContent: '',
     mergeViewActive: false,
-    SVG_COMPARE: `
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <rect x="3" y="3" width="8" height="18" rx="2" stroke="currentColor" stroke-width="2" fill="none"/>
-            <rect x="13" y="3" width="8" height="18" rx="2" stroke="currentColor" stroke-width="2" fill="none"/>
-        </svg>
-    `,
-    SVG_RESTORE: `
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2" fill="none"/>
-        </svg>
-    `,
+    isFullscreen: false,
+    mergeShowDifferences: true,
+
     overwriteFiles: [],
     overwriteSubInfo: {},
     overwriteCardBar: null,
@@ -720,16 +143,10 @@ var ConfigEditor = {
         document.addEventListener('keydown', function(e) {
             if (!self.overlay.classList.contains('show')) return;
 
-            if ((e.ctrlKey || e.metaKey) && (e.key === '=' || e.key === '+')) {
+            if (e.key === 'Escape' && self.isFullscreen) {
                 e.preventDefault();
-                self.zoomIn();
-            } else if ((e.ctrlKey || e.metaKey) && e.key === '-') {
-                e.preventDefault();
-                self.zoomOut();
-            } else if ((e.ctrlKey || e.metaKey) && e.key === '0') {
-                e.preventDefault();
-                self.resetZoom();
-            } else if (e.key === 'Escape' && (!self.editorInstance || !self.editorInstance.getOption("fullScreen"))) {
+                self.toggleFullscreen(false);
+            } else if (e.key === 'Escape' && !self.isFullscreen) {
                 self.closeEditor();
             }
         });
@@ -772,11 +189,11 @@ var ConfigEditor = {
                     self.showMergeView();
                     self.currentViewMode = 'original';
                     layoutBtn.title = "<%:Restore%>";
-                    layoutBtn.innerHTML = self.SVG_RESTORE;
+                    layoutBtn.innerHTML = _ocIcons.SVG_RESTORE;
                 } else {
                     self.hideMergeView();
                     layoutBtn.title = "<%:Compare%>";
-                    layoutBtn.innerHTML = self.SVG_COMPARE;
+                    layoutBtn.innerHTML = _ocIcons.SVG_COMPARE;
                 }
             });
         };
@@ -786,6 +203,7 @@ var ConfigEditor = {
     },
 
     show: function(configFile) {
+        var self = this;
         this.isOverwrite = false;
         this.currentViewMode = 'original';
         this.currentConfigFile = '';
@@ -793,29 +211,29 @@ var ConfigEditor = {
         this.runtimeContent = '';
         this.isModified = false;
         this.mergeViewActive = false;
+        this.isFullscreen = false;
 
         if (this.editorInstance) {
-            if (this.editorInstance.toTextArea) this.editorInstance.toTextArea();
+            this._destroyEditor();
             this.editorInstance = null;
         }
         var textarea = document.getElementById('config-editor-textarea');
         if (textarea) {
             textarea.value = '';
-            textarea.style.display = 'none';
+            textarea.classList.add('oc-hidden');
         }
-        var loadingDiv = document.getElementById('config-editor-loading');
-        if (loadingDiv) loadingDiv.style.display = 'flex';
+        ocShowLoading(textarea.parentNode, '<%:Loading config file...%>');
         var mergeview = document.getElementById('config-mergeview-container');
-        if (mergeview) mergeview.style.display = 'none';
+        if (mergeview) mergeview.classList.add('oc-hidden');
 
         var banner = document.getElementById('overwrite-banner');
-        if (banner) banner.style.display = 'none';
+        if (banner) banner.classList.add('oc-hidden');
 
         var tabs = document.getElementById('config-mode-tabs');
-        if (tabs) tabs.style.display = 'flex';
+        if (tabs) tabs.classList.remove('oc-hidden');
 
         var layoutBtn = document.getElementById('config-editor-layout');
-        if (layoutBtn) layoutBtn.style.display = 'inline-flex';
+        if (layoutBtn) layoutBtn.classList.remove('oc-hidden');
 
         if (!configFile) {
             alert('<%:Please select a config file first%>');
@@ -827,6 +245,7 @@ var ConfigEditor = {
 
         this.model.classList.remove('maximized');
         this.model.classList.remove('minimized');
+        this.resetModelStyles();
 
         var editTitle = document.getElementById('editTitle');
         if (editTitle) {
@@ -840,39 +259,40 @@ var ConfigEditor = {
 
         this.hideMergeView();
         this.updateModeTabs();
-        this.loadConfigContent();
+        self.loadConfigContent();
     },
 
     showOverwrite: function() {
+        var self = this;
         this.isOverwrite = true;
         this.currentViewMode = 'original';
         this.originalContent = '';
         this.runtimeContent = '';
         this.isModified = false;
         this.mergeViewActive = false;
+        this.isFullscreen = false;
 
         if (this.editorInstance) {
-            if (this.editorInstance.toTextArea) this.editorInstance.toTextArea();
+            this._destroyEditor();
             this.editorInstance = null;
         }
         var textarea = document.getElementById('config-editor-textarea');
         if (textarea) {
             textarea.value = '';
-            textarea.style.display = 'none';
+            textarea.classList.add('oc-hidden');
         }
-        var loadingDiv = document.getElementById('config-editor-loading');
-        if (loadingDiv) loadingDiv.style.display = 'flex';
+        ocShowLoading(textarea.parentNode, '<%:Loading config file...%>');
         var mergeview = document.getElementById('config-mergeview-container');
-        if (mergeview) mergeview.style.display = 'none';
+        if (mergeview) mergeview.classList.add('oc-hidden');
 
         var banner = document.getElementById('overwrite-banner');
-        if (banner) banner.style.display = 'flex';
+        if (banner) banner.classList.remove('oc-hidden');
 
         var tabs = document.getElementById('config-mode-tabs');
-        if (tabs) tabs.style.display = 'none';
+        if (tabs) tabs.classList.add('oc-hidden');
 
         var layoutBtn = document.getElementById('config-editor-layout');
-        if (layoutBtn) layoutBtn.style.display = 'none';
+        if (layoutBtn) layoutBtn.classList.add('oc-hidden');
 
         if (!this.currentConfigFile) {
             this.currentConfigFile = '/etc/openclash/custom/openclash_custom_overwrite.sh';
@@ -881,13 +301,14 @@ var ConfigEditor = {
 
         this.model.classList.remove('maximized');
         this.model.classList.remove('minimized');
+        this.resetModelStyles();
 
         var editTitle = document.getElementById('editTitle');
         if (editTitle) {
             editTitle.textContent = '<%:Overwrite Edit%>: ';
         }
 
-        if (this.overwriteCardBar) this.overwriteCardBar.style.display = 'block';
+        if (this.overwriteCardBar) this.overwriteCardBar.classList.remove('oc-hidden');
         this.loadOverwriteFiles();
 
         var configNameElement = document.getElementById('config-file-name');
@@ -896,39 +317,90 @@ var ConfigEditor = {
         }
 
         this.hideMergeView();
-        this.loadConfigContent();
+        self.loadConfigContent();
+    },
+
+    _destroyEditor: function() {
+        this.toggleFullscreen(false);
+        if (this.editorInstance) {
+            if (this.editorInstance.a && this.editorInstance.a.destroy) {
+                this.editorInstance.a.destroy();
+                if (this.editorInstance.b && this.editorInstance.b.destroy) this.editorInstance.b.destroy();
+            } else if (this.editorInstance.destroy) {
+                this.editorInstance.destroy();
+            } else if (this.editorInstance.toTextArea) {
+                this.editorInstance.toTextArea();
+            }
+            this.editorInstance = null;
+        }
+        this._currentEditorMode = null;
+        var textarea = document.getElementById('config-editor-textarea');
+        if (textarea) textarea.classList.remove('oc-hidden');
+    },
+
+    toggleFullscreen: function(forceState) {
+        var nextState = typeof forceState === 'boolean' ? forceState : !this.isFullscreen;
+        this.isFullscreen = nextState;
+        window._ocFullscreenActive = nextState;
+        if (typeof CM6 !== 'undefined' && CM6.toggleFullscreen) {
+            if (nextState) {
+                var dom = this.editorInstance;
+                if (dom && dom.dom) dom = dom.dom;
+                if (dom && dom.classList) {
+                    if (typeof _ocEnterFullscreen === 'function') _ocEnterFullscreen(dom);
+                    CM6.toggleFullscreen(dom);
+                }
+            } else {
+                var fsEl = document.getElementById('oc-fullscreen-active');
+                if (fsEl) CM6.toggleFullscreen(fsEl);
+                if (typeof _ocExitFullscreen === 'function') _ocExitFullscreen();
+            }
+        }
     },
 
     hide: function() {
         this.overlay.classList.remove('show');
 
-        if (this.editorInstance) {
-            if (this.editorInstance.toTextArea) this.editorInstance.toTextArea();
-            this.editorInstance = null;
-        }
+        this._destroyEditor();
+        window._mergeViewInstance = null;
 
         this.isModified = false;
         this.originalContent = '';
-        this.overwriteCardBar.style.display = 'none';
+        this.overwriteCardBar.classList.add('oc-hidden');
         if (!this.isOverwrite) {
             this.currentConfigFile = '';
         }
 
-        var loadingDiv = document.getElementById('config-editor-loading');
         var textarea = document.getElementById('config-editor-textarea');
         var mergeview = document.getElementById('config-mergeview-container');
         var editor_help = document.getElementById('config-editor-help');
         var layoutBtn = document.getElementById('config-editor-layout');
 
-        if (loadingDiv) loadingDiv.style.display = 'flex';
-        if (textarea) textarea.style.display = 'none';
-        if (mergeview) mergeview.style.display = 'none';
+        if (textarea) {
+            ocHideLoading(textarea.parentNode);
+            textarea.classList.add('oc-hidden');
+        }
+        if (mergeview) mergeview.classList.add('oc-hidden');
         if (layoutBtn) {
             layoutBtn.classList.remove('active');
             layoutBtn.title = "<%:Compare%>";
-            layoutBtn.innerHTML = this.SVG_COMPARE;
+            layoutBtn.innerHTML = _ocIcons.SVG_COMPARE;
         }
-        if (editor_help) editor_help.textContent = '<%:Press F11 for fullscreen, Esc to exit fullscreen, Ctrl+Mouse Wheel to zoom%>';
+        if (editor_help) editor_help.innerHTML = '<%:Press%> <b style="color:var(--success-color)">F11</b> <%:for fullscreen,%> <b style="color:var(--success-color)">Esc</b> <%:to exit fullscreen,%> <b style="color:var(--success-color)">Ctrl + <%:Mouse Wheel%></b> <%:to zoom%>';
+    },
+
+    resetModelStyles: function() {
+        if (!this.model) return;
+        this.model.style.position = '';
+        this.model.style.left = '';
+        this.model.style.top = '';
+        this.model.style.right = '';
+        this.model.style.bottom = '';
+        this.model.style.margin = '';
+        this.model.style.transform = '';
+        this.model.style.transition = '';
+        this.model.style.width = '';
+        this.model.style.height = '';
     },
 
     formatDisplayName: function(fileName) {
@@ -982,11 +454,9 @@ var ConfigEditor = {
     loadConfigContent: function() {
         var self = this;
         var statusText = document.getElementById('config-editor-status-text');
-        var loadingDiv = document.getElementById('config-editor-loading');
         var textarea = document.getElementById('config-editor-textarea');
         var mergeview = document.getElementById('config-mergeview-container');
-        if (mergeview) mergeview.style.display = 'none';
-        if (textarea) textarea.style.display = 'block';
+        if (mergeview) mergeview.classList.add('oc-hidden');
 
         statusText.textContent = '<%:Loading...%>';
 
@@ -1011,59 +481,90 @@ var ConfigEditor = {
         }
 
         function renderEditor(content, mode, readOnly, lint) {
-            loadingDiv.style.display = 'none';
             textarea.value = content;
-            textarea.style.display = 'block';
+
+            var editorKey = mode + '|' + (readOnly ? 'r' : 'w') + '|' + (lint ? 'l' : 'n');
+
+            if (self.editorInstance && self._currentEditorMode === editorKey && !self.mergeViewActive) {
+                self.originalContent = content;
+                self.editorInstance.dispatch({
+                    changes: { from: 0, to: self.editorInstance.state.doc.length, insert: content }
+                });
+                self.isModified = false;
+                self.updateSaveButtonState();
+                textarea.classList.add('oc-hidden');
+                ocHideLoading(textarea.parentNode);
+                return;
+            }
 
             if (self.editorInstance) {
-                if (self.editorInstance.toTextArea) self.editorInstance.toTextArea();
-                self.editorInstance = null;
+                self._destroyEditor();
             }
-            self.editorInstance = CodeMirror.fromTextArea(textarea, {
-                mode: mode,
-                autoRefresh: true,
-                styleActiveLine: true,
-                lineNumbers: true,
-                theme: "material",
-                lineWrapping: true,
-                matchBrackets: true,
-                foldGutter: true,
-                lint: lint,
-                readOnly: readOnly,
-                gutters: lint
-                    ? ["CodeMirror-linenumbers", "CodeMirror-foldgutter", "CodeMirror-lint-markers"]
-                    : ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
-                extraKeys: {
-                    "F11": function(cm) {
-                        cm.setOption("fullScreen", !cm.getOption("fullScreen"));
-                    },
-                    "Esc": function(cm) {
-                        if (cm.getOption("fullScreen")) {
-                            cm.setOption("fullScreen", false);
-                        }
-                    },
-                    "Tab": function(cm) {
-                        if (cm.somethingSelected()) {
-                            cm.indentSelection('add');
-                        } else {
-                            var spaces = Array(cm.getOption("indentUnit") + 1).join(" ");
-                            cm.replaceSelection(spaces);
-                        }
-                    },
-                    "Ctrl-S": function(cm) {
-                        if (!readOnly) self.saveConfigContent();
-                    }
+            self._currentEditorMode = editorKey;
+
+            var exts = [];
+            var isDark = isDarkBackground(document.body);
+            var topSearch = (CM6 && CM6.topSearchExtension) ? CM6.topSearchExtension() : null;
+            exts.push(CM6.themeExtension(isDark));
+            if (topSearch) exts.push(topSearch);
+
+            if (mode === 'text/yaml' || mode === 'text/x-yaml') {
+                exts.push(CM6.yaml());
+                if (lint) {
+                    exts.push(CM6.yamlLinter());
+                    exts.push(CM6.lintGutter());
                 }
-            });
-            self.editorInstance.setSize('100%', '100%');
-            self.editorInstance.setValue(content);
-            self.editorInstance.refresh();
-            if (!readOnly) {
-                self.editorInstance.on("change", function() {
-                    self.isModified = self.editorInstance.getValue() !== self.originalContent;
-                    self.updateSaveButtonState();
-                });
+                exts.push(CM6.autocompletion({ override: [CM6.mihomoCompletion] }));
+                exts.push(CM6.indentUnit.of("  "));
+                exts.push(CM6.indentMarkerExtension());
+            } else if (mode === 'text/x-sh' || mode === 'shell') {
+                exts.push(CM6.StreamLanguage.define(CM6.shell));
+            } else if (mode === 'text/x-properties' || mode === 'properties') {
+                exts.push(CM6.StreamLanguage.define(CM6.properties));
             }
+
+            if (readOnly) {
+                exts.push(CM6.EditorState.readOnly.of(true));
+            } else {
+                if (mode === 'text/yaml' || mode === 'text/x-yaml') {
+                    exts.push(CM6.placeholderExtension('<%:Enter YAML configuration...%>'));
+                } else if (mode === 'text/x-sh' || mode === 'shell') {
+                    exts.push(CM6.placeholderExtension('<%:Enter shell script...%>'));
+                } else {
+                    exts.push(CM6.placeholderExtension('<%:Enter configuration...%>'));
+                }
+            }
+
+            exts.push(CM6.keymap.of([
+                { key: 'Ctrl-s', run: function() {
+                    if (!readOnly) self.saveConfigContent();
+                    return true;
+                }}
+            ]));
+
+            if (!readOnly) {
+                exts.push(CM6.EditorView.updateListener.of(function(update) {
+                    if (update.docChanged) {
+                        self.isModified = update.state.doc.toString() !== self.originalContent;
+                        self.updateSaveButtonState();
+                    }
+                }));
+            }
+
+            var parent = textarea.parentNode;
+            self.editorInstance = new CM6.EditorView({
+                state: CM6.EditorState.create({
+                    doc: content,
+                    extensions: [CM6.baseExtensions(), ...exts]
+                }),
+                parent: parent
+            });
+
+            textarea.classList.add('oc-hidden');
+            self.editorInstance.dom.style.height = '100%';
+            ocHideLoading(textarea.parentNode);
+
+            if (CM6.mirrorThemeScrollbar) CM6.mirrorThemeScrollbar();
         }
 
         if (!this.isOverwrite) {
@@ -1082,14 +583,12 @@ var ConfigEditor = {
         }
 
         fetch(url)
-            .then(function(response) {
-                if (!response.ok) {
-                    throw new Error('HTTP error! status: ' + response.status);
-                }
-                return response.json();
+            .then(function(r) {
+                if (!r.ok) throw new Error('HTTP ' + r.status);
+                return r.json();
             })
             .then(function(data) {
-                if (data.content !== undefined) {
+                if (data.status === 'success' && data.content !== undefined) {
                     if (self.currentViewMode === 'runtime' && !self.isOverwrite) {
                         self.runtimeContent = data.content;
                         renderEditor(self.runtimeContent, "text/yaml", true, false);
@@ -1101,11 +600,12 @@ var ConfigEditor = {
                     }
                     self.updateModeTabs();
                 } else {
-                    throw new Error('Invalid response data');
+                    ocHideLoading(textarea.parentNode);
+                    statusText.textContent = '<%:Load failed%>';
                 }
             })
-            .catch(function(error) {
-                loadingDiv.querySelector('span').textContent = '<%:Failed to load config file%>';
+            .catch(function(err) {
+                ocHideLoading(textarea.parentNode);
                 statusText.textContent = '<%:Load failed%>';
             });
     },
@@ -1115,17 +615,18 @@ var ConfigEditor = {
         if (this.isOverwrite) return;
         var container = document.getElementById('config-mergeview-container');
         var textarea = document.getElementById('config-editor-textarea');
-        var loadingDiv = document.getElementById('config-editor-loading');
         var tabs = document.getElementById('config-mode-tabs');
         var editor_help = document.getElementById('config-editor-help');
         var statusText = document.getElementById('config-editor-status-text');
 
-        if (tabs) tabs.style.display = 'none';
-        if (textarea) textarea.style.display = 'none';
-        if (loadingDiv) loadingDiv.style.display = 'none';
-        if (container) container.style.display = 'block';
+        if (tabs) tabs.classList.add('oc-hidden');
+        if (textarea) {
+            textarea.classList.add('oc-hidden');
+            ocHideLoading(textarea.parentNode);
+        }
+        if (container) container.classList.remove('oc-hidden');
         if (statusText) statusText.textContent = '<%:Loading...%>';
-        if (editor_help) editor_help.textContent = '<%:Press F10 to toggle differences, F11 for fullscreen, Esc to exit fullscreen, Ctrl+Mouse Wheel to zoom%>';
+        if (editor_help) editor_help.innerHTML = '<%:Press%> <b style="color:var(--success-color)">F10</b> <%:to toggle differences,%> <b style="color:var(--success-color)">F11</b> <%:for fullscreen,%> <b style="color:var(--success-color)">Esc</b> <%:to exit fullscreen,%> <b style="color:var(--success-color)">Ctrl + <%:Mouse Wheel%></b> <%:to zoom%>';
 
         var getOriginal = function() {
             return new Promise(function(resolve, reject) {
@@ -1147,68 +648,54 @@ var ConfigEditor = {
             });
         };
 
-        let showDifferences = true;
+        this.mergeShowDifferences = true;
 
         Promise.all([getOriginal(), getRuntime()]).then(function(contents){
             var original = contents[0] || '';
             var runtime = contents[1] || '';
             container.innerHTML = '';
-            if (self.editorInstance && self.editorInstance.toTextArea) self.editorInstance.toTextArea();
-            self.editorInstance = CodeMirror.MergeView(container, {
-                value: original,
-                orig: runtime,
-                mode: "text/yaml",
-                theme: "material",
-                lineNumbers: true,
-                autoRefresh: true,
-                styleActiveLine: true,
-                lineWrapping: true,
-                matchBrackets: true,
-                foldGutter: true,
-                lint: true,
-                highlightDifferences: showDifferences,
-                connect: null,
-                collapseIdentical: false,
-                readOnly: false,
-                gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter", "CodeMirror-lint-markers"],
-                extraKeys: {
-                    "F10": function() {
-                        showDifferences = !showDifferences;
-                        if (self.editorInstance && self.editorInstance.setShowDifferences) {
-                            self.editorInstance.setShowDifferences(showDifferences);
-                        }
-                    },
-                    "F11": function(cm) {
-                        cm.setOption("fullScreen", !cm.getOption("fullScreen"));
-                    },
-                    "Esc": function(cm) {
-                        if (cm.getOption("fullScreen")) cm.setOption("fullScreen", false);
-                    },
-                    "Tab": function(cm) {
-                        if (cm.somethingSelected()) {
-                            cm.indentSelection('add');
-                        } else {
-                            var spaces = Array(cm.getOption("indentUnit") + 1).join(" ");
-                            cm.replaceSelection(spaces);
-                        }
-                    },
-                    "Ctrl-S": function(cm) {
-                        self.saveConfigContent();
-                    }
-                }
-            });
-            var leftEditor = self.editorInstance.edit;
-            if (leftEditor) {
-                leftEditor.on("change", function() {
-                    self.isModified = leftEditor.getValue() !== self.originalContent;
-                    self.updateSaveButtonState();
-                });
+            if (self.editorInstance) self._destroyEditor();
+
+            var isDark = isDarkBackground(document.body);
+            var themeExt = CM6.themeExtension(isDark);
+            var topSearch = (CM6 && CM6.topSearchExtension) ? CM6.topSearchExtension() : null;
+            var extA = [CM6.baseExtensions(), themeExt, CM6.placeholderExtension('<%:Edit original config...%>'), CM6.yaml(), CM6.yamlLinter(), CM6.lintGutter(), CM6.autocompletion({ override: [CM6.mihomoCompletion] }), CM6.indentUnit.of("  "), CM6.indentMarkerExtension()];
+            var extB = [CM6.baseExtensions(), themeExt, CM6.placeholderExtension('<%:Runtime config (read only)%>'), CM6.yaml(), CM6.indentUnit.of("  "), CM6.indentMarkerExtension(), CM6.EditorState.readOnly.of(true)];
+            var mergeDefaults = CM6.mergeDefaultConfig || {};
+            if (topSearch) {
+                extA.push(topSearch);
+                extB.push(topSearch);
             }
-            if (self.editorInstance.editor)
-                self.editorInstance.editor().setSize('100%', '100%');
-            if (self.editorInstance.rightOriginal && self.editorInstance.rightOriginal())
-                self.editorInstance.rightOriginal().setSize('100%', '100%');
+
+            extA.push(CM6.EditorView.updateListener.of(function(update) {
+                if (update.docChanged) {
+                    self.isModified = update.state.doc.toString() !== self.originalContent;
+                    self.updateSaveButtonState();
+                }
+            }));
+
+            self.editorInstance = new CM6.MergeView({
+                a: {
+                    doc: original,
+                    extensions: extA
+                },
+                b: {
+                    doc: runtime,
+                    extensions: extB
+                },
+                parent: container,
+                diffConfig: mergeDefaults.diffConfig || { scanLimit: 5000 },
+                gutter: mergeDefaults.gutter !== false,
+                revertControls: mergeDefaults.revertControls || 'b-to-a',
+                highlightChanges: self.mergeShowDifferences,
+                collapseUnchanged: mergeDefaults.collapseUnchanged || false
+            });
+
             self.mergeViewActive = true;
+            window._mergeViewInstance = self.editorInstance;
+
+            if (CM6.mirrorThemeScrollbar) CM6.mirrorThemeScrollbar();
+
             if (statusText) statusText.textContent = '<%:Compare mode: left(Original Config), right(Runtime Config)%>';
             var layoutBtn = document.getElementById('config-editor-layout');
             if (layoutBtn) layoutBtn.classList.add('active');
@@ -1223,20 +710,21 @@ var ConfigEditor = {
         var layoutBtn = document.getElementById('config-editor-layout');
         if (container) {
             container.innerHTML = '';
-            container.style.display = 'none';
+            container.classList.add('oc-hidden');
         }
-        if (textarea) textarea.style.display = 'block';
-        if (!this.isOverwrite && tabs) tabs.style.display = 'flex';
+        if (textarea) textarea.classList.remove('oc-hidden');
+        if (!this.isOverwrite && tabs) tabs.classList.remove('oc-hidden');
         this.mergeViewActive = false;
+        window._mergeViewInstance = null;
         this.loadConfigContent();
 
         if (layoutBtn) {
             layoutBtn.classList.remove('active');
             layoutBtn.title = "<%:Compare%>";
-            layoutBtn.innerHTML = this.SVG_COMPARE;
+            layoutBtn.innerHTML = _ocIcons.SVG_COMPARE;
         }
 
-        if (editor_help) editor_help.textContent = '<%:Press F11 for fullscreen, Esc to exit fullscreen, Ctrl+Mouse Wheel to zoom%>';
+        if (editor_help) editor_help.innerHTML = '<%:Press%> <b style="color:var(--success-color)">F11</b> <%:for fullscreen,%> <b style="color:var(--success-color)">Esc</b> <%:to exit fullscreen,%> <b style="color:var(--success-color)">Ctrl + <%:Mouse Wheel%></b> <%:to zoom%>';
     },
 
     saveConfigContent: function() {
@@ -1252,10 +740,12 @@ var ConfigEditor = {
         saveBtn.disabled = true;
 
         var content;
-        if (this.mergeViewActive && this.editorInstance && this.editorInstance.edit) {
-            content = this.editorInstance.edit.getValue();
+        if (this.mergeViewActive && this.editorInstance && this.editorInstance.a) {
+            content = this.editorInstance.a.state.doc.toString();
+        } else if (this.editorInstance.state) {
+            content = this.editorInstance.state.doc.toString();
         } else {
-            content = this.editorInstance.getValue();
+            content = '';
         }
 
         if (!content) {
@@ -1277,11 +767,9 @@ var ConfigEditor = {
             method: 'POST',
             body: formData
         })
-        .then(function(response) {
-            if (!response.ok) {
-                throw new Error('HTTP error! status: ' + response.status);
-            }
-            return response.json();
+        .then(function(r) {
+            if (!r.ok) throw new Error('HTTP ' + r.status);
+            return r.json();
         })
         .then(function(data) {
             saveBtn.disabled = false;
@@ -1308,16 +796,10 @@ var ConfigEditor = {
                 }, 3000);
             }
         })
-        .catch(function(error) {
+        .catch(function(err) {
             saveBtn.disabled = false;
             statusText.textContent = '<%:Save failed%>';
-            alert('<%:Save config failed:%> ' + error.message);
-
-            setTimeout(function() {
-                if (statusText && statusText.textContent === '<%:Save failed%>') {
-                    statusText.textContent = '<%:Ready%>';
-                }
-            }, 3000);
+            alert('<%:Failed to save config file:%> ' + err.message);
         });
     },
 
@@ -1328,10 +810,12 @@ var ConfigEditor = {
         }
 
         var content;
-        if (this.mergeViewActive && this.editorInstance && this.editorInstance.edit) {
-            content = this.editorInstance.edit.getValue();
+        if (this.mergeViewActive && this.editorInstance && this.editorInstance.a) {
+            content = this.editorInstance.a.state.doc.toString();
+        } else if (this.editorInstance.state) {
+            content = this.editorInstance.state.doc.toString();
         } else {
-            content = this.editorInstance.getValue();
+            content = '';
         }
 
         var filename;
@@ -1407,6 +891,11 @@ var ConfigEditor = {
         .then(function(data) {
             if (data.status === 'success') {
                 self.overwriteSubInfo = (data && data.data) ? data.data : {};
+                Object.keys(self.overwriteSubInfo).forEach(function(key) {
+                    var subInfo = self.overwriteSubInfo[key] || {};
+                    subInfo.config = self.parseOverwriteConfigValue(subInfo.config);
+                    self.overwriteSubInfo[key] = subInfo;
+                });
                 self.overwriteFiles.sort(function(a, b) {
                     var an = a.name || (a.path ? a.path.split('/').pop() : '');
                     var bn = b.name || (b.path ? b.path.split('/').pop() : '');
@@ -1435,7 +924,7 @@ var ConfigEditor = {
         var addCard = document.createElement('div');
         addCard.className = 'sub-card overwrite-item';
         addCard.style.cursor = 'pointer';
-        addCard.innerHTML = '<div class="overwrite-add-icon">+</div>';
+        addCard.innerHTML = '<div class="overwrite-add-icon"><svg width="20" height="20"><use href="#oc-icon-add"/></svg></div>';
         addCard.title = '<%:Add New File%>';
         addCard.onclick = function() {
             ConfigEditor.showAddOverwritemodel();
@@ -1530,6 +1019,7 @@ var ConfigEditor = {
                 formData.append('update_hour', sub.update_hour || '');
                 formData.append('order', (typeof sub.order !== 'undefined' && sub.order !== null && sub.order !== '') ? sub.order : idx);
                 formData.append('param', sub.param || '');
+                formData.append('config', self.parseOverwriteConfigValue(sub.config).join('\n'));
                 formData.append('enable', newEnable);
                 fetch('/cgi-bin/luci/admin/services/openclash/overwrite_subscribe_info', {
                     method: 'POST',
@@ -1574,7 +1064,7 @@ var ConfigEditor = {
                 refresh.className = 'icon-btn overwrite-refresh-btn';
                 refresh.type = 'button';
                 refresh.title = '<%:Refresh Subscription%>';
-                refresh.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.13-3.36L23 10"/><path d="M1 14l4.35 4.35A9 9 0 0 0 20.49 15"/></svg>';
+                refresh.innerHTML = '<svg width="16" height="16"><use href="#oc-icon-update"/></svg>';
                 refresh.onclick = function(e) {
                     e.stopPropagation();
                     var statusText = document.getElementById('config-editor-status-text');
@@ -1590,6 +1080,7 @@ var ConfigEditor = {
                     formData.append('update_hour', sub.update_hour || '');
                     formData.append('order', (typeof sub.order !== 'undefined' && sub.order !== null && sub.order !== '') ? sub.order : idx);
                     formData.append('param', sub.param || '');
+                    formData.append('config', self.parseOverwriteConfigValue(sub.config).join('\n'));
                     formData.append('enable', typeof sub.enable !== 'undefined' ? sub.enable : 1);
                     fetch('/cgi-bin/luci/admin/services/openclash/overwrite_subscribe_info', {
                         method: 'POST',
@@ -1628,7 +1119,7 @@ var ConfigEditor = {
             gear.className = 'icon-btn overwrite-gear-btn';
             gear.type = 'button';
             gear.title = '<%:Edit Module Info%>';
-            gear.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.09a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h.09a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.09a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>';
+            gear.innerHTML = '<svg width="16" height="16"><use href="#oc-icon-gear"/></svg>';
             gear.onclick = function(e) {
                 e.stopPropagation();
                 ConfigEditor.showOverwriteSubmodel(name, sub, file.path);
@@ -1639,7 +1130,7 @@ var ConfigEditor = {
             del.className = 'icon-btn overwrite-del-btn';
             del.type = 'button';
             del.title = '<%:Delete%>';
-            del.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/></svg>';
+            del.innerHTML = '<svg width="16" height="16"><use href="#oc-icon-trash"/></svg>';
             del.onclick = function(e) {
                 e.stopPropagation();
                 if (confirm('<%:Are you sure you want to delete this file and its subscription info?%>')) {
@@ -2099,7 +1590,11 @@ var ConfigEditor = {
             ConfigEditor.overwriteDrag.isTouchDragging = false;
         });
 
-        bar.style.display = self.isOverwrite ? 'block' : 'none';
+        if (self.isOverwrite) {
+            bar.classList.remove('oc-hidden');
+        } else {
+            bar.classList.add('oc-hidden');
+        }
     },
 
     saveOverwriteSort: function() {
@@ -2116,6 +1611,7 @@ var ConfigEditor = {
             formData.append('update_days', sub.update_days || '');
             formData.append('update_hour', sub.update_hour || '');
             formData.append('param', sub.param || '');
+            formData.append('config', self.parseOverwriteConfigValue(sub.config).join('\n'));
             formData.append('order', idx);
             reqs.push(fetch('/cgi-bin/luci/admin/services/openclash/overwrite_subscribe_info', {
                 method: 'POST',
@@ -2127,31 +1623,302 @@ var ConfigEditor = {
         });
     },
 
+    getOverwriteConfigFiles: function() {
+        var rawList = [];
+        if (window.configFiles && Array.isArray(window.configFiles)) {
+            rawList = window.configFiles;
+        } else if (window.ConfigFileManager && Array.isArray(window.ConfigFileManager.configList)) {
+            rawList = window.ConfigFileManager.configList;
+        }
+
+        return rawList.map(function(file) {
+            if (typeof file === 'string') {
+                return {
+                    name: file,
+                    path: file
+                };
+            }
+            return {
+                name: file.name || file.filename || file.path || '',
+                path: file.path || file.filepath || file.name || ''
+            };
+        }).filter(function(file) {
+            return !!file.path;
+        });
+    },
+
+    parseOverwriteConfigValue: function(value) {
+        if (!value) return [];
+        if (Array.isArray(value)) {
+            return value.filter(function(item) { return !!item; });
+        }
+        return String(value).split(/[\r\n,;]+/).map(function(item) {
+            return item.trim();
+        }).filter(function(item) {
+            return !!item;
+        });
+    },
+
+    renderOverwriteConfigDropdown: function(configValue, dropdownId) {
+        var files = this.getOverwriteConfigFiles();
+        var selected = this.parseOverwriteConfigValue(configValue);
+        var selectedMap = {};
+        selected.forEach(function(item) {
+            selectedMap[item] = true;
+        });
+
+        if (!selected.length) {
+            selectedMap['all'] = true;
+        }
+
+        var allChecked = !!selectedMap['all'];
+
+        var allOptionHtml = `
+            <label class="overwrite-config-option${allChecked ? ' selected' : ''}" data-path="all" data-all-option="1">
+                <span class="overwrite-config-option-left">
+                    <input type="checkbox" value="all"${allChecked ? ' checked' : ''}>
+                    <span class="overwrite-config-option-name" title="<%:Use For All Config File%>"><%:Use For All Config File%></span>
+                </span>
+                <span class="overwrite-config-option-state">${allChecked ? '✓' : ''}</span>
+            </label>
+        `;
+
+        var fileOptionsHtml = files.length ? files.map(function(file) {
+            var checked = (!allChecked && (selectedMap[file.path] || selectedMap[file.name])) ? ' checked' : '';
+            var selectedClass = checked ? ' selected' : '';
+            var disabledClass = allChecked ? ' disabled-by-all' : '';
+            var stateText = checked ? '✓' : '';
+            var disabled = allChecked;
+            return `
+                <label class="overwrite-config-option${selectedClass}${disabledClass}" data-path="${file.path}">
+                    <span class="overwrite-config-option-left">
+                        <input type="checkbox" value="${file.path}"${checked}${disabled ? ' disabled' : ''}>
+                        <span class="overwrite-config-option-name" title="${file.name}">${file.name}</span>
+                    </span>
+                    <span class="overwrite-config-option-state">${stateText}</span>
+                </label>
+            `;
+        }).join('') : '<div class="overwrite-config-option"><span class="overwrite-config-option-name"><%:No config files found%></span></div>';
+
+        var optionsHtml = allOptionHtml + fileOptionsHtml;
+
+        return `
+            <div class="overwrite-config-dropdown form-select-wrapper" id="${dropdownId}">
+                <button type="button" class="overwrite-config-dropdown-btn form-select">
+                    <span class="overwrite-config-dropdown-text"><%:Use For All Config File%></span>
+                    <span class="overwrite-config-dropdown-arrow"></span>
+                </button>
+                <div class="overwrite-config-dropdown-panel">
+                    ${optionsHtml}
+                </div>
+            </div>
+        `;
+    },
+
+    updateOverwriteConfigDropdownLabel: function(dropdown) {
+        if (!dropdown) return;
+        var textEl = dropdown.querySelector('.overwrite-config-dropdown-text');
+        if (!textEl) return;
+        var checked = dropdown.querySelectorAll('.overwrite-config-option input[type="checkbox"]:checked');
+        if (!checked.length) {
+            textEl.textContent = '<%:Use For All Config File%>';
+            return;
+        }
+        if (checked.length === 1) {
+            var oneName = checked[0].closest('.overwrite-config-option').querySelector('.overwrite-config-option-name');
+            textEl.textContent = oneName ? oneName.textContent : '<%:1 file selected%>';
+            return;
+        }
+        textEl.textContent = checked.length + ' <%:files selected%>';
+    },
+
+    bindOverwriteConfigDropdown: function(container) {
+        if (!container || container.dataset.inited === '1') return;
+        container.dataset.inited = '1';
+
+        var self = this;
+        var btn = container.querySelector('.overwrite-config-dropdown-btn');
+        var panel = container.querySelector('.overwrite-config-dropdown-panel');
+
+        function syncAllExclusiveState() {
+            var allInput = container.querySelector('.overwrite-config-option input[type="checkbox"][value="all"]');
+            var allOption = allInput ? allInput.closest('.overwrite-config-option') : null;
+            var allState = allOption ? allOption.querySelector('.overwrite-config-option-state') : null;
+            var allSelected = !!(allInput && allInput.checked);
+
+            if (allOption) {
+                allOption.classList.toggle('selected', allSelected);
+            }
+            if (allState) {
+                allState.textContent = allSelected ? '✓' : '';
+            }
+
+            container.querySelectorAll('.overwrite-config-option input[type="checkbox"]').forEach(function(input) {
+                if (input.value === 'all') return;
+                var option = input.closest('.overwrite-config-option');
+                var state = option ? option.querySelector('.overwrite-config-option-state') : null;
+                if (allSelected) {
+                    input.checked = false;
+                }
+                input.disabled = allSelected;
+                if (option) {
+                    option.classList.toggle('selected', input.checked);
+                    option.classList.toggle('disabled-by-all', allSelected);
+                    option.setAttribute('aria-disabled', allSelected ? 'true' : 'false');
+                }
+                if (state) {
+                    state.textContent = input.checked ? '✓' : '';
+                }
+            });
+        }
+
+        this.updateOverwriteConfigDropdownLabel(container);
+        syncAllExclusiveState();
+        this.updateOverwriteConfigDropdownLabel(container);
+
+        if (btn && !btn.disabled) {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                container.classList.toggle('open');
+            });
+        }
+
+        container.querySelectorAll('.overwrite-config-option input[type="checkbox"]').forEach(function(input) {
+            input.addEventListener('change', function() {
+                if (input.value === 'all') {
+                    syncAllExclusiveState();
+                } else if (input.checked) {
+                    var allInput = container.querySelector('.overwrite-config-option input[type="checkbox"][value="all"]');
+                    if (allInput) {
+                        allInput.checked = false;
+                    }
+                    syncAllExclusiveState();
+                }
+
+                var option = input.closest('.overwrite-config-option');
+                var state = option ? option.querySelector('.overwrite-config-option-state') : null;
+                if (option) {
+                    option.classList.toggle('selected', input.checked);
+                }
+                if (state) {
+                    state.textContent = input.checked ? '✓' : '';
+                }
+                self.updateOverwriteConfigDropdownLabel(container);
+            });
+        });
+
+        if (panel) {
+            panel.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+        }
+
+        document.addEventListener('click', function(e) {
+            if (!container.contains(e.target)) {
+                container.classList.remove('open');
+            }
+        });
+    },
+
+    addOverwriteParamRow: function(container, name, value) {
+        var row = document.createElement('div');
+        row.className = 'form-row overwrite-param-row';
+        row.style.cssText = 'align-items: center; gap: 6px; margin-bottom: 6px;';
+
+        var nameInput = document.createElement('input');
+        nameInput.type = 'text';
+        nameInput.className = 'form-input';
+        nameInput.placeholder = 'Key';
+        nameInput.value = name || '';
+        nameInput.style.cssText = 'flex: 1; height: 32px;';
+
+        var valueInput = document.createElement('input');
+        valueInput.type = 'text';
+        valueInput.className = 'form-input';
+        valueInput.placeholder = 'Value';
+        valueInput.value = value || '';
+        valueInput.style.cssText = 'flex: 1.5; height: 32px;';
+
+        var removeBtn = document.createElement('button');
+        removeBtn.type = 'button';
+        removeBtn.className = 'icon-btn';
+        removeBtn.title = '<%:Remove%>';
+        removeBtn.style.cssText = 'flex-shrink: 0;';
+        removeBtn.innerHTML = '<svg width="14" height="14"><use href="#oc-icon-close"/></svg>';
+        removeBtn.addEventListener('click', function() {
+            row.parentNode.removeChild(row);
+            if (container.children.length === 0) {
+                container.classList.add('oc-hidden');
+            }
+        });
+
+        row.appendChild(nameInput);
+        row.appendChild(valueInput);
+        row.appendChild(removeBtn);
+        container.appendChild(row);
+        container.classList.remove('oc-hidden');
+    },
+
+    buildOverwriteParamRows: function(container, paramStr) {
+        if (!paramStr) return;
+        var pairs = paramStr.split(';');
+        for (var i = 0; i < pairs.length; i++) {
+            var pair = pairs[i].trim();
+            if (pair) {
+                var eqIdx = pair.indexOf('=');
+                var name = eqIdx > 0 ? pair.substring(0, eqIdx).trim() : pair;
+                var value = eqIdx > 0 ? pair.substring(eqIdx + 1).trim() : '';
+                this.addOverwriteParamRow(container, name, value);
+            }
+        }
+    },
+
+    collectOverwriteParams: function(container) {
+        var rows = container.querySelectorAll('.overwrite-param-row');
+        var params = [];
+        for (var i = 0; i < rows.length; i++) {
+            var inputs = rows[i].querySelectorAll('input');
+            var name = inputs[0].value.trim();
+            var value = inputs[1].value.trim();
+            if (name) {
+                params.push(name + '=' + value);
+            }
+        }
+        return params.join(';');
+    },
+
+    getOverwriteConfigSelection: function(root, dropdownId) {
+        var dropdown = root.querySelector('#' + dropdownId);
+        if (!dropdown) return [];
+        var selected = Array.from(dropdown.querySelectorAll('.overwrite-config-option input[type="checkbox"]:checked')).map(function(input) {
+            return input.value;
+        }).filter(function(value) {
+            return !!value;
+        });
+        if (selected.indexOf('all') !== -1) {
+            return ['all'];
+        }
+        return selected;
+    },
+
     renderOverwriteSubForm: function(options) {
         var name = options.name || '';
         var sub = options.sub || {};
         var readonly = !!options.readonly;
         var showTabs = !!options.showTabs;
         var activeTab = options.activeTab || 'file';
+        var fileConfigDropdown = this.renderOverwriteConfigDropdown(sub.config || '', 'overwrite-upload-config-dropdown');
+        var subscribeConfigDropdown = this.renderOverwriteConfigDropdown(sub.config || '', 'overwrite-subscribe-config-dropdown');
 
         var tabsHtml = showTabs ? `
             <div class="upload-mode-selector">
                 <div class="mode-tabs">
                     <button type="button" class="mode-tab${activeTab==='file'?' active':''}" id="overwrite-upload-mode-file" data-mode="file">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                            <polyline points="17,11 12,6 7,11"></polyline>
-                            <line x1="12" y1="18" x2="12" y2="6"></line>
-                        </svg>
+                        <svg width="16" height="16"><use href="#oc-icon-upload"/></svg>
                         <%:Upload File%>
                     </button>
                     <button type="button" class="mode-tab${activeTab==='subscribe'?' active':''}" id="overwrite-upload-mode-subscribe" data-mode="subscribe">
-                        <svg width="15" height="15" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M26.2401 16.373L17.1001 7.23303C14.4388 4.57168 10.0653 4.6303 7.33158 7.36397C4.59791 10.0976 4.53929 14.4712 7.20064 17.1325L15.1359 25.0678" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"></path>
-                            <path d="M32.9027 23.0031L40.838 30.9384C43.4994 33.5998 43.4407 37.9733 40.7071 40.707C37.9734 43.4407 33.5999 43.4993 30.9385 40.8379L21.7985 31.6979" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"></path>
-                            <path d="M26.1093 26.1416C28.843 23.4079 28.9016 19.0344 26.2403 16.373" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"></path>
-                            <path d="M21.7989 21.7984C19.0652 24.5321 19.0066 28.9056 21.6679 31.5669" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"></path>
-                        </svg>
+                        <svg width="15" height="15"><use href="#oc-icon-link"/></svg>
                         <%:Subscribe Link%>
                     </button>
                 </div>
@@ -2160,21 +1927,21 @@ var ConfigEditor = {
 
         var fileContent = `
             <form id="overwrite-upload-form-file" style="display:${activeTab==='file'?'block':'none'};">
+                <div class="form-group oc-mb-5">
+                    <label for="overwrite-upload-config"><%:Config File%>:</label>
+                    ${fileConfigDropdown}
+                </div>
                 <div class="upload-zone" id="overwrite-upload-zone">
                     <div class="upload-icon">
-                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
-                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                            <polyline points="17,11 12,6 7,11"></polyline>
-                            <line x1="12" y1="18" x2="12" y2="6"></line>
-                        </svg>
+                        <svg width="48" height="48"><use href="#oc-icon-upload-feather"/></svg>
                     </div>
                     <div class="upload-text">
                         <p class="upload-primary"><%:Click to select file or drag and drop%></p>
                         <p class="upload-secondary"><%:Support txt,conf files, max size 10MB%></p>
                     </div>
-                    <input type="file" id="overwrite-upload-file-input" accept=".txt,.conf,*" style="display: none;">
+                    <input type="file" id="overwrite-upload-file-input" accept=".txt,.conf,*" class="oc-hidden">
                 </div>
-                <div class="filename-input-container" style="margin-top:20px;">
+                <div class="filename-input-container oc-mt-5">
                     <label for="overwrite-upload-filename-input"><%:File Name%>:</label>
                     <input type="text" id="overwrite-upload-filename-input" placeholder="<%:Please enter a filename%>" class="form-input" value="${name}" ${readonly ? 'readonly' : ''}/>
                 </div>
@@ -2186,6 +1953,10 @@ var ConfigEditor = {
                 <div class="form-group">
                     <label><%:File Name%>:</label>
                     <input type="text" class="form-input" name="filename" id="overwrite-subscribe-filename" value="${name}" ${readonly ? 'readonly' : ''} placeholder="<%:Please enter a filename%>">
+                </div>
+                <div class="form-group">
+                    <label for="overwrite-subscribe-config"><%:Config File%>:</label>
+                    ${subscribeConfigDropdown}
                 </div>
                 <div class="form-group">
                     <label><%:Type%>:</label>
@@ -2226,9 +1997,11 @@ var ConfigEditor = {
                 </div>
                 <div class="form-group" id="overwrite-subscribe-param-group" style="display:'block';">
                     <label><%:Environment variable%>:</label>
-                    <input type="text" class="form-input" name="param" id="overwrite-subscribe-param" value="${sub.param||''}" placeholder="key1=value1;key2=value2">
+                    <div class="form-help" style="margin-bottom: unset;"><%:Set environment variables for the overwrite script%></div>
+                    <div id="overwrite-subscribe-param-container" class="oc-hidden"></div>
+                    <button type="button" id="overwrite-subscribe-param-add" class="add-row-btn"><svg><use href="#oc-icon-add"/></svg><span><%:Add Param%></span></button>
                 </div>
-                <div class="upload-progress" id="overwrite-upload-progress" style="display:none;">
+                <div class="upload-progress oc-hidden" id="overwrite-upload-progress">
                     <div class="progress-bar">
                         <div class="progress-fill" id="overwrite-progress-fill" style="width:0%;"></div>
                     </div>
@@ -2254,10 +2027,9 @@ var ConfigEditor = {
 
         var ocDiv = document.createElement('div');
         ocDiv.className = 'oc';
-        var mainOc = document.querySelector('.oc[data-darkmode="true"]');
-        if (mainOc) {
-            ocDiv.setAttribute('data-darkmode', 'true');
-        }
+		if (document.documentElement.getAttribute('data-darkmode') === 'true') {
+			ocDiv.setAttribute('data-darkmode', 'true');
+		}
 
         var overlay = document.createElement('div');
         overlay.className = 'config-upload-model-overlay show';
@@ -2274,10 +2046,7 @@ var ConfigEditor = {
                 </div>
                 <div class="config-upload-actions">
                     <button type="button" class="icon-btn" id="overwrite-add-close" title="<%:Close%>">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <line x1="18" y1="6" x2="6" y2="18"></line>
-                            <line x1="6" y1="6" x2="18" y2="18"></line>
-                        </svg>
+                        <svg width="14" height="14"><use href="#oc-icon-close"/></svg>
                     </button>
                 </div>
             </div>
@@ -2298,6 +2067,9 @@ var ConfigEditor = {
         overlay.appendChild(model);
         ocDiv.appendChild(overlay);
         document.body.appendChild(ocDiv);
+
+        this.bindOverwriteConfigDropdown(model.querySelector('#overwrite-upload-config-dropdown'));
+        this.bindOverwriteConfigDropdown(model.querySelector('#overwrite-subscribe-config-dropdown'));
 
         var tabFile = model.querySelector('#overwrite-upload-mode-file');
         var tabSub = model.querySelector('#overwrite-upload-mode-subscribe');
@@ -2357,11 +2129,7 @@ var ConfigEditor = {
         model.querySelector('#overwrite-add-close').onclick = function() {
             document.body.removeChild(ocDiv);
         };
-        overlay.onclick = function(e) {
-            if (e.target === overlay) {
-                document.body.removeChild(ocDiv);
-            }
-        };
+
         model.querySelector('#overwrite-upload-cancel').onclick = function() {
             document.body.removeChild(ocDiv);
         };
@@ -2408,6 +2176,14 @@ var ConfigEditor = {
         if (model.querySelector('#overwrite-subscribe-filename')) {
             model.querySelector('#overwrite-subscribe-filename').addEventListener('input', validateAddOverwriteForm);
         }
+        var paramContainer = model.querySelector('#overwrite-subscribe-param-container');
+        if (paramContainer) {
+            self.buildOverwriteParamRows(paramContainer, '');
+            model.querySelector('#overwrite-subscribe-param-add').addEventListener('click', function() {
+                self.addOverwriteParamRow(paramContainer, '', '');
+            });
+        }
+
         if (model.querySelector('#overwrite-subscribe-type')) {
             model.querySelector('#overwrite-subscribe-type').addEventListener('change', validateAddOverwriteForm);
         }
@@ -2439,11 +2215,13 @@ var ConfigEditor = {
                     var reader = new FileReader();
                     reader.onload = function(e) {
                         var fileContent = e.target.result;
+                        var selectedConfigPaths = self.getOverwriteConfigSelection(model, 'overwrite-upload-config-dropdown');
                         var formData = new FormData();
                         formData.append('filename', filename);
                         formData.append('config_file', fileContent);
                         formData.append('order', self.overwriteFileCardCount + 1);
                         formData.append('enable', '0');
+                        formData.append('config', selectedConfigPaths.join('\n'));
 
                         fetch('/cgi-bin/luci/admin/services/openclash/upload_overwrite', {
                             method: 'POST',
@@ -2478,7 +2256,8 @@ var ConfigEditor = {
                 var update_days = form.querySelector('#overwrite-subscribe-update-days').value;
                 var update_hour = form.querySelector('#overwrite-subscribe-update-hour').value;
                 var type = form.querySelector('#overwrite-subscribe-type').value;
-                var param = form.querySelector('#overwrite-subscribe-param').value.trim();
+                var param = self.collectOverwriteParams(form.querySelector('#overwrite-subscribe-param-container'));
+                var selectedConfigPaths = self.getOverwriteConfigSelection(model, 'overwrite-subscribe-config-dropdown');
                 if (!filename) {
                     alert('<%:Please enter a filename%>');
                     return;
@@ -2501,6 +2280,7 @@ var ConfigEditor = {
                 formData.append('param', param);
                 formData.append('order', self.overwriteFileCardCount + 1);
                 formData.append('enable', '0');
+                formData.append('config', selectedConfigPaths.join('\n'));
                 if (type === 'http') {
                     formData.append('url', url);
                     formData.append('update_days', update_days);
@@ -2511,7 +2291,7 @@ var ConfigEditor = {
                 var progressText = form.querySelector('#overwrite-progress-text');
                 if (type === 'http') {
                     statusText.textContent = '<%:Downloading subscription content...%>';
-                    progressContainer.style.display = 'block';
+                    progressContainer.classList.remove('oc-hidden');
                     var progress = 0;
                     var interval = setInterval(function() {
                         progress = Math.min(progress + Math.random() * 20, 90);
@@ -2558,10 +2338,9 @@ var ConfigEditor = {
 
         var ocDiv = document.createElement('div');
         ocDiv.className = 'oc';
-        var mainOc = document.querySelector('.oc[data-darkmode="true"]');
-        if (mainOc) {
-            ocDiv.setAttribute('data-darkmode', 'true');
-        }
+		if (document.documentElement.getAttribute('data-darkmode') === 'true') {
+			ocDiv.setAttribute('data-darkmode', 'true');
+		}
 
         var overlay = document.createElement('div');
         overlay.className = 'config-upload-model-overlay show';
@@ -2578,10 +2357,7 @@ var ConfigEditor = {
                 </div>
                 <div class="config-upload-actions">
                     <button type="button" class="icon-btn" id="overwrite-sub-close" title="<%:Close%>">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <line x1="18" y1="6" x2="6" y2="18"></line>
-                            <line x1="6" y1="6" x2="18" y2="18"></line>
-                        </svg>
+                        <svg width="14" height="14"><use href="#oc-icon-close"/></svg>
                     </button>
                 </div>
             </div>
@@ -2602,6 +2378,19 @@ var ConfigEditor = {
         overlay.appendChild(model);
         ocDiv.appendChild(overlay);
         document.body.appendChild(ocDiv);
+
+        this.bindOverwriteConfigDropdown(model.querySelector('#overwrite-subscribe-config-dropdown'));
+
+        var paramContainer = model.querySelector('#overwrite-subscribe-param-container');
+        if (paramContainer && sub && sub.param) {
+            self.buildOverwriteParamRows(paramContainer, sub.param);
+        }
+        var paramAddBtn = model.querySelector('#overwrite-subscribe-param-add');
+        if (paramAddBtn) {
+            paramAddBtn.addEventListener('click', function() {
+                self.addOverwriteParamRow(paramContainer, '', '');
+            });
+        }
 
         var typeSelect = model.querySelector('#overwrite-subscribe-type');
         var urlGroup = model.querySelector('#overwrite-subscribe-url-group');
@@ -2662,7 +2451,8 @@ var ConfigEditor = {
             var newName = form.querySelector('#overwrite-subscribe-filename').value.trim();
             var type = form.querySelector('#overwrite-subscribe-type').value;
             var url = form.querySelector('#overwrite-subscribe-url').value.trim();
-            var param = form.querySelector('#overwrite-subscribe-param').value.trim();
+            var param = self.collectOverwriteParams(form.querySelector('#overwrite-subscribe-param-container'));
+            var selectedConfigPaths = self.getOverwriteConfigSelection(model, 'overwrite-subscribe-config-dropdown');
 
             if (!newName) {
                 alert('<%:Please enter a filename%>');
@@ -2689,6 +2479,9 @@ var ConfigEditor = {
                 formData.delete('update_days');
                 formData.delete('update_hour');
             }
+            formData.delete('config');
+            formData.append('config', selectedConfigPaths.join('\n'));
+            formData.append('param', param);
             if (newName !== name) {
                 formData.append('old_filename', name);
             }
@@ -2705,7 +2498,7 @@ var ConfigEditor = {
             var statusText = model.querySelector('#overwrite-edit-status-text');
             if (type === 'http') {
                 statusText.textContent = '<%:Downloading subscription content...%>';
-                progressContainer.style.display = 'block';
+                progressContainer.classList.remove('oc-hidden');
                 var progress = 0;
                 var interval = setInterval(function() {
                     progress = Math.min(progress + Math.random() * 20, 90);
@@ -2761,55 +2554,69 @@ var ConfigEditor = {
         }
         this.hideMergeView();
         this.hide();
+
+        if (window.OverwriteSubscribeManager && window.OverwriteSubscribeManager.load) {
+            window.OverwriteSubscribeManager.load(true);
+        }
+        try {
+            window.dispatchEvent(new Event('oc-overwrite-updated'));
+        } catch (e) {}
     },
 
     updateZoom: function(newZoom) {
         this.currentZoom = newZoom;
-
-        if (this.editorInstance) {
-            var cmWrapper = this.model.querySelector('.CodeMirror');
-            if (cmWrapper) {
-                this.zoomLevels.forEach(function(level) {
-                    cmWrapper.classList.remove('zoom-' + level);
-                });
-
-                if (this.currentZoom !== 100) {
-                    cmWrapper.classList.add('zoom-' + this.currentZoom);
-                }
-
-                this.editorInstance.refresh();
-            }
-        }
+        ocApplyZoom(this.editorInstance, newZoom);
     },
 
     zoomIn: function() {
-        var currentIndex = this.zoomLevels.indexOf(this.currentZoom);
-        if (currentIndex < this.zoomLevels.length - 1) {
-            this.updateZoom(this.zoomLevels[currentIndex + 1]);
-        }
+        var newZoom = ocZoomIn(this.currentZoom);
+        if (newZoom !== this.currentZoom) this.updateZoom(newZoom);
     },
 
     zoomOut: function() {
-        var currentIndex = this.zoomLevels.indexOf(this.currentZoom);
-        if (currentIndex > 0) {
-            this.updateZoom(this.zoomLevels[currentIndex - 1]);
-        }
+        var newZoom = ocZoomOut(this.currentZoom);
+        if (newZoom !== this.currentZoom) this.updateZoom(newZoom);
     },
 
     resetZoom: function() {
-        this.updateZoom(100);
+        this.updateZoom(ocResetZoom());
+    },
+
+    isPointOnTextContent: function(el, clientX, clientY) {
+        if (!el) return false;
+
+        var textWalker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null, false);
+        var textNode;
+        while ((textNode = textWalker.nextNode())) {
+            if (!textNode.nodeValue || !textNode.nodeValue.trim()) {
+                continue;
+            }
+            var range = document.createRange();
+            range.selectNodeContents(textNode);
+            var rects = range.getClientRects();
+            for (var i = 0; i < rects.length; i++) {
+                var rect = rects[i];
+                if (clientX >= rect.left && clientX <= rect.right && clientY >= rect.top && clientY <= rect.bottom) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     },
 
     makeDraggable: function() {
         var self = this;
         var header = this.model.querySelector('.config-editor-header');
-        var startX, startY, startLeft, startTop;
         var isDragging = false;
+        var startX = 0, startY = 0, startLeft = 0, startTop = 0;
 
-        header.addEventListener('mousedown', function(e) {
-            if (e.target.closest('.config-editor-actions')) {
-                return;
-            }
+        header.addEventListener('pointerdown', function(e) {
+            if (isDragging) return;
+            var target = e.target && e.target.nodeType === 1 ? e.target : e.target.parentElement;
+            if (target && target.closest('.config-editor-actions')) return;
+            var textEl = target ? target.closest('#editTitle, #config-file-name') : null;
+            if (textEl && self.isPointOnTextContent(textEl, e.clientX, e.clientY)) return;
 
             isDragging = true;
             startX = e.clientX;
@@ -2825,102 +2632,33 @@ var ConfigEditor = {
             self.model.style.margin = '0';
             self.model.style.transform = 'none';
             self.model.style.transition = 'none';
-
-            document.addEventListener('mousemove', onMouseMove);
-            document.addEventListener('mouseup', onMouseUp);
-
-            e.preventDefault();
-        });
-
-        function onMouseMove(e) {
-            if (!isDragging) return;
-
-            var deltaX = e.clientX - startX;
-            var deltaY = e.clientY - startY;
-
-            var newLeft = startLeft + deltaX;
-            var newTop = startTop + deltaY;
-
-            var modelRect = self.model.getBoundingClientRect();
-            var maxLeft = window.innerWidth - modelRect.width;
-            var maxTop = window.innerHeight - modelRect.height;
-
-            newLeft = Math.max(0, Math.min(newLeft, maxLeft));
-            newTop = Math.max(0, Math.min(newTop, maxTop));
-
-            self.model.style.left = newLeft + 'px';
-            self.model.style.top = newTop + 'px';
-        }
-
-        function onMouseUp() {
-            isDragging = false;
-
-            setTimeout(function() {
-                self.model.style.transition = 'all 0.3s ease';
-            }, 50);
-
-            document.removeEventListener('mousemove', onMouseMove);
-            document.removeEventListener('mouseup', onMouseUp);
-        }
-
-        header.addEventListener('touchstart', function(e) {
-            if (e.target.closest('.config-editor-actions')) {
-                return;
+            header.style.touchAction = 'none';
+            if (header.setPointerCapture) {
+                try { header.setPointerCapture(e.pointerId); } catch(err) {}
             }
-            if (e.touches.length !== 1) return;
-
-            isDragging = true;
-            startX = e.touches[0].clientX;
-            startY = e.touches[0].clientY;
-
-            var rect = self.model.getBoundingClientRect();
-            startLeft = rect.left;
-            startTop = rect.top;
-
-            self.model.style.position = 'fixed';
-            self.model.style.left = startLeft + 'px';
-            self.model.style.top = startTop + 'px';
-            self.model.style.margin = '0';
-            self.model.style.transform = 'none';
-            self.model.style.transition = 'none';
-
-            document.addEventListener('touchmove', onTouchMove, {passive: false});
-            document.addEventListener('touchend', onTouchEnd);
-
             e.preventDefault();
         });
 
-        function onTouchMove(e) {
-            if (!isDragging || e.touches.length !== 1) return;
-
-            var deltaX = e.touches[0].clientX - startX;
-            var deltaY = e.touches[0].clientY - startY;
-
-            var newLeft = startLeft + deltaX;
-            var newTop = startTop + deltaY;
-
-            var modelRect = self.model.getBoundingClientRect();
-            var maxLeft = window.innerWidth - modelRect.width;
-            var maxTop = window.innerHeight - modelRect.height;
-
-            newLeft = Math.max(0, Math.min(newLeft, maxLeft));
-            newTop = Math.max(0, Math.min(newTop, maxTop));
-
+        header.addEventListener('pointermove', function(e) {
+            if (!isDragging) return;
+            var rect = self.model.getBoundingClientRect();
+            var newLeft = Math.max(0, Math.min(startLeft + (e.clientX - startX), window.innerWidth - rect.width));
+            var newTop = Math.max(0, Math.min(startTop + (e.clientY - startY), window.innerHeight - rect.height));
             self.model.style.left = newLeft + 'px';
             self.model.style.top = newTop + 'px';
+        });
 
-            e.preventDefault();
-        }
-
-        function onTouchEnd() {
+        function stopDrag(e) {
+            if (!isDragging) return;
             isDragging = false;
-            setTimeout(function() {
-                self.model.style.transition = 'all 0.3s ease';
-            }, 50);
-
-            document.removeEventListener('touchmove', onTouchMove);
-            document.removeEventListener('touchend', onTouchEnd);
+            header.style.touchAction = '';
+            self.model.style.transition = '';
+            if (header.releasePointerCapture) {
+                try { header.releasePointerCapture(e.pointerId); } catch(err) {}
+            }
         }
+        header.addEventListener('pointerup', stopDrag);
+        header.addEventListener('pointercancel', stopDrag);
     },
 
     makeResizable: function() {
@@ -2965,18 +2703,6 @@ var ConfigEditor = {
 
             self.model.style.width = newWidth + 'px';
             self.model.style.height = newHeight + 'px';
-
-            if (self.editorInstance) {
-                requestAnimationFrame(function() {
-                    if (self.mergeViewActive && self.editorInstance.editor) {
-                        self.editorInstance.editor().refresh();
-                        if (self.editorInstance.rightOriginal)
-                            self.editorInstance.rightOriginal().refresh();
-                    } else {
-                        self.editorInstance.refresh();
-                    }
-                });
-            }
         }
 
         function onMouseUp() {
@@ -2986,18 +2712,6 @@ var ConfigEditor = {
 
             document.removeEventListener('mousemove', onMouseMove);
             document.removeEventListener('mouseup', onMouseUp);
-
-            if (self.editorInstance) {
-                setTimeout(function() {
-                    if (self.mergeViewActive && self.editorInstance.editor) {
-                        self.editorInstance.editor().refresh();
-                        if (self.editorInstance.rightOriginal)
-                            self.editorInstance.rightOriginal().refresh();
-                    } else {
-                        self.editorInstance.refresh();
-                    }
-                }, 50);
-            }
         }
 
         resizeHandle.addEventListener('touchstart', function(e) {
@@ -3038,18 +2752,6 @@ var ConfigEditor = {
             self.model.style.width = newWidth + 'px';
             self.model.style.height = newHeight + 'px';
 
-            if (self.editorInstance) {
-                requestAnimationFrame(function() {
-                    if (self.mergeViewActive && self.editorInstance.editor) {
-                        self.editorInstance.editor().refresh();
-                        if (self.editorInstance.rightOriginal)
-                            self.editorInstance.rightOriginal().refresh();
-                    } else {
-                        self.editorInstance.refresh();
-                    }
-                });
-            }
-
             e.preventDefault();
         }
 
@@ -3059,18 +2761,6 @@ var ConfigEditor = {
 
             document.removeEventListener('touchmove', onTouchMove);
             document.removeEventListener('touchend', onTouchEnd);
-
-            if (self.editorInstance) {
-                setTimeout(function() {
-                    if (self.mergeViewActive && self.editorInstance.editor) {
-                        self.editorInstance.editor().refresh();
-                        if (self.editorInstance.rightOriginal)
-                            self.editorInstance.rightOriginal().refresh();
-                    } else {
-                        self.editorInstance.refresh();
-                    }
-                }, 50);
-            }
         }
     }
 };

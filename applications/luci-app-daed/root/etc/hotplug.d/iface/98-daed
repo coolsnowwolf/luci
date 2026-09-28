@@ -1,0 +1,31 @@
+#!/bin/sh
+
+[ "$ACTION" = "ifup" ] || [ "$ACTION" = "ifupdate" ] || exit 0
+[ "$ACTION" = "ifupdate" ] && [ -z "$IFUPDATE_ADDRESSES" ] && [ -z "$IFUPDATE_DATA" ] && exit 0
+
+UPTIME=$(cut -d. -f1 /proc/uptime 2>/dev/null)
+[ -n "$UPTIME" ] && [ "$UPTIME" -lt 30 ] && exit 0
+
+. /lib/functions/network.sh
+network_find_wan6 NET_IF6
+network_find_wan NET_IF
+[ "$INTERFACE" != "$NET_IF6" ] && [ "$INTERFACE" != "$NET_IF" ] && exit 0
+
+[ "$(uci -q get daed.config.enabled)" = "1" ] || exit 0
+
+DEBOUNCE_FILE="/tmp/run/daed_hotplug_gen"
+mkdir -p /tmp/run
+
+my_gen="$$.$(date +%s)"
+echo "$my_gen" > "$DEBOUNCE_FILE"
+
+(
+    sleep 5
+    [ "$(cat "$DEBOUNCE_FILE" 2>/dev/null)" = "$my_gen" ] || exit 0
+
+    if /etc/init.d/daed running; then
+        /etc/init.d/daed restart
+    else
+        /etc/init.d/daed start
+    fi
+) &

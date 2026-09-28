@@ -1,318 +1,39 @@
-<style>
-.oc[data-darkmode="true"] .developer-container {
-    background: var(--bg-white);
-    border-color: var(--border-light);
-}
-
-.oc[data-darkmode="true"] .developer-avatar {
-    border-color: rgba(249, 250, 251, 0.8);
-    background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
-}
-
-.oc[data-darkmode="true"] .developer-avatar:hover {
-    border-color: rgba(249, 250, 251, 1);
-}
-
-.oc[data-darkmode="true"] .developer-label {
-    background: rgba(31, 41, 55, 0.9);
-    border-color: rgba(107, 114, 128, 0.3);
-    color: var(--text-primary);
-}
-
-.oc .developer_ {
-    text-align: justify;
-    text-align-last: justify;
-}
-
-.oc .developer-container {
-    background: var(--bg-white);
-    border: 1px solid var(--border-light);
-    border-radius: var(--radius-lg);
-    padding: var(--card-padding);
-    box-shadow: var(--shadow-md);
-    margin: 0;
-    width: 100%;
-    transition: all var(--transition-fast);
-    overflow: hidden;
-    position: relative;
-}
-
-.oc .developer-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px 30px;
-    padding: 0;
-    justify-content: center;
-    align-items: flex-start;
-    position: relative;
-    z-index: 1;
-    min-height: auto;
-    line-height: 1;
-    padding-top: 5px;
-}
-
-.oc .developer-avatar-container {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    flex-shrink: 0;
-    min-width: 50px;
-    width: 50px;
-}
-
-.oc .developer-avatar-container:hover {
-    transform: translateY(-3px);
-}
-
-.oc .developer-avatar {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    cursor: pointer;
-    border-radius: 50%;
-    width: 50px;
-    height: 50px;
-    object-fit: cover;
-    border: 2px solid rgba(255, 255, 255, 0.8);
-    box-shadow: 
-        0 3px 10px rgba(0, 0, 0, 0.1),
-        0 1px 6px rgba(0, 0, 0, 0.08),
-        inset 0 1px 0 rgba(255, 255, 255, 0.4);
-    position: relative;
-    background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
-    padding: 1px;
-}
-
-.oc .developer-avatar::before {
-    content: '';
-    position: absolute;
-    top: -4px;
-    left: -4px;
-    right: -4px;
-    bottom: -4px;
-    border-radius: 50%;
-    background: linear-gradient(45deg, #667eea, #764ba2, #f093fb, #f5576c);
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    z-index: -1;
-    animation: rotate 3s linear infinite;
-}
-
-.oc .developer-avatar:hover::before {
-    opacity: 0.6;
-}
-
-.oc .developer-avatar:hover {
-    transform: scale(1.1) rotate(3deg);
-    box-shadow: 
-        0 6px 20px rgba(0, 0, 0, 0.12),
-        0 3px 10px rgba(102, 126, 234, 0.25),
-        inset 0 1px 0 rgba(255, 255, 255, 0.6);
-    border-color: rgba(255, 255, 255, 1);
-}
-
-@keyframes rotate {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-.oc .developer-label {
-    margin-top: 6px;
-    font-size: 11px;
-    font-weight: 400;
-    color: #555;
-    text-align: center;
-    opacity: 0;
-    transform: translateY(6px);
-    transition: all 0.25s ease;
-    background: rgba(255, 255, 255, 0.9);
-    padding: 2px 6px;
-    border-radius: 6px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-    backdrop-filter: blur(8px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-    white-space: nowrap;
-}
-
-.oc .developer-avatar-container:hover .developer-label {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-.oc .developer-grid > span {
-    animation: fadeInUp 0.6s ease forwards;
-    opacity: 0;
-    transform: translateY(20px);
-}
-
-.oc .developer-grid > span:nth-child(1) { animation-delay: 0.1s; }
-.oc .developer-grid > span:nth-child(2) { animation-delay: 0.15s; }
-.oc .developer-grid > span:nth-child(3) { animation-delay: 0.2s; }
-.oc .developer-grid > span:nth-child(4) { animation-delay: 0.25s; }
-.oc .developer-grid > span:nth-child(5) { animation-delay: 0.3s; }
-.oc .developer-grid > span:nth-child(6) { animation-delay: 0.35s; }
-.oc .developer-grid > span:nth-child(7) { animation-delay: 0.4s; }
-.oc .developer-grid > span:nth-child(8) { animation-delay: 0.45s; }
-.oc .developer-grid > span:nth-child(9) { animation-delay: 0.5s; }
-.oc .developer-grid > span:nth-child(10) { animation-delay: 0.55s; }
-.oc .developer-grid > span:nth-child(11) { animation-delay: 0.6s; }
-.oc .developer-grid > span:nth-child(12) { animation-delay: 0.65s; }
-
-@keyframes fadeInUp {
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@media (min-width: 1200px) {
-    .oc .developer-grid {
-        gap: 10px 35px;
-    }
-
-    .oc .developer-avatar {
-        width: 60px;
-        height: 60px;
-        border-width: 3px;
-    }
-
-    .oc .developer-avatar-container {
-        min-width: 60px;
-        width: 60px;
-    }
-
-    .oc .developer-label {
-        font-size: 11px;
-        padding: 3px 8px;
-        margin-top: 6px;
-    }
-}
-
-@media (max-width: 768px) {
-    .oc .developer-grid {
-        gap: 6px 25px;
-    }
-
-    .oc .developer-avatar {
-        width: 45px;
-        height: 45px;
-        border-width: 2px;
-    }
-
-    .oc .developer-avatar-container {
-        min-width: 45px;
-        width: 45px;
-    }
-
-    .oc .developer-label {
-        font-size: 9px;
-        padding: 2px 4px;
-        margin-top: 6px;
-    }
-}
-
-@media (max-width: 600px) {
-    .oc .developer-grid {
-        gap: 4px 20px;
-    }
-
-    .oc .developer-avatar {
-        width: 40px;
-        height: 40px;
-    }
-
-    .oc .developer-avatar-container {
-        min-width: 40px;
-        width: 40px;
-    }
-
-    .oc .developer-label {
-        font-size: 8px;
-        padding: 1px 4px;
-        margin-top: 4px;
-    }
-}
-
-@media (max-width: 480px) {
-    .oc .developer-grid {
-        gap: 3px 15px;
-    }
-
-    .oc .developer-avatar {
-        width: 35px;
-        height: 35px;
-    }
-
-    .oc .developer-avatar-container {
-        min-width: 35px;
-        width: 35px;
-    }
-
-    .oc .developer-label {
-        font-size: 7px;
-        padding: 1px 3px;
-        margin-top: 3px;
-    }
-}
-
-@media (max-width: 320px) {
-    .oc .developer-grid {
-        gap: 2px 10px;
-    }
-
-    .oc .developer-avatar {
-        width: 30px;
-        height: 30px;
-    }
-
-    .oc .developer-avatar-container {
-        min-width: 30px;
-        width: 30px;
-    }
-
-    .oc .developer-label {
-        font-size: 6px;
-        padding: 1px 2px;
-        margin-top: 3px;
-    }
-}
-</style>
-
 <fieldset class="cbi-section">
     <div class="oc">
         <div class="developer-container">
             <div class="developer-grid">
-                <span id="_Dreamacro"><%:Collecting data...%></span>
-                <span id="_vernesong"><%:Collecting data...%></span>
-                <span id="_frainzy1477"><%:Collecting data...%></span>
-                <span id="_SukkaW"><%:Collecting data...%></span>
-                <span id="_haishanh"><%:Collecting data...%></span>
-                <span id="_Zephyruso"><%:Collecting data...%></span>
-                <span id="_Alecthw"><%:Collecting data...%></span>
-                <span id="_Tindy_X"><%:Collecting data...%></span>
-                <span id="_lmc999"><%:Collecting data...%></span>
-                <span id="_immortalwrt"><%:Collecting data...%></span>
-                <span id="_MetaCubeX"><%:Collecting data...%></span>
-                <span id="_more"><%:Collecting data...%></span>
+                <span id="Dreamacro"><%:Collecting data...%></span>
+                <span id="vernesong"><%:Collecting data...%></span>
+                <span id="frainzy1477"><%:Collecting data...%></span>
+                <span id="SukkaW"><%:Collecting data...%></span>
+                <span id="haishanh"><%:Collecting data...%></span>
+                <span id="Zephyruso"><%:Collecting data...%></span>
+                <span id="Alecthw"><%:Collecting data...%></span>
+                <span id="Tindy_X"><%:Collecting data...%></span>
+                <span id="lmc999"><%:Collecting data...%></span>
+                <span id="immortalwrt"><%:Collecting data...%></span>
+                <span id="MetaCubeX"><%:Collecting data...%></span>
+                <span id="oixcloud"><%:Collecting data...%></span>
+                <span id="more"><%:Collecting data...%></span>
             </div>
         </div>
     </div>
 </fieldset>
 
 <script type="text/javascript">//<![CDATA[
-    var Dreamacro = document.getElementById('_Dreamacro');
-    var vernesong = document.getElementById('_vernesong');
-    var frainzy1477 = document.getElementById('_frainzy1477');
-    var SukkaW = document.getElementById('_SukkaW');
-    var Zephyruso = document.getElementById('_Zephyruso');
-    var haishanh = document.getElementById('_haishanh');
-    var Alecthw = document.getElementById('_Alecthw');
-    var Tindy_X = document.getElementById('_Tindy_X');
-    var immortalwrt = document.getElementById('_immortalwrt');
-    var lmc999 = document.getElementById('_lmc999');
-    var MetaCubeX = document.getElementById('_MetaCubeX');
-    var more = document.getElementById('_more');
+    var Dreamacro = document.getElementById('Dreamacro');
+    var vernesong = document.getElementById('vernesong');
+    var frainzy1477 = document.getElementById('frainzy1477');
+    var SukkaW = document.getElementById('SukkaW');
+    var Zephyruso = document.getElementById('Zephyruso');
+    var haishanh = document.getElementById('haishanh');
+    var Alecthw = document.getElementById('Alecthw');
+    var Tindy_X = document.getElementById('Tindy_X');
+    var immortalwrt = document.getElementById('immortalwrt');
+    var lmc999 = document.getElementById('lmc999');
+    var MetaCubeX = document.getElementById('MetaCubeX');
+    var oixcloud = document.getElementById('oixcloud');
+    var more = document.getElementById('more');
 
     function getAvatarSize() {
         var width = window.innerWidth;
@@ -352,6 +73,7 @@
         immortalwrt.innerHTML = createAvatarHTML('https://avatars.githubusercontent.com/u/82308430?v=4', 'immortalwrt', 'immortalwrt', 'immortalwrt_rediret');
         lmc999.innerHTML = createAvatarHTML('https://avatars.githubusercontent.com/u/39726914?v=4', 'lmc999', 'lmc999', 'lmc999_rediret');
         MetaCubeX.innerHTML = createAvatarHTML('https://avatars.githubusercontent.com/u/84378451?v=4', 'MetaCubeX', 'MetaCubeX', 'MetaCubeX_rediret');
+        oixcloud.innerHTML = createAvatarHTML('/luci-static/resources/openclash/img/oixcloud.png', 'oixCloud', 'oixcloud', 'oixcloud_rediret');
         more.innerHTML = createMoreAvatarHTML('<%:More%>', 'more_rediret');
     }
 
@@ -393,6 +115,9 @@
     }
     function MetaCubeX_rediret() {
         window.open('https://github.com/MetaCubeX');
+    }
+    function oixcloud_rediret() {
+        window.open('http://bit.ly/oixcloud-register');
     }
     function more_rediret() {
         window.open('https://github.com/vernesong/OpenClash/graphs/contributors');

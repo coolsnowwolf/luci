@@ -88,7 +88,16 @@ local function build_common(node)
 	if net == "ws" then
 		local opts = node["ws-opts"]
 		if opts then
-			o.transport.path = opts.path
+			local path = opts.path or "/"
+			local ed = opts["max-early-data"]
+			local eh = opts["early-data-header-name"]
+			if ed then
+				path = path .. "?ed=" .. ed
+			end
+			if eh then
+				path = path .. (path:find("?", 1, true) and "&eh=" or "?eh=") .. eh
+			end
+			o.transport.path = path
 			o.transport.host = opts.headers and opts.headers.Host
 		end
 
@@ -439,6 +448,7 @@ local function encode_tuic(node)
 	if node["disable-sni"] then table.insert(p, "disable_sni=1") end
 	if node["skip-cert-verify"] then table.insert(p, "allowInsecure=1") end
 	if node["udp-relay-mode"] then table.insert(p, "udp_relay_mode=" .. node["udp-relay-mode"]) end
+	if node["fingerprint"] then table.insert(p, "pcs=" .. urlencode(node["fingerprint"])) end
 
 	if #p > 0 then
 		link = link .. "?" .. table.concat(p, "&")
@@ -474,11 +484,8 @@ local function encode_anytls(node)
 	if o.tls.alpn then table.insert(p, "alpn=" .. urlencode(o.tls.alpn)) end
 	if o.tls.fp then table.insert(p, "fp=" .. urlencode(o.tls.fp)) end
 	if o.tls.ech then table.insert(p, "ech=" .. urlencode(o.tls.ech)) end
-	if o.tls.pcs then
-		table.insert(p, "insecure=1")
-	else
-		table.insert(p, "insecure=" .. (o.tls.insecure and "1" or "0"))
-	end
+	if o.tls.pcs then table.insert(p, "pcs=" .. urlencode(o.tls.pcs)) end
+	table.insert(p, "insecure=" .. (o.tls.insecure and "1" or "0"))
 
 	if #p > 0 then
 		link = link .. "?" .. table.concat(p, "&")
@@ -504,6 +511,42 @@ local function encode_ssr(node)
 	return 0, "ssr://" .. base64(link)
 end
 
+-- snell
+local function encode_snell(node)
+	local err_msg
+	local obfs = node["obfs-opts"]
+	if obfs and obfs.mode ~= "http" and obfs.mode ~= "none" then
+		err_msg = obfs.mode
+	end
+	if err_msg then
+		err_msg = "订阅转换 → 丢弃 Snell 节点：" .. (node.name or "") .. "，因 Sing-Box 不支持 Snell + " .. err_msg
+		return 1, err_msg
+	end
+	local version = node.version and tonumber(node.version) or 4
+	version = (version == 5) and 4 or version
+	if version < 4 then
+		err_msg = "订阅转换 → 丢弃 Snell 节点：" .. (node.name or "") .. "，因 Sing-Box 不支持 Snell 版本小于 4"
+		return 1, err_msg
+	end
+
+	local link = "snell://" .. host_format(node.server) .. ":" .. node.port
+	local p = {}
+
+	if node.psk then table.insert(p, "psk=" .. urlencode(node.psk)) end
+	table.insert(p, "version=" .. version)
+	if obfs.mode == "http" then
+		table.insert(p, "obfs=http")
+		if obfs.host then table.insert(p, "obfs-host=" .. urlencode(obfs.host)) end
+	end
+	table.insert(p, "reuse=" .. (node.reuse and "1" or "0"))
+
+	if #p > 0 then
+		link = link .. "?" .. table.concat(p, "&")
+	end
+
+	return 0, link .. "#" .. urlencode(node.name or "")
+end
+
 local function encode_node(node)
 	if (not node.type) or (not node.name) then return nil end
 
@@ -520,12 +563,13 @@ local function encode_node(node)
 	elseif t == "tuic" then return encode_tuic(node)
 	elseif t == "anytls" then return encode_anytls(node)
 	elseif t == "ssr" then return encode_ssr(node)
+	elseif t == "snell" then return encode_snell(node)
 	else api.log("订阅转换 → 丢弃不支持的节点：" .. node.name .. "，节点类型：" .. t)
 	end
 end
 
 function parseClashNode(raw, remark)
-	if not raw then return "" end
+	if not raw then return "" end 
 	local ok, lyaml = pcall(require, "lyaml")
 	if not ok then return raw end
 

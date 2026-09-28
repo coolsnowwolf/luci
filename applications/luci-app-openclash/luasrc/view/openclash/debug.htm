@@ -8,66 +8,6 @@ local diag_host = "www.instagram.com"
 local dns_host = "www.instagram.com"
 %>
 
-<style>
-:root[data-darkmode="true"] .diag-style {
-	color: #ffffff;
-	background-color: #404040;
-}
-
-:root[data-darkmode="true"] .diag-style select, .diag-style input {
-	color: #ffffff;
-	background-color: #404040;
-}
-
-:root[data-darkmode="true"] #diag-rc-output > pre {
-	background-color: #404040;
-	color: #ffffff;
-}
-
-:root[data-darkmode="true"] #dns-rc-output > pre {
-	background-color: #404040;
-	color: #ffffff;
-}
-
-.diag-style {
-	color: #000;
-	background-color: #f5f5f5;
-}
-
-.diag-style select, .diag-style input {
-	color: #000;
-	background-color: #f5f5f5;
-}
-
-#diag-rc-output > pre {
-    background-color: #ffffff;
-    display: block;
-    padding: 8.5px;
-    margin: 0 0 18px;
-    line-height: 1.5rem;
-    -moz-border-radius: 3px;
-    white-space: pre-wrap;
-    word-wrap: break-word;
-    font-size: 1.4rem;
-    color: #404040;
-}
-
-#dns-rc-output > pre {
-    background-color: #ffffff;
-    display: block;
-    padding: 8.5px;
-    margin: 0 0 18px;
-    line-height: 1.5rem;
-    -moz-border-radius: 3px;
-    white-space: pre-wrap;
-    word-wrap: break-word;
-    font-size: 1.4rem;
-    color: #404040;
-}
-
-</style>
-
-
 <script type="text/javascript">//<![CDATA[
 	function show_diag_info(addr)
 	{
@@ -78,19 +18,24 @@ local dns_host = "www.instagram.com"
 		if (legend && output)
 		{
 			XHR.get('<%=luci.dispatcher.build_url("admin", "services", "openclash", "diag_connection")%>', {addr: addr}, function(x, status) {
+				legend.textContent = '<%:Connection Test Result%>';
 				if (x && x.status == 200 && x.responseText != "")
 				{
-					legend.style.display = 'none';
-					output.innerHTML = String.format('<pre>%h</pre>', x.responseText);
+					output.innerHTML = '';
+					var ta = document.createElement('textarea');
+					ta.style.width = '100%';
+					ta.value = x.responseText.split('\n').map(function(l) { return l.trim(); }).filter(function(l) { return l !== ''; }).join('\n');
+					output.appendChild(ta);
+					_cmWhenReady(function() {
+						other_editor(ta, true, '100%', '400px');
+					});
 				}
 				else if (x.status == 500)
 				{
-					legend.style.display = 'none';
 					output.innerHTML = '<span class="error"><%:Bad address specified!%></span>';
 				}
 				else
 				{
-					legend.style.display = 'none';
 					output.innerHTML = '<span class="error"><%:Could not find any connection logs!%></br></br><%:1. It may be that the plugin is not running%></br></br><%:2. It may be that the cache causes the browser to directly use the IP for access%></br></br><%:3. It may be that DNS hijacking did not take effect, so clash unable to reverse the domain name%></br></br><%:4. It may be that the filled address cannot be resolved and connected%></span>';
 				}
 			});
@@ -106,11 +51,12 @@ local dns_host = "www.instagram.com"
 		if (legend && output)
 		{
 			output.innerHTML =
-				'<img src="<%=resource%>/icons/loading.svg" onerror="this.onerror=null;this.src=\'<%=resource%>/icons/loading.gif\'" alt="<%:Loading%>" style="vertical-align:middle" /> ' +
+				'<span class="loading-spinner" style="vertical-align:middle"></span> ' +
 				'<%:Waiting for command to complete...%>';
 
-			legend.parentNode.style.display = 'block';
-			legend.style.display = 'inline';
+			legend.textContent = '<%:Collecting data...%>';
+			legend.parentNode.classList.remove('oc-hidden');
+			legend.style.display = 'block';
 		}
 		
 		let HTTP = {
@@ -149,99 +95,65 @@ local dns_host = "www.instagram.com"
 		if (legend && output)
 		{
 			output.innerHTML =
-				'<img src="<%=resource%>/icons/loading.svg" onerror="this.onerror=null;this.src=\'<%=resource%>/icons/loading.gif\'" alt="<%:Loading%>" style="vertical-align:middle" /> ' +
+				'<span class="loading-spinner" style="vertical-align:middle"></span> ' +
 				'<%:Waiting for command to complete...%>';
 
-			legend.parentNode.style.display = 'block';
-			legend.style.display = 'inline';
+			legend.textContent = '<%:Collecting data...%>';
+			legend.parentNode.classList.remove('oc-hidden');
+			legend.style.display = 'block';
 		}
 		
 		if (legend && output)
 		{
 			XHR.get('<%=luci.dispatcher.build_url("admin", "services", "openclash", "diag_dns")%>', {addr: addr}, function(x, status) {
+				legend.textContent = '<%:DNS Test Result%>';
 				if (x && x.status == 200 && x.responseText != "")
 				{
-					legend.style.display = 'none';
-					output.innerHTML = String.format('<pre>%h</pre>', x.responseText);
+					output.innerHTML = '';
+					var ta = document.createElement('textarea');
+					ta.style.width = '100%';
+					ta.value = x.responseText.split('\n').map(function(l) { return l.trim(); }).filter(function(l) { return l !== ''; }).join('\n');
+					output.appendChild(ta);
+					_cmWhenReady(function() {
+						other_editor(ta, true, '100%', '400px');
+					});
 				}
 				else if (x.status == 500)
 				{
-					legend.style.display = 'none';
 					output.innerHTML = '<span class="error"><%:Bad address specified!%></span>';
 				}
 				else
 				{
-					legend.style.display = 'none';
 					output.innerHTML = '<span class="error"><%:No Response Found!%></span>';
 				}
 			});
 		}
 	}
-	
-	function gen_debug_logs()
-	{
-		var legend = document.getElementById('debug-rc-legend');
-		var output = document.getElementById('debug-rc-output');
-
-		if (legend && output)
-		{
-			output.innerHTML =
-				'<img src="<%=resource%>/icons/loading.svg" onerror="this.onerror=null;this.src=\'<%=resource%>/icons/loading.gif\'" alt="<%:Loading%>" style="vertical-align:middle" /> ' +
-				'<%:Waiting for command to complete...%>';
-
-			legend.parentNode.style.display = 'block';
-			legend.style.display = 'inline';
-			
-			XHR.get('<%=luci.dispatcher.build_url("admin", "services", "openclash", "gen_debug_logs")%>', null, function(x, status) {
-				if (x && x.status == 200 && x.responseText != "")
-				{
-					legend.style.display = 'none';
-					output.innerHTML = '<textarea class="cbi-input-textarea" style="width: 100%;display:inline" data-update="change" rows="30" cols="60" readonly="readonly" >'+x.responseText+'</textarea>';
-				}
-				else
-				{
-					legend.style.display = 'none';
-					output.innerHTML = '<span class="error"><%:Some error occurred!%></span>';
-				}
-			}
-			);
-		}
-	}
 //]]></script>
 
+<div class="oc">
 <form>
 	<fieldset class="diag-style">
-		<div style="width:33%; float: left; text-align: center; white-space: nowrap;">
+		<div class="oc-text-center" style="width:50%;float:left;white-space:nowrap;">
 			<%:Connection Test%>&nbsp;&nbsp;&nbsp;&nbsp;
 			<input type="text" value="<%=diag_host%>" name="diag" />
 			<input type="button" value="<%:Click to Test%>" class="btn cbi-button cbi-button-apply" onclick="update_status(this.form.diag)" />
 		</div>
-		<div style="width:33%; float: left; text-align: center; white-space: nowrap;">
+		<div class="oc-text-center" style="width:50%;float:left;white-space:nowrap;">
 			<%:DNS Test%>&nbsp;&nbsp;&nbsp;&nbsp;
 			<input type="text" value="<%=dns_host%>" name="dns_host" />
 			<input type="button" value="<%:Click to Test%>" class="btn cbi-button cbi-button-apply" onclick="diag_dns(this.form.dns_host)" />
 		</div>
-		<div style="width:33%; float: left; text-align: center; white-space: nowrap;">
-			<%:Generate Logs%>&nbsp;&nbsp;&nbsp;&nbsp;
-			<input type="button" value="<%:Click to Generate%>" class="btn cbi-button cbi-button-apply" onclick="gen_debug_logs(this)" />
-		</div>
 	</fieldset>
 
-	<fieldset class="diag-style" style="display:none">
-		<legend id="diag-rc-legend"><%:Collecting data...%></legend>
-		<br />
+	<div class="diag-style oc-hidden">
+		<div id="diag-rc-legend" class="diag-legend"><%:Collecting data...%></div>
 		<span id="diag-rc-output"></span>
-	</fieldset>
+	</div>
 
-	<fieldset class="diag-style" style="display:none">
-		<legend id="dns-rc-legend"><%:Collecting data...%></legend>
-		<br />
+	<div class="diag-style oc-hidden">
+		<div id="dns-rc-legend" class="diag-legend"><%:Collecting data...%></div>
 		<span id="dns-rc-output"></span>
-	</fieldset>
-	
-	<fieldset class="diag-style" style="display:none">
-		<legend id="debug-rc-legend"><%:Collecting data...%></legend>
-		<br />
-		<span id="debug-rc-output"></span>
-	</fieldset>
+	</div>
 </form>
+</div>

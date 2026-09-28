@@ -11,7 +11,7 @@ local datatype = require "luci.cbi.datatypes"
 
 -- 优化 CBI UI（新版 LuCI 专用）
 local function optimize_cbi_ui()
-	luci.http.write([[
+	HTTP.write([[
 		<script type="text/javascript">
 			// 修正上移、下移按钮名称
 			document.querySelectorAll("input.btn.cbi-button.cbi-button-up").forEach(function(btn) {
@@ -93,12 +93,15 @@ o:value("https://cp.cloudflare.com/generate_204")
 o:value("http://captive.apple.com/generate_204")
 o.default = "0"
 
-o = s:taboption("settings", Value, "github_address_mod", translate("Github Address Modify"))
-o.description = translate("Modify The Github Address In The Config And OpenClash With Proxy(CDN) To Prevent File Download Faild. Format Reference:").." ".."<a href='javascript:void(0)' onclick='javascript:return winOpen(\"https://ghfast.top/\")'>https://ghfast.top/</a>"
+o = s:taboption("settings", Value, "github_address_mod", font_red..bold_on..translate("GitHub Address Proxy")..bold_off..font_off)
+o.description = translate("Proxy The GitHub Address In The Config And OpenClash With Proxy(CDN) To Prevent File Download Failed.").." "..translate("Format Reference:").." ".."<a href='javascript:void(0)' onclick='javascript:return winOpen(\"https://ghfast.top/\")'>https://ghfast.top/</a>"
 o:value("0", translate("Disable"))
 o:value("https://fastly.jsdelivr.net/")
 o:value("https://testingcf.jsdelivr.net/")
 o:value("https://cdn.jsdelivr.net/")
+for _, cdn in ipairs(fs.cdn_list()) do
+	o:value(cdn)
+end
 o.default = "0"
 
 o = s:taboption("settings", ListValue, "log_level", translate("Log Level"))
@@ -205,16 +208,17 @@ custom_fallback_filter.wrap = "off"
 custom_fallback_filter:depends("custom_fallback_filter", "1")
 
 function custom_fallback_filter.cfgvalue(self, section)
-	return NXFS.readfile("/etc/openclash/custom/openclash_custom_fallback_filter.yaml") or ""
+	return fs.readfile("/etc/openclash/custom/openclash_custom_fallback_filter.yaml") or ""
 end
 function custom_fallback_filter.write(self, section, value)
 	if value then
 		value = value:gsub("\r\n?", "\n")
-		local old_value = NXFS.readfile("/etc/openclash/custom/openclash_custom_fallback_filter.yaml")
+		local old_value = fs.readfile("/etc/openclash/custom/openclash_custom_fallback_filter.yaml")
 		if value ~= old_value then
-			NXFS.writefile("/etc/openclash/custom/openclash_custom_fallback_filter.yaml", value)
+			fs.writefile("/etc/openclash/custom/openclash_custom_fallback_filter.yaml", value)
 		end
 	end
+	return true
 end
 
 if op_mode == "fake-ip" then
@@ -237,16 +241,17 @@ custom_fake_black.wrap = "off"
 custom_fake_black:depends("custom_fakeip_filter", "1")
 
 function custom_fake_black.cfgvalue(self, section)
-	return NXFS.readfile("/etc/openclash/custom/openclash_custom_fake_filter.list") or ""
+	return fs.readfile("/etc/openclash/custom/openclash_custom_fake_filter.list") or ""
 end
 function custom_fake_black.write(self, section, value)
 	if value then
 		value = value:gsub("\r\n?", "\n")
-		local old_value = NXFS.readfile("/etc/openclash/custom/openclash_custom_fake_filter.list")
+		local old_value = fs.readfile("/etc/openclash/custom/openclash_custom_fake_filter.list")
 		if value ~= old_value then
-			NXFS.writefile("/etc/openclash/custom/openclash_custom_fake_filter.list", value)
+			fs.writefile("/etc/openclash/custom/openclash_custom_fake_filter.list", value)
 		end
 	end
+	return true
 end
 end
 
@@ -261,16 +266,17 @@ custom_domain_dns_policy.wrap = "off"
 custom_domain_dns_policy:depends("custom_name_policy", "1")
 
 function custom_domain_dns_policy.cfgvalue(self, section)
-	return NXFS.readfile("/etc/openclash/custom/openclash_custom_domain_dns_policy.list") or ""
+	return fs.readfile("/etc/openclash/custom/openclash_custom_domain_dns_policy.list") or ""
 end
 function custom_domain_dns_policy.write(self, section, value)
 	if value then
 		value = value:gsub("\r\n?", "\n")
-		local old_value = NXFS.readfile("/etc/openclash/custom/openclash_custom_domain_dns_policy.list")
+		local old_value = fs.readfile("/etc/openclash/custom/openclash_custom_domain_dns_policy.list")
 		if value ~= old_value then
-			NXFS.writefile("/etc/openclash/custom/openclash_custom_domain_dns_policy.list", value)
+			fs.writefile("/etc/openclash/custom/openclash_custom_domain_dns_policy.list", value)
 		end
 	end
+	return true
 end
 
 o = s:taboption("dns", Flag, "custom_proxy_server_policy", translate("Proxy-Server-Nameserver-Policy"))
@@ -284,16 +290,17 @@ custom_proxy_server_dns_policy.wrap = "off"
 custom_proxy_server_dns_policy:depends("custom_proxy_server_policy", "1")
 
 function custom_proxy_server_dns_policy.cfgvalue(self, section)
-	return NXFS.readfile("/etc/openclash/custom/openclash_custom_proxy_server_dns_policy.list") or ""
+	return fs.readfile("/etc/openclash/custom/openclash_custom_proxy_server_dns_policy.list") or ""
 end
 function custom_proxy_server_dns_policy.write(self, section, value)
 	if value then
 		value = value:gsub("\r\n?", "\n")
-		local old_value = NXFS.readfile("/etc/openclash/custom/openclash_custom_proxy_server_dns_policy.list")
+		local old_value = fs.readfile("/etc/openclash/custom/openclash_custom_proxy_server_dns_policy.list")
 		if value ~= old_value then
-			NXFS.writefile("/etc/openclash/custom/openclash_custom_proxy_server_dns_policy.list", value)
+			fs.writefile("/etc/openclash/custom/openclash_custom_proxy_server_dns_policy.list", value)
 		end
 	end
+	return true
 end
 
 o = s:taboption("dns", Flag, "custom_host", translate("Hosts"))
@@ -307,16 +314,17 @@ custom_hosts.wrap = "off"
 custom_hosts:depends("custom_host", "1")
 
 function custom_hosts.cfgvalue(self, section)
-	return NXFS.readfile("/etc/openclash/custom/openclash_custom_hosts.list") or ""
+	return fs.readfile("/etc/openclash/custom/openclash_custom_hosts.list") or ""
 end
 function custom_hosts.write(self, section, value)
 	if value then
 		value = value:gsub("\r\n?", "\n")
-		local old_value = NXFS.readfile("/etc/openclash/custom/openclash_custom_hosts.list")
+		local old_value = fs.readfile("/etc/openclash/custom/openclash_custom_hosts.list")
 		if value ~= old_value then
-			NXFS.writefile("/etc/openclash/custom/openclash_custom_hosts.list", value)
+			fs.writefile("/etc/openclash/custom/openclash_custom_hosts.list", value)
 		end
 	end
+	return true
 end
 
 -- Meta
@@ -326,6 +334,13 @@ o.default = "0"
 
 o = s:taboption("meta", Flag, "enable_unified_delay", font_red..bold_on..translate("Enable Unified Delay")..bold_off..font_off)
 o.description = font_red..bold_on..translate("Change The Delay Calculation Method To Remove Extra Delays Such as Handshaking")..bold_off..font_off
+o.default = "0"
+
+o = s:taboption("meta", Value, "global_ua", translate("Global User-Agent"))
+o:value("0", translate("Disable"))
+o:value("clash-verge/v2.4.5")
+o:value("clash.meta/1.19.20")
+o:value("Clash")
 o.default = "0"
 
 o = s:taboption("meta", ListValue, "find_process_mode", translate("Enable Process Rule"))
@@ -367,16 +382,17 @@ sniffer_custom.rows = 20
 sniffer_custom.wrap = "off"
 
 function sniffer_custom.cfgvalue(self, section)
-	return NXFS.readfile("/etc/openclash/custom/openclash_custom_sniffer.yaml") or ""
+	return fs.readfile("/etc/openclash/custom/openclash_custom_sniffer.yaml") or ""
 end
 function sniffer_custom.write(self, section, value)
 	if value then
 		value = value:gsub("\r\n?", "\n")
-		local old_value = NXFS.readfile("/etc/openclash/custom/openclash_custom_sniffer.yaml")
+		local old_value = fs.readfile("/etc/openclash/custom/openclash_custom_sniffer.yaml")
 		if value ~= old_value then
-			NXFS.writefile("/etc/openclash/custom/openclash_custom_sniffer.yaml", value)
+			fs.writefile("/etc/openclash/custom/openclash_custom_sniffer.yaml", value)
 		end
 	end
+	return true
 end
 
 -- Smart Settings
@@ -392,6 +408,14 @@ o.description = translate("Nodes Weight Priority, <1 Means Lower Priority, >1 Me
 o = s:taboption("smart", Flag, "smart_prefer_asn", font_red..bold_on..translate("Prefer-ASN")..bold_off..font_off)
 o.description = translate("Select Nodes Force Lookup and Use Target ASN Info First For More Stable Experience")
 o.default = 0
+
+o = s:taboption("smart", Value, "smart_tolerance", translate("Smart Group Tolerance").."(ms)")
+o.description = translate("Sort When Proxies Delays Within Tolerance are Treated as Equal, Preventing Jitter")
+o:value("0", translate("Disable"))
+o:value("100")
+o:value("150")
+o.datatype = "uinteger"
+o.default = "0"
 
 o = s:taboption("smart", Flag, "smart_enable_lgbm", font_red..bold_on..translate("Enable LightGBM Model")..bold_off..font_off)
 o.description = font_red..bold_on..translate("Use LightGBM Model To Predict Weight")..bold_off..font_off
@@ -459,16 +483,17 @@ custom_rules.rows = 20
 custom_rules.wrap = "off"
 
 function custom_rules.cfgvalue(self, section)
-	return NXFS.readfile("/etc/openclash/custom/openclash_custom_rules.list") or ""
+	return fs.readfile("/etc/openclash/custom/openclash_custom_rules.list") or ""
 end
 function custom_rules.write(self, section, value)
 	if value then
 		value = value:gsub("\r\n?", "\n")
-		local old_value = NXFS.readfile("/etc/openclash/custom/openclash_custom_rules.list")
+		local old_value = fs.readfile("/etc/openclash/custom/openclash_custom_rules.list")
 		if value ~= old_value then
-			NXFS.writefile("/etc/openclash/custom/openclash_custom_rules.list", value)
+			fs.writefile("/etc/openclash/custom/openclash_custom_rules.list", value)
 		end
 	end
+	return true
 end
 
 custom_rules_2 = s:taboption("rules", Value, "custom_rules_2")
@@ -479,16 +504,17 @@ custom_rules_2.rows = 20
 custom_rules_2.wrap = "off"
 
 function custom_rules_2.cfgvalue(self, section)
-	return NXFS.readfile("/etc/openclash/custom/openclash_custom_rules_2.list") or ""
+	return fs.readfile("/etc/openclash/custom/openclash_custom_rules_2.list") or ""
 end
 function custom_rules_2.write(self, section, value)
 	if value then
 		value = value:gsub("\r\n?", "\n")
-		local old_value = NXFS.readfile("/etc/openclash/custom/openclash_custom_rules_2.list")
+		local old_value = fs.readfile("/etc/openclash/custom/openclash_custom_rules_2.list")
 		if value ~= old_value then
-			NXFS.writefile("/etc/openclash/custom/openclash_custom_rules_2.list", value)
+			fs.writefile("/etc/openclash/custom/openclash_custom_rules_2.list", value)
 		end
 	end
+	return true
 end
 
 -- [[ Edit Custom DNS ]] --
@@ -497,15 +523,15 @@ ds.anonymous = true
 ds.addremove = true
 ds.sortable = true
 ds.template = "openclash/tblsection"
-ds.extedit = luci.dispatcher.build_url("admin/services/openclash/custom-dns-edit/%s")
+ds.extedit = DISP.build_url("admin/services/openclash/custom-dns-edit/%s")
 function ds.create(self, section)
 	local sid = TypedSection.create(self, section)
 	if sid then
-		local name = luci.http.formvalue("cbi.cts.tagname.".. self.config .. "." .. self.sectiontype)
+		local name = HTTP.formvalue("cbi.cts.tagname.".. self.config .. "." .. self.sectiontype)
 		if name and #name > 0 then
 			self.map.uci:set("openclash", sid, "group", name)
 		end
-		luci.http.redirect(ds.extedit % sid)
+		HTTP.redirect(ds.extedit % sid)
 		return
 	end
 end

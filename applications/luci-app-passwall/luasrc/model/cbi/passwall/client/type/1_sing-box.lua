@@ -17,15 +17,11 @@ if s1.val["type"] ~= type_name then
 	return
 end
 
-local s = NamedSection(m, arg[1], "server")
+local s = NamedSection(m, arg[1], "tmp_" .. s1.sectiontype)
+s.parent = s1
 s.type_name = type_name
 s.option_prefix = "singbox_"
-
-local formvalue_proto = luci.http.formvalue(formvalue_key .. "protocol")
-
-if formvalue_proto then s1.val["protocol"] = formvalue_proto end
-
-local arg_select_proto = luci.http.formvalue("select_proto") or ""
+api.set_type_cbi(s)
 
 local ss_method_new_list = {
 	"none", "aes-128-gcm", "aes-192-gcm", "aes-256-gcm", "chacha20-ietf-poly1305", "xchacha20-ietf-poly1305", "2022-blake3-aes-128-gcm", "2022-blake3-aes-256-gcm", "2022-blake3-chacha20-poly1305"
@@ -40,6 +36,7 @@ local security_list = { "none", "auto", "aes-128-gcm", "chacha20-poly1305", "zer
 local singbox_tags = luci.sys.exec(singbox_bin .. " version  | grep 'Tags:' | awk '{print $2}'")
 
 local singbox_version = api.get_app_version("sing-box"):match("[^v]+")
+local version_ge_1_14_0 = api.compare_versions(singbox_version, ">=", "1.14.0")
 
 o = s:option(ListValue, "protocol", translate("Protocol"))
 o:value("socks", "Socks")
@@ -65,26 +62,25 @@ o:value("ssh", "SSH")
 if singbox_tags:find("with_naive_outbound") then
 	o:value("naive", "NaïveProxy")
 end
+if version_ge_1_14_0 then
+	o:value("snell", "Snell")
+end
 o:value("_urltest", translate("URLTest"))
 o:value("_shunt", translate("Shunt"))
 o:value("_iface", translate("Custom Interface"))
-function o.custom_cfgvalue(self, section)
-	if arg_select_proto ~= "" then
-		return arg_select_proto
-	else
-		return m:get(section, self.config_option)
-	end
+
+local protocol_val = m:get(s.section, "protocol")
+local formvalue_proto = s.fields["protocol"]:formvalue(s.section)
+if formvalue_proto then
+	protocol_val = formvalue_proto
 end
 
-local load_urltest_options = s1.val["protocol"] == "_urltest" or arg_select_proto == "_urltest"
-local load_shunt_options = s1.val["protocol"] == "_shunt" or arg_select_proto == "_shunt"
-local load_iface_options = s1.val["protocol"] == "_iface" or arg_select_proto == "_iface"
+local load_urltest_options = protocol_val == "_urltest"
+local load_shunt_options = protocol_val == "_shunt"
+local load_iface_options = protocol_val == "_iface"
 local load_normal_options = true
 if load_urltest_options or load_shunt_options or load_iface_options then
 	load_normal_options = nil
-end
-if not arg_select_proto:find("_") then
-	load_normal_options = true
 end
 
 local netdev_list = api.get_network_devices()
@@ -100,6 +96,7 @@ if load_urltest_options then -- [[ URLTest Start ]]
 	o = s:option(MultiValue, "urltest_node", translate("URLTest node list"), translate("List of nodes to test, <a target='_blank' href='https://sing-box.sagernet.org/configuration/outbound/urltest'>document</a>"))
 	o:depends({ node_add_mode = "manual" })
 	o.widget = "checkbox"
+	o.cast = "table"
 	o.template = m:template_path("/cbi/nodes_multivalue")
 	o.group = {}
 	for k1, v1 in pairs(node_list) do
@@ -108,30 +105,6 @@ if load_urltest_options then -- [[ URLTest Start ]]
 				o:value(v.id, v.remark)
 				o.group[#o.group+1] = v.group or ""
 			end
-		end
-	end
-	-- 读取旧 DynamicList
-	function o.custom_cfgvalue(self, section)
-		return table.concat(m:get(section, "urltest_node") or {}, " ")
-	end
-	-- 写入保持 DynamicList
-	function o.custom_write(self, section, value)
-		local old = m:get(section, "urltest_node") or {}
-		local new, set = {}, {}
-		for v in value:gmatch("%S+") do
-			new[#new + 1] = v
-			set[v] = 1
-		end
-		for _, v in ipairs(old) do
-			if not set[v] then
-				m:set(section, "urltest_node", new)
-				return
-			end
-			set[v] = nil
-		end
-		for _ in pairs(set) do
-			m:set(section, "urltest_node", new)
-			return
 		end
 	end
 
@@ -190,7 +163,7 @@ if load_urltest_options then -- [[ URLTest Start ]]
 	o = s:option(Flag, "urltest_interrupt_exist_connections", translate("Interrupt existing connections"))
 	o:depends({ protocol = "_urltest" })
 	o.default = "0"
-	o.description = translate("Interrupt existing connections when the selected outbound has changed.")
+	o.description = translate("Interrupt existing connections when the selected outbound has changed.") 
 end -- [[ URLTest End ]]
 
 if load_iface_options then -- [[ 自定义接口 Start ]]
@@ -231,6 +204,43 @@ o:depends({ protocol = "tuic" })
 o:depends({ protocol = "anytls" })
 o:depends({ protocol = "ssh" })
 o:depends({ protocol = "naive" })
+
+if version_ge_1_14_0 then
+	-- snell
+	s.fields["password"]:depends({ protocol = "snell" })
+
+	o = s:option(Value, "snell_psk", translate("Pre shared key"))
+	o.rmempty = false
+	o:depends({ protocol = "snell" })
+
+	o = s:option(ListValue, "snell_version", translate("Version"))
+	o:value("4")
+	o:value("6")
+	o:depends({ protocol = "snell" })
+
+	o = s:option(Flag, "snell_reuse", translate("Connection Reuse"))
+	o:depends({ protocol = "snell" })
+
+	o = s:option(ListValue, "snell_network", translate("Transport"))
+	o:value("", "TCP UDP")
+	o:value("tcp", "TCP")
+	o:value("udp", "UDP")
+	o:depends({ protocol = "snell" })
+
+	o = s:option(ListValue, "snell_obfs_mode", translate("Camouflage Type"))
+	o:value("none")
+	o:value("http")
+	o:depends({ protocol = "snell", snell_version = "4" })
+
+	o = s:option(Value, "snell_obfs_host", translate("HTTP Host"))
+	o:depends({ protocol = "snell", snell_version = "4", snell_obfs_mode = "http" })
+
+	o = s:option(ListValue, "snell_mode", translate("Mode"))
+	o:value("default")
+	o:value("unshaped")
+	o:value("unsafe-raw")
+	o:depends({ protocol = "snell", snell_version = "6" })
+end
 
 o = s:option(ListValue, "security", translate("Encrypt Method"))
 for a, t in ipairs(security_list) do o:value(t) end
@@ -364,7 +374,7 @@ if singbox_tags:find("with_quic") then
 
 	o = s:option(Flag, "hysteria2_realms", translate("Realms"))
 	o.default = "0"
-	if api.compare_versions(singbox_version, ">=", "1.14.0") then
+	if version_ge_1_14_0 then
 		o:depends({ protocol = "hysteria2"})
 	else
 		o:depends({ protocol = "__hide"})
@@ -514,9 +524,17 @@ o:depends({ protocol = "naive" })
 o = s:option(Flag, "tls_allowInsecure", translate("allowInsecure"), translate("Whether unsafe connections are allowed. When checked, Certificate validation will be skipped."))
 o.default = "0"
 o:depends({ tls = true })
-o:depends({ protocol = "hysteria"})
+o:depends({ protocol = "hysteria" })
 o:depends({ protocol = "tuic" })
 o:depends({ protocol = "hysteria2" })
+
+o = s:option(Value, "tls_pinSHA256", translate("TLS Chain Fingerprint (SHA256)"))
+o:depends({ tls = true })
+o:depends({ protocol = "hysteria" })
+o:depends({ protocol = "tuic" })
+o:depends({ protocol = "hysteria2" })
+o.description = translate("Once set, connects only when the server’s chain fingerprint matches.") ..
+		string.format("<a href='javascript:void(0)' onclick='javascript:fetchCertSha256(this)'>%s</a>", "→ " .. translate("Fetch Manually"))
 
 o = s:option(Flag, "tls_certificate", translate("TLS Certificate (PEM)"))
 o.default = "0"
@@ -531,9 +549,12 @@ o.default = ""
 o.rows = 5
 o.wrap = "off"
 o:depends({ tls_certificate = true })
+o.cfgvalue = function(self, section)
+	return (m:get(section, "tls_certificate_pem") or ""):gsub("\\n", "\n")
+end
 o.validate = function(self, value)
-	value = api.trim(value):gsub("\r\n", "\n"):gsub("[ \t]*\n[ \t]*", "\n"):gsub("\n+", "\n")
-	return value
+	value = api.trim(value):gsub("\r\n", "\n"):gsub("\r", "\n"):gsub("[ \t]*\n[ \t]*", "\n"):gsub("\n+", "\n")
+	return value:gsub("\n", "\\n")
 end
 
 o = s:option(Value, "cipherSuites", translate("Cipher Suites"), '<a href="https://go.dev/src/crypto/tls/cipher_suites.go#L44" target="_blank">***</a>' .. " " .. translate("Configures the list of supported cipher suites, separated by :"))
@@ -552,9 +573,12 @@ o.default = ""
 o.rows = 5
 o.wrap = "off"
 o:depends({ ech = true })
+o.cfgvalue = function(self, section)
+	return (m:get(section, "ech_config") or ""):gsub("\\n", "\n")
+end
 o.validate = function(self, value)
-	value = api.trim(value):gsub("\r\n", "\n"):gsub("[ \t]*\n[ \t]*", "\n"):gsub("\n+", "\n")
-	return value
+	value = api.trim(value):gsub("\r\n", "\n"):gsub("\r", "\n"):gsub("[ \t]*\n[ \t]*", "\n"):gsub("\n+", "\n")
+	return value:gsub("\n", "\\n")
 end
 
 o = s:option(Value, "ech_query_server_name", translate("ECH Query Domain"), translate("Overrides the domain name used for ECH HTTPS record queries."))
@@ -587,6 +611,7 @@ if singbox_tags:find("with_utls") then
 	o:depends({ protocol = "shadowsocks", tls = true })
 	o:depends({ protocol = "trojan", tls = true })
 	o:depends({ protocol = "anytls", tls = true })
+	o:depends({ protocol = "http", tls = true })
 
 	o = s:option(Value, "reality_publicKey", translate("Public Key"))
 	o:depends({ reality = true })
@@ -672,16 +697,6 @@ o:depends({ transport = "ws" })
 o = s:option(Value, "ws_path", translate("WebSocket Path"))
 o.placeholder = "/"
 o:depends({ transport = "ws" })
-
-o = s:option(Flag, "ws_enableEarlyData", translate("Enable early data"))
-o:depends({ transport = "ws" })
-
-o = s:option(Value, "ws_maxEarlyData", translate("Early data length"))
-o.default = "1024"
-o:depends({ ws_enableEarlyData = true })
-
-o = s:option(Value, "ws_earlyDataHeaderName", translate("Early data header name"), translate("Recommended value: Sec-WebSocket-Protocol"))
-o:depends({ ws_enableEarlyData = true })
 
 -- [[ HTTPUpgrade部分 ]]--
 o = s:option(Value, "httpupgrade_host", translate("HTTPUpgrade Host"))
@@ -894,7 +909,7 @@ if not load_shunt_options then
 	for k1, v1 in pairs(node_list) do
 		if k1 ~= "shunt_list" and k1 ~= "iface_list" then
 			for i, v in ipairs(v1) do
-				if v.id ~= arg[1] then
+				if v.id ~= s.section then
 					o1:value(v.id, v.remark)
 					o1.group[#o1.group+1] = (v.group and v.group ~= "") and v.group or translate("default")
 					if k1 == "normal_list" then
@@ -908,14 +923,15 @@ if not load_shunt_options then
 	end
 end
 
-api.luci_types(s1, s)
+api.type_cbi_section(s1, s)
 
 if load_shunt_options then
-	local current_node = m:get(arg[1]) or {}
 	local shunt_lua = loadfile("/usr/lib/lua/luci/model/cbi/passwall/client/include/shunt_options.lua")
 	setfenv(shunt_lua, getfenv(1))(m, s1, {
-		node_id = arg[1],
-		node = current_node,
+		node = {
+			[".name"] = s.section,
+			type = type_name,
+		},
 		node_list = node_list,
 	})
 end

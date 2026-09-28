@@ -1,0 +1,73 @@
+local api = require "luci.passwall2.api"
+api.set_default_cbi()
+
+m = Map()
+
+s = m:section(NamedSection, "@global[0]", "global", translate("ACLs"), "<font color='red'>" .. translate("ACLs is a tools which used to designate specific IP proxy mode.") .. "</font>")
+
+o = s:option(Flag, "acl_enable", translate("Main switch"))
+o.rmempty = false
+o.default = false
+
+-- [[ ACLs Settings ]]--
+s = m:section(TypedSection, "acl_rule")
+s.template = "cbi/tblsection"
+s.sortable = true
+s.anonymous = true
+s.addremove = true
+s.extedit = api.url("acl_config", "%s")
+function s.create(e, t)
+	local uid = "acl_" .. api.gen_random_char(5)
+	TypedSection.create(e, uid)
+	luci.http.redirect(e.extedit:format(uid))
+end
+
+---- Enable
+o = s:option(Flag, "enabled", translate("Enable"))
+o.default = 1
+o.rmempty = false
+
+---- Remarks
+o = s:option(Value, "remarks", translate("Remarks"))
+o.rmempty = true
+
+local mac_t = {}
+api.sys.net.mac_hints(function(e, t)
+	mac_t[e] = {
+		ip = t,
+		mac = e
+	}
+end)
+
+i = s:option(DummyValue, "interface", translate("Source Interface"))
+i.cfgvalue = function(t, n)
+	local v = Value.cfgvalue(t, n) or ''
+	if v == "" then
+		return translate("All")
+	end
+	return v
+end
+
+o = s:option(DummyValue, "sources", translate("Source"))
+o.rawhtml = true
+o.cfgvalue = function(self, section)
+	local v = self.map:get(section, self.option) or {}
+	if type(v) == "table" then
+		return table.concat(v, "<br/>")
+	end
+end
+
+i = s:option(DummyValue, "mode", translate("Mode"))
+i.cfgvalue = function(t, n)
+	local v = Value.cfgvalue(t, n) or '0'
+	if v == "1" then
+		return translate("Proxy")
+	elseif v == "2" then
+		return translate("Proxy") .. " " .. translate("Use global config")
+	end
+	return translate("No Proxy")
+end
+
+m:appendTemplate("/cbi/sortable", {sectiontype = s.sectiontype})
+
+return api.return_map(m)

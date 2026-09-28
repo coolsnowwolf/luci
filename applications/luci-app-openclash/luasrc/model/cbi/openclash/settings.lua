@@ -18,7 +18,7 @@ end
 
 -- 优化 CBI UI（新版 LuCI 专用）
 local function optimize_cbi_ui()
-	luci.http.write([[
+	HTTP.write([[
 		<script type="text/javascript">
 			// 修正上移、下移按钮名称
 			document.querySelectorAll("input.btn.cbi-button.cbi-button-up").forEach(function(btn) {
@@ -76,9 +76,10 @@ s:tab("rules_update", translate("Rules Update"))
 s:tab("geo_update", translate("GEO Update"))
 s:tab("chnr_update", translate("Chnroute Update"))
 s:tab("auto_restart", translate("Auto Restart"))
-s:tab("version_update", translate("Version Update"))
+s:tab("debug", translate("Core Tests"))
 s:tab("developer", translate("Developer Settings"))
-s:tab("debug", translate("Debug Logs"))
+s:tab("version_update", translate("Version Update"))
+s:tab("oixcloud", translate("oixCloud"))
 
 o = s:taboption("op_mode", ListValue, "en_mode", font_red..bold_on..translate("Select Mode")..bold_off..font_off)
 o.description = translate("Select Mode For OpenClash Work, Try Flush DNS Cache If Network Error")
@@ -154,6 +155,51 @@ o:value("2", translate("Firewall Redirect"))
 o = s:taboption("dns", DummyValue, "flush_dns_cache", translate("Flush DNS"))
 o.template = "openclash/flush_dns_cache"
 
+o = s:taboption("dns", Button, "dnsmasq_fix", translate("Dnsmasq Fix"))
+o.description = translate("If DNS is abnormal after stopping the OpenClash, please try to fix")
+o.inputtitle = translate("Fix")
+o.inputstyle = "reload"
+o.write = function()
+	uci:set("dhcp", "@dnsmasq[0]", "noresolv", "0")
+	uci:set("dhcp", "@dnsmasq[0]", "localuse", "1")
+	local resolv_file = uci:get("dhcp", "@dnsmasq[0]", "resolvfile")
+	local need_fix = false
+	if not resolv_file or resolv_file == "" then
+		need_fix = true
+	elseif not NXFS.access(resolv_file) then
+		need_fix = true
+	else
+		local content = fs.readfile(resolv_file) or ""
+		if not content:find("nameserver") then
+			need_fix = true
+		end
+	end
+	if need_fix then
+		for _, f in ipairs({"/tmp/resolv.conf.d/resolv.conf.auto", "/tmp/resolv.conf.auto"}) do
+			if NXFS.access(f) then
+				local content = fs.readfile(f) or ""
+				if content:find("nameserver") then
+					uci:set("dhcp", "@dnsmasq[0]", "resolvfile", f)
+					resolv_file = f
+					need_fix = false
+					break
+				end
+			end
+		end
+	end
+	if need_fix then
+		resolv_file = "/tmp/resolv.conf.d/resolv.conf.auto"
+		SYS.call("mkdir -p /tmp/resolv.conf.d")
+		fs.writefile(resolv_file, "# Interface lan\nnameserver 119.29.29.29\nnameserver 8.8.8.8\n")
+		uci:set("dhcp", "@dnsmasq[0]", "resolvfile", resolv_file)
+	end
+	uci:set("openclash", "config", "redirect_dns", "0")
+	uci:commit("dhcp")
+	uci:commit("openclash")
+	SYS.call("/etc/init.d/dnsmasq restart")
+	HTTP.redirect(DISP.build_url("admin", "services", "openclash", "settings"))
+end
+
 o = s:taboption("dns", Flag, "enable_custom_domain_dns_server", translate("Enable Specify DNS Server"))
 o.default = 0
 o:depends("enable_redirect_dns", "1")
@@ -173,16 +219,17 @@ custom_domain_dns.wrap = "off"
 custom_domain_dns:depends{enable_redirect_dns = "1", enable_custom_domain_dns_server = "1"}
 
 function custom_domain_dns.cfgvalue(self, section)
-	return NXFS.readfile("/etc/openclash/custom/openclash_custom_domain_dns.list") or ""
+	return fs.readfile("/etc/openclash/custom/openclash_custom_domain_dns.list") or ""
 end
 function custom_domain_dns.write(self, section, value)
 	if value then
 		value = value:gsub("\r\n?", "\n")
-		local old_value = NXFS.readfile("/etc/openclash/custom/openclash_custom_domain_dns.list")
+		local old_value = fs.readfile("/etc/openclash/custom/openclash_custom_domain_dns.list")
 	if value ~= old_value then
-			NXFS.writefile("/etc/openclash/custom/openclash_custom_domain_dns.list", value)
+			fs.writefile("/etc/openclash/custom/openclash_custom_domain_dns.list", value)
 		end
 	end
+	return true
 end
 
 ---- Access Control
@@ -265,17 +312,17 @@ o.placeholder = translate("5000 or 1234-2345")
 o.rmempty = true
 
 o = s2:option(ListValue, "proto", translate("Proto"))
+o:value("both", translate("Both"))
 o:value("udp", translate("UDP"))
 o:value("tcp", translate("TCP"))
-o:value("both", translate("Both"))
-o.default = "tcp"
+o.default = "both"
 o.rmempty = false
 
 o = s2:option(ListValue, "family", translate("Family"))
+o:value("both", translate("Both"))
 o:value("ipv4", translate("IPv4"))
 o:value("ipv6", translate("IPv6"))
-o:value("both", translate("Both"))
-o.default = "tcp"
+o.default = "both"
 o.rmempty = false
 
 o = s2:option(ListValue, "interface", translate("Interface"))
@@ -289,7 +336,7 @@ o.rmempty = true
 o = s2:option(ListValue, "user", translate("User"))
 o:value("")
 o.default = ""
-local passwd_content = NXFS.readfile("/etc/passwd")
+local passwd_content = fs.readfile("/etc/passwd")
 local users = ""
 if passwd_content then
     for line in string.gmatch(passwd_content, "[^\n]+") do
@@ -442,7 +489,7 @@ o.default = 0
 o = s:taboption("traffic_control", Value, "common_ports", font_red..bold_on..translate("Common Ports Proxy Mode")..bold_off..font_off)
 o.description = translate("Only Common Ports, Prevent BT/P2P Passing")
 o:value("0", translate("Disable"))
-o:value("21 22 23 53 80 123 143 194 443 465 587 853 993 995 998 2052 2053 2082 2083 2086 2095 2096 5222 5228 5229 5230 8080 8443 8880 8888 8889", translate("Default Common Ports"))
+o:value("21 22 23 53 80 123 143 194 443 465 587 853 993 995 998 2052 2053 2082 2083 2086 2095 2096 2197 5222 5223 5228 5229 5230 8080 8443 8880 8888 8889", translate("Default Common Ports"))
 o.default = 0
 o.placeholder = translate("443 or 21-443, Use Space to Separate")
 o:depends("en_mode", "redir-host")
@@ -482,16 +529,17 @@ o.rows = 20
 o.wrap = "off"
 
 function o.cfgvalue(self, section)
-	return NXFS.readfile("/etc/openclash/custom/openclash_custom_localnetwork_ipv4.list") or ""
+	return fs.readfile("/etc/openclash/custom/openclash_custom_localnetwork_ipv4.list") or ""
 end
 function o.write(self, section, value)
 	if value then
 		value = value:gsub("\r\n?", "\n")
-		local old_value = NXFS.readfile("/etc/openclash/custom/openclash_custom_localnetwork_ipv4.list")
+		local old_value = fs.readfile("/etc/openclash/custom/openclash_custom_localnetwork_ipv4.list")
 		if value ~= old_value then
-			NXFS.writefile("/etc/openclash/custom/openclash_custom_localnetwork_ipv4.list", value)
+			fs.writefile("/etc/openclash/custom/openclash_custom_localnetwork_ipv4.list", value)
 		end
 	end
+	return true
 end
 
 o = s:taboption("traffic_control", Value, "chnroute_pass", translate("Chnroute Bypassed List"))
@@ -503,16 +551,17 @@ o:depends("enable_redirect_dns", "1")
 o:depends("enable_redirect_dns", "0")
 
 function o.cfgvalue(self, section)
-	return NXFS.readfile("/etc/openclash/custom/openclash_custom_chnroute_pass.list") or ""
+	return fs.readfile("/etc/openclash/custom/openclash_custom_chnroute_pass.list") or ""
 end
 function o.write(self, section, value)
 	if value then
 		value = value:gsub("\r\n?", "\n")
-		local old_value = NXFS.readfile("/etc/openclash/custom/openclash_custom_chnroute_pass.list")
+		local old_value = fs.readfile("/etc/openclash/custom/openclash_custom_chnroute_pass.list")
 		if value ~= old_value then
-			NXFS.writefile("/etc/openclash/custom/openclash_custom_chnroute_pass.list", value)
+			fs.writefile("/etc/openclash/custom/openclash_custom_chnroute_pass.list", value)
 		end
 	end
+	return true
 end
 
 --Stream Enhance
@@ -885,6 +934,62 @@ o.template = "openclash/other_stream_option"
 o.value = "OpenAI"
 o:depends("stream_auto_select_openai", "1")
 
+-- Claude
+o = s:taboption("stream_enhance", Flag, "stream_auto_select_claude", font_red..translate("Claude")..font_off)
+o.default = 0
+o:depends("stream_auto_select", "1")
+
+o = s:taboption("stream_enhance", Value, "stream_auto_select_group_key_claude", translate("Group Filter"))
+o.placeholder = "Claude|AI"
+o.description = translate("It Will Be Searched According To The Regex When Auto Search Group Fails")
+o:depends("stream_auto_select_claude", "1")
+o.rmempty = true
+
+o = s:taboption("stream_enhance", Value, "stream_auto_select_region_key_claude", translate("Unlock Region Filter"))
+o.placeholder = "US"
+o.description = translate("It Will Be Selected Region(Country Shortcode) According To The Regex")
+o:depends("stream_auto_select_claude", "1")
+o.rmempty = true
+
+o = s:taboption("stream_enhance", Value, "stream_auto_select_node_key_claude", translate("Unlock Nodes Filter"))
+o.description = translate("It Will Be Selected Nodes According To The Regex")
+o:depends("stream_auto_select_claude", "1")
+o.rmempty = true
+
+o = s:taboption("stream_enhance", DummyValue, "Claude", translate("Manual Test"))
+o.rawhtml = true
+o.template = "openclash/other_stream_option"
+o.value = "Claude"
+o:depends("stream_auto_select_claude", "1")
+
+-- Gemini
+o = s:taboption("stream_enhance", Flag, "stream_auto_select_gemini", font_red..translate("Gemini")..font_off)
+o.default = 0
+o:depends("stream_auto_select", "1")
+
+o = s:taboption("stream_enhance", Value, "stream_auto_select_group_key_gemini", translate("Group Filter"))
+o.placeholder = "Gemini|AI"
+o.description = translate("It Will Be Searched According To The Regex When Auto Search Group Fails")
+o:depends("stream_auto_select_gemini", "1")
+o.rmempty = true
+
+o = s:taboption("stream_enhance", Value, "stream_auto_select_region_key_gemini", translate("Unlock Region Filter"))
+o.placeholder = "US"
+o.description = translate("It Will Be Selected Region(Country Shortcode) According To The Regex")
+o:depends("stream_auto_select_gemini", "1")
+o.rmempty = true
+
+o = s:taboption("stream_enhance", Value, "stream_auto_select_node_key_gemini", translate("Unlock Nodes Filter"))
+o.description = translate("It Will Be Selected Nodes According To The Regex")
+o:depends("stream_auto_select_gemini", "1")
+o.rmempty = true
+
+o = s:taboption("stream_enhance", DummyValue, "Gemini", translate("Manual Test"))
+o.rawhtml = true
+o.template = "openclash/other_stream_option"
+o.value = "Gemini"
+o:depends("stream_auto_select_gemini", "1")
+
 ---- update Settings
 o = s:taboption("geo_update", Flag, "geo_auto_update", font_red..bold_on..translate("Auto Update GeoIP MMDB")..bold_off..font_off)
 o.default = 0
@@ -912,9 +1017,10 @@ o = s:taboption("geo_update", Value, "geo_custom_url")
 o.title = translate("Custom GeoIP MMDB URL")
 o.rmempty = true
 o.description = translate("Custom GeoIP MMDB URL, Click Button Below To Refresh After Edit")
-o:value("https://testingcf.jsdelivr.net/gh/alecthw/mmdb_china_ip_list@release/lite/Country.mmdb", translate("Alecthw-lite-Version")..translate("(Default mmdb)"))
-o:value("https://testingcf.jsdelivr.net/gh/alecthw/mmdb_china_ip_list@release/Country.mmdb", translate("Alecthw-Version")..translate("(All Info mmdb)"))
-o:value("https://testingcf.jsdelivr.net/gh/Hackl0us/GeoIP2-CN@release/Country.mmdb", translate("Hackl0us-Version")..translate("(Only CN)"))
+o:value("https://testingcf.jsdelivr.net/gh/alecthw/mmdb_china_ip_list@release/lite/Country.mmdb", translate("Alecthw-lite-testingcf-Version")..translate("(Default mmdb)"))
+o:value("https://testingcf.jsdelivr.net/gh/alecthw/mmdb_china_ip_list@release/Country.mmdb", translate("Alecthw-testingcf-Version")..translate("(All Info mmdb)"))
+o:value("https://testingcf.jsdelivr.net/gh/Hackl0us/GeoIP2-CN@release/Country.mmdb", translate("Hackl0us-testingcf-Version")..translate("(Only CN)"))
+o:value("https://github.com/alecthw/mmdb_china_ip_list/releases/latest/download/Country-lite.mmdb", translate("Alecthw-lite-github-Version"))
 o.default = "https://testingcf.jsdelivr.net/gh/alecthw/mmdb_china_ip_list@release/lite/Country.mmdb"
 o:depends("geo_auto_update", "1")
 
@@ -926,7 +1032,7 @@ o.inputstyle = "reload"
 o.write = function()
 	m.uci:set("openclash", "config", "enable", 1)
 	m.uci:commit("openclash")
-	SYS.call("/usr/share/openclash/openclash_ipdb.sh >/dev/null 2>&1 &")
+	SYS.call("/usr/share/openclash/openclash_geo.sh ipdb >/dev/null 2>&1 &")
 	HTTP.redirect(DISP.build_url("admin", "services", "openclash"))
 end
 
@@ -958,6 +1064,7 @@ o.rmempty = true
 o.description = translate("Custom GeoIP Dat URL, Click Button Below To Refresh After Edit")
 o:value("https://testingcf.jsdelivr.net/gh/Loyalsoldier/v2ray-rules-dat@release/geoip.dat", translate("Loyalsoldier-testingcf-jsdelivr-Version")..translate("(Default)"))
 o:value("https://fastly.jsdelivr.net/gh/Loyalsoldier/v2ray-rules-dat@release/geoip.dat", translate("Loyalsoldier-fastly-jsdelivr-Version"))
+o:value("https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geoip.dat", translate("Loyalsoldier-github-Version"))
 o.default = "https://testingcf.jsdelivr.net/gh/Loyalsoldier/v2ray-rules-dat@release/geoip.dat"
 o:depends("geoip_auto_update", "1")
 
@@ -969,7 +1076,7 @@ o.inputstyle = "reload"
 o.write = function()
 	m.uci:set("openclash", "config", "enable", 1)
 	m.uci:commit("openclash")
-	SYS.call("/usr/share/openclash/openclash_geoip.sh >/dev/null 2>&1 &")
+	SYS.call("/usr/share/openclash/openclash_geo.sh geoip >/dev/null 2>&1 &")
 	HTTP.redirect(DISP.build_url("admin", "services", "openclash"))
 end
 
@@ -1001,6 +1108,7 @@ o.rmempty = true
 o.description = translate("Custom GeoSite Data URL, Click Button Below To Refresh After Edit")
 o:value("https://testingcf.jsdelivr.net/gh/Loyalsoldier/v2ray-rules-dat@release/geosite.dat", translate("Loyalsoldier-testingcf-jsdelivr-Version")..translate("(Default)"))
 o:value("https://fastly.jsdelivr.net/gh/Loyalsoldier/v2ray-rules-dat@release/geosite.dat", translate("Loyalsoldier-fastly-jsdelivr-Version"))
+o:value("https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geosite.dat", translate("Loyalsoldier-github-Version"))
 o.default = "https://testingcf.jsdelivr.net/gh/Loyalsoldier/v2ray-rules-dat@release/geosite.dat"
 o:depends("geosite_auto_update", "1")
 
@@ -1012,7 +1120,7 @@ o.inputstyle = "reload"
 o.write = function()
 	m.uci:set("openclash", "config", "enable", 1)
 	m.uci:commit("openclash")
-	SYS.call("/usr/share/openclash/openclash_geosite.sh >/dev/null 2>&1 &")
+	SYS.call("/usr/share/openclash/openclash_geo.sh geosite >/dev/null 2>&1 &")
 	HTTP.redirect(DISP.build_url("admin", "services", "openclash"))
 end
 
@@ -1044,6 +1152,7 @@ o.rmempty = true
 o.description = translate("Custom Geo ASN Data URL, Click Button Below To Refresh After Edit")
 o:value("https://testingcf.jsdelivr.net/gh/xishang0128/geoip@release/GeoLite2-ASN.mmdb", translate("xishang0128-testingcf-jsdelivr-Version")..translate("(Default)"))
 o:value("https://fastly.jsdelivr.net/gh/xishang0128/geoip@release/GeoLite2-ASN.mmdb", translate("xishang0128-fastly-jsdelivr-Version"))
+o:value("https://github.com/xishang0128/geoip/releases/latest/download/GeoLite2-ASN.mmdb", translate("xishang0128-github-Version"))
 o.default = "https://testingcf.jsdelivr.net/gh/xishang0128/geoip@release/GeoLite2-ASN.mmdb"
 o:depends("geoasn_auto_update", "1")
 
@@ -1055,7 +1164,7 @@ o.inputstyle = "reload"
 o.write = function()
 	m.uci:set("openclash", "config", "enable", 1)
 	m.uci:commit("openclash")
-	SYS.call("/usr/share/openclash/openclash_geoasn.sh >/dev/null 2>&1 &")
+	SYS.call("/usr/share/openclash/openclash_geo.sh geoasn >/dev/null 2>&1 &")
 	HTTP.redirect(DISP.build_url("admin", "services", "openclash"))
 end
 
@@ -1088,6 +1197,7 @@ o:value("https://ispip.clang.cn/all_cn.txt", translate("Clang-CN")..translate("(
 o:value("https://ispip.clang.cn/all_cn_cidr.txt", translate("Clang-CN-CIDR"))
 o:value("https://fastly.jsdelivr.net/gh/Hackl0us/GeoIP2-CN@release/CN-ip-cidr.txt", translate("Hackl0us-CN-CIDR-fastly-jsdelivr"))
 o:value("https://testingcf.jsdelivr.net/gh/Hackl0us/GeoIP2-CN@release/CN-ip-cidr.txt", translate("Hackl0us-CN-CIDR-testingcf-jsdelivr"))
+o:value("https://raw.githubusercontent.com/gaoyifan/china-operator-ip/refs/heads/ip-lists/china.txt", translate("gaoyifan-github-Version"))
 o.default = "https://ispip.clang.cn/all_cn.txt"
 
 o = s:taboption("chnr_update", Value, "chnr6_custom_url")
@@ -1095,6 +1205,7 @@ o.title = translate("Custom Chnroute6 Lists URL")
 o.rmempty = false
 o.description = translate("Custom Chnroute6 Lists URL, Click Button Below To Refresh After Edit")
 o:value("https://ispip.clang.cn/all_cn_ipv6.txt", translate("Clang-CN-IPV6")..translate("(Default)"))
+o:value("https://raw.githubusercontent.com/gaoyifan/china-operator-ip/refs/heads/ip-lists/china6.txt", translate("gaoyifan-github-Version"))
 o.default = "https://ispip.clang.cn/all_cn_ipv6.txt"
 
 o = s:taboption("chnr_update", Button, translate("Chnroute Lists Update")) 
@@ -1248,16 +1359,17 @@ o.wrap = "off"
 o:depends("ipv6_enable", "1")
 
 function o.cfgvalue(self, section)
-	return NXFS.readfile("/etc/openclash/custom/openclash_custom_localnetwork_ipv6.list") or ""
+	return fs.readfile("/etc/openclash/custom/openclash_custom_localnetwork_ipv6.list") or ""
 end
 function o.write(self, section, value)
 	if value then
 		value = value:gsub("\r\n?", "\n")
-		local old_value = NXFS.readfile("/etc/openclash/custom/openclash_custom_localnetwork_ipv6.list")
+		local old_value = fs.readfile("/etc/openclash/custom/openclash_custom_localnetwork_ipv6.list")
 		if value ~= old_value then
-			NXFS.writefile("/etc/openclash/custom/openclash_custom_localnetwork_ipv6.list", value)
+			fs.writefile("/etc/openclash/custom/openclash_custom_localnetwork_ipv6.list", value)
 		end
 	end
+	return true
 end
 
 o = s:taboption("ipv6", Value, "chnroute6_pass", translate("Chnroute6 Bypassed List"))
@@ -1268,21 +1380,23 @@ o.wrap = "off"
 o:depends({ipv6_enable = "1", enable_redirect_dns = "1"})
 
 function o.cfgvalue(self, section)
-	return NXFS.readfile("/etc/openclash/custom/openclash_custom_chnroute6_pass.list") or ""
+	return fs.readfile("/etc/openclash/custom/openclash_custom_chnroute6_pass.list") or ""
 end
 function o.write(self, section, value)
 	if value then
 		value = value:gsub("\r\n?", "\n")
-		local old_value = NXFS.readfile("/etc/openclash/custom/openclash_custom_chnroute6_pass.list")
+		local old_value = fs.readfile("/etc/openclash/custom/openclash_custom_chnroute6_pass.list")
 		if value ~= old_value then
-			NXFS.writefile("/etc/openclash/custom/openclash_custom_chnroute6_pass.list", value)
+			fs.writefile("/etc/openclash/custom/openclash_custom_chnroute6_pass.list", value)
 		end
 	end
+	return true
 end
 
 ---- version update
-core_update = s:taboption("version_update", DummyValue, "", nil)
-core_update.template = "openclash/update"
+version_update_panel = s:taboption("version_update", DummyValue, "", nil)
+version_update_panel.template = "openclash/update"
+version_update_panel.version_tab = true
 
 ---- developer
 o = s:taboption("developer", Value, "firewall_custom")
@@ -1292,21 +1406,27 @@ o.rows = 30
 o.wrap = "off"
 
 function o.cfgvalue(self, section)
-	return NXFS.readfile("/etc/openclash/custom/openclash_custom_firewall_rules.sh") or ""
+	return fs.readfile("/etc/openclash/custom/openclash_custom_firewall_rules.sh") or ""
 end
 function o.write(self, section, value)
 	if value then
 		value = value:gsub("\r\n?", "\n")
-		local old_value = NXFS.readfile("/etc/openclash/custom/openclash_custom_firewall_rules.sh")
+		local old_value = fs.readfile("/etc/openclash/custom/openclash_custom_firewall_rules.sh")
 		if value ~= old_value then
-			NXFS.writefile("/etc/openclash/custom/openclash_custom_firewall_rules.sh", value)
+			fs.writefile("/etc/openclash/custom/openclash_custom_firewall_rules.sh", value)
 		end
 	end
+	return true
 end
 
 ---- debug
 o = s:taboption("debug", DummyValue, "", nil)
 o.template = "openclash/debug"
+
+---- oixcloud
+oixcloud_panel = s:taboption("oixcloud", DummyValue, "", nil)
+oixcloud_panel.template = "openclash/oix_login"
+oixcloud_panel.rawhtml = true
 
 local t = {
 	{Commit, Apply}
@@ -1345,8 +1465,7 @@ o.write = function()
 	HTTP.redirect(DISP.build_url("admin", "services", "openclash"))
 end
 
-m:append(Template("openclash/config_editor"))
 m:append(Template("openclash/toolbar_show"))
-m:append(Template("openclash/select_git_cdn"))
+m:append(Template("openclash/config_editor"))
 
 return m

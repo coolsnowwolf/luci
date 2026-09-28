@@ -3,16 +3,15 @@ local m, s, o
 local openclash = "openclash"
 local uci = luci.model.uci.cursor()
 local sys = require "luci.sys"
+local HTTP = require "luci.http"
+local DISP = require "luci.dispatcher"
 local sid = arg[1]
 local fs = require "luci.openclash"
-local file_path = ""
+local file_path = fs.get_file_path_from_request()
 
-for i = 2, #(arg) do
-	file_path = file_path .. "/" .. luci.http.urlencode(arg[i])
-end
-
-if not fs.isfile(file_path) and file_path ~= "" then
-	file_path = luci.http.urldecode(file_path)
+if not file_path then
+	HTTP.redirect(DISP.build_url("admin", "services", "openclash", "servers"))
+	return
 end
 
 font_red = [[<b style=color:red>]]
@@ -20,22 +19,11 @@ font_off = [[</b>]]
 bold_on = [[<strong>]]
 bold_off = [[</strong>]]
 
-function IsYamlFile(e)
-	e=e or""
-	local e=string.lower(string.sub(e,-5,-1))
-	return e == ".yaml"
-end
-function IsYmlFile(e)
-	e=e or""
-	local e=string.lower(string.sub(e,-4,-1))
-	return e == ".yml"
-end
-
 m = Map(openclash, translate("Edit Proxy-Provider"))
 m.pageaction = false
-m.redirect = luci.dispatcher.build_url("admin/services/openclash/servers%s" % file_path)
+m.redirect = DISP.build_url("admin/services/openclash/servers") .. "?file=" .. HTTP.urlencode(file_path)
 if m.uci:get(openclash, sid) ~= "proxy-provider" then
-	luci.http.redirect(m.redirect)
+	HTTP.redirect(m.redirect)
 	return
 end
 
@@ -52,7 +40,7 @@ for t,f in ipairs(fs.glob("/etc/openclash/config/*"))do
 	if a then
 		e[t]={}
 		e[t].name=fs.basename(f)
-		if IsYamlFile(e[t].name) or IsYmlFile(e[t].name) then
+		if fs.IsYamlExt(e[t].name) then
 			o:value(e[t].name)
 		end
 	end
@@ -77,7 +65,7 @@ for t,f in ipairs(fs.glob("/etc/openclash/proxy_provider/*"))do
 	if h then
 		p[t]={}
 		p[t].name=fs.basename(f)
-		if IsYamlFile(p[t].name) or IsYmlFile(p[t].name) then
+		if fs.IsYamlExt(p[t].name) then
 			o:value("./proxy_provider/"..p[t].name)
 		end
 	end
@@ -182,7 +170,7 @@ o.inputtitle = translate("Commit Settings")
 o.inputstyle = "apply"
 o.write = function()
 	m.uci:commit(openclash)
-	luci.http.redirect(m.redirect)
+	HTTP.redirect(m.redirect)
 end
 
 o = a:option(Button,"Back", " ")
@@ -190,7 +178,7 @@ o.inputtitle = translate("Back Settings")
 o.inputstyle = "reset"
 o.write = function()
 	m.uci:revert(openclash, sid)
-	luci.http.redirect(m.redirect)
+	HTTP.redirect(m.redirect)
 end
 
 m:append(Template("openclash/toolbar_show"))
