@@ -2,7 +2,9 @@
 
 `luci.client-rates get` accepts up to 1024 IP addresses and returns cached upload
 and download bytes/second for each address, plus cumulative upload + download
-bytes keyed by MAC in `totals`. It reads `NETLINK_NETFILTER` connection
+bytes keyed by MAC in `totals`. The `traffic` table also exposes cumulative
+`upload` and `download` bytes per MAC, each combining IPv4 and IPv6. The homepage
+displays upload / download and sorts by their sum. It reads `NETLINK_NETFILTER` connection
 counters; it never installs packet-filter rules or resets kernel counters.
 
 On QSDK, ECM's NSS/SFE/PPE statistics synchronization updates these conntrack

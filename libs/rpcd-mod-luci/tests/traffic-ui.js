@@ -33,6 +33,13 @@ assert.equal(view.rateValue(view.clientAddresses(lease,hints),totals,'total',mac
 assert.equal(view.rateValue(['192.168.0.2'],totals,'total',mac)[0],123456);
 assert.equal(view.rateValue([],totals,'total',mac.toLowerCase())[0],123456);
 assert.equal(view.rateValue([],{},'total',mac)[1],'-');
+const split = {traffic:{[mac]:{upload:1200,download:12200}}};
+assert.deepEqual(view.rateValue([], split, 'total', mac.toLowerCase()),
+ [13400, '%1024.2mB'.format(1200) + ' / ' + '%1024.2mB'.format(12200)]);
+assert.equal(view.rateValue([], {traffic:{[mac]:{upload:0,download:0}}}, 'total', mac)[0], 0);
+assert.equal(view.rateValue([], {traffic:{[mac]:{upload:0,download:50}}}, 'total', mac)[1],
+ '%1024.2mB'.format(0) + ' / ' + '%1024.2mB'.format(50));
+
 assert.equal(view.rateValue([], {totals:{[mac]:0}}, 'total',mac)[0],0);
 assert.deepEqual(view.rateValue([], {connections:{[mac]:12}}, 'connections', mac), [12,'12']);
 assert.deepEqual(view.rateValue([], {connections:{[mac]:0}}, 'connections', mac), [0,'0']);
