@@ -291,6 +291,12 @@ set_overclock() {
 		echo '{"error":"missing freq_mhz parameter"}'
 		return
 	fi
+	case "$target_mhz" in
+		*[!0-9]*)
+			echo '{"error":"frequency must be an integer"}'
+			return
+			;;
+	esac
 
 	# Validate range (500-1600, crash likely above 1500 at stock voltage)
 	if [ "$target_mhz" -lt 500 ] || [ "$target_mhz" -gt 1600 ]; then
@@ -312,9 +318,16 @@ set_overclock() {
 		posdiv=0
 		pcw_int=$((target_mhz / 50))
 	fi
+	if [ $((pcw_int * 50 / (1 << posdiv))) -ne "$target_mhz" ]; then
+		echo '{"error":"frequency must use 25 MHz steps below 1000 MHz or 50 MHz steps above"}'
+		return
+	fi
 
 	# Lock governor to performance to prevent cpufreq from fighting
-	echo performance > /sys/devices/system/cpu/cpufreq/policy0/scaling_governor 2>/dev/null
+	if ! echo performance > /sys/devices/system/cpu/cpufreq/policy0/scaling_governor 2>/dev/null; then
+		echo '{"error":"failed to lock performance governor"}'
+		return
+	fi
 
 	# Read current register values
 	local cur_clkmux=$(($(devmem 0x1fa201e0)))
@@ -347,7 +360,7 @@ set_overclock() {
 	fi
 
 	# Step 6: Wait for PLL lock
-	sleep 0.02
+	sleep 0.02 2>/dev/null || sleep 1
 
 	# Step 7: Enable ARMPLL path in CLK_MUX (set bit 0)
 	local cur_clkmux2=$(($(devmem 0x1fa201e0)))
@@ -379,6 +392,11 @@ set_overclock() {
 		read_freq=$((read_pcw * 50 / (1 << read_posdiv)))
 	fi
 
+	if [ "$read_freq" -ne "$target_mhz" ]; then
+		printf '{"error":"PLL frequency verification failed","target_mhz":%d,"actual_mhz":%d}' \
+			"$target_mhz" "$read_freq"
+		return
+	fi
 	printf '{"result":"ok","target_mhz":%d,"actual_mhz":%d,"pcw":%d,"posdiv":%d}' \
 		"$target_mhz" "$read_freq" "$read_pcw" "$read_posdiv"
 }
