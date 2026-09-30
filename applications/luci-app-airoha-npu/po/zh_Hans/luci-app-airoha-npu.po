@@ -1,0 +1,197 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: zh_Hans\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+msgid "%d clients"
+msgstr "%d 个客户端"
+
+msgid "%d cores"
+msgstr "%d 个核心"
+
+msgid "%d used / %d free (%s%%)"
+msgstr "已用 %d / 空闲 %d（%s%%）"
+
+msgid "%s (%d regions)"
+msgstr "%s（%d 个区域）"
+
+msgid "%s MHz (OC)"
+msgstr "%s MHz（超频）"
+
+msgid "8x RISC-V via PCIe RAM"
+msgstr "8 个 RISC-V 核心，通过 PCIe RAM 通信"
+
+msgid "ACTIVE"
+msgstr "运行中"
+
+msgid "Active"
+msgstr "运行中"
+
+msgid "Airoha SoC Status"
+msgstr "Airoha SoC 状态"
+
+msgid "Apply"
+msgstr "应用"
+
+msgid "Applying..."
+msgstr "正在应用…"
+
+msgid "Band %d"
+msgstr "频段 %d"
+
+msgid "Bound"
+msgstr "已绑定"
+
+msgid "CPU Cores"
+msgstr "CPU 核心数"
+
+msgid "CPU Frequency"
+msgstr "CPU 频率"
+
+msgid "CPU set to"
+msgstr "CPU 频率已设置为"
+
+msgid "Critical"
+msgstr "严重"
+
+msgid "Current Frequency"
+msgstr "当前频率"
+
+msgid "Direct PLL. Stock max 1200 MHz. Stable up to 1500 MHz."
+msgstr "直接设置 PLL。默认最高 1200 MHz，已测试稳定至 1500 MHz。"
+
+msgid "Drop"
+msgstr "丢包"
+
+msgid "Error:"
+msgstr "错误："
+
+msgid "Ethernet"
+msgstr "以太网"
+
+msgid "Failed:"
+msgstr "失败："
+
+msgid "Fair"
+msgstr "一般"
+
+msgid "Firmware / Clock / Cores"
+msgstr "固件 / 时钟 / 核心"
+
+msgid "Frame Engine"
+msgstr "帧引擎"
+
+msgid "Good"
+msgstr "良好"
+
+msgid "Governor"
+msgstr "调频策略"
+
+msgid "Grant access to Airoha SoC status (NPU + CPU + Overclock)"
+msgstr "允许访问 Airoha SoC 状态（NPU、CPU 和超频）"
+
+msgid "HW Offload:"
+msgstr "硬件卸载："
+
+msgid "Healthy"
+msgstr "正常"
+
+msgid "Idle"
+msgstr "空闲"
+
+msgid "Index"
+msgstr "索引"
+
+msgid "Internal Switch (1G LAN3/4)"
+msgstr "内置交换机（千兆 LAN3/4）"
+
+msgid "Manages:"
+msgstr "管理："
+
+msgid "Max Frequency"
+msgstr "最高频率"
+
+msgid "Must be 500-1600 MHz"
+msgstr "频率必须在 500–1600 MHz 之间"
+
+msgid "NPU & Offload Engine"
+msgstr "NPU 与卸载引擎"
+
+msgid "NPU Status"
+msgstr "NPU 状态"
+
+msgid "New Flow"
+msgstr "转换后数据流"
+
+msgid "No clients"
+msgstr "无客户端"
+
+msgid "Not Active"
+msgstr "未运行"
+
+msgid "OFF"
+msgstr "关闭"
+
+msgid "Original Flow"
+msgstr "原始数据流"
+
+msgid "Overclock"
+msgstr "超频"
+
+msgid "PPE Eng 1"
+msgstr "PPE 引擎 1"
+
+msgid "PPE Eng 2"
+msgstr "PPE 引擎 2"
+
+msgid "PPE Engines"
+msgstr "PPE 引擎"
+
+msgid "PPE Flow Offload Entries"
+msgstr "PPE 流量卸载条目"
+
+msgid "PPE init, WDMA rings, flow stats"
+msgstr "PPE 初始化、WDMA 环形队列、流量统计"
+
+msgid "PSE Port Queue Status"
+msgstr "PSE 端口队列状态"
+
+msgid "PSE Shared Buffer"
+msgstr "PSE 共享缓冲区"
+
+msgid "Poor"
+msgstr "差"
+
+msgid "RX Drop"
+msgstr "接收丢包"
+
+msgid "Reserved Memory"
+msgstr "保留内存"
+
+msgid "SoC Status"
+msgstr "SoC 状态"
+
+msgid "State"
+msgstr "状态"
+
+msgid "Switch 1G"
+msgstr "千兆交换机"
+
+msgid "TX Drop"
+msgstr "发送丢包"
+
+msgid "Total"
+msgstr "总计"
+
+msgid "Type"
+msgstr "类型"
+
+msgid "Warning"
+msgstr "警告"
+
+msgid "devmem not available on this build"
+msgstr "当前固件不支持 devmem"
+
+msgid "Frequencies above 1400 MHz may be unstable. Continue?"
+msgstr "超过 1400 MHz 的频率可能不稳定，是否继续？"

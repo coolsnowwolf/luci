@@ -71,14 +71,14 @@ var bandInfo = [
 
 var psePortMap = [
 	{ name: 'CDM1', label: 'CPU DMA 1',   color: '#607d8b' },
-	{ name: 'GDM1', label: 'Switch 1G',   color: '#ff9800' },
+	{ name: 'GDM1', label: _('Switch 1G'),   color: '#ff9800' },
 	{ name: 'GDM2', label: 'WAN 10G',     color: '#4caf50' },
 	{ name: 'GDM3', label: 'GDM3',        color: '#607d8b' },
-	{ name: 'PPE1', label: 'PPE Eng 1',   color: '#2196f3' },
+	{ name: 'PPE1', label: _('PPE Eng 1'),   color: '#2196f3' },
 	{ name: 'CDM2', label: 'CPU DMA 2',   color: '#607d8b' },
 	{ name: 'CDM3', label: 'CDM3',        color: '#607d8b' },
 	{ name: 'CDM4', label: 'WDMA WiFi',   color: '#9c27b0' },
-	{ name: 'PPE2', label: 'PPE Eng 2',   color: '#2196f3' },
+	{ name: 'PPE2', label: _('PPE Eng 2'),   color: '#2196f3' },
 	{ name: 'GDM4', label: 'LAN2 10G',    color: '#4caf50' }
 ];
 
@@ -102,7 +102,7 @@ function calcTotalMem(regions) {
 function tokenHealth(c, s) {
 	if (!s) return { text: 'N/A', color: '#888' };
 	var p = c/s*100;
-	return p < 50 ? { text:'Healthy', color:'#4caf50' } : p < 80 ? { text:'Warning', color:'#ff9800' } : { text:'Critical', color:'#f44336' };
+	return p < 50 ? { text:_('Healthy'), color:'#4caf50' } : p < 80 ? { text:_('Warning'), color:'#ff9800' } : { text:_('Critical'), color:'#f44336' };
 }
 
 function getBandStats(ti, b) {
@@ -118,10 +118,10 @@ function getTxQueue(ti, b) {
 }
 
 function bandHealth(s) {
-	if (!s || s.count===0) return { text:'No clients', color:'#888' };
-	if (!s.tx_packets) return { text:'Idle', color:'#888' };
+	if (!s || s.count===0) return { text:_('No clients'), color:'#888' };
+	if (!s.tx_packets) return { text:_('Idle'), color:'#888' };
 	var r = s.tx_retries/(s.tx_packets+s.tx_retries);
-	return r>0.5 ? {text:'Poor',color:'#f44336'} : r>0.2 ? {text:'Fair',color:'#ff9800'} : {text:'Good',color:'#4caf50'};
+	return r>0.5 ? {text:_('Poor'),color:'#f44336'} : r>0.2 ? {text:_('Fair'),color:'#ff9800'} : {text:_('Good'),color:'#4caf50'};
 }
 
 function retryPct(s) {
@@ -131,7 +131,7 @@ function retryPct(s) {
 
 /* ── Mini Band Chip (compact for FE diagram) ── */
 function renderBandChip(band, txQ, stats) {
-	var info = bandInfo[band] || { name: 'Band '+band, accent: '#888' };
+	var info = bandInfo[band] || { name: _('Band %d').format(band), accent: '#888' };
 	var id = 'band-'+band;
 	var h = bandHealth(stats);
 	var type = txQ ? txQ.type : '?';
@@ -147,7 +147,7 @@ function renderBandChip(band, txQ, stats) {
 				E('span', { 'style': 'width:7px;height:7px;border-radius:50%;background:'+h.color+';display:inline-block' }),
 				E('span', { 'style': 'color:'+h.color+';font-weight:500' }, h.text)
 			]),
-			E('span', { 'id': id+'-clients', 'class': 'soc-muted' }, stats.count + ' sta'),
+			E('span', { 'id': id+'-clients', 'class': 'soc-muted' }, _('%d clients').format(stats.count)),
 			(stats.tx_packets > 0) ? E('span', { 'id': id+'-retries', 'class': 'soc-muted' }, rp) : E('span')
 		])
 	]);
@@ -158,14 +158,14 @@ function updateBandChip(band, stats) {
 	var el = document.getElementById(id+'-health');
 	if (el) { el.innerHTML = ''; el.appendChild(E('span',{'style':'width:6px;height:6px;border-radius:50%;background:'+h.color+';display:inline-block'})); el.appendChild(E('span',{'style':'color:'+h.color+';font-weight:500;font-size:11px'},h.text)); }
 	var cl = document.getElementById(id+'-clients');
-	if (cl) cl.textContent = stats.count+'sta';
+	if (cl) cl.textContent = _('%d clients').format(stats.count);
 	var re = document.getElementById(id+'-retries');
 	if (re) { var rp2 = retryPct(stats); re.textContent = rp2; }
 }
 
 /* ── Frame Engine Diagram (with WiFi bands, NPU, PPE flows) ── */
 function renderFeDiagram(fe, ti, st) {
-	if (!fe || fe.error) return E('div', { 'class': 'soc-muted' }, 'devmem not available on this build');
+	if (!fe || fe.error) return E('div', { 'class': 'soc-muted' }, _('devmem not available on this build'));
 	ti = ti || {}; st = st || {};
 
 	var ports = Array.isArray(fe.pse_ports) ? fe.pse_ports : [];
@@ -184,9 +184,9 @@ function renderFeDiagram(fe, ti, st) {
 				E('span', { 'class': 'soc-muted' }, 'TX'), E('span', { 'class': 'soc-text', 'style': 'text-align:right' }, fmtK(d.tx)),
 				E('span', { 'class': 'soc-muted' }, 'RX'), E('span', { 'class': 'soc-text', 'style': 'text-align:right' }, fmtK(d.rx))
 			].concat(d.tx_drop > 0 ? [
-				E('span', { 'style': 'color:#f44336' }, 'TX Drop'), E('span', { 'style': 'color:#f44336;text-align:right' }, fmtK(d.tx_drop))
+				E('span', { 'style': 'color:#f44336' }, _('TX Drop')), E('span', { 'style': 'color:#f44336;text-align:right' }, fmtK(d.tx_drop))
 			] : []).concat(d.rx_drop > 0 ? [
-				E('span', { 'style': 'color:#f44336' }, 'RX Drop'), E('span', { 'style': 'color:#f44336;text-align:right' }, fmtK(d.rx_drop))
+				E('span', { 'style': 'color:#f44336' }, _('RX Drop')), E('span', { 'style': 'color:#f44336;text-align:right' }, fmtK(d.rx_drop))
 			] : []))
 		]);
 	}
@@ -202,7 +202,7 @@ function renderFeDiagram(fe, ti, st) {
 				E('span', { 'style': 'font-weight:bold;color:#607d8b;font-size:13px' }, name+' '+pse),
 				E('span', { 'class': 'soc-label' }, label)
 			]),
-			E('div', { 'class': 'soc-text', 'style': 'font-size:12px;margin-bottom:4px' }, 'HW Offload: '+pct+'%'),
+			E('div', { 'class': 'soc-text', 'style': 'font-size:12px;margin-bottom:4px' }, _('HW Offload:')+' '+pct+'%'),
 			E('div', { 'class': 'soc-bar-track', 'style': 'height:6px' }, [
 				E('div', { 'style': 'background:'+barCol+';height:100%;width:'+pct+'%;transition:width .5s;border-radius:4px' })
 			]),
@@ -228,7 +228,7 @@ function renderFeDiagram(fe, ti, st) {
 		E('div', { 'style': 'display:flex;gap:12px;font-size:11px;margin-bottom:8px' }, [
 			E('span', { 'class': 'soc-muted' }, 'IQ '+p7.iq),
 			E('span', { 'class': 'soc-muted' }, 'OQ '+p7.oq),
-			p7.drops > 0 ? E('span', { 'style': 'color:#f44336' }, 'Drop '+fmtK(p7.drops)) : null
+			p7.drops > 0 ? E('span', { 'style': 'color:#f44336' }, _('Drop')+' '+fmtK(p7.drops)) : null
 		].filter(Boolean)),
 		// WiFi bands inside
 		E('div', { 'style': 'display:grid;grid-template-columns:repeat(3,1fr);gap:6px' }, bandChips)
@@ -239,28 +239,28 @@ function renderFeDiagram(fe, ti, st) {
 	var npuCard = E('div', { 'class': 'soc-card', 'style': 'border-color:'+(npuActive?'#00bcd4':'var(--soc-border)') }, [
 		E('div', { 'style': 'display:flex;justify-content:space-between;align-items:center;margin-bottom:4px' }, [
 			E('span', { 'style': 'font-weight:bold;color:#00bcd4;font-size:14px' }, 'NPU'),
-			E('span', { 'style': 'background:'+(npuActive?'#00695c':'#666')+';color:#fff;padding:1px 7px;border-radius:3px;font-size:10px;font-weight:600' }, npuActive ? 'ACTIVE' : 'OFF')
+			E('span', { 'style': 'background:'+(npuActive?'#00695c':'#666')+';color:#fff;padding:1px 7px;border-radius:3px;font-size:10px;font-weight:600' }, npuActive ? _('ACTIVE') : _('OFF'))
 		]),
-		E('div', { 'class': 'soc-label', 'style': 'margin-bottom:4px' }, '8x RISC-V via PCIe RAM'),
+		E('div', { 'class': 'soc-label', 'style': 'margin-bottom:4px' }, _('8x RISC-V via PCIe RAM')),
 		E('div', { 'style': 'font-size:11px' }, [
-			E('span', { 'class': 'soc-muted' }, 'Manages: '),
-			E('span', { 'class': 'soc-text', 'style': 'font-size:11px' }, 'PPE init, WDMA rings, flow stats')
+			E('span', { 'class': 'soc-muted' }, _('Manages:')+' '),
+			E('span', { 'class': 'soc-text', 'style': 'font-size:11px' }, _('PPE init, WDMA rings, flow stats'))
 		])
 	]);
 
 	// PPE engines with flow count
 	var ppeCard = E('div', { 'class': 'soc-card', 'style': 'border-color:#2196f3' }, [
 		E('div', { 'style': 'display:flex;justify-content:space-between;align-items:center;margin-bottom:4px' }, [
-			E('span', { 'style': 'font-weight:bold;color:#2196f3;font-size:14px' }, 'PPE Engines'),
+			E('span', { 'style': 'font-weight:bold;color:#2196f3;font-size:14px' }, _('PPE Engines')),
 			E('span', { 'class': 'soc-label' }, 'P4 + P8')
 		]),
 		E('div', { 'style': 'display:flex;gap:16px;font-size:12px' }, [
 			E('span', {}, [
-				E('span', { 'class': 'soc-muted' }, 'Bound '),
+				E('span', { 'class': 'soc-muted' }, _('Bound')+' '),
 				E('span', { 'class': 'soc-text', 'style': 'font-weight:bold', 'id': 'fe-ppe-bound' }, (st.offload_bound||0).toString())
 			]),
 			E('span', {}, [
-				E('span', { 'class': 'soc-muted' }, 'Total '),
+				E('span', { 'class': 'soc-muted' }, _('Total')+' '),
 				E('span', { 'class': 'soc-text', 'id': 'fe-ppe-total' }, (st.offload_total||0).toString())
 			])
 		])
@@ -289,8 +289,8 @@ function renderFeDiagram(fe, ti, st) {
 		// PSE buffer bar
 		E('div', { 'class': 'soc-card', 'style': 'margin-bottom:10px' }, [
 			E('div', { 'style': 'display:flex;justify-content:space-between;margin-bottom:4px' }, [
-				E('span', { 'class': 'soc-text', 'style': 'font-weight:bold;font-size:13px' }, 'PSE Shared Buffer'),
-				E('span', { 'class': 'soc-muted', 'style': 'font-size:12px' }, (fe.pse_used||0)+' used / '+(fe.pse_free||0)+' free ('+pseP+'%)')
+				E('span', { 'class': 'soc-text', 'style': 'font-weight:bold;font-size:13px' }, _('PSE Shared Buffer')),
+				E('span', { 'class': 'soc-muted', 'style': 'font-size:12px' }, _('%d used / %d free (%s%%)').format(fe.pse_used||0, fe.pse_free||0, pseP))
 			]),
 			E('div', { 'class': 'soc-bar-track', 'style': 'height:8px' }, [
 				E('div', { 'style': 'background:'+pseCol+';height:100%;width:'+pseP+'%;border-radius:4px;transition:width .5s' })
@@ -298,7 +298,7 @@ function renderFeDiagram(fe, ti, st) {
 		]),
 		// Row 1: GDM ports
 		E('div', { 'class': 'soc-gdm-grid' }, [
-			gdmCard('gdm1', 'GDM1', 'Internal Switch (1G LAN3/4)', '#ff9800', 'P1'),
+			gdmCard('gdm1', 'GDM1', _('Internal Switch (1G LAN3/4)'), '#ff9800', 'P1'),
 			gdmCard('gdm2', 'GDM2', 'WAN (USXGMII 10G)', '#4caf50', 'P2'),
 			gdmCard('gdm4', 'GDM4', 'LAN2 (USXGMII 10G)', '#4caf50', 'P9')
 		]),
@@ -314,7 +314,7 @@ function renderFeDiagram(fe, ti, st) {
 			npuCard
 		]),
 		// PSE port grid
-		E('div', { 'class': 'soc-text', 'style': 'font-size:12px;font-weight:600;margin-bottom:6px' }, 'PSE Port Queue Status'),
+		E('div', { 'class': 'soc-text', 'style': 'font-size:12px;font-weight:600;margin-bottom:6px' }, _('PSE Port Queue Status')),
 		E('div', { 'class': 'soc-pse-grid' }, portCells)
 	]);
 }
@@ -331,7 +331,7 @@ function renderFreqBar(hw, min, max, pll, gov) {
 	var pct = Math.round(((s.freq-min)/(s.max-min))*100);
 	pct = Math.max(0,Math.min(100,pct));
 	var bg = s.oc ? 'linear-gradient(90deg,#e65100,#ff9800)' : 'linear-gradient(90deg,#2e7d32,#66bb6a)';
-	var label = s.oc ? (pll+' MHz (OC)') : fmtFreq(s.freq);
+	var label = s.oc ? (_('%s MHz (OC)').format(pll)) : fmtFreq(s.freq);
 
 	return E('div', { 'id':'cpu-freq-bar-wrap', 'style':'display:flex;align-items:center;gap:10px' }, [
 		E('span', { 'class':'soc-muted', 'style':'font-size:90%' }, fmtFreq(min)),
@@ -346,7 +346,7 @@ function renderFreqBar(hw, min, max, pll, gov) {
 function updateFreqBar(hw, min, max, pll, gov) {
 	var s = freqBarState(hw,min,max,pll,gov);
 	var el = document.getElementById('cpu-freq-text'), fl = document.getElementById('cpu-freq-fill'), ml = document.getElementById('cpu-freq-max-label');
-	if (el) el.textContent = s.oc ? (pll+' MHz (OC)') : fmtFreq(s.freq);
+	if (el) el.textContent = s.oc ? (_('%s MHz (OC)').format(pll)) : fmtFreq(s.freq);
 	if (fl && s.max>0) { var pct=Math.max(0,Math.min(100,Math.round(((s.freq-min)/(s.max-min))*100))); fl.style.width=pct+'%'; fl.style.background=s.oc?'linear-gradient(90deg,#e65100,#ff9800)':'linear-gradient(90deg,#2e7d32,#66bb6a)'; }
 	if (ml) ml.textContent = fmtFreq(s.max);
 }
@@ -356,7 +356,7 @@ function renderGovSelect(avail, active) {
 	if (!gs.length) return E('span',{},'N/A');
 	return E('select', { 'id':'cpu-governor-select','class':'cbi-input-select','style':'min-width:140px','change':function(ev){
 		var g=ev.target.value; ev.target.disabled=true;
-		callSetGovernor(g).then(function(r){ev.target.disabled=false;if(r&&r.error) ui.addNotification(null,E('p',{},_('Error: ')+r.error),'error');}).catch(function(){ev.target.disabled=false;});
+		callSetGovernor(g).then(function(r){ev.target.disabled=false;if(r&&r.error) ui.addNotification(null,E('p',{},_('Error:')+' '+r.error),'error');}).catch(function(){ev.target.disabled=false;});
 	}}, gs.map(function(g){return E('option',{'value':g,'selected':g===active?'':null},g);}));
 }
 
@@ -365,7 +365,7 @@ function renderMaxFreqSelect(avail, cur) {
 	if (!fs.length) return E('span',{},'N/A');
 	return E('select', { 'id':'cpu-maxfreq-select','class':'cbi-input-select','style':'min-width:140px','change':function(ev){
 		var f=ev.target.value; ev.target.disabled=true;
-		callSetMaxFreq(parseInt(f)).then(function(r){ev.target.disabled=false;if(r&&r.error) ui.addNotification(null,E('p',{},_('Error: ')+r.error),'error');}).catch(function(){ev.target.disabled=false;});
+		callSetMaxFreq(parseInt(f)).then(function(r){ev.target.disabled=false;if(r&&r.error) ui.addNotification(null,E('p',{},_('Error:')+' '+r.error),'error');}).catch(function(){ev.target.disabled=false;});
 	}}, fs.map(function(f){return E('option',{'value':f,'selected':parseInt(f)===parseInt(cur)?'':null},(parseInt(f)/1000).toFixed(0)+' MHz');}));
 }
 
@@ -374,11 +374,11 @@ function renderOcControls() {
 	var btn = E('button',{'class':'cbi-button cbi-button-action','style':'margin-left:8px','click':function(){
 		var f=parseInt(document.getElementById('oc-freq-input').value);
 		if(isNaN(f)||f<500||f>1600){ui.addNotification(null,E('p',{},_('Must be 500-1600 MHz')),'error');return;}
-		if(f>1400&&!confirm('Frequencies above 1400 MHz may be unstable. Continue?')) return;
+		if(f>1400&&!confirm(_('Frequencies above 1400 MHz may be unstable. Continue?'))) return;
 		btn.disabled=true;btn.textContent=_('Applying...');
 		callSetOverclock(f).then(function(r){btn.disabled=false;btn.textContent=_('Apply');
-			if(r&&r.error) ui.addNotification(null,E('p',{},_('Failed: ')+r.error),'error');
-			else if(r&&r.result==='ok') ui.addNotification(null,E('p',{},_('CPU set to ')+r.actual_mhz+' MHz'),'info');
+			if(r&&r.error) ui.addNotification(null,E('p',{},_('Failed:')+' '+r.error),'error');
+			else if(r&&r.result==='ok') ui.addNotification(null,E('p',{},_('CPU set to')+' '+r.actual_mhz+' MHz'),'info');
 		}).catch(function(e){btn.disabled=false;btn.textContent=_('Apply');});
 	}},_('Apply'));
 	return E('div',{'style':'display:flex;align-items:center;gap:8px;flex-wrap:wrap'},[
@@ -434,9 +434,9 @@ return view.extend({
 							E('span',{'class':'label-success'},_('Active')+(st.npu_device?' ('+st.npu_device+')':'')) :
 							E('span',{'class':'label-danger'},_('Not Active'))) ]),
 					E('tr',{'class':'tr'},[ E('td',{'class':'td'},E('strong',{},_('Firmware / Clock / Cores'))),
-						E('td',{'class':'td','id':'npu-info'}, (st.npu_version||'N/A')+' | '+(st.npu_clock?(st.npu_clock/1e6).toFixed(0)+' MHz':'N/A')+' | '+(st.npu_cores||0)+' cores') ]),
+						E('td',{'class':'td','id':'npu-info'}, (st.npu_version||'N/A')+' | '+(st.npu_clock?(st.npu_clock/1e6).toFixed(0)+' MHz':'N/A')+' | '+_('%d cores').format(st.npu_cores||0)) ]),
 					E('tr',{'class':'tr'},[ E('td',{'class':'td'},E('strong',{},_('Reserved Memory'))),
-						E('td',{'class':'td','id':'npu-memory'}, calcTotalMem(memR)+' ('+memR.length+' regions)') ])
+						E('td',{'class':'td','id':'npu-memory'}, _('%s (%d regions)').format(calcTotalMem(memR), memR.length)) ])
 				]),
 
 				// Frame Engine diagram (includes WiFi bands, PPE flows, NPU indicator)
