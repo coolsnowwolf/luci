@@ -23,7 +23,7 @@ elif [ -e "/lib/modules/$kernel_ver/mtkhnat.ko" ]; then
 	uci -q set "turboacc.config.fastpath_mh_eth_hnat_wed"="0"
 elif [ -e "/lib/modules/$kernel_ver/xt_FLOWOFFLOAD.ko" ]; then
 	uci -q set "turboacc.config.fastpath"="flow_offloading"
-	if grep -q "mt762" "/etc/openwrt_release"; then
+	if grep -qE "mt762|^DISTRIB_TARGET=['\"]?airoha/" "/etc/openwrt_release"; then
 		uci -q set "turboacc.config.fastpath_fo_hw"="1"
 	else
 		uci -q set "turboacc.config.fastpath_fo_hw"="0"
