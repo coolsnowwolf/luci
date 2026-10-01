@@ -15,10 +15,13 @@
 		},
 		"write": {
 			"file": {
-				"/etc/firewall.user": [ "write" ]
+				"/etc/firewall.user": [ "write" ],
+				"/bin/sh -n /etc/firewall.user": [ "exec" ],
+				"/etc/init.d/firewall restart": [ "exec" ]
 			},
 			"ubus": {
-				"file": [ "write" ]
+				"file": [ "write", "exec" ],
+				"uci": [ "commit" ]
 			},
 			"uci": [ "firewall" ]
 		}

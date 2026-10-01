@@ -1435,3 +1435,23 @@ msgstr ""
 #: applications/luci-app-firewall/htdocs/luci-static/resources/tools/firewall.js:338
 msgid "valid firewall mark"
 msgstr ""
+
+#: applications/luci-app-firewall/htdocs/luci-static/resources/view/firewall/custom.js
+msgid "Custom rules are shell commands executed after each firewall restart, after the default ruleset has been loaded. Use nft commands for the nftables firewall. Saving applies the rules immediately."
+msgstr ""
+
+#: applications/luci-app-firewall/htdocs/luci-static/resources/view/firewall/custom.js
+msgid "Custom rules have been saved and applied."
+msgstr ""
+
+#: applications/luci-app-firewall/htdocs/luci-static/resources/view/firewall/custom.js
+msgid "Unable to save or apply custom rules: %s"
+msgstr ""
+
+#: applications/luci-app-firewall/htdocs/luci-static/resources/view/firewall/custom.js
+msgid "Invalid shell script."
+msgstr ""
+
+#: applications/luci-app-firewall/htdocs/luci-static/resources/view/firewall/custom.js
+msgid "Unable to restart the firewall."
+msgstr ""

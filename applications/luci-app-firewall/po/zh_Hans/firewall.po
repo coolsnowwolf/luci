@@ -345,7 +345,7 @@ msgid "TCP congestion control algorithm."
 msgstr "TCP 拥塞控制算法。"
 
 msgid "Running status: %s, TCP congestion control algorithm is %s"
-msgstr "当前运行状态：%s，TCP 拥塞控制算法为 %s"
+msgstr "当前NAT1状态：%s，TCP 拥塞控制算法为 %s"
 
 msgid "Broadcom Fullcone NAT1"
 msgstr "Broadcom Fullcone NAT1"
@@ -1567,3 +1567,23 @@ msgstr "最多 65536 个条目。"
 #: applications/luci-app-firewall/htdocs/luci-static/resources/tools/firewall.js:338
 msgid "valid firewall mark"
 msgstr "有效的防火墙标记"
+
+#: applications/luci-app-firewall/htdocs/luci-static/resources/view/firewall/custom.js
+msgid "Custom rules are shell commands executed after each firewall restart, after the default ruleset has been loaded. Use nft commands for the nftables firewall. Saving applies the rules immediately."
+msgstr "自定义规则是 Shell 命令，每次防火墙重启并加载默认规则后执行。nftables 防火墙请使用 nft 命令。保存后立即应用规则。"
+
+#: applications/luci-app-firewall/htdocs/luci-static/resources/view/firewall/custom.js
+msgid "Custom rules have been saved and applied."
+msgstr "自定义规则已保存并应用。"
+
+#: applications/luci-app-firewall/htdocs/luci-static/resources/view/firewall/custom.js
+msgid "Unable to save or apply custom rules: %s"
+msgstr "无法保存或应用自定义规则：%s"
+
+#: applications/luci-app-firewall/htdocs/luci-static/resources/view/firewall/custom.js
+msgid "Invalid shell script."
+msgstr "Shell 脚本语法错误。"
+
+#: applications/luci-app-firewall/htdocs/luci-static/resources/view/firewall/custom.js
+msgid "Unable to restart the firewall."
+msgstr "无法重启防火墙。"

@@ -1553,3 +1553,23 @@ msgstr "最多 65536 個條目。"
 #: applications/luci-app-firewall/htdocs/luci-static/resources/tools/firewall.js:338
 msgid "valid firewall mark"
 msgstr "有效防火牆標記"
+
+#: applications/luci-app-firewall/htdocs/luci-static/resources/view/firewall/custom.js
+msgid "Custom rules are shell commands executed after each firewall restart, after the default ruleset has been loaded. Use nft commands for the nftables firewall. Saving applies the rules immediately."
+msgstr "自訂規則是 Shell 指令，每次防火牆重新啟動並載入預設規則後執行。nftables 防火牆請使用 nft 指令。儲存後立即套用規則。"
+
+#: applications/luci-app-firewall/htdocs/luci-static/resources/view/firewall/custom.js
+msgid "Custom rules have been saved and applied."
+msgstr "自訂規則已儲存並套用。"
+
+#: applications/luci-app-firewall/htdocs/luci-static/resources/view/firewall/custom.js
+msgid "Unable to save or apply custom rules: %s"
+msgstr "無法儲存或套用自訂規則：%s"
+
+#: applications/luci-app-firewall/htdocs/luci-static/resources/view/firewall/custom.js
+msgid "Invalid shell script."
+msgstr "Shell 指令碼語法錯誤。"
+
+#: applications/luci-app-firewall/htdocs/luci-static/resources/view/firewall/custom.js
+msgid "Unable to restart the firewall."
+msgstr "無法重新啟動防火牆。"
