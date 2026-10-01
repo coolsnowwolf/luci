@@ -49,11 +49,10 @@
 				<%
 					local empty = true
 					for _, iface in ipairs(net:is_bridge() and net:get_interfaces() or { net:get_interface() }) do
-						if not iface:is_bridge() then
-							empty = false
+						empty = false
 				-%>
 					<img<%=attr("title", iface:get_i18n())%> style="width:16px; height:16px; vertical-align:middle" src="<%=resource%>/icons/<%=iface:type()%><%=iface:is_up() and "" or "_disabled"%>.svg" />
-				<%- end end %>
+				<%- end %>
 				<% if empty then %>
 					<em class="hide-close"><%:(no interfaces attached)%></em>
 					<em class="hide-open">-</em>
