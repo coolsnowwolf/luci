@@ -27,43 +27,11 @@ jobs:
 
       - name: Sync application directories
         shell: bash
-        env:
-          GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
 
           work_dir="$(mktemp -d)"
           trap 'rm -rf "$work_dir"' EXIT
-
-          apply_homeproxy_patch() {
-            local checkout_dir="$1"
-            local patch_file="$GITHUB_WORKSPACE/.github/patches/homeproxy/672-cache-singbox-features.patch"
-            local merged
-
-            merged="$(gh api repos/immortalwrt/homeproxy/pulls/672 --jq '.merged')"
-            case "$merged" in
-              true)
-                echo 'HomeProxy PR #672 is merged; skipping the local patch.'
-                return 0
-                ;;
-              false) ;;
-              *)
-                echo '::error::Unable to determine the merge status of HomeProxy PR #672.'
-                return 1
-                ;;
-            esac
-
-            if patch --directory="$checkout_dir" -p1 --fuzz=0 --batch --force --reverse --dry-run \
-              < "$patch_file" > /dev/null 2>&1; then
-              echo 'HomeProxy PR #672 is already present; skipping the local patch.'
-              return 0
-            fi
-
-            patch --directory="$checkout_dir" -p1 --fuzz=0 --batch --forward --dry-run < "$patch_file"
-            patch --directory="$checkout_dir" -p1 --fuzz=0 --batch --forward < "$patch_file"
-            chmod +x "$checkout_dir/root/etc/uci-defaults/luci-homeproxy-features"
-            echo 'Applied the local patch for HomeProxy PR #672.'
-          }
 
           sync_app() {
             local repository="$1"
@@ -88,10 +56,6 @@ jobs:
               return 0
             fi
 
-            if [[ "$repository" == 'immortalwrt/homeproxy' ]]; then
-              apply_homeproxy_patch "$checkout_dir"
-            fi
-
             mkdir -p "$destination"
             rsync --archive --delete --exclude='/.git/' --exclude='/.github/' "$checkout_dir/$source_path/" "$destination/"
           }
@@ -108,7 +72,7 @@ jobs:
             "luci-app-mosdns" "applications/luci-app-mosdns"
           sync_app "QiuSimons/luci-app-daed" "kix" \
             "luci-app-daed" "applications/luci-app-daed"
-          sync_app "immortalwrt/homeproxy" "master" \
+          sync_app "coolsnowwolf/homeproxy" "lean" \
             "." "applications/luci-app-homeproxy"
 
       - name: Commit and push changes
