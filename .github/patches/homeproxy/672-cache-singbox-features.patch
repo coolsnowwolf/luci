@@ -1,0 +1,105 @@
+From: coolsnowwolf <coolsnowwolf@gmail.com>
+Subject: [PATCH] homeproxy: cache sing-box features to speed up first page load
+
+Avoid starting the large sing-box executable on every LuCI visit. Cache
+successful version/build-tag probes by executable identity and prime the
+cache at installation or first boot. Keep runtime capability checks live.
+
+Upstream-Status: Submitted [https://github.com/immortalwrt/homeproxy/pull/672]
+Signed-off-by: coolsnowwolf <coolsnowwolf@gmail.com>
+
+--- a/root/etc/homeproxy/scripts/singbox_features.uc
++++ b/root/etc/homeproxy/scripts/singbox_features.uc
+@@ -0,0 +1,49 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++
++'use strict';
++
++import { popen, readfile, stat, writefile } from 'fs';
++
++const binary = '/usr/bin/sing-box';
++const cache = '/etc/homeproxy/sing-box-features.json';
++
++function binaryIdentity() {
++	const st = stat(binary);
++	return st ? sprintf('%J', [st.dev, st.inode, st.size, st.mtime, st.ctime]) : null;
++}
++
++export function getSingBoxFeatures() {
++	const identity = binaryIdentity();
++	if (!identity)
++		return {};
++
++	/* Keep the large Go executable off the page load path, even after reboot. */
++	try {
++		const saved = json(readfile(cache));
++		if (saved?.identity === identity && type(saved.features) === 'object' &&
++		    type(saved.features.version) === 'string' && length(saved.features.version))
++			return saved.features;
++	} catch (e) {}
++
++	let features = {};
++	const fd = popen(`${binary} version`);
++	if (!fd)
++		return features;
++
++	for (let line = fd.read('line'); length(line); line = fd.read('line')) {
++		const version = match(trim(line), /^sing-box version (.+)/);
++		if (version)
++			features.version = version[1];
++
++		const tags = match(trim(line), /^Tags: (.*)/);
++		if (tags)
++			for (let tag in split(tags[1], ','))
++				features[tag] = true;
++	}
++
++	/* Never persist failed probes or results from a binary replaced mid-probe. */
++	if (fd.close() === 0 && features.version && identity === binaryIdentity())
++		writefile(cache, sprintf('%J\n', { identity, features }));
++
++	return features;
++};
+--- a/root/etc/uci-defaults/luci-homeproxy-features
++++ b/root/etc/uci-defaults/luci-homeproxy-features
+@@ -0,0 +1,6 @@
++#!/bin/sh
++
++# Probe once at installation/first boot instead of blocking the first LuCI visit.
++ucode -e 'import { getSingBoxFeatures } from "/etc/homeproxy/scripts/singbox_features.uc"; getSingBoxFeatures();'
++
++exit 0
+--- a/root/usr/share/rpcd/ucode/luci.homeproxy
++++ b/root/usr/share/rpcd/ucode/luci.homeproxy
+@@ -8,6 +8,7 @@
+ 'use strict';
+ 
+ import { access, error, lstat, popen, readfile, writefile } from 'fs';
++import { getSingBoxFeatures } from '/etc/homeproxy/scripts/singbox_features.uc';
+ 
+ /* Kanged from ucode/luci */
+ function shellquote(s) {
+@@ -205,22 +206,7 @@
+ 
+ 	singbox_get_features: {
+ 		call: function() {
+-			let features = {};
+-
+-			const fd = popen('/usr/bin/sing-box version');
+-			if (fd) {
+-				for (let line = fd.read('line'); length(line); line = fd.read('line')) {
+-					if (match(trim(line), /^sing-box version (.*)/))
+-						features.version = match(trim(line), /^sing-box version (.*)/)[1];
+-
+-					let tags = match(trim(line), /^Tags: (.*)/);
+-					if (tags)
+-						for (let i in split(tags[1], ','))
+-							features[i] = true;
+-				}
+-
+-				fd.close();
+-			}
++			let features = getSingBoxFeatures();
+ 
+ 			features.hp_has_ip_full = access('/usr/libexec/ip-full');
+ 			features.hp_has_tcp_brutal = hasKernelModule('brutal.ko');
