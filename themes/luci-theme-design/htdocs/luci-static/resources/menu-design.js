@@ -19,10 +19,7 @@ return baseclass.extend({
 		this.dynamicMenuTargets = {};
 
 		this.syncConditionalMenuCache()
-			.then(L.bind(function(reloading) {
-				if (reloading)
-					return;
-
+			.then(L.bind(function() {
 				return this.resolveDynamicMenuTargets()
 					.then(L.bind(function() {
 						return ui.menu.load().then(L.bind(this.render, this));
@@ -68,13 +65,6 @@ return baseclass.extend({
 			return L.url.apply(L, target.split('/'));
 
 		return L.url(url, child.name);
-	},
-
-	reloadPageWithMenuFlush: function() {
-		var url = new URL(window.location.href);
-
-		url.searchParams.set('menu', 'flush');
-		window.location.replace(url.toString());
 	},
 
 	getFileListStamp: function(path, suffix) {
@@ -126,12 +116,11 @@ return baseclass.extend({
 			if (previousStamp === stamp)
 				return false;
 
-			window.localStorage.setItem(storageKey, stamp);
-
-			return this.flushBackendMenuCache().then(L.bind(function() {
-				this.reloadPageWithMenuFlush();
-				return true;
-			}, this));
+			return this.flushBackendMenuCache().then(function() {
+				// Reload only the menu: navigating here can abort form saves.
+				ui.menu.menu = null;
+				window.localStorage.setItem(storageKey, stamp);
+			});
 		}, this));
 	},
 
