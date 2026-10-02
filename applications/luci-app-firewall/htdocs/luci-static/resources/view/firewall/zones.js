@@ -116,7 +116,8 @@ return view.extend({
 
 		/* Netfilter flow offload support */
 
-		if (L.hasSystemFeature('offloading')) {
+		const hasMediatekHNAT = fw4 && runtimeStatus?.hnat_available === true;
+		if (L.hasSystemFeature('offloading') || hasMediatekHNAT) {
 			s = m.section(form.TypedSection, 'defaults', _('Routing/NAT Offloading'),
 				_('Not fully compatible with QoS/SQM.'));
 
@@ -128,17 +129,22 @@ return view.extend({
 			o.value('1', _("Software flow offloading"), _('Software based offloading for routing/NAT.'));
 			if (L.hasSystemFeature('offloading_hw'))
 				o.value('2', _("Hardware flow offloading"), _('Hardware based offloading for routing with/without NAT.') + ' ' + _(' Requires hardware NAT support.'));
+			if (hasMediatekHNAT)
+				o.value('3', "Mediatek HNAT", "基于Mediatek原厂闭源驱动的HNAT卸载");
 			o.optional = false;
 			o.load = function (section_id) {
 				const flow_offloading = uci.get('firewall', section_id, 'flow_offloading');
 				const flow_offloading_hw = uci.get('firewall', section_id, 'flow_offloading_hw');
 				const has_hw_offloading = L.hasSystemFeature('offloading_hw');
+				if (hasMediatekHNAT && flow_offloading === '3')
+					return '3';
 				return (flow_offloading === '1')
 					? ((flow_offloading_hw === '1' && has_hw_offloading) ? '2' : '1')
 					: '0';
 			};
 			o.write = function(section_id, value) {
-				uci.set('firewall', section_id, 'flow_offloading', value === '0' ? null : '1');
+				uci.set('firewall', section_id, 'flow_offloading', value === '3' ? '3' : ((value === '1' || value === '2') ? '1' : '0'));
+				uci.unset('firewall', section_id, 'mediatek_hnat');
 				uci.set('firewall', section_id, 'flow_offloading_hw',
 					(value === '2' && L.hasSystemFeature('offloading_hw')) ? '1' : null);
 			};
