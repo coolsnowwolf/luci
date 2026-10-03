@@ -2,7 +2,7 @@ msgid ""
 msgstr "Content-Type: text/plain; charset=UTF-8"
 
 #: applications/luci-app-ksmbd/htdocs/luci-static/resources/view/ksmbd.js:58
-msgid "Add optional guest access to IPC$ share, disabled by default"
+msgid "Allow anonymous clients to list shared directories."
 msgstr ""
 
 #: applications/luci-app-ksmbd/htdocs/luci-static/resources/view/ksmbd.js:57

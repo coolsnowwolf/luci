@@ -55,7 +55,9 @@ return view.extend({
 		o.placeholder = 'Ksmbd on OpenWrt';
 		
 		o = s.taboption('general', form.Flag, 'allow_guest_ipc', _('Allow guest on IPC$.'),
-			_('Add optional guest access to IPC$ share, disabled by default'));
+			_('Allow anonymous clients to list shared directories.'));
+		o.default = '1';
+		o.rmempty = false;
 
 		o = s.taboption('general', form.Flag, 'allow_legacy_protocols', _('Allow legacy (insecure) protocols/authentication.'),
 			_('Allow legacy smb(v1)/Lanman connections, needed for older devices without smb(v2.1/3) support.'));
