@@ -83,8 +83,8 @@ function renderbox(ifc, ipv6, dhcpv6_stats) {
 return baseclass.extend({
 	title: _('Network'),
 
-	wanCapacity(networks) {
-		const lower = new Map(), ports = new Map();
+	wanDevices(networks) {
+		const lower = new Map(), devices = new Map();
 		for (const net of networks) {
 			const l3 = net.getL3Device(), l2 = net.getL2Device();
 			if (l3 && l2 && l3.getName() != l2.getName())
@@ -101,12 +101,19 @@ return baseclass.extend({
 					break;
 				dev = parent;
 			}
-			if (dev) {
-				const speed = Number(dev.getSpeed());
-				ports.set(dev.getName(), Number.isFinite(speed) && speed > 0 && speed < 0xffffffff ? speed : 1000);
-			}
+			if (dev)
+				devices.set(dev.getName(), dev);
 		}
-		return Array.from(ports.values()).reduce((sum, speed) => sum + speed, 0) || 1000;
+		return devices;
+	},
+
+	wanCapacity(devices) {
+		let capacity = 0;
+		for (const dev of devices.values()) {
+			const speed = Number(dev.getSpeed());
+			capacity += Number.isFinite(speed) && speed > 0 && speed < 0xffffffff ? speed : 1000;
+		}
+		return capacity || 1000;
 	},
 
 	bandwidthBar(value, capacity) {
@@ -121,14 +128,11 @@ return baseclass.extend({
 		}, E('div', { 'style': 'width:%.2f%%'.format(Math.min(100, percent)) }));
 	},
 
-	wanRates(networks, now) {
+	wanRates(devices, now) {
 		const previous = this.wanSamples || new Map();
 		const samples = new Map();
 		let download = 0, upload = 0, ready = true;
-		for (const net of networks) {
-			const dev = net.getL3Device();
-			if (!dev || samples.has(dev.getName()))
-				continue;
+		for (const dev of devices.values()) {
 			const name = dev.getName();
 			const sample = { rx: dev.getRXBytes(), tx: dev.getTXBytes(), time: now };
 			const old = previous.get(name);
@@ -159,8 +163,9 @@ return baseclass.extend({
 	render([ct_count, ct_max, wan_nets, wan6_nets, dhcpv6_stats, onlineusers]) {
 
 		const networks = [...wan_nets, ...wan6_nets];
-		const [download, upload] = this.wanRates(networks, performance.now());
-		const capacity = this.wanCapacity(networks);
+		const devices = this.wanDevices(networks);
+		const [download, upload] = this.wanRates(devices, performance.now());
+		const capacity = this.wanCapacity(devices);
 
 		const fields = [
 			{ label: _('Active Connections'), value: ct_max ? ct_count : null },
