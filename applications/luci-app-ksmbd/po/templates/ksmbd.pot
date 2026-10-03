@@ -141,3 +141,6 @@ msgstr ""
 
 msgid "Mask for new directories"
 msgstr ""
+
+msgid "Hostname"
+msgstr ""

@@ -156,3 +156,6 @@ msgstr "新文件权限掩码"
 
 msgid "Mask for new directories"
 msgstr "新目录权限掩码"
+
+msgid "Hostname"
+msgstr "主机名"

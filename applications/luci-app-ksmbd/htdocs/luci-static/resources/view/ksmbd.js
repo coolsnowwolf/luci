@@ -8,6 +8,7 @@ return view.extend({
 		return Promise.all([
 			L.resolveDefault(fs.stat('/sbin/block'), null),
 			L.resolveDefault(fs.stat('/etc/config/fstab'), null),
+			L.resolveDefault(fs.trimmed('/proc/sys/kernel/hostname'), ''),
 		]);
 	},
 	render: function(stats) {
@@ -24,6 +25,12 @@ return view.extend({
 		o = s.taboption('general', form.Flag, 'enabled', _('Enable'));
 		o.default = '1';
 		o.rmempty = false;
+
+		o = s.taboption('general', form.Value, 'name', _('Hostname'));
+		o.placeholder = stats[2].split('.')[0];
+		o.datatype = 'hostname';
+		o.maxlength = 15;
+		o.rmempty = true;
 
 		o = s.taboption('general', form.Value, 'description', _('Description'));
 		o.placeholder = 'Ksmbd on OpenWrt';

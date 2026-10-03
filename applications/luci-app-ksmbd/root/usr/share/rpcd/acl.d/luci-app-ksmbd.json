@@ -3,7 +3,8 @@
 		"description": "Grant access to LuCI app ksmbd",
 		"read": {
 			"file": {
-				"/etc/ksmbd/ksmbd.conf.template": [ "read" ]
+				"/etc/ksmbd/ksmbd.conf.template": [ "read" ],
+				"/proc/sys/kernel/hostname": [ "read" ]
 			},
 			"uci": [ "ksmbd" ]
 		},
