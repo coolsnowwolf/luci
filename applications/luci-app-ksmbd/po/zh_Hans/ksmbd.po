@@ -18,6 +18,9 @@ msgstr ""
 msgid "Allow anonymous clients to list shared directories."
 msgstr "允许匿名客户端列出共享目录。"
 
+msgid "Enable"
+msgstr "启用"
+
 #: applications/luci-app-ksmbd/htdocs/luci-static/resources/view/ksmbd.js:57
 msgid "Allow guest on IPC$."
 msgstr "允许访客访问 IPC$。"
