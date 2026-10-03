@@ -120,3 +120,24 @@ msgstr ""
 #: applications/luci-app-ksmbd/htdocs/luci-static/resources/view/ksmbd.js:51
 msgid "Workgroup"
 msgstr ""
+
+msgid "Share home-directories"
+msgstr ""
+
+msgid "Allow system users to reach their home directories via network shares"
+msgstr ""
+
+msgid "Auto Share"
+msgstr ""
+
+msgid "Auto share local disk which connected"
+msgstr ""
+
+msgid "Browseable"
+msgstr ""
+
+msgid "Mask for new files"
+msgstr ""
+
+msgid "Mask for new directories"
+msgstr ""

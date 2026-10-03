@@ -3,7 +3,7 @@
 include $(TOPDIR)/rules.mk
 
 LUCI_TITLE:=Network Shares - Ksmbd the SMB kernel fileserver
-LUCI_DEPENDS:=+luci-base +ksmbd-server
+LUCI_DEPENDS:=+luci-base +ksmbd-server +ksmbd-hotplug
 
 PKG_LICENSE:=Apache-2.0
 PKG_MAINTAINER:=Richard Yu <yurichard3839@gmail.com>
