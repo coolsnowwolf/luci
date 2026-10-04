@@ -254,11 +254,11 @@ function loadIwinfoResolver(force) {
 
 	const configuredDevices = getIwinfoDevicesFromConfig();
 	const deviceRequest = configuredDevices != null
-		? Promise.resolve({ devices: configuredDevices })
-		: L.resolveDefault(callIwinfoDevices(), {});
+		? Promise.resolve(configuredDevices)
+		: L.resolveDefault(callIwinfoDevices(), []);
 
-	cachedIwinfoResolverPromise = deviceRequest.then((res) => {
-		cachedIwinfoResolver = buildIwinfoResolver(res?.devices, configuredDevices != null);
+	cachedIwinfoResolverPromise = deviceRequest.then((devices) => {
+		cachedIwinfoResolver = buildIwinfoResolver(devices, configuredDevices != null);
 		cachedIwinfoResolverPromise = null;
 		return cachedIwinfoResolver;
 	}).catch(() => {
@@ -1217,7 +1217,7 @@ function probeAssocListCandidates(candidates, probeFn) {
 
 	function tryNext() {
 		if (index >= candidates.length)
-			return [];
+			return Promise.resolve([]);
 
 		return probeFn(candidates[index++]).then((entries) => {
 			if (Array.isArray(entries) && entries.length)

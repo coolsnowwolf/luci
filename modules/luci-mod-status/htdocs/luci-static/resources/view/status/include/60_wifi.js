@@ -546,7 +546,7 @@ function probeAssocListCandidates(candidates, probeFn) {
 
 	function tryNext() {
 		if (index >= candidates.length)
-			return [];
+			return Promise.resolve([]);
 
 		return probeFn(candidates[index++]).then((entries) => {
 			if (Array.isArray(entries) && entries.length)
@@ -604,8 +604,8 @@ return baseclass.extend({
 	}),
 
 	loadIwinfoResolver(radios, networks) {
-		return L.resolveDefault(callIwinfoDevices(), {}).then((res) => {
-			return buildIwinfoResolver(radios, networks, res?.devices);
+		return L.resolveDefault(callIwinfoDevices(), []).then((devices) => {
+			return buildIwinfoResolver(radios, networks, devices);
 		}).catch(() => ({
 			deviceLookup: Object.create(null),
 			aliasMap: Object.create(null),
