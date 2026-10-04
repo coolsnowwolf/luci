@@ -28,7 +28,7 @@ function parseIwDevMap(stdout) {
 	return Object.entries(byPhy).reduce((map, entry) => {
 		const phy = entry[0];
 		const ifaces = entry[1];
-		const preferred = ifaces.find((ifname) => !/^wifi\d+$/.test(ifname)) || ifaces[0];
+		const preferred = ifaces.find((ifname) => !/^(wifi\d+$|tmpsta\d+$|tmp\.)/.test(ifname)) || ifaces.find((ifname) => /^wifi\d+$/.test(ifname)) || ifaces[0];
 		const temp = `tmpsta${phy.replace(/^phy/, '')}`;
 
 		ifaces.forEach((ifname) => {
@@ -374,7 +374,19 @@ return view.extend({
 			.finally(L.bind(this.cleanupTemporaryScanIface, this, tempIfname));
 	},
 
+	isQcaRadio(radioDev) {
+		return ['qcawifi', 'qcawificfg80211'].includes(radioDev.get('type'));
+	},
+
 	resolveScanDevice(radioDev) {
+		if (this.isQcaRadio(radioDev)) {
+			// QCA netifd may expose logical wifiN.networkM names instead of VAPs.
+			const radio = this.iwDevMap?.[radioDev.getName()];
+			const ifname = radio?.preferred;
+			if (!ifname || ifname == radioDev.getName())
+				return Promise.reject(new Error(_('No active wireless interface found for %s').format(radioDev.getName())));
+			return Promise.resolve(ifname);
+		}
 		return radioDev.getWifiNetworks().then((networks) => {
 			const ap = networks.find(net => net.getMode() == 'ap') || networks[0];
 			return ap?.getIfname() || radioDev.getName();
@@ -386,6 +398,15 @@ return view.extend({
 			return radioDev.getScanList();
 
 		return this.resolveScanDevice(radioDev).then((scanIfname) => {
+			if (this.isQcaRadio(radioDev)) {
+				// QCA STA teardown also stops AP VAPs through the repeater state machine.
+				// Scan the existing VAP without changing the radio topology.
+				return fs.exec('/usr/sbin/iw', [ 'dev', scanIfname, 'scan', 'ap-force' ]).then((res) => {
+					if (res.code !== 0 || /scan aborted!/i.test(res.stdout || ''))
+						throw new Error(res.stderr?.trim() || res.stdout?.trim() || _('Wireless scan failed'));
+					return parseIwScan(res.stdout);
+				});
+			}
 			const iwDev = this.iwDevMap?.[scanIfname] || this.iwDevMap?.[radioDev.getName()];
 			const scanTasks = [];
 
@@ -793,24 +814,19 @@ return view.extend({
 		return Promise.all([
 			this.loadSVG(L.resource('svg/channel_analysis.svg')),
 			L.resolveDefault(fs.exec('/usr/sbin/iw', [ 'dev' ]), null),
-			network.getWifiDevices().then(L.bind(function(data) {
-				const tasks = [], ret = [];
+			network.getWifiDevices()
+		]).then(([svg, iwDevs, devices]) => {
+			this.iwDevMap = parseIwDevMap(iwDevs?.stdout);
+			const ret = {};
 
-				for (let d of data) {
-					ret[d.getName()] = { dev : d };
-
-					tasks.push(this.callFrequencyList(d.getName())
-					.then(L.bind(function(radio, data) {
-						ret[radio.getName()].freq = data;
-					}, this, d)));
-				}
-
-				return Promise.all(tasks).then(function() { return ret; })
-			}, this))
-		]).then((data) => {
-			this.iwDevMap = parseIwDevMap(data[1]?.stdout);
-
-			return [ data[0], data[2] ];
+			return Promise.all(devices.map((dev) => {
+				const name = dev.getName();
+				// Query an existing QCA VAP; querying wifiN creates a temporary VAP.
+				const target = this.isQcaRadio(dev) ? this.iwDevMap[name]?.preferred : name;
+				const freqs = target && (!this.isQcaRadio(dev) || target != name)
+					? this.callFrequencyList(target) : Promise.resolve([]);
+				return freqs.then((freq) => { ret[name] = { dev, freq }; });
+			})).then(() => [svg, ret]);
 		});
 	},
 
