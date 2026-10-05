@@ -135,6 +135,13 @@ function gen_outbound(flag, node, tag, proxy_table)
 			node.transport = "hysteria"
 			node.stream_security = "tls"
 		end
+		if node.protocol == "masque" then
+			node.transport = "masque"
+			node.stream_security = "tls"
+			node.alpn = nil
+			node.utls = nil
+			node.finalmask = nil
+		end
 
 		if node.protocol == "http" and node.stream_security == "tls" then
 			node.transport = "raw"
@@ -152,13 +159,13 @@ function gen_outbound(flag, node, tag, proxy_table)
 			_flag_proxy_tag = proxy_tag,
 			tag = tag,
 			protocol = node.protocol,
-			mux = {
+			mux = (node.protocol ~= "masque") and {
 				enabled = (node.mux == "1") and true or false,
 				concurrency = (node.mux == "1" and ((node.mux_concurrency) and tonumber(node.mux_concurrency) or -1)) or nil,
 				xudpConcurrency = (node.mux == "1" and ((node.xudp_concurrency) and tonumber(node.xudp_concurrency) or 8)) or nil
 			} or nil,
 			-- 底层传输配置
-			streamSettings = (node.streamSettings or dialer_proxy_tag or node.protocol == "vmess" or node.protocol == "vless" or node.protocol == "socks" or node.protocol == "shadowsocks" or node.protocol == "trojan" or node.protocol == "hysteria" or node.protocol == "http") and {
+			streamSettings = (node.streamSettings or dialer_proxy_tag or node.protocol == "vmess" or node.protocol == "vless" or node.protocol == "socks" or node.protocol == "shadowsocks" or node.protocol == "trojan" or node.protocol == "hysteria" or node.protocol == "http" or node.protocol == "masque") and {
 				sockopt = {
 					mark = 255,
 					domainStrategy = node.domain_strategy or "UseIP",
@@ -268,6 +275,23 @@ function gen_outbound(flag, node, tag, proxy_table)
 						return api.cleanEmptyTables(extra)
 					end)()
 				} or nil,
+				masqueSettings = (node.protocol == "masque") and {
+					path = (node.masque_path and node.masque_path ~= "") and node.masque_path or nil,
+					headers = (function()
+						local headers = {}
+						if (node.username and node.username ~= "") or (node.password and node.password ~= "") then
+							headers["authorization"] = "Basic " .. api.base64Encode((node.username or "") .. ":" .. (node.password or ""))
+						end
+						if node.user_agent and node.user_agent ~= "" then
+							headers["user-agent"] = node.user_agent
+						end
+						for line in (node.masque_headers or ""):gsub("\\n", "\n"):gmatch("[^\r\n]+") do
+							local key, value = line:match("^%s*([^:]+):%s*(.-)%s*$")
+							if key then headers[api.trim(key):lower()] = value end
+						end
+						return next(headers) and headers or nil
+					end)()
+				} or nil,
 				hysteriaSettings = (node.transport == "hysteria") and {
 					version = 2,
 					auth = node.hysteria2_auth_password
@@ -364,7 +388,9 @@ function gen_outbound(flag, node, tag, proxy_table)
 								t = tonumber(tostring(t or "0"):match("^%d+"))
 								return (t and t >= 2 and t <= 60) and t or nil
 							end)(node.hysteria2_keep_alive_period),
-							disablePathMTUDiscovery = tonumber(node.hysteria2_disable_mtu_discovery) == 1
+							disablePathMTUDiscovery = node.hysteria2_disable_mtu_discovery == "1",
+							initStreamReceiveWindow = node.hysteria2_stream_recv_win and tonumber(node.hysteria2_stream_recv_win) or nil,
+							initConnectionReceiveWindow = node.hysteria2_conn_recv_win and tonumber(node.hysteria2_conn_recv_win) or nil,
 						}
 					end
 					if fragment and fragment_table and ({raw=1, ws=1, httpupgrade=1, grpc=1, xhttp=1})[TP] then
