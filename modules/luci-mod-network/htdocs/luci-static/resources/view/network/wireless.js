@@ -483,6 +483,8 @@ function formatConfigEncryption(enc) {
 
 	if (enc == '' || enc == 'none')
 		return _('None');
+	if (enc == 'owe')
+		return 'OWE';
 	if (enc == 'psk2' || enc.indexOf('psk2+') == 0)
 		return 'WPA2-PSK';
 	if (enc == 'psk' || enc.indexOf('psk+') == 0)
@@ -509,12 +511,43 @@ function formatConfigEncryption(enc) {
 	return enc;
 }
 
+// Keep an incompatible saved value visible as invalid, never silently replace it.
+function restrictQca6GHzChoices(option, getBand, allowed, message) {
+	let widget, section;
+	const update = function() {
+		if (!widget)
+			return;
+		widget.querySelectorAll('option').forEach(choice => {
+			const incompatible = getBand() == '6g' && !allowed.includes(choice.value);
+			choice.disabled = incompatible;
+			choice.hidden = incompatible && !choice.selected;
+		});
+	};
+	option.renderWidget = function(section_id, option_index, cfgvalue) {
+		section = section_id;
+		widget = form.ListValue.prototype.renderWidget.call(this, section_id, option_index, cfgvalue);
+		widget.addEventListener('change', update);
+		update();
+		return widget;
+	};
+	option.validate = function(section_id, value) {
+		return getBand() != '6g' || allowed.includes(value) || message;
+	};
+	return function() {
+		update();
+		if (widget)
+			option.triggerValidation(section);
+	};
+}
+
 function getConfigEncryptionValue(section_id, hwtype) {
 	const enc = String(uci.get('wireless', section_id, 'encryption') || '');
 	const sae = uci.get('wireless', section_id, 'sae');
 
 	if (enc == 'wep')
 		return 'wep-open';
+	if (isQcaWifiHwtype(hwtype) && uci.get('wireless', section_id, 'owe') == '1')
+		return 'owe';
 
 	if (isQcaWifiHwtype(hwtype) && sae == '1') {
 		if (enc == 'psk2' || enc.indexOf('psk2+') == 0)
@@ -548,12 +581,18 @@ function getConfigCipherValue(section_id, hwtype) {
 }
 
 function getDisplayEncryption(radioNet) {
+	const hwtype = uci.get('wireless', radioNet.getWifiDeviceName(), 'type');
+	const configured = getConfigEncryptionValue(radioNet.getName(), hwtype);
+	// The QCA iwinfo backend reports OWE as WPA2-PSK.
+	if (isQcaWifiHwtype(hwtype) && configured == 'owe')
+		return formatConfigEncryption(configured);
+
 	const encryption = radioNet.getActiveEncryption();
 
 	if (encryption && encryption != '-')
 		return encryption;
 
-	return formatConfigEncryption(getConfigEncryptionValue(radioNet.getName(), uci.get('wireless', radioNet.getWifiDeviceName(), 'type')));
+	return formatConfigEncryption(configured);
 }
 
 function getDisplayBSSID(radioNet) {
@@ -2240,6 +2279,11 @@ var CBIWifiFrequencyValue = form.Value.extend({
 			E('br', { 'style': 'clear:left' })
 		]);
 
+		elem.addEventListener('change', () => {
+			if (this.onBandChange)
+				this.onBandChange();
+		});
+
 		return this.setInitialValues(section_id, elem, cfgvalue);
 	},
 
@@ -2782,6 +2826,15 @@ return view.extend({
 				 * Mode/Band/Channel/Width controls in the modal.
 				 */
 				o.ucisection = radioNet.getWifiDeviceName();
+				const frequencyOption = o;
+				const getSecurityBand = function() {
+					const device = radioNet.getWifiDeviceName();
+					const field = frequencyOption.map.findElement('data-field', frequencyOption.cbid(device));
+					const band = field && field.querySelector('select.band');
+					return band ? band.value : getConfiguredBand(hwtype,
+						uci.get('wireless', device, 'hwmode'), uci.get('wireless', device, 'channel'),
+						uci.get('wireless', device, 'band'), uci.get('wireless', device, 'htmode'));
+				};
 
 				if (hwtype == 'mac80211' || isQcaWifiHwtype(hwtype)) {
 					o = ss.taboption('general', CBIWifiTxPowerValue, 'txpower', _('Maximum transmit power'), _('Specifies the maximum transmit power the wireless radio may use. Depending on regulatory requirements and wireless usage, the actual transmit power may be reduced by the driver.'));
@@ -3227,6 +3280,15 @@ return view.extend({
 						c = 'ccmp';
 
 					if (isQcaWifiHwtype(hwtype)) {
+						if (e == 'owe') {
+							stored_e = 'ccmp';
+							uci.set('wireless', section_id, 'owe', '1');
+							uci.set('wireless', section_id, 'ieee80211w', '2');
+							uci.unset('wireless', section_id, 'key');
+						}
+						else {
+							uci.unset('wireless', section_id, 'owe');
+						}
 						if (e == 'sae-mixed') {
 							stored_e = 'psk2';
 							uci.set('wireless', section_id, 'sae', '1');
@@ -3246,6 +3308,7 @@ return view.extend({
 				};
 
 				o = ss.taboption('encryption', form.ListValue, 'cipher', _('Cipher'));
+				const cipherOption = o;
 				o.depends('encryption', 'wpa');
 				o.depends('encryption', 'wpa2');
 				o.depends('encryption', 'wpa3');
@@ -3447,6 +3510,17 @@ return view.extend({
 
 					encr.value(crypto_mode[0], '%s (%s)'.format(crypto_mode[1], security_level));
 				});
+
+				if (isQcaWifiHwtype(hwtype)) {
+					const updateEncryption = restrictQca6GHzChoices(encr, getSecurityBand,
+						['sae', 'owe'], _('6 GHz requires WPA3-SAE or OWE.'));
+					const updateCipher = restrictQca6GHzChoices(cipherOption, getSecurityBand,
+						['auto', 'ccmp', 'ccmp256', 'gcmp', 'gcmp256'], _('TKIP is not supported on 6 GHz.'));
+					frequencyOption.onBandChange = function() {
+						updateEncryption();
+						updateCipher();
+					};
+				}
 
 				// QR Code
 				o = ss.taboption('encryption', form.DummyValue, '_qrops', _('QR Code'),
