@@ -8,7 +8,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=rpcd-mod-luci
 PKG_VERSION:=20240305
-PKG_RELEASE:=8
+PKG_RELEASE:=9
 PKG_MAINTAINER:=Jo-Philipp Wich <jo@mein.io>
 
 PKG_LICENSE:=Apache-2.0
@@ -35,7 +35,7 @@ define Package/rpcd-mod-luci
   SECTION:=libs
   CATEGORY:=Libraries
   TITLE:=Rapid reverse DNS rpcd module
-  DEPENDS:=+rpcd +libubox +libubus +libnl-tiny
+  DEPENDS:=+rpcd +libubox +libubus +libnl-tiny +kmod-nf-conntrack-netlink
 endef
 
 define Package/rpcd-mod-luci/description
