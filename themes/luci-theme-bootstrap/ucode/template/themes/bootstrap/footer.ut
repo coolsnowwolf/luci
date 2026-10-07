@@ -7,7 +7,7 @@
 					{{ version.luciname }} ({{ version.luciversion }})</a>
 				/
 				<a href="{{ entityencode(version.disturl ?? '#', true) }}" target="_blank" rel="noreferrer">
-					{{ version.distname }} {{ version.distversion }} ({{ version.distrevision }})</a>
+					{{ version.distname }} {{ version.distversion }}{% if (version.distrevision): %} ({{ version.distrevision }}){% endif %}</a>
 				{% if (lua_active): %}
 					/ {{ _('Lua compatibility mode active') }}
 				{% endif %}
