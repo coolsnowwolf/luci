@@ -596,14 +596,20 @@ function getDisplayEncryption(radioNet) {
 }
 
 function getDisplayBSSID(radioNet) {
-	const bssid = uci.get('wireless', radioNet.getName(), 'macaddr') ||
-		uci.get('wireless', radioNet.getWifiDeviceName(), 'macaddr') ||
-		radioNet.getBSSID() || radioNet.getActiveBSSID();
+	// A radio MAC may differ from the BSSID of an individual virtual AP.
+	const candidates = [
+		radioNet.getActiveBSSID(),
+		radioNet.getBSSID(),
+		uci.get('wireless', radioNet.getName(), 'macaddr')
+	];
 
-	if (bssid && bssid != '00:00:00:00:00:00')
-		return String(bssid).toUpperCase();
+	for (const bssid of candidates)
+		if (typeof bssid == 'string' &&
+		    /^(?:[0-9a-f]{2}:){5}[0-9a-f]{2}$/i.test(bssid) &&
+		    bssid != '00:00:00:00:00:00')
+			return bssid.toUpperCase();
 
-	return bssid || null;
+	return null;
 }
 
 function getFtIdentifier(radioNet) {
