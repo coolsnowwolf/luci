@@ -583,8 +583,8 @@ function getConfigCipherValue(section_id, hwtype) {
 function getDisplayEncryption(radioNet) {
 	const hwtype = uci.get('wireless', radioNet.getWifiDeviceName(), 'type');
 	const configured = getConfigEncryptionValue(radioNet.getName(), hwtype);
-	// The QCA iwinfo backend reports OWE as WPA2-PSK.
-	if (isQcaWifiHwtype(hwtype) && configured == 'owe')
+	// The QCA iwinfo backend reports OWE and SAE as WPA2-PSK.
+	if (isQcaWifiHwtype(hwtype) && ['owe', 'sae', 'sae-mixed'].includes(configured))
 		return formatConfigEncryption(configured);
 
 	const encryption = radioNet.getActiveEncryption();
@@ -3301,6 +3301,10 @@ return view.extend({
 						}
 						else if (e == 'sae') {
 							uci.set('wireless', section_id, 'sae', '1');
+							if (getSecurityBand() == '6g') {
+								uci.set('wireless', section_id, 'sae_pwe', '1');
+								uci.set('wireless', section_id, 'ieee80211w', '2');
+							}
 						}
 						else {
 							uci.unset('wireless', section_id, 'sae');
