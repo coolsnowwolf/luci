@@ -74,7 +74,7 @@
             return Math.min(cardCount, 2);
         }
 
-        return Math.min(cardCount, 8);
+        return Math.min(cardCount, 10);
     }
 
     function syncOverviewPortStatus() {
