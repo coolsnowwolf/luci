@@ -23,7 +23,7 @@ return view.extend({
 		s.tab('template', _('Edit Template'), _('Edit the template that is used for generating the ksmbd configuration.'));
 
 		o = s.taboption('general', form.Flag, 'enabled', _('Enable'));
-		o.default = '1';
+		o.default = '0';
 		o.rmempty = false;
 
 		o = s.taboption('general', form.Value, 'name', _('Hostname'));
