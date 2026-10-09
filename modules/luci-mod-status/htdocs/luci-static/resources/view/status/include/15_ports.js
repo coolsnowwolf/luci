@@ -56,6 +56,9 @@ function addKnownPort(knownPorts, seenPorts, role, device, extra)
 		label: device
 	}, extra || {});
 
+	if (port.label === 'cpu')
+		return;
+
 	if (!port.netdev && !port.swstate)
 		port.netdev = network.instantiateDevice(device);
 
@@ -211,7 +214,11 @@ function addResolvedPort(knownPorts, seenPorts, role, device, mapping, board, sw
 			});
 		}
 		else {
-			addKnownPort(knownPorts, seenPorts, role, value);
+			const deviceInfo = L.isObject(board) && L.isObject(board['network-device'])
+				? board['network-device'][value] : null;
+
+			addKnownPort(knownPorts, seenPorts, role, value,
+				L.isObject(deviceInfo) && isString(deviceInfo.label) ? { label: deviceInfo.label } : null);
 		}
 	}
 }
