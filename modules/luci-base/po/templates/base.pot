@@ -12515,6 +12515,10 @@ msgstr ""
 msgid "Very High"
 msgstr ""
 
+#: modules/luci-mod-network/htdocs/luci-static/resources/view/network/wireless.js:2934
+msgid "Very Low"
+msgstr ""
+
 #: protocols/luci-proto-vxlan/htdocs/luci-static/resources/protocol/vxlan.js:229
 #: protocols/luci-proto-vxlan/htdocs/luci-static/resources/protocol/vxlan6.js:229
 msgid "Via"

@@ -12929,6 +12929,10 @@ msgstr "正在校验上传的固件文件。"
 msgid "Very High"
 msgstr "非常高"
 
+#: modules/luci-mod-network/htdocs/luci-static/resources/view/network/wireless.js:2934
+msgid "Very Low"
+msgstr "很低"
+
 #: protocols/luci-proto-vxlan/htdocs/luci-static/resources/protocol/vxlan.js:229
 #: protocols/luci-proto-vxlan/htdocs/luci-static/resources/protocol/vxlan6.js:229
 msgid "Via"

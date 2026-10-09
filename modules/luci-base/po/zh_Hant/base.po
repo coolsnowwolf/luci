@@ -12812,6 +12812,10 @@ msgstr "驗證上傳的映像檔中。"
 msgid "Very High"
 msgstr "超高速"
 
+#: modules/luci-mod-network/htdocs/luci-static/resources/view/network/wireless.js:2934
+msgid "Very Low"
+msgstr "很低"
+
 #: protocols/luci-proto-vxlan/htdocs/luci-static/resources/protocol/vxlan.js:229
 #: protocols/luci-proto-vxlan/htdocs/luci-static/resources/protocol/vxlan6.js:229
 msgid "Via"
