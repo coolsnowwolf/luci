@@ -1,0 +1,47 @@
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\n"
+
+msgid "Design Config"
+msgstr ""
+
+msgid "Configure the Design theme appearance and mobile navigation shortcuts."
+msgstr ""
+
+msgid "Theme configuration"
+msgstr ""
+
+msgid "Theme mode"
+msgstr ""
+
+msgid "Choose whether the theme follows your device appearance or uses a fixed color mode."
+msgstr ""
+
+msgid "Follow System"
+msgstr ""
+
+msgid "Force Light"
+msgstr ""
+
+msgid "Force Dark"
+msgstr ""
+
+msgid "Navigation bar setting"
+msgstr ""
+
+msgid "Show or hide the fixed navigation bar at the bottom of the page."
+msgstr ""
+
+msgid "Display navigation bar"
+msgstr ""
+
+msgid "Close navigation bar"
+msgstr ""
+
+msgid "Navigation bar proxy"
+msgstr ""
+
+msgid "Select which installed proxy service appears in the navigation bar, or hide the proxy shortcut."
+msgstr ""
+
+msgid "Hide"
+msgstr ""

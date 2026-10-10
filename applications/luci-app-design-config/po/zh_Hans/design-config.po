@@ -1,0 +1,47 @@
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\n"
+
+msgid "Design Config"
+msgstr "Design 主题设置"
+
+msgid "Configure the Design theme appearance and mobile navigation shortcuts."
+msgstr "配置 Design 主题外观和手机端导航快捷入口。"
+
+msgid "Theme configuration"
+msgstr "主题配置"
+
+msgid "Theme mode"
+msgstr "主题模式"
+
+msgid "Choose whether the theme follows your device appearance or uses a fixed color mode."
+msgstr "选择跟随设备外观，或固定使用亮色、暗色模式。"
+
+msgid "Follow System"
+msgstr "跟随系统"
+
+msgid "Force Light"
+msgstr "强制亮色"
+
+msgid "Force Dark"
+msgstr "强制暗色"
+
+msgid "Navigation bar setting"
+msgstr "导航栏设置"
+
+msgid "Show or hide the fixed navigation bar at the bottom of the page."
+msgstr "显示或隐藏页面底部的固定导航栏。"
+
+msgid "Display navigation bar"
+msgstr "显示导航栏"
+
+msgid "Close navigation bar"
+msgstr "关闭导航栏"
+
+msgid "Navigation bar proxy"
+msgstr "导航栏代理入口"
+
+msgid "Select which installed proxy service appears in the navigation bar, or hide the proxy shortcut."
+msgstr "选择在导航栏显示哪个已安装代理服务的快捷入口，或隐藏代理入口。"
+
+msgid "Hide"
+msgstr "隐藏"

@@ -1,0 +1,14 @@
+{
+	"admin/system/design-config": {
+		"title": "Design Config",
+		"order": 90,
+		"action": {
+			"type": "view",
+			"path": "design-config"
+		},
+		"depends": {
+			"acl": [ "luci-app-design-config" ],
+			"uci": { "design": true }
+		}
+	}
+}
