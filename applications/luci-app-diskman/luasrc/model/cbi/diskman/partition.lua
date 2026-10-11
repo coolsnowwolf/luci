@@ -30,6 +30,20 @@ local function is_firmware_partition(part)
   return name:match("^0:") or name:find("rootfs", 1, true)
 end
 
+local first_partition_start
+for _, part in ipairs(disk_info.partitions) do
+  local start = tonumber(part.sec_start)
+  if part.number > 0 and start then
+    first_partition_start = math.min(first_partition_start or start, start)
+  end
+end
+
+local function is_leading_free_space(part)
+  -- Bootloader data may live in the gap before the first real partition.
+  return part.number == -1 and first_partition_start and
+    tonumber(part.sec_end) < first_partition_start
+end
+
 s = m:section(Table, {disk_info}, translate("Device Info"))
 -- s:option(DummyValue, "key")
 -- s:option(DummyValue, "value")
@@ -131,7 +145,7 @@ if not disk_info.p_table:match("Raid") then
   local val_sec_start = s_partition_table:option(Value, "sec_start", translate("Start Sector"))
   val_sec_start.render = function(self, section, scope)
     -- could create new partition
-    if disk_info.partitions[section].number == -1 and disk_info.partitions[section].size > 1 * 1024 * 1024 then
+    if disk_info.partitions[section].number == -1 and not is_leading_free_space(disk_info.partitions[section]) and disk_info.partitions[section].size > 1 * 1024 * 1024 then
       self.template = "cbi/value"
       Value.render(self, section, scope)
     else
@@ -142,7 +156,7 @@ if not disk_info.p_table:match("Raid") then
   local val_sec_end = s_partition_table:option(Value, "sec_end", translate("End Sector"))
   val_sec_end.render = function(self, section, scope)
     -- could create new partition
-    if disk_info.partitions[section].number == -1 and disk_info.partitions[section].size > 1 * 1024 * 1024 then
+    if disk_info.partitions[section].number == -1 and not is_leading_free_space(disk_info.partitions[section]) and disk_info.partitions[section].size > 1 * 1024 * 1024 then
       self.template = "cbi/value"
       Value.render(self, section, scope)
     else
@@ -268,7 +282,7 @@ if not disk_info.p_table:match("Raid") then
   btn_action.forcewrite = true
   btn_action.template = "diskman/cbi/disabled_button"
   btn_action.render = function(self, section, scope)
-    if is_firmware_partition(disk_info.partitions[section]) then
+    if is_firmware_partition(disk_info.partitions[section]) or is_leading_free_space(disk_info.partitions[section]) then
       self.template = "cbi/dvalue"
       DummyValue.render(self, section, scope)
       return
@@ -295,7 +309,7 @@ if not disk_info.p_table:match("Raid") then
     Button.render(self, section, scope)
   end
   btn_action.write = function(self, section, value)
-    if is_firmware_partition(disk_info.partitions[section]) then return end
+    if is_firmware_partition(disk_info.partitions[section]) or is_leading_free_space(disk_info.partitions[section]) then return end
     if value == translate("New") then
       local start_sec = disk_info.partitions[section]._sec_start and tonumber(disk_info.partitions[section]._sec_start) or tonumber(disk_info.partitions[section].sec_start)
       local end_sec = disk_info.partitions[section]._sec_end

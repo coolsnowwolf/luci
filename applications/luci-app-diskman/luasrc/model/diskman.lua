@@ -34,7 +34,42 @@ function byte_format(byte)
   end
 end
 
+local function get_emmc_health(device)
+  if not device:match("^mmcblk%d+$") then return end
+  local path = "/sys/class/block/" .. device .. "/device/"
+  if not (nixio.fs.readfile(path .. "type") or ""):match("^MMC%s*$") then return end
+  local translate = require("luci.i18n").translate
+  local info = {}
+  local lifetime
+  -- Use the more worn of the supported A/B estimates; zero means undefined.
+  for value in (nixio.fs.readfile(path .. "life_time") or ""):gmatch("%S+") do
+    local estimate = tonumber(value)
+    if estimate and estimate >= 1 and estimate <= 11 then
+      lifetime = math.max(lifetime or 0, estimate)
+    end
+  end
+  if lifetime then
+    if lifetime == 11 then
+      info.health = translate("Estimated lifetime exceeded")
+    else
+      -- Report estimated remaining life as a range, not an exact percentage.
+      info.health = string.format("%d-%d%%", 100 - lifetime * 10, 110 - lifetime * 10)
+    end
+  end
+  local eol = tonumber(nixio.fs.readfile(path .. "pre_eol_info") or "")
+  if eol == 1 then
+    info.status = translate("Normal")
+  elseif eol == 2 then
+    info.status = translate("Warning")
+  elseif eol == 3 then
+    info.status = translate("Urgent")
+  end
+  return info
+end
+
 local get_smart_info = function(device)
+  local emmc_info = get_emmc_health(device)
+  if emmc_info then return emmc_info end
   local section
   local smart_info = {}
   for _, line in ipairs(luci.util.execl(d.command.smartctl .. " -H -A -i -n standby -f brief /dev/" .. device)) do
