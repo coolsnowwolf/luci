@@ -189,6 +189,10 @@ local get_parted_info = function(device)
       elseif device:match("mmcblk") or device:match("md") or device:match("nvme") then
         partition_temp["name"] = device.."p"..partition_temp["number"]
       end
+      -- Read the kernel partition name: older parted output does not escape colons.
+      local uevent = partition_temp["name"] ~= "-" and
+        nixio.fs.readfile("/sys/class/block/" .. partition_temp["name"] .. "/uevent") or ""
+      partition_temp["partition_name"] = (uevent or ""):match("\nPARTNAME=([^\n]+)") or "-"
       if partition_temp["number"] > 0 and partition_temp["fs"] == "" and d.command.lsblk then
         partition_temp["fs"] = (luci.util.exec(d.command.lsblk .. " /dev/" .. partition_temp["name"] .. " -no fstype") or ""):match("([^%s]+)") or ""
       end

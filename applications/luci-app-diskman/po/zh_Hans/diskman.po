@@ -503,3 +503,6 @@ msgstr ""
 #: applications/luci-app-diskman/luasrc/model/cbi/diskman/partition.lua:99
 msgid "is in use! please unmount it first!"
 msgstr "正在被使用！请先卸载！"
+
+msgid "Partition Name"
+msgstr "分区名"

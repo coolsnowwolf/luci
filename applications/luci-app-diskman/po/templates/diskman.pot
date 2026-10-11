@@ -488,3 +488,6 @@ msgstr ""
 #: applications/luci-app-diskman/luasrc/model/cbi/diskman/partition.lua:99
 msgid "is in use! please unmount it first!"
 msgstr ""
+
+msgid "Partition Name"
+msgstr ""
