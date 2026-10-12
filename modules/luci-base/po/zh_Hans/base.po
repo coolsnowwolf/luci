@@ -14183,3 +14183,225 @@ msgstr "导出系统日志到 TXT"
 
 msgid "Export kernel log to TXT"
 msgstr "导出内核日志到 TXT"
+
+msgid "2-character hexadecimal mobility domain ID used by MTK fast transition."
+msgstr "MTK 快速切换使用的 2 字符十六进制移动域 ID。"
+
+msgid "802.11k"
+msgstr "802.11k 无线资源测量"
+
+msgid "802.11k/v/r roaming RSSI threshold"
+msgstr "802.11k/v/r 漫游 RSSI 阈值"
+
+msgid "802.11v"
+msgstr "802.11v BSS 切换"
+
+msgid "802.11v BSS Transition"
+msgstr "802.11v BSS 切换"
+
+msgid "Association RSSI threshold"
+msgstr "关联 RSSI 阈值"
+
+msgid "At least one MBSSID needs to be reserved"
+msgstr "必须至少保留一个 MBSSID"
+
+msgid "Band Steering"
+msgstr "频段引导"
+
+msgid "Disconnect clients when the RSSI falls below this threshold. Units: dBm."
+msgstr "当 RSSI 低于此阈值时断开客户端。单位：dBm。"
+
+msgid "Enable BSS transition management for assisted roaming."
+msgstr "启用 BSS 切换管理以辅助无线漫游。"
+
+msgid "Enable fast roaming among access points that belong to the same mobility domain."
+msgstr "在同一移动域的接入点之间启用快速漫游。"
+
+msgid "Enable radio resource measurements for roaming assistance."
+msgstr "启用无线资源测量以辅助无线漫游。"
+
+msgid "Fore 40 MHz"
+msgstr "前向 40 MHz"
+
+msgid "List of R0KHs in the same Mobility Domain. <br />Format: MAC-address,NAS-Identifier,128-bit key as hex string. <br />This list is used to map R0KH-ID (NAS Identifier) to a destination MAC address when requesting PMK-R1 key from the R0KH that the STA used during the Initial Mobility Domain Association."
+msgstr "同一移动域中的 R0KH 列表。<br />格式：MAC 地址、NAS 标识符、十六进制 128 位密钥。<br />当向 STA 初次关联移动域时使用的 R0KH 请求 PMK-R1 密钥时，此列表用于将 R0KH-ID（NAS 标识符）映射到目标 MAC 地址。"
+
+msgid "List of R1KHs in the same Mobility Domain. <br />Format: MAC-address,R1KH-ID as 6 octets with colons,128-bit key as hex string. <br />This list is used to map R1KH-ID to a destination MAC address when sending PMK-R1 key from the R0KH. This is also the list of authorized R1KHs in the MD that can request PMK-R1 keys."
+msgstr "同一移动域中的 R1KH 列表。<br />格式：MAC 地址、以冒号分隔的 6 字节 R1KH-ID、十六进制 128 位密钥。<br />从 R0KH 发送 PMK-R1 密钥时，此列表用于将 R1KH-ID 映射到目标 MAC 地址；同时也是移动域内有权请求 PMK-R1 密钥的 R1KH 列表。"
+
+msgid "MU-MIMO"
+msgstr "MU-MIMO（多用户多入多出）"
+
+msgid "Multicast Rate"
+msgstr "组播速率"
+
+msgid "Please delete the existing MBSSID and try again."
+msgstr "请删除已有的 MBSSID 后重试。"
+
+msgid "Rear 40 MHz"
+msgstr "后向 40 MHz"
+
+msgid "Reject association requests below this threshold. Units: dBm."
+msgstr "拒绝 RSSI 低于此阈值的关联请求。单位：dBm。"
+
+msgid "Roaming assistance threshold used together with weak signal kick. Units: dBm."
+msgstr "与弱信号踢除配合使用的漫游辅助阈值。单位：dBm。"
+
+msgid "Static WDS"
+msgstr "静态 WDS"
+
+msgid "Target Wake Time"
+msgstr "目标唤醒时间"
+
+msgid "The number of MBSSID has reached the maximum"
+msgstr "MBSSID 数量已达到上限"
+
+msgid "U-APSD"
+msgstr "U-APSD（自动省电传输）"
+
+msgid "Used for RADIUS NAS ID and 802.11r R0KH-ID."
+msgstr "用于 RADIUS NAS ID 和 802.11r R0KH-ID。"
+
+msgid "Weak signal kick threshold"
+msgstr "弱信号踢除阈值"
+
+msgid "When using a PSK, the PMK can be generated locally without inter AP communications"
+msgstr "使用 PSK 时，可在本地生成 PMK，无需接入点之间通信。"
+
+msgid "Wireless HWNAT"
+msgstr "无线硬件 NAT"
+
+msgid "Wireless configuration error"
+msgstr "无线配置错误"
+
+msgid "Legacy"
+msgstr "传统模式"
+
+msgid "MediaTek wireless device"
+msgstr "MediaTek 无线设备"
+
+msgid "Generic wireless device"
+msgstr "通用无线设备"
+
+msgid "WPA-PSK/WPA2-PSK Mixed Mode"
+msgstr "WPA-PSK/WPA2-PSK 混合模式"
+
+msgid "WPA2-PSK/WPA3-SAE Mixed Mode"
+msgstr "WPA2-PSK/WPA3-SAE 混合模式"
+
+msgid "WPA2-EAP/WPA3-EAP Mixed Mode"
+msgstr "WPA2-EAP/WPA3-EAP 混合模式"
+
+msgid "WPA3-EAP 192-bit Mode"
+msgstr "WPA3-EAP 192 位模式"
+
+msgid "OWE"
+msgstr "OWE"
+
+msgid "WPA-EAP"
+msgstr "WPA-EAP"
+
+msgid "WPA-PSK"
+msgstr "WPA-PSK"
+
+msgid "WPA2-EAP"
+msgstr "WPA2-EAP"
+
+msgid "WPA2-PSK"
+msgstr "WPA2-PSK"
+
+msgid "WPA3-EAP"
+msgstr "WPA3-EAP"
+
+msgid "WPA3-SAE"
+msgstr "WPA3-SAE"
+
+msgid "MLO Overview"
+msgstr "MLO 多链路概览"
+
+msgid "MLO access point"
+msgstr "MLO 多链路接入点"
+
+msgid "Member links"
+msgstr "成员链路"
+
+msgid "Multi-Link Operation"
+msgstr "多链路操作（MLO）"
+
+msgid "MLO group is disabled"
+msgstr "MLO 多链路组已禁用"
+
+msgid "Set an MLO key and enable the group in its settings."
+msgstr "请先设置 MLO 密钥，并在设置中启用此组。"
+
+msgid "MLO group is enabled"
+msgstr "MLO 多链路组已启用"
+
+msgid "Edit MLO group “%s”"
+msgstr "编辑 MLO 多链路组“%s”"
+
+msgid "Disable MLO group"
+msgstr "禁用 MLO 多链路组"
+
+msgid "MLO SSID"
+msgstr "MLO 网络名称（SSID）"
+
+msgid "Management frame protection"
+msgstr "管理帧保护"
+
+msgid "This MediaTek driver supports one MLO group."
+msgstr "此联发科驱动仅支持一个 MLO 多链路组。"
+
+msgid "Edit this MLO group"
+msgstr "编辑此 MLO 多链路组"
+
+msgid "Default MAC address"
+msgstr "默认 MAC 地址"
+
+msgid "Override the physical radio MAC address. Leave empty to use the driver or EEPROM default. Do not use this for MBSSID or MLO member addresses."
+msgstr "覆盖物理无线设备的 MAC 地址。留空则使用驱动或 EEPROM 默认值。请勿将此项用于 MBSSID 或 MLO 成员地址。"
+
+msgid "Wireless is associated"
+msgstr "无线已关联"
+
+msgid "Interface is not available"
+msgstr "接口不可用"
+
+msgid "Edit this MLO member interface"
+msgstr "编辑此 MLO 成员接口"
+
+msgid "Usage (%)"
+msgstr "使用率（%）"
+
+msgid "CPU: unavailable"
+msgstr "CPU：不可用"
+
+msgid "PPE"
+msgstr "PPE"
+
+msgid "flow entries"
+msgstr "条流表项"
+
+msgid "2.4 GHz interface"
+msgstr "2.4 GHz 接口"
+
+msgid "5 GHz interface"
+msgstr "5 GHz 接口"
+
+msgid "Select an interface"
+msgstr "选择接口"
+
+msgid "Select one 2.4 GHz and one 5 GHz wireless interface for this MLO group."
+msgstr "为该 MLO 组各选择一个 2.4 GHz 与 5 GHz 无线接口。"
+
+msgid "Both 2.4 GHz and 5 GHz interfaces must be selected."
+msgstr "必须同时选择 2.4 GHz 与 5 GHz 接口。"
+
+msgid "Add MLO group"
+msgstr "添加 MLO 组"
+
+msgid "Delete MLO group"
+msgstr "删除 MLO 组"
+
+msgid "Delete this MLO group"
+msgstr "删除该 MLO 组"

@@ -366,6 +366,10 @@ function isQcaWifiHwtype(hwtype) {
 	return (hwtype == 'qcawifi' || hwtype == 'qcawificfg80211');
 }
 
+function isMtkWifiHwtype(hwtype) {
+	return (hwtype == 'mt_dbdc' || hwtype == 'mtkwifi');
+}
+
 function suspendQcaRuntimeProbes() {
 	qcaRuntimeProbeHoldoffUntil = Date.now() + qcaRuntimeProbeHoldoff;
 
@@ -426,7 +430,7 @@ function isNetworkDisplayUp(radioNet) {
 	if (radioNet.isUp())
 		return true;
 
-	if ((hwtype == 'mt_dbdc' || isQcaWifiHwtype(hwtype)) && radioNet.getMode() == 'ap')
+	if ((isMtkWifiHwtype(hwtype) || isQcaWifiHwtype(hwtype)) && radioNet.getMode() == 'ap')
 		return !isNetworkDisabled(radioNet);
 
 	return false;
@@ -511,33 +515,40 @@ function formatConfigEncryption(enc) {
 	return enc;
 }
 
-// Keep an incompatible saved value visible as invalid, never silently replace it.
-function restrictQca6GHzChoices(option, getBand, allowed, message) {
-	let widget, section;
-	const update = function() {
-		if (!widget)
-			return;
-		widget.querySelectorAll('option').forEach(choice => {
-			const incompatible = getBand() == '6g' && !allowed.includes(choice.value);
-			choice.disabled = incompatible;
-			choice.hidden = incompatible && !choice.selected;
-		});
-	};
-	option.renderWidget = function(section_id, option_index, cfgvalue) {
-		section = section_id;
-		widget = form.ListValue.prototype.renderWidget.call(this, section_id, option_index, cfgvalue);
-		widget.addEventListener('change', update);
-		update();
-		return widget;
-	};
-	option.validate = function(section_id, value) {
-		return getBand() != '6g' || allowed.includes(value) || message;
-	};
-	return function() {
-		update();
-		if (widget)
-			option.triggerValidation(section);
-	};
+function formatActiveMode(mode) {
+	switch (mode) {
+	case 'Master': return _('Master');
+	case 'Client': return _('Client');
+	case 'Ad-Hoc': return _('Ad-Hoc');
+	case 'Mesh Point': return _('Mesh Point');
+	case 'Monitor': return _('Monitor');
+	case 'Unknown': return _('Unknown');
+	default: return mode;
+	}
+}
+
+function getConfiguredPhyMode(radioNet) {
+	const device = radioNet.getWifiDeviceName();
+	const hwmode = String(uci.get('wireless', device, 'hwmode') || '').toLowerCase();
+	const htmode = String(uci.get('wireless', device, 'htmode') || '').toUpperCase();
+
+	if (hwmode == 'be' || htmode.indexOf('EHT') == 0)
+		return 'BE';
+	if (hwmode == 'ax' || htmode.indexOf('HE') == 0)
+		return 'AX';
+	if (hwmode == 'ac' || htmode.indexOf('VHT') == 0)
+		return 'AC';
+	if (hwmode == 'n' || htmode.indexOf('HT') == 0)
+		return 'N';
+
+	return null;
+}
+
+function getDisplayedNetworkMode(radioNet, hwtype, activeMode) {
+	if (isMtkWifiHwtype(hwtype) && radioNet.getMode() == 'ap')
+		return getConfiguredPhyMode(radioNet) || formatActiveMode(activeMode);
+
+	return formatActiveMode(activeMode);
 }
 
 function getConfigEncryptionValue(section_id, hwtype) {
@@ -628,7 +639,7 @@ function isUnsetChannelValue(channel) {
 
 function shouldDisplayAutoChannel(hwtype, configChannel, runtimeChannel) {
 	return configChannel == 'auto' || runtimeChannel == 'auto' ||
-		((isQcaWifiHwtype(hwtype) || hwtype == 'mt_dbdc') && isUnsetChannelValue(configChannel));
+		((isQcaWifiHwtype(hwtype) || isMtkWifiHwtype(hwtype)) && isUnsetChannelValue(configChannel));
 }
 
 function isPlausibleTxPowerValue(txpower, hwtype) {
@@ -1347,7 +1358,7 @@ function isDisplayAssociated(radioNet, hwtype, mode, bssid, channel, disabled) {
 function getDisplaySignalPercent(radioNet, hwtype, is_assoc, disabled) {
 	if (disabled)
 		return -1;
-	if (hwtype == 'mt_dbdc')
+	if (isMtkWifiHwtype(hwtype))
 		return (radioNet.isUp() || is_assoc) ? 100 : -1;
 	if (isQcaWifiHwtype(hwtype) && radioNet.getMode() == 'ap')
 		return is_assoc ? 100 : 0;
@@ -1358,14 +1369,14 @@ function getDisplaySignalPercent(radioNet, hwtype, is_assoc, disabled) {
 }
 
 function getDisplaySignalValue(radioNet, hwtype, is_assoc) {
-	if ((hwtype == 'mt_dbdc' || (isQcaWifiHwtype(hwtype) && radioNet.getMode() == 'ap')) && is_assoc)
+	if ((isMtkWifiHwtype(hwtype) || (isQcaWifiHwtype(hwtype) && radioNet.getMode() == 'ap')) && is_assoc)
 		return getDisplayTxPower(radioNet) ?? 30;
 
 	return radioNet.getSignal();
 }
 
 function getDisplayNoiseValue(radioNet, hwtype, is_assoc) {
-	if ((hwtype == 'mt_dbdc' || (isQcaWifiHwtype(hwtype) && radioNet.getMode() == 'ap')) && is_assoc)
+	if ((isMtkWifiHwtype(hwtype) || (isQcaWifiHwtype(hwtype) && radioNet.getMode() == 'ap')) && is_assoc)
 		return null;
 
 	return radioNet.getNoise();
@@ -1516,11 +1527,249 @@ function render_network_status(radioNet) {
 
 	return L.itemlist(E('div'), [
 		is_mesh ? _('Mesh ID') : _('SSID'), (is_mesh ? radioNet.getMeshID() : radioNet.getSSID()) ?? '?',
-		_('Mode'),       mode,
+		_('Mode'),       getDisplayedNetworkMode(radioNet, hwtype, mode),
 		_('BSSID'),      (!changecount && is_assoc) ? bssid : null,
 		_('Encryption'), (!changecount && is_assoc) ? getDisplayEncryption(radioNet) : null,
 		'',            status_text
 	], [ ' | ', E('br') ]);
+}
+
+function getMldMemberNetworks(section_id, wifiNets) {
+	const links = String(uci.get('wireless', section_id, 'iface') || '').trim().split(/\s+/).filter(Boolean);
+	const networks = Array.isArray(wifiNets) ? wifiNets : [];
+	const wifiIfaces = uci.sections('wireless', 'wifi-iface');
+
+	return links.map(function(link) {
+		const network = networks.filter(function(radioNet) {
+			return radioNet.getName() == link || radioNet.getIfname() == link;
+		})[0];
+		const iface = wifiIfaces.filter(function(wifiIface) {
+			return wifiIface['.name'] == link || wifiIface.ifname == link;
+		})[0];
+
+		return {
+			name: link,
+			network: network,
+			section: network ? network.getName() : (iface ? iface['.name'] : null)
+		};
+	});
+}
+
+function render_mld_member_status(section_id, wifiNets, section) {
+	const members = getMldMemberNetworks(section_id, wifiNets);
+
+	if (!members.length)
+		return E('em', _('None'));
+
+	return E('div', { 'class': 'mlo-member-links' }, members.map(function(member) {
+		const networkName = member.network ? member.network.getIfname() : member.name;
+		const networkSection = member.network ? member.network.getName() : null;
+		const title = networkSection && networkSection != networkName
+			? `${networkName} (${networkSection})`
+			: networkName;
+		const actions = [];
+		let status;
+
+		if (member.section && section && typeof section.renderMoreOptionsModal == 'function') {
+			actions.push(E('button', {
+				'class': 'cbi-button cbi-button-action',
+				'title': _('Edit this MLO member interface'),
+				'click': function(ev) {
+					ev.preventDefault();
+					return section.renderMoreOptionsModal(member.section);
+				}
+			}, _('Edit')));
+		}
+
+		if (member.network) {
+			const bitrate = getDisplayBitRate(member.network);
+			const disabled = isNetworkDisabled(member.network);
+			const mode = member.network.getActiveMode();
+			const bssid = getDisplayBSSID(member.network);
+			const channel = getDisplayChannel(member.network);
+			const hwtype = uci.get('wireless', member.network.getWifiDeviceName(), 'type');
+			const is_assoc = isDisplayAssociated(member.network, hwtype, mode, bssid, channel, disabled);
+
+			status = E('div', { 'style': 'margin-top:0.35em;' }, [
+				E('div', {}, [
+					_('Mode'), ': ', getDisplayedNetworkMode(member.network, hwtype, mode) , ' | ',
+					_('BSSID'), ': ', is_assoc ? bssid : '?', ' | ',
+					_('Channel'), ': ', is_assoc ? channel : '?', ' | ',
+					_('Rate'), ': ', is_assoc ? `${bitrate || '?'} ${_('Mbit/s')}` : '?'
+				]),
+			]);
+		}
+		else {
+			status = E('em', _('Interface is not available'));
+		}
+
+		return E('div', {
+			'class': 'mlo-member-link',
+			'style': 'display:flex; align-items:flex-start; justify-content:space-between; gap:1em; margin:0.5em 0 0.5em 1.5em; padding:0.75em 1em; border-left:3px solid #bbb; background:rgba(127,127,127,0.08);'
+		}, [
+			E('div', { 'style': 'min-width:0; flex:1;' }, [
+				E('strong', { 'style': 'display:block; margin-bottom:0.35em;' }, title),
+				status
+			]),
+			actions.length ? E('div', { 'class': 'cbi-section-actions', 'style': 'flex:0 0 auto; margin-left:auto; text-align:right;' }, actions) : null
+		]);
+	}));
+}
+
+// MTK builds an MLD from per-interface settings. Never apply these settings to
+// mac80211 or other vendor stacks, which may also use wifi-mld sections.
+function get_mld_members(section_id) {
+	return String(uci.get('wireless', section_id, 'iface') || '').trim().split(/\s+/).filter(Boolean);
+}
+
+function get_mtk_mld_member(member) {
+	const iface = uci.sections('wireless', 'wifi-iface').filter(function(s) {
+		return s['.name'] == member || s.ifname == member;
+	})[0];
+	return iface && isMtkWifiHwtype(uci.get('wireless', iface.device, 'type')) && iface.mode == 'ap'
+		? iface : null;
+}
+
+function is_mtk_mld(section_id) {
+	const members = get_mld_members(section_id);
+	return uci.get('wireless', section_id, 'mode') == 'ap' && members.length == 2 &&
+		members.every(function(member) { return !!get_mtk_mld_member(member); });
+}
+
+function mld_band_default_ssid(name) {
+	return /^rai/.test(String(name || '')) ? 'QWRT-5G' : 'QWRT-2.4G';
+}
+
+// MLO needs EHT on every radio. Remember the standalone mode for disable/delete.
+function sync_mld_device_mode(iface, enabled) {
+	const device = iface && iface.device;
+	if (!device) return;
+	const mode = uci.get('wireless', device, 'htmode') || '';
+	const previous = uci.get('wireless', device, 'mlo_prev_htmode');
+	if (enabled) {
+		if (!/^EHT/.test(mode)) {
+			if (!previous) uci.set('wireless', device, 'mlo_prev_htmode', mode);
+			const width = mode.match(/(20|40|80|160)$/);
+			uci.set('wireless', device, 'htmode', 'EHT' + (width ? width[1] : '80'));
+		}
+	} else if (previous) {
+		uci.set('wireless', device, 'htmode', previous);
+		uci.unset('wireless', device, 'mlo_prev_htmode');
+	}
+}
+
+function restore_mld_members(section_id, members) {
+	members = members || get_mld_members(section_id);
+	const self_owned = ['ssid', 'encryption', 'key', 'ieee80211w'];
+
+	members.forEach(function(member) {
+		const iface = get_mtk_mld_member(member);
+		if (!iface)
+			return;
+		const name = iface['.name'];
+		sync_mld_device_mode(iface, false);
+		uci.unset('wireless', name, 'mld_group');
+		if (!uci.get('wireless', name, 'mlo_prev'))
+			return;
+
+		self_owned.forEach(function(opt) {
+			const prev = uci.get('wireless', name, 'mlo_prev_' + opt);
+			if (prev) {
+				uci.set('wireless', name, opt, prev);
+			} else {
+				uci.unset('wireless', name, opt);
+			}
+			uci.unset('wireless', name, 'mlo_prev_' + opt);
+		});
+		uci.unset('wireless', name, 'mlo_prev');
+	});
+}
+
+function sync_mld_to_members(section_id) {
+	if (!is_mtk_mld(section_id))
+		return;
+	const members = get_mld_members(section_id);
+
+	const disabled = uci.get('wireless', section_id, 'disabled') == '1';
+	if (disabled) {
+		restore_mld_members(section_id);
+		return;
+	}
+
+	const ssid = uci.get('wireless', section_id, 'ssid');
+	const enc = uci.get('wireless', section_id, 'encryption');
+	const key = uci.get('wireless', section_id, 'key');
+	const mfp = uci.get('wireless', section_id, 'ieee80211w');
+	const self_owned = ['ssid', 'encryption', 'key', 'ieee80211w'];
+
+	members.forEach(function(member) {
+		const iface = get_mtk_mld_member(member);
+		const name = iface['.name'];
+
+		// An already grouped legacy interface has no reliable standalone SSID.
+		if (!uci.get('wireless', name, 'mlo_prev')) {
+			self_owned.forEach(function(opt) {
+				let value = uci.get('wireless', name, opt) || '';
+				if (opt == 'ssid' && uci.get('wireless', name, 'mld_group') && value == ssid)
+					value = mld_band_default_ssid(name);
+				uci.set('wireless', name, 'mlo_prev_' + opt, value);
+			});
+			uci.set('wireless', name, 'mlo_prev', '1');
+		}
+
+		sync_mld_device_mode(iface, true);
+		uci.set('wireless', name, 'mld_group', '1');
+		if (ssid) uci.set('wireless', name, 'ssid', ssid);
+		if (enc) uci.set('wireless', name, 'encryption', enc);
+		if (key) uci.set('wireless', name, 'key', key);
+		if (mfp) uci.set('wireless', name, 'ieee80211w', mfp);
+	});
+}
+
+function render_mld_status(section_id, wifiNets, section) {
+	const disabled = uci.get('wireless', section_id, 'disabled') == '1';
+	const links = L.toArray(String(uci.get('wireless', section_id, 'iface') || '').trim().split(/\s+/).filter(Boolean));
+	const members = links.length ? render_mld_member_status(section_id, wifiNets, section) : _('None');
+
+	return E('div', { 'class': 'mlo-group-status' }, [
+		E('div', { 'style': 'font-size:1.1em; font-weight:bold; margin-bottom:0.5em;' }, [
+			E('div', {}, [ _('SSID'), ': ', uci.get('wireless', section_id, 'ssid') || '?' ]),
+			E('div', {}, [ _('Mode'), ': ', _('MLO access point') ]),
+			E('div', {}, [ _('Encryption'), ': ', formatConfigEncryption(uci.get('wireless', section_id, 'encryption')) ])
+		]),
+		E('div', { 'style': 'margin-bottom:0.5em;' }, [
+			E('em', disabled ? _('MLO group is disabled') : _('MLO group is enabled'))
+		]),
+		E('div', { 'style': 'margin-left:0.5em;' }, [
+			E('strong', {}, _('Member links')),
+			members
+		])
+	]);
+}
+
+function render_mld_badge(section_id) {
+	const disabled = uci.get('wireless', section_id, 'disabled') == '1';
+
+	return E('div', { 'class': 'center' }, [
+		E('div', { 'class': 'wireless-radio-badge' }, [
+			E('img', {
+				'src': L.resource('icons/wifi%s.svg').format(disabled ? '_disabled' : ''),
+				'title': _('Multi-Link Operation')
+			})
+		])
+	]);
+}
+
+function isMldMemberNetwork(radioNet) {
+	const section = radioNet.getName();
+	const ifname = radioNet.getIfname();
+
+	return uci.sections('wireless', 'wifi-mld').some(function(mld) {
+		if (!is_mtk_mld(mld['.name']) || mld.disabled == '1')
+			return false;
+		const members = String(mld.iface || '').trim().split(/\s+/).filter(Boolean);
+		return members.indexOf(section) >= 0 || (ifname && members.indexOf(ifname) >= 0);
+	});
 }
 
 function render_modal_status(node, radioNet) {
@@ -1691,7 +1940,7 @@ var CBIWifiFrequencyValue = form.Value.extend({
 		const bandval = uci.get('wireless', device_section, 'band');
 		const cfg_channel = uci.get('wireless', device_section, 'channel');
 		const chval = +cfg_channel;
-		const allow_auto = (hwtype == 'mt_dbdc' || isQcaWifiHwtype(hwtype) ||
+		const allow_auto = (isMtkWifiHwtype(hwtype) || isQcaWifiHwtype(hwtype) ||
 			cfg_channel == 'auto' || L.hasSystemFeature('hostapd', 'acs'));
 		const configOnly = isConfigWifiDeviceDisabled(device_section) ||
 			(isQcaWifiHwtype(hwtype) && areQcaRuntimeProbesSuspended());
@@ -2366,7 +2615,7 @@ var CBIWifiFrequencyValue = form.Value.extend({
 		else if (this.useBandOption) {
 			setValue('band', band);
 
-			if (hwtype == 'mac80211')
+			if (hwtype == 'mac80211' || isMtkWifiHwtype(hwtype))
 				unsetValue('hwmode');
 		}
 		else {
@@ -2464,6 +2713,34 @@ var CBIWifiCountryValue = form.Value.extend({
 	}
 });
 
+function restrictQca6GHzChoices(option, getBand, allowed, message) {
+	let widget, section;
+	const update = function() {
+		if (!widget)
+			return;
+		widget.querySelectorAll('option').forEach(choice => {
+			const incompatible = getBand() == '6g' && !allowed.includes(choice.value);
+			choice.disabled = incompatible;
+			choice.hidden = incompatible && !choice.selected;
+		});
+	};
+	option.renderWidget = function(section_id, option_index, cfgvalue) {
+		section = section_id;
+		widget = form.ListValue.prototype.renderWidget.call(this, section_id, option_index, cfgvalue);
+		widget.addEventListener('change', update);
+		update();
+		return widget;
+	};
+	option.validate = function(section_id, value) {
+		return getBand() != '6g' || allowed.includes(value) || message;
+	};
+	return function() {
+		update();
+		if (widget)
+			option.triggerValidation(section);
+	};
+}
+
 return view.extend({
 	poll_status: function(map, data) {
 		const rows = map.querySelectorAll('.cbi-section-table-row[data-sid]');
@@ -2472,12 +2749,25 @@ return view.extend({
 			const section_id = row.getAttribute('data-sid');
 			const radioDev = data[1].filter(function(d) { return d.getName() == section_id; })[0];
 			const radioNet = data[2].filter(function(n) { return n.getName() == section_id; })[0];
+			const mldSection = uci.sections('wireless', 'wifi-mld').filter(function(mld) {
+				return mld['.name'] == section_id;
+			})[0];
 			const badge = row.querySelector('[data-name="_badge"] > div');
 			const stat = row.querySelector('[data-name="_stat"]');
 			const btns = row.querySelectorAll('.cbi-section-actions button');
-			const busy = btns[0].classList.contains('spinning') || btns[1].classList.contains('spinning') || btns[2].classList.contains('spinning');
 
-			if (radioDev) {
+			if (!radioDev && !radioNet && !mldSection)
+				return;
+
+			const busy = Array.from(btns).some(function(button) {
+				return button.classList.contains('spinning');
+			});
+
+			if (mldSection) {
+				dom.content(badge, render_mld_badge(section_id));
+				dom.content(stat, render_mld_status(section_id, data[2], this.overviewSection));
+			}
+			else if (radioDev) {
 				dom.content(badge, render_radio_badge(radioDev, data[2].filter(function(n) { return n.getWifiDeviceName() == radioDev.getName(); })));
 				dom.content(stat, render_radio_status(radioDev, data[2].filter(function(n) { return n.getWifiDeviceName() == radioDev.getName(); })));
 			}
@@ -2653,7 +2943,7 @@ return view.extend({
 	},
 
 	renderOverview: function(zones) {
-		let m, s, o;
+		let m, s, mld, o;
 		const ppeVpTarget = isPpeVpTarget(this.boardinfo);
 
 		m = new form.Map('wireless');
@@ -2701,7 +2991,12 @@ return view.extend({
 				rv.push(radio.getName());
 
 				this.wifis.forEach(wifi => {
-					if (wifi.getWifiDeviceName() == radio.getName())
+					const radioName = wifi.getWifiDeviceName();
+					const isUnusedMtkClient = isMtkWifiHwtype(uci.get('wireless', radioName, 'type')) &&
+						wifi.getMode() == 'sta' && wifi.get('disabled') == '1' && !wifi.getSSID();
+					const isMldMember = isMldMemberNetwork(wifi);
+
+					if (radioName == radio.getName() && !isUnusedMtkClient && !isMldMember)
 						rv.push(wifi.getName());
 				});
 			});
@@ -2906,9 +3201,13 @@ return view.extend({
 						};
 					}
 				}
-				else if (hwtype == 'mt_dbdc') {
+				else if (isMtkWifiHwtype(hwtype)) {
 					o = ss.taboption('advanced', CBIWifiCountryValue, 'country', _('Country Code'));
 					o.wifiNetwork = radioNet;
+
+					o = ss.taboption('advanced', form.Value, 'macaddr', _('Default MAC address'), _('Override the physical radio MAC address. Leave empty to use the driver or EEPROM default. Do not use this for MBSSID or MLO member addresses.'));
+					o.datatype = 'macaddr';
+					o.placeholder = _('driver default');
 
 					o = ss.taboption('advanced', form.Flag, 'noscan', _('Force 40MHz mode'), _('Always use 40MHz channels even if the secondary channel overlaps. Using this option does not comply with IEEE 802.11n-2009!'));
 					o.depends({ '_freq': '2g', '!contains': true });
@@ -2952,7 +3251,7 @@ return view.extend({
 				o = ss.taboption('general', form.ListValue, 'mode', _('Mode'),
 					(hwtype == 'mac80211' && !have_mesh) ? '<a id="installmesh" href="%s" target="_blank" rel="noreferrer">%s</a>'
 						.format(L.url('admin/system/package-manager') + '?query=wpad-mesh', _('802.11s? Install mesh wpad') ) : '');
-				if (hwtype == 'mt_dbdc') {
+				if (isMtkWifiHwtype(hwtype)) {
 					o.value('ap', _('Access Point'));
 					o.value('sta', _('Client'));
 				}
@@ -2988,7 +3287,7 @@ return view.extend({
 				o.depends('mode', 'sta-wds');
 				o.depends('mode', 'wds');
 
-				if (!(hwtype == 'mt_dbdc' && ifmode == 'ap')) {
+				if (!(isMtkWifiHwtype(hwtype) && ifmode == 'ap')) {
 					o = ss.taboption('general', form.Value, 'bssid', _('<abbr title="Basic Service Set Identifier">BSSID</abbr>'));
 					o.datatype = 'macaddr';
 				}
@@ -3029,7 +3328,7 @@ return view.extend({
 					});
 				};
 
-				if (hwtype == 'mac80211' || hwtype == 'mt_dbdc' || isQcaWifiHwtype(hwtype)) {
+				if (hwtype == 'mac80211' || isMtkWifiHwtype(hwtype) || isQcaWifiHwtype(hwtype)) {
 					o = ss.taboption('general', form.Flag, 'hidden', _('Hide <abbr title="Extended Service Set Identifier">ESSID</abbr>'), _('Where the ESSID is hidden, clients may fail to roam and airtime efficiency may be significantly reduced.'));
 					o.depends('mode', 'ap');
 
@@ -3329,7 +3628,7 @@ return view.extend({
 				o.depends('encryption', 'psk2');
 				o.depends('encryption', 'wpa-mixed');
 				o.depends('encryption', 'psk-mixed');
-				if (hwtype != 'mt_dbdc')
+				if (!isMtkWifiHwtype(hwtype))
 					o.depends('encryption', 'psk');
 				o.value('auto', _('auto'));
 				o.value('ccmp', _('Force CCMP (AES)'));
@@ -3563,7 +3862,7 @@ return view.extend({
 						for (const b of bytes) {
 							// printable = 0x20–0x3A and 0x3C–0x7E, but semicolon (0x3B) excluded
 							// anything *within* this range %encoded should be treated as printable literal(?)
-							// There seems to be a glaring bug in this WiFi spec. Ofc there are bugs. 
+							// There seems to be a glaring bug in this WiFi spec. Ofc there are bugs.
 							// By not encoding the "%" character, a string literal % with two successive
 							// digits is ambiguous. If the password contains "%20" which
 							// should be interpreted literally ['%', '2', '0'] and not " ", some
@@ -4150,7 +4449,7 @@ return view.extend({
 					o.depends({ ieee80211r: '1', ft_psk_generate_local: '' });
 					o.rmempty = true;
 				}
-				else if (hwtype == 'mt_dbdc') {
+				else if (isMtkWifiHwtype(hwtype)) {
 					const ft_identifier = getFtIdentifier(radioNet);
 
 					o = ss.taboption('advanced', form.Value, 'rssikick', _('Weak signal kick threshold'), _('Disconnect clients when the RSSI falls below this threshold. Units: dBm.'));
@@ -4175,9 +4474,24 @@ return view.extend({
 					o.depends('mode', 'ap');
 					o.rmempty = true;
 
+					o = ss.taboption('roaming', form.Flag, 'rrm_neighbor_report', _('Neighbour Report'), _('802.11k: Enable neighbor report via radio measurements.'));
+					o.depends({ ieee80211k: '1' });
+					o.default = o.enabled;
+					o.rmempty = false;
+
+					o = ss.taboption('roaming', form.Flag, 'rrm_beacon_report', _('Beacon Report'), _('802.11k: Enable beacon report via radio measurements.'));
+					o.depends({ ieee80211k: '1' });
+					o.default = o.enabled;
+					o.rmempty = false;
+
 					o = ss.taboption('roaming', form.Flag, 'ieee80211v', _('802.11v BSS Transition'), _('Enable BSS transition management for assisted roaming.'));
 					o.depends('mode', 'ap');
 					o.rmempty = true;
+
+					o = ss.taboption('roaming', form.Flag, 'bss_transition', _('BSS Transition'), _('802.11v: Basic Service Set (BSS) transition management.'));
+					o.depends({ ieee80211v: '1' });
+					o.default = o.enabled;
+					o.rmempty = false;
 
 					o = ss.taboption('roaming', form.Flag, 'ieee80211r', _('802.11r Fast Transition'), _('Enable fast roaming among access points that belong to the same mobility domain.'));
 					o.depends('mode', 'ap');
@@ -4391,7 +4705,7 @@ return view.extend({
 			const hwtype = uci.get('wireless', radioName, 'type');
 			const ifmode = radioNet.getMode();
 
-			if (hwtype == 'mt_dbdc' && ifmode == 'ap') {
+			if (isMtkWifiHwtype(hwtype) && ifmode == 'ap') {
 				const wifi_sections = uci.sections('wireless', 'wifi-iface');
 				let mbssid_num = 0;
 
@@ -4588,7 +4902,7 @@ return view.extend({
 
 					uci.unset('wireless', radioDev.getName(), 'disabled');
 
-					if (hwtype == 'mt_dbdc') {
+					if (isMtkWifiHwtype(hwtype)) {
 						for (let ws of wifi_sections) {
 							if (ws.device == radioDev.getName() && ws.mode == 'sta') {
 								section_id = ws['.name'];
@@ -4612,7 +4926,7 @@ return view.extend({
 					const w = (bss.ht_operation.secondary_channel_offset == 'no secondary') ? 20 : 40;
 					uci.set('wireless', radioDev.getName(), 'htmode', 'HT'+w);
 				}
-				else if (hwtype != 'mt_dbdc') {
+				else if (!isMtkWifiHwtype(hwtype)) {
 					uci.unset('wireless', radioDev.getName(), 'htmode');
 				}
 
@@ -4769,7 +5083,7 @@ return view.extend({
 			if (bss.ssid != null) {
 				bssid = s2.option(form.Flag, 'bssid', _('Lock to BSSID'), _('Instead of joining any network with a matching SSID, only connect to the BSSID <code>%h</code>.').format(bss.bssid));
 				const radioType = uci.get('wireless', radioDev.getName(), 'type');
-				bssid.default = ['mt_dbdc', 'qcawifi', 'qcawificfg80211'].includes(radioType) ? '1' : '0';
+				bssid.default = (isMtkWifiHwtype(radioType) || isQcaWifiHwtype(radioType)) ? '1' : '0';
 			}
 
 			zone = s2.option(widgets.ZoneSelect, 'zone', _('Create / Assign firewall-zone'), _('Choose the firewall zone you want to assign to this interface. Select <em>unspecified</em> to remove the interface from the associated zone or fill out the <em>custom</em> field to define a new zone and attach the interface to it.'));
@@ -4795,7 +5109,7 @@ return view.extend({
 		s.handleAdd = function(radioDev, ev) {
 			const hwtype = uci.get('wireless', radioDev.getName(), 'type');
 
-			if (hwtype == 'mt_dbdc') {
+			if (isMtkWifiHwtype(hwtype)) {
 				const wifi_sections = uci.sections('wireless', 'wifi-iface');
 				let mbssid_num = 0;
 				const max_mbssid_num = 16;
@@ -4860,7 +5174,318 @@ return view.extend({
 				return render_network_status(inst);
 		};
 
-		return m.render().then(L.bind(function(m, nodes) {
+		const mldMemberOptions = [];
+		const mldMemberBands = {};
+		const mldMembers = uci.sections('wireless', 'wifi-iface');
+		const mldDevices = uci.sections('wireless', 'wifi-device');
+
+		mldMembers.forEach(function(iface) {
+			if (iface.mode != 'ap')
+				return;
+
+			const device = mldDevices.filter(function(dev) {
+				return dev['.name'] == iface.device;
+			})[0];
+			const hwtype = device ? device.type : null;
+			if (!isMtkWifiHwtype(hwtype))
+				return;
+			const band = getConfiguredBand(hwtype, device.hwmode, device.channel, device.band, device.htmode);
+			const ifname = iface.ifname || iface['.name'];
+
+			if (!ifname || (band != '2g' && band != '5g'))
+				return;
+
+			mldMemberOptions.push({
+				value: iface['.name'],
+				ifname: ifname,
+				label: `${ifname} (${band == '2g' ? '2.4 GHz' : '5 GHz'})`,
+				band: band
+			});
+			mldMemberBands[iface['.name']] = band;
+		});
+
+		mldMemberOptions.sort(function(a, b) {
+			return a.band.localeCompare(b.band) || a.label.localeCompare(b.label);
+		});
+
+		if (mldMemberOptions.some(function(o) { return o.band == '2g'; }) &&
+		    mldMemberOptions.some(function(o) { return o.band == '5g'; })) {
+			mld = m.section(form.GridSection, 'wifi-mld', _('MLO Overview'));
+			mld.anonymous = true;
+			mld.addremove = true;
+			mld.nodescriptions = true;
+			mld.filter = function(section_id) {
+				return section_id == m.addedSection || is_mtk_mld(section_id);
+			};
+			mld.add_caption = _('Add MLO group');
+			mld.remove_caption = _('Delete MLO group');
+			this.overviewSection = s;
+			mld.modaltitle = function(section_id) {
+				return _('Edit MLO group “%s”').format(uci.get('wireless', section_id, 'ssid') || section_id);
+			};
+			mld.handleAdd = function(ev) {
+				if (uci.sections('wireless', 'wifi-mld').some(function(s) { return is_mtk_mld(s['.name']); })) {
+					ui.addNotification(null, E('p', _('This MediaTek driver supports one MLO group.')), 'warning');
+					return;
+				}
+
+				const section_id = 'mld' + uci.sections('wireless', 'wifi-mld').length;
+				let id = section_id;
+
+				while (uci.get('wireless', id))
+					id = 'mld' + (parseInt(id.substring(3), 10) + 1);
+
+				uci.add('wireless', 'wifi-mld', id);
+				uci.set('wireless', id, 'disabled', '0');
+				uci.set('wireless', id, 'mode', 'ap');
+				uci.set('wireless', id, 'ssid', 'MLO');
+				uci.set('wireless', id, 'encryption', 'sae');
+				uci.set('wireless', id, 'ieee80211w', '2');
+				m.addedSection = id;
+
+				return this.renderMoreOptionsModal(id);
+			};
+
+			mld.handleRemove = function(section_id, ev) {
+				restore_mld_members(section_id);
+				return form.TypedSection.prototype.handleRemove.apply(this, [section_id, ev]);
+			};
+			mld.handleToggle = function(section_id, ev) {
+				const disabled = uci.get('wireless', section_id, 'disabled') == '1';
+				if (disabled && !uci.get('wireless', section_id, 'key')) {
+					ui.addNotification(null, E('p', _('Set an MLO key and enable the group in its settings.')), 'info');
+					return this.renderMoreOptionsModal(section_id);
+				}
+
+				uci.set('wireless', section_id, 'disabled', disabled ? '0' : '1');
+				return this.map.save().then(function() {
+					return ui.changes.apply();
+				});
+			};
+			mld.handleModalSave = function(modalMap, ev) {
+				const mapNode = this.getActiveModalMap();
+				let activeMap = dom.findClassInstance(mapNode);
+				let saveTasks = activeMap.save(null, true);
+
+				while (activeMap.parent) {
+					activeMap = activeMap.parent;
+					saveTasks = saveTasks.then(L.bind(activeMap.load, activeMap))
+						.then(L.bind(activeMap.reset, activeMap));
+				}
+
+				return saveTasks.then(L.bind(this.handleModalCancel, this, modalMap, ev, true))
+					.then(() => this.map.save(null, true))
+					.catch(() => {});
+			};
+
+			mld.renderRowActions = function(section_id) {
+			const disabled = uci.get('wireless', section_id, 'disabled') == '1';
+			return E('td', { 'class': 'td middle cbi-section-actions' }, E('div', [
+				E('button', {
+					'class': 'cbi-button cbi-button-action',
+					'title': disabled ? _('Enable') : _('Disable'),
+					'click': ui.createHandlerFn(this, 'handleToggle', section_id)
+				}, disabled ? _('Enable') : _('Disable')),
+				E('button', {
+					'class': 'cbi-button cbi-button-action important',
+					'title': _('Edit this MLO group'),
+					'click': ui.createHandlerFn(this, 'renderMoreOptionsModal', section_id)
+				}, _('Edit')),
+				E('button', {
+					'class': 'cbi-button cbi-button-negative remove',
+					'title': _('Delete this MLO group'),
+					'click': ui.createHandlerFn(this, 'handleRemove', section_id)
+				}, _('Delete'))
+			]));
+		};
+
+			o = mld.option(form.DummyValue, '_badge');
+			o.modalonly = false;
+			o.textvalue = function(section_id) {
+				return render_mld_badge(section_id);
+			};
+
+			o = mld.option(form.DummyValue, '_stat');
+			o.modalonly = false;
+			o.textvalue = function(section_id) {
+				return render_mld_status(section_id, s.wifis, s);
+			};
+
+			o = mld.option(form.ListValue, 'mode', _('Mode'));
+			o.modalonly = true;
+			o.value('ap', _('Access Point'));
+			o.default = 'ap';
+			o.rmempty = false;
+
+			o = mld.option(form.Flag, 'disabled', _('Disable MLO group'));
+			o.modalonly = true;
+			o.enabled = '1';
+			o.disabled = '0';
+			o.default = '0';
+			o.rmempty = false;
+
+			o = mld.option(form.Value, 'ssid', _('MLO SSID'));
+			o.modalonly = true;
+			o.datatype = 'maxlength(32)';
+			o.rmempty = false;
+
+			o = mld.option(form.Value, 'iface', _('Member links'), _('Select one 2.4 GHz and one 5 GHz wireless interface for this MLO group.'));
+			o.modalonly = true;
+			o.rmempty = false;
+
+			o.cfgvalue = function(section_id) {
+				const configured = String(uci.get('wireless', section_id, 'iface') || '').trim().split(/\s+/).filter(Boolean);
+				const selected = { '2g': '', '5g': '' };
+
+				for (const link of configured) {
+					const option = mldMemberOptions.filter(function(item) {
+						return item.value == link || item.ifname == link;
+					})[0];
+
+					if (option && !selected[option.band])
+						selected[option.band] = option.value;
+				}
+
+				return [ selected['2g'], selected['5g'] ];
+			};
+
+			o.renderWidget = function(section_id, option_index, cfgvalue) {
+				const configured = String(uci.get('wireless', section_id, 'iface') || '')
+					.trim().split(/\s+/).filter(Boolean);
+				const selected = { '2g': '', '5g': '' };
+
+				configured.forEach(function(link) {
+					const option = mldMemberOptions.filter(function(item) {
+						return item.value == link || item.ifname == link;
+					})[0];
+
+					if (option && !selected[option.band])
+						selected[option.band] = option.value;
+				});
+
+				const selectForBand = function(band, label) {
+					const select = E('select', {
+						'class': `mld-member-${band}`,
+						'style': 'min-width:12em'
+					}, [
+						E('option', { 'value': '' }, _('Select an interface')),
+						...mldMemberOptions.filter(function(option) {
+							return option.band == band;
+						}).map(function(option) {
+							return E('option', {
+								'value': option.value
+							}, option.label);
+						})
+					]);
+
+					/* Set the native select value after creating the options so the
+					 * current UCI member is shown even when cfgvalue is normalized by CBI. */
+					select.value = selected[band];
+
+					return E('label', { 'style': 'display:inline-block; margin-right:1em;' }, [
+						label, E('br'), select
+					]);
+				};
+
+				return E('div', { 'class': 'mld-member-selects' }, [
+					selectForBand('2g', _('2.4 GHz interface')),
+					selectForBand('5g', _('5 GHz interface'))
+				]);
+			};
+
+			o.formvalue = function(section_id) {
+				const node = this.map.findElement('data-field', this.cbid(section_id));
+				return [
+					node.querySelector('.mld-member-2g').value,
+					node.querySelector('.mld-member-5g').value
+				];
+			};
+
+			o.validate = function(section_id, value) {
+				const values = Array.isArray(value) ? value.map(function(item) {
+					return String(item || '').trim();
+				}).filter(Boolean) : [];
+				const selectedBands = {};
+
+				if (values.length != 2 || !values[0] || !values[1])
+					return _('Both 2.4 GHz and 5 GHz interfaces must be selected.');
+
+				for (const value of values) {
+					const band = mldMemberBands[value];
+					if (!band)
+						return _('Select only wireless interfaces from the available 2.4 GHz and 5 GHz bands.');
+					if (selectedBands[band])
+						return _('Select no more than one interface from each band.');
+					selectedBands[band] = true;
+				}
+
+				if (!selectedBands['2g'] || !selectedBands['5g'])
+					return _('Select one 2.4 GHz interface and one 5 GHz interface.');
+
+				return true;
+			};
+
+			o.write = function(section_id, value) {
+				const values = Array.isArray(value) ? value.map(function(item) {
+					return String(item || '').trim();
+				}).filter(Boolean) : [];
+
+				if (values.length != 2)
+					return Promise.reject(new Error(_('Both 2.4 GHz and 5 GHz interfaces must be selected.')));
+
+				return form.Value.prototype.write.call(this, section_id, values.join(' '));
+			};
+
+			o = mld.option(form.ListValue, 'encryption', _('Encryption'));
+			o.modalonly = true;
+			o.value('sae', _('WPA3-SAE'));
+			o.default = 'sae';
+			o.rmempty = false;
+
+			o = mld.option(form.Value, 'key', _('Key'));
+			o.modalonly = true;
+			o.depends('encryption', 'sae');
+			o.datatype = 'wpakey';
+			o.password = true;
+			o.rmempty = false;
+
+			o = mld.option(form.ListValue, 'ieee80211w', _('Management frame protection'));
+			o.modalonly = true;
+			o.value('2', _('Required'));
+			o.default = '2';
+			o.rmempty = false;
+		}
+
+	// Keep MTK MLO members in sync before the map is saved.
+	{
+		const __mldOrigSave = m.save;
+		const previousMembers = {};
+		uci.sections('wireless', 'wifi-mld').forEach(function(mld) {
+			if (is_mtk_mld(mld['.name']))
+				previousMembers[mld['.name']] = get_mld_members(mld['.name']);
+		});
+		m.save = function(cb, silent) {
+			return __mldOrigSave.call(this, function() {
+				const groups = uci.sections('wireless', 'wifi-mld').filter(function(mld) {
+					return is_mtk_mld(mld['.name']);
+				});
+				if (groups.length > 1)
+					throw new Error(_('This MediaTek driver supports one MLO group.'));
+				groups.forEach(function(mld) {
+					const id = mld['.name'];
+					const current = get_mld_members(id);
+					const removed = (previousMembers[id] || []).filter(function(member) {
+						return current.indexOf(member) < 0;
+					});
+					restore_mld_members(id, removed);
+					sync_mld_to_members(id);
+					previousMembers[id] = current;
+				});
+				if (cb) return cb();
+			}, silent);
+		};
+	}
+	return m.render().then(L.bind(function(m, nodes) {
 			let initialAssocRefresh = true;
 
 			poll.add(L.bind(function() {
