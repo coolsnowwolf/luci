@@ -2651,6 +2651,11 @@ return view.extend({
 			callSystemBoard()
 		]).then((data) => {
 			this.boardinfo = data[4] || {};
+			/* MTK capability rates need iwinfo and the PHY MCS/NSS map.
+			 * Populate them before the first render, not the next poll. */
+			if (!this.checkAnonymousSections() &&
+			    uci.sections('wireless', 'wifi-device').some(radio => radio.type == 'mt_dbdc'))
+				return loadIwinfoInfoMap(false).then(() => data);
 			return data;
 		});
 	},
@@ -2962,7 +2967,8 @@ return view.extend({
 
 					o = ss.taboption('advanced', form.Flag, 'noscan', _('Force 40MHz mode'), _('Always use 40MHz channels even if the secondary channel overlaps. Using this option does not comply with IEEE 802.11n-2009!'));
 					o.depends({ '_freq': '2g', '!contains': true });
-					o.default = o.disabled;
+					o.ucisection = radioNet.getWifiDeviceName();
+					o.default = o.enabled;
 					o.rmempty = false;
 
 					o = ss.taboption('advanced', form.Flag, 'mu_beamformer', _('MU-MIMO'));
