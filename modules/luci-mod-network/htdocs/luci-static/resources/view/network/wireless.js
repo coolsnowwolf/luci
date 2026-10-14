@@ -294,7 +294,18 @@ function loadIwinfoInfoMap(force) {
 
 		return Promise.all(queryTargets.map((name) =>
 			L.resolveDefault(callIwinfoInfoCompat(name), null).then((info) => [ name, info ])
-		)).then((entries) => {
+		)).then(async (entries) => {
+			const phyQueries = {};
+			for (const [ name, info ] of entries) {
+				if (info?.hardware?.id?.[0] != 0x14c3 || !/^phy\d+$/.test(info?.phy || ''))
+					continue;
+				phyQueries[info.phy] ??= L.resolveDefault(
+					fs.exec_direct('/usr/sbin/iw', [ 'phy', info.phy, 'info' ]), '');
+			}
+			for (const [ name, info ] of entries) {
+				if (phyQueries[info?.phy])
+					info.theoretical_bitrate = calculateEhtCapabilityRate(info, await phyQueries[info.phy]);
+			}
 			const nextMap = {};
 
 			for (const [ name, info ] of entries)
@@ -956,6 +967,41 @@ function getDisplayIwinfoBitRate(radioNet) {
 	return null;
 }
 
+/* EHT full-band PHY ceiling at GI 0.8 us, using advertised TX MCS/NSS.
+ * This is a capability estimate, never an observed station bitrate. */
+function calculateEhtCapabilityRate(info, phyInfo) {
+	const width = +(String(info?.htmode || '').match(/(20|40|80|160|320)$/)?.[1]);
+	const tones = { 20: 234, 40: 468, 80: 980, 160: 1960, 320: 3920 }[width];
+	if (!tones)
+		return null;
+
+	let best = 0;
+	for (const line of String(phyInfo || '').split('\n')) {
+		const m = line.match(/EHT bw\s*(<=|=)\s*(\d+) MHz, max NSS for MCS \d+-(\d+): Rx=\d+, Tx=(\d+)/);
+		if (!m || (m[1] == '=' ? width != +m[2] : width > +m[2]))
+			continue;
+		const nss = +m[4];
+		const bits = { 7: 5, 9: 20 / 3, 11: 25 / 3, 13: 10 }[+m[3]];
+		if (nss >= 1 && nss <= 8 && bits)
+			best = Math.max(best, tones * bits * nss / 13.6);
+	}
+	return best > 0 ? Math.round(best * 10) / 10 : null;
+}
+
+function getDisplayTheoreticalBitRate(radioNet) {
+	const device = radioNet.getWifiDeviceName();
+	if (uci.get('wireless', device, 'type') != 'mt_dbdc' ||
+	    !/^EHT/.test(uci.get('wireless', device, 'htmode') || ''))
+		return null;
+
+	for (const candidate of getIwinfoInfoCandidates(radioNet)) {
+		const rate = cachedIwinfoInfoMap?.[candidate]?.theoretical_bitrate;
+		if (rate > 0)
+			return rate;
+	}
+	return null;
+}
+
 function getDisplayBitRate(radioNet) {
 	let rate = radioNet.getBitRate();
 	const hwmode = uci.get('wireless', radioNet.getWifiDeviceName(), 'hwmode') || '';
@@ -1476,18 +1522,20 @@ function render_network_badge(radioNet) {
 function render_radio_status(radioDev, wifiNets) {
 	const name = getRadioDisplayName(radioDev);
 	const node = E('div', [ E('big', {}, E('strong', {}, name)), E('div') ]);
-	let channel, frequency, bitrate;
+	let channel, frequency, bitrate, theoretical;
 
 	wifiNets.forEach(wifiNet => {
 		channel   = channel   ?? getDisplayChannel(wifiNet);
 		frequency = frequency ?? getDisplayFrequency(wifiNet, channel);
 		bitrate   = bitrate   ?? getDisplayBitRate(wifiNet);
+		theoretical = theoretical ?? getDisplayTheoreticalBitRate(wifiNet);
 	});
 
 	if (isRadioDisplayUp(radioDev, wifiNets))
 		L.itemlist(node.lastElementChild, [
 			_('Channel'), `${channel || '?'} (${frequency || '?'} ${_('GHz')})`,
-			_('Bitrate'), `${bitrate || '?'} ${_('Mbit/s')}`
+			theoretical != null ? _('Theoretical bitrate') : _('Bitrate'),
+			`${theoretical ?? bitrate ?? '?'} ${_('Mbit/s')}`
 		], ' | ');
 	else
 		node.lastElementChild.appendChild(E('em', _('Device is not active')));
@@ -1530,7 +1578,8 @@ function render_modal_status(node, radioNet) {
 	const bssid = getDisplayBSSID(radioNet);
 	const channel = getDisplayChannel(radioNet);
 	const frequency = getDisplayFrequency(radioNet, channel);
-	const bitrate = getDisplayBitRate(radioNet);
+	const theoretical = getDisplayTheoreticalBitRate(radioNet);
+	const bitrate = theoretical ?? getDisplayBitRate(radioNet);
 	const hwtype = uci.get('wireless', radioNet.getWifiDeviceName(), 'type');
 	const disabled = isNetworkDisabled(radioNet);
 	const is_assoc = isDisplayAssociated(radioNet, hwtype, mode, bssid, channel, disabled);
@@ -1553,7 +1602,8 @@ function render_modal_status(node, radioNet) {
 		getDisplayTxPowerLabel(radioNet), (is_assoc && txpower != null) ? `${txpower} ${_('dBm')}` : null,
 		_('Signal'),     (is_assoc && noise != null) ? `${radioNet.getSignal()} ${_('dBm')}` : null,
 		_('Noise'),      (is_assoc && noise != null) ? `${noise} ${_('dBm')}` : null,
-		_('Bitrate'),    is_assoc ? `${bitrate ?? 0} ${_('Mbit/s')}` : null,
+		theoretical != null ? _('Theoretical bitrate') : _('Bitrate'),
+		                is_assoc ? `${bitrate ?? 0} ${_('Mbit/s')}` : null,
 		_('Country'),    is_assoc ? getDisplayCountryCode(radioNet) : null
 	], [ ' | ', E('br'), E('br'), E('br'), E('br'), E('br'), ' | ', E('br'), ' | ' ]);
 
