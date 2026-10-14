@@ -6,29 +6,34 @@
 
 get_status() {
 	# === NPU Status ===
-	# Read the actually-loaded NPU firmware path from DTS (firmware-name property).
-	local npu_fw=""
-	local npu_dt="/proc/device-tree/soc/npu@1e900000/firmware-name"
-	if [ -f "$npu_dt" ]; then
-		# firmware-name is a string list (null-separated). First entry is the rv32 code.
-		local fw_rel=$(tr '\0' '\n' < "$npu_dt" 2>/dev/null | grep -m1 "rv32")
-		[ -n "$fw_rel" ] && npu_fw="/lib/firmware/$fw_rel"
-	fi
-
-	local npu_ver="Unknown"
-	if [ -n "$npu_fw" ] && [ -f "$npu_fw" ]; then
-		npu_ver=$(strings "$npu_fw" 2>/dev/null | grep -oE '([0-9]+\.[0-9]+\.[0-9]+-)?TLB[0-9.]+[-_v0-9]*' | head -1)
-		[ -z "$npu_ver" ] && npu_ver="Unknown"
-	fi
-
 	local npu_loaded="false"
 	local npu_device=""
 	local npu_driver_path="/sys/bus/platform/drivers/airoha-npu"
 
 	if [ -d "$npu_driver_path" ]; then
 		npu_device=$(ls -1 "$npu_driver_path" 2>/dev/null | grep '\.npu$' | head -1)
-		if [ -n "$npu_device" ]; then
-			npu_loaded="true"
+		[ -n "$npu_device" ] && npu_loaded="true"
+	fi
+
+	local npu_ver="" npu_fw="" fw_rel="" compatible=""
+	local npu_dt="$npu_driver_path/$npu_device/of_node"
+	if [ "$npu_loaded" = "true" ]; then
+		# Prefer the version reported by the running firmware.
+		npu_ver=$(dmesg 2>/dev/null | sed -n 's/.*airoha-npu .*NPU fw version: \([0-9][0-9]*\.[0-9][0-9]*\) *$/\1/p' | tail -1)
+		if [ -f "$npu_dt/firmware-name" ]; then
+			fw_rel=$(tr '\0' '\n' < "$npu_dt/firmware-name" | grep -m1 "rv32")
+		else
+			# Match the driver's defaults when DTS does not override them.
+			compatible=$(tr '\0' '\n' < "$npu_dt/compatible" 2>/dev/null)
+			case "$compatible" in
+				*airoha,en7581-npu*) fw_rel="airoha/en7581_npu_rv32.bin" ;;
+				*airoha,an7583-npu*) fw_rel="airoha/an7583_npu_rv32.bin" ;;
+			esac
+		fi
+		[ -n "$fw_rel" ] && npu_fw="/lib/firmware/$fw_rel"
+		# Boot messages may have rolled out of the kernel log buffer.
+		if [ -z "$npu_ver" ] && [ -n "$npu_fw" ] && [ -f "$npu_fw" ]; then
+			npu_ver=$(strings "$npu_fw" 2>/dev/null | grep -oE '([0-9]+\.[0-9]+\.[0-9]+-)?TLB[0-9.]+[-_v0-9]*' | head -1)
 		fi
 	fi
 

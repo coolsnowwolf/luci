@@ -20,7 +20,7 @@ function shellquote(s) {
 
 function has_supported_hw_offloading_target(target) {
 	return type(target) == 'string' &&
-		match(target, /^(ramips\/mt7621|mediatek\/mt76..|mediatek\/filogic)$/) != null;
+		match(target, /^(ramips\/mt7621|mediatek\/mt76..|mediatek\/filogic|airoha\/an758[0-9])$/) != null;
 }
 
 function callPackageVersionCheck(pkg) {
