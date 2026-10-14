@@ -415,7 +415,7 @@ msgstr "7d（7 天）"
 
 #: modules/luci-mod-network/htdocs/luci-static/resources/view/network/wireless.js:1932
 msgid "802.11k RRM"
-msgstr "802.11k RRM"
+msgstr "802.11k 无线资源测量（RRM）"
 
 #: modules/luci-mod-network/htdocs/luci-static/resources/view/network/wireless.js:1941
 msgid "802.11k: Enable beacon report via radio measurements."
@@ -14186,3 +14186,45 @@ msgstr "导出内核日志到 TXT"
 
 msgid "Theoretical bitrate"
 msgstr "理论速率"
+
+msgid "Weak signal kick threshold"
+msgstr "弱信号剔除阈值"
+
+msgid "Disconnect clients when the RSSI falls below this threshold. Units: dBm."
+msgstr "当客户端的 RSSI 低于此阈值时断开连接。单位：dBm。"
+
+msgid "Association RSSI threshold"
+msgstr "接入 RSSI 阈值"
+
+msgid "Reject association requests below this threshold. Units: dBm."
+msgstr "拒绝 RSSI 低于此阈值的接入请求。单位：dBm。"
+
+msgid "802.11k/v/r roaming RSSI threshold"
+msgstr "802.11k/v/r 漫游 RSSI 阈值"
+
+msgid "Roaming assistance threshold used together with weak signal kick. Units: dBm."
+msgstr "与弱信号剔除功能配合使用的漫游辅助阈值。单位：dBm。"
+
+msgid "Enable radio resource measurements for roaming assistance."
+msgstr "启用无线资源测量以辅助漫游。"
+
+msgid "802.11v BSS Transition"
+msgstr "802.11v BSS 切换"
+
+msgid "Enable BSS transition management for assisted roaming."
+msgstr "启用 BSS 切换管理以辅助漫游。"
+
+msgid "Enable fast roaming among access points that belong to the same mobility domain."
+msgstr "在属于同一移动域的接入点之间启用快速漫游。"
+
+msgid "2-character hexadecimal mobility domain ID used by MTK fast transition."
+msgstr "MTK 快速切换使用的移动域标识，由 2 个十六进制字符组成。"
+
+msgid "Used for RADIUS NAS ID and 802.11r R0KH-ID."
+msgstr "用于 RADIUS NAS ID 和 802.11r R0KH-ID。"
+
+msgid "Target Wake Time"
+msgstr "目标唤醒时间（TWT）"
+
+msgid "MU-MIMO"
+msgstr "多用户 MIMO（MU-MIMO）"
