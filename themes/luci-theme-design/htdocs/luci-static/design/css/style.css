@@ -990,12 +990,7 @@ body[class*="node-"] > .main > .main-left > .nav > .slide > .menu.active::before
 }
 
 /* ripple effect */
-.main > .main-left > .nav > .slide > .menu,
-.main > .main-left > .nav > li:last-child a,
-.main > .main-left > .nav > li > a[data-title="Inital Setup"],
-.main > .main-left > .nav > li > a[data-title="Setup_Wizard"],
-.main > .main-left > .nav > li > a[href="/cgi-bin/luci//admin/wizard"],
-.main > .main-left > .nav > li > a[href="/cgi-bin/luci/admin/wizard"]
+.main > .main-left > .nav > li > a
 {
     display: block;
     padding: 0.675rem 0 0.675rem 2.5rem;
