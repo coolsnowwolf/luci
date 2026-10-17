@@ -11,10 +11,11 @@
 				"/usr/libexec/luci-peeraddr": [ "exec" ],
 				"/usr/sbin/wlanconfig": [ "exec" ],
 				"/proc/sys/net/ipv[46]/conf/*": [ "read" ],
-				"/sys/class/net/*/brport/*": [ "read" ]
+				"/sys/class/net/*/brport/*": [ "read" ],
+				"/sys/class/net/*/device/uevent": [ "read" ]
 			},
 			"ubus": {
-				"file": [ "exec" ],
+				"file": [ "exec", "read" ],
 				"iwinfo": [ "assoclist", "countrylist", "devices", "freqlist", "info", "txpowerlist" ],
 				"luci": [ "getSwconfigFeatures", "getSwconfigPortState" ],
 				"network.wireless": [ "status" ]
