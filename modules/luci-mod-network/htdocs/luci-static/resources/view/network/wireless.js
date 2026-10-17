@@ -678,7 +678,8 @@ function getDisplayTxPower(radioNet) {
 		if (isPlausibleTxPowerValue(info != null ? info.txpower : null, hwtype))
 			return info.txpower;
 
-	if (isPlausibleTxPowerValue(cfgvalue, hwtype))
+	// mt_dbdc configures power as a percentage, not dBm.
+	if (hwtype != 'mt_dbdc' && isPlausibleTxPowerValue(cfgvalue, hwtype))
 		return cfgvalue;
 
 	return null;
@@ -1404,7 +1405,9 @@ function getDisplaySignalPercent(radioNet, hwtype, is_assoc, disabled) {
 }
 
 function getDisplaySignalValue(radioNet, hwtype, is_assoc) {
-	if ((hwtype == 'mt_dbdc' || (isQcaWifiHwtype(hwtype) && radioNet.getMode() == 'ap')) && is_assoc)
+	if (hwtype == 'mt_dbdc' && radioNet.getMode() == 'ap')
+		return is_assoc ? getDisplayTxPower(radioNet) : null;
+	if (isQcaWifiHwtype(hwtype) && radioNet.getMode() == 'ap' && is_assoc)
 		return getDisplayTxPower(radioNet) ?? 30;
 
 	return radioNet.getSignal();
@@ -1437,7 +1440,7 @@ function renderStatusRow(pairs, className) {
 	return added ? row : null;
 }
 
-function render_signal_badge(signalPercent, signalValue, noiseValue, wrap, mode) {
+function render_signal_badge(signalPercent, signalValue, noiseValue, wrap, mode, txpower = false) {
 	let icon = L.resource('icons/signal-075-100.svg'), title, value;
 
 	switch(true) {
@@ -1459,13 +1462,13 @@ function render_signal_badge(signalPercent, signalValue, noiseValue, wrap, mode)
 		}
 		else {
 			value = `${signalValue}\xa0${_('dBm')}`;
-			title = `${_('Signal')} ${signalValue} ${_('dBm')}`;
+			title = `${txpower ? _('Tx-Power') : _('Signal')} ${signalValue} ${_('dBm')}`;
 		}
 	}
 	else if (signalPercent > -1) {
 		switch (mode) {
 			case 'ap':
-				title = _('No client associated');
+				title = txpower ? _('Tx-Power') : _('No client associated');
 				break;
 
 			case 'sta':
@@ -1516,7 +1519,8 @@ function render_network_badge(radioNet) {
 	return render_signal_badge(
 		getDisplaySignalPercent(radioNet, hwtype, is_assoc, disabled),
 		getDisplaySignalValue(radioNet, hwtype, is_assoc),
-		getDisplayNoiseValue(radioNet, hwtype, is_assoc), false, radioNet.getMode());
+		getDisplayNoiseValue(radioNet, hwtype, is_assoc), false, radioNet.getMode(),
+		hwtype == 'mt_dbdc' && radioNet.getMode() == 'ap');
 }
 
 function render_radio_status(radioDev, wifiNets) {
@@ -1591,7 +1595,8 @@ function render_modal_status(node, radioNet) {
 
 	dom.content(node.firstElementChild, render_signal_badge(
 		getDisplaySignalPercent(radioNet, hwtype, is_assoc, disabled),
-		getDisplaySignalValue(radioNet, hwtype, is_assoc), noise, true, radioNet.getMode()));
+		getDisplaySignalValue(radioNet, hwtype, is_assoc), noise, true, radioNet.getMode(),
+		hwtype == 'mt_dbdc' && radioNet.getMode() == 'ap'));
 
 	L.itemlist(node.lastElementChild, [
 		_('Mode'),       mode,
