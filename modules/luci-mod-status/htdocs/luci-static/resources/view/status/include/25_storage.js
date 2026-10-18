@@ -5,6 +5,8 @@
 var callMountPoints = rpc.declare({
 	object: 'luci',
 	method: 'getMountPoints',
+	params: [ 'root_only' ],
+	nobatch: true,
 	expect: { result: [] }
 });
 
@@ -26,7 +28,7 @@ return baseclass.extend({
 
 	load: function() {
 		return Promise.all([
-			L.resolveDefault(callMountPoints(), {}),
+			L.resolveDefault(callMountPoints(true), []),
 		]);
 	},
 

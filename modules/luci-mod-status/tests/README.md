@@ -43,3 +43,9 @@ pending wireless query does not delay other overview cards or their next
 refresh, duplicate itself, or prevent retry after failure. Run
 `node modules/luci-mod-status/tests/wifi-disabled.js` for configured QCA and
 MediaTek VIF selection, disabled interfaces and mixed-backend handling.
+
+Run `node modules/luci-mod-status/tests/mount-points.js` to verify that the
+homepage's root-only storage query never calls statvfs on unrelated mounts,
+while existing callers without the option still receive the complete list.
+Cold-boot validation should keep a FAT USB volume mounted: its initial free-space
+scan must not delay the overview's system, memory or storage cards.

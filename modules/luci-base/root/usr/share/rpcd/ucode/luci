@@ -571,7 +571,8 @@ const methods = {
 	},
 
 	getMountPoints: {
-		call: function() {
+		args: { root_only: false },
+		call: function(request) {
 			const fd = open('/proc/mounts', 'r');
 
 			if (fd) {
@@ -581,6 +582,11 @@ const methods = {
 					const m = split(line, ' ');
 					const device = replace(m[0], /\\([0-9][0-9][0-9])/g, (m, n) => chr(int(n, 8)));
 					const mount  = replace(m[1], /\\([0-9][0-9][0-9])/g, (m, n) => chr(int(n, 8)));
+					// The overview only needs root storage. Avoid waking disks or
+					// scanning FAT free space on unrelated mounts during first login.
+					if (request.args.root_only && mount != '/' && mount != '/overlay')
+						continue;
+
 					const stat = statvfs(mount);
 
 					if (stat?.blocks > 0) {
