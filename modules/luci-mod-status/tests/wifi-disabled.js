@@ -61,5 +61,26 @@ function networks() { return uci.sections('wireless', 'wifi-iface').map(s => ({
  config.wifi0.disabled = '0';
  resolver = await view.loadIwinfoResolver(radios(), networks());
  assert.deepEqual(resolver.queryTargets, ['radio0'], 'mixed setups must not probe bare QCA radios');
+ for (const type of ['mtwifi', 'mt_dbdc', 'mtdbdc', 'ralink']) {
+  config = {
+   ra: {'.type':'wifi-device', type}, rai: {'.type':'wifi-device', type},
+   ra0: {'.type':'wifi-iface', device:'ra', ifname:'ra0'},
+   cfg5g: {'.type':'wifi-iface', device:'rai', ifname:'rai0'},
+   rai1: {'.type':'wifi-iface', device:'rai', disabled:'1'}
+  };
+  calls = [];
+  resolver = await view.loadIwinfoResolver(radios(), networks());
+  assert.deepEqual(resolver.queryTargets, ['ra0', 'rai0']);
+  assert.equal(resolver.aliasMap.cfg5g, 'rai0');
+  view.iwinfoResolver = resolver;
+  await view.loadIwinfoInfoMap(resolver);
+  for (const net of networks()) await view.getAssocListForNetwork(net);
+  assert.deepEqual(calls, [['info','ra0'], ['info','rai0'], ['assoclist','ra0'], ['assoclist','rai0']],
+   type + ': query only enabled real VIFs, without enumeration or synthetic netids');
+  delete config.ra0.ifname;
+  config.cfg5g.disabled = '1';
+  resolver = await view.loadIwinfoResolver(radios(), networks());
+  assert.deepEqual(resolver.queryTargets, ['ra0'], 'legacy section name is a valid VIF');
+ }
  console.log('Wi-Fi status: disabled radios/VAPs, active VAP, custom ifname, missing VAP and mixed backends passed');
 })().catch(e => {console.error(e); process.exit(1);});

@@ -37,3 +37,9 @@ mtwifi/mt_dbdc/ralink radios. It does not start a repeating scan poll or stop
 LuCI's global poller. The refresh button is enabled immediately on completion or failure;
 requests are coalesced per radio and serialized across radios. Run
 `node modules/luci-mod-status/tests/channel-analysis.js` from the LuCI root.
+
+Run `node modules/luci-mod-status/tests/overview-async.js` to check that a
+pending wireless query does not delay other overview cards or their next
+refresh, duplicate itself, or prevent retry after failure. Run
+`node modules/luci-mod-status/tests/wifi-disabled.js` for configured QCA and
+MediaTek VIF selection, disabled interfaces and mixed-backend handling.

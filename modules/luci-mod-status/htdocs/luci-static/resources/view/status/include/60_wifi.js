@@ -9,6 +9,7 @@
 
 const callIwinfoAssoclistCompat = rpc.declare({
 	object: 'iwinfo',
+	nobatch: true,
 	method: 'assoclist',
 	params: [ 'device' ],
 	expect: { results: [] }
@@ -16,6 +17,7 @@ const callIwinfoAssoclistCompat = rpc.declare({
 
 const callIwinfoInfoCompat = rpc.declare({
 	object: 'iwinfo',
+	nobatch: true,
 	method: 'info',
 	params: [ 'device' ],
 	expect: {}
@@ -23,12 +25,34 @@ const callIwinfoInfoCompat = rpc.declare({
 
 const callIwinfoDevices = rpc.declare({
 	object: 'iwinfo',
+	nobatch: true,
 	method: 'devices',
 	expect: { devices: [] }
 });
 
 function isQcaWifiHwtype(hwtype) {
 	return (hwtype == 'qcawifi' || hwtype == 'qcawificfg80211');
+}
+
+function isConfigWifiHwtype(hwtype) {
+	return isQcaWifiHwtype(hwtype) || ['mtwifi', 'mt_dbdc', 'mtdbdc', 'ralink'].includes(hwtype);
+}
+
+function getConfiguredIfname(iface) {
+	if (iface.ifname)
+		return iface.ifname;
+	const hwtype = uci.get('wireless', iface.device, 'type');
+	if (isQcaWifiHwtype(hwtype))
+		return getQcaFallbackIfname(iface.device, iface['.name']);
+	// Only use real VIF names, never invent a primary interface for a VAP.
+	if (isConfigWifiHwtype(hwtype) && /^(ra[xiyez]?|apcli[xiyez]?)\d+$/.test(iface['.name']))
+		return iface['.name'];
+	return null;
+}
+
+function useConfiguredWifi() {
+	const radios = uci.sections('wireless', 'wifi-device');
+	return radios.length > 0 && radios.every((radio) => isConfigWifiHwtype(radio.type));
 }
 
 function pushUnique(list, value) {
@@ -62,9 +86,9 @@ function getResolvedIwinfoDeviceName(net, deviceLookup) {
 	const device = net.getWifiDeviceName();
 	const fallback = getQcaFallbackIfname(device, section);
 	const configuredIfname = uci.get('wireless', section, 'ifname');
-	const isQca = isQcaWifiHwtype(uci.get('wireless', device, 'type'));
+	const isConfig = isConfigWifiHwtype(uci.get('wireless', device, 'type'));
 
-	for (const candidate of [ configuredIfname, ifname, section, fallback, isQca ? null : device ])
+	for (const candidate of [ configuredIfname, ifname, section, fallback, isConfig ? null : device ])
 		if (candidate && deviceLookup[candidate])
 			return candidate;
 
@@ -110,7 +134,7 @@ function buildIwinfoResolver(radios, networks, devices) {
 	radios.forEach((radio) => {
 		const name = radio.getName();
 		if (uci.get('wireless', name, 'disabled') == '1' ||
-		    isQcaWifiHwtype(uci.get('wireless', name, 'type')))
+		    isConfigWifiHwtype(uci.get('wireless', name, 'type')))
 			return;
 
 		const target = radioTargets[name] || (deviceLookup[name] ? name : null);
@@ -613,18 +637,15 @@ return baseclass.extend({
 	}),
 
 	loadIwinfoResolver(radios, networks) {
-		// Query enabled QCA VAPs only: probing a bare wifiN may create a
-		// temporary VAP and block rpcd while the disabled radio starts up.
-		const configuredRadios = uci.sections('wireless', 'wifi-device');
-		const configOnly = configuredRadios.length > 0 &&
-			configuredRadios.every((radio) => isQcaWifiHwtype(radio.type));
+		// Vendor radios are queried through configured VIFs, not global probes.
+		const configOnly = useConfiguredWifi();
 		const configuredDevices = [];
 
 		for (const iface of uci.sections('wireless', 'wifi-iface')) {
 			if (iface.disabled == '1' || uci.get('wireless', iface.device, 'disabled') == '1')
 				continue;
 
-			pushUnique(configuredDevices, iface.ifname || getQcaFallbackIfname(iface.device, iface['.name']));
+			pushUnique(configuredDevices, getConfiguredIfname(iface));
 		}
 
 		return (configOnly ? Promise.resolve(configuredDevices) : L.resolveDefault(callIwinfoDevices(), [])).then((devices) => {
@@ -662,6 +683,16 @@ return baseclass.extend({
 			return Promise.resolve([]);
 
 		const hwtype = uci.get('wireless', net.getWifiDeviceName(), 'type');
+		if (isConfigWifiHwtype(hwtype)) {
+			const target = this.iwinfoResolver?.aliasMap[net.getName()];
+			if (!target)
+				return Promise.resolve([]);
+			return L.resolveDefault(callIwinfoAssoclistCompat(target), []).then((entries) => {
+				if (entries.length || !isQcaWifiHwtype(hwtype) || net.getMode() != 'ap')
+					return entries;
+				return callWlanconfigAssoclistCompat(target);
+			});
+		}
 		const candidates = getAssocListCandidates(net, this.iwinfoResolver);
 		const resolvedIfname = candidates[0];
 		const useResolvedIfname = (isQcaWifiHwtype(hwtype) && resolvedIfname && resolvedIfname != net.getIfname());
@@ -765,6 +796,8 @@ return baseclass.extend({
 	},
 
 	renderbox(radio, networks) {
+		const radioUp = radio.isUp() ||
+			(uci.get('wireless', radio.getName(), 'disabled') != '1' && this.iwinfoInfoMap?.[radio.getName()]?.mode);
 		let chan = null;
 		let freq = null;
 		let rate = null;
@@ -841,7 +874,7 @@ return baseclass.extend({
 		}
 
 		return E('div', { class: 'ifacebox' }, [
-			E('div', { class: 'ifacebox-head center ' + (radio.isUp() ? 'active' : '') },
+			E('div', { class: 'ifacebox-head center ' + (radioUp ? 'active' : '') },
 				E('strong', radio.getName())),
 			E('div', { class: 'ifacebox-body left' }, [
 				L.itemlist(E('span'), [
@@ -860,15 +893,14 @@ return baseclass.extend({
 	isWPSEnabled: {},
 
 	load() {
-		return Promise.all([
-			network.getWifiDevices(),
-			network.getWifiNetworks(),
+		return L.resolveDefault(uci.load('wireless')).then(() => Promise.all([
+			useConfiguredWifi() ? network.getWifiDevicesFromConfig() : network.getWifiDevices(),
+			useConfiguredWifi() ? network.getWifiNetworksFromConfig() : network.getWifiNetworks(),
 			network.getHostHints(),
 			this.callSessionAccess('access-group', 'luci-mod-status-index-wifi', 'read'),
 			this.callSessionAccess('access-group', 'luci-mod-status-index-wifi', 'write'),
 			firewall.getZones(),
-			L.hasSystemFeature('wifi') ? L.resolveDefault(uci.load('wireless')) : L.resolveDefault(),
-		]).then(L.bind(data => {
+		])).then(L.bind(data => {
 			const tasks = [];
 			const radios_networks_hints = data[1];
 			const hasWPS = L.hasSystemFeature('hostapd', 'wps');
@@ -901,6 +933,23 @@ return baseclass.extend({
 				}, this)));
 
 				return Promise.all(tasks).then(() => {
+					if (useConfiguredWifi()) {
+						const states = {};
+						for (const radio of data[0]) {
+							const name = radio.getName();
+							const info = this.iwinfoInfoMap[name];
+							states[name] = { iwinfo: info || {}, up: !!info?.mode && uci.get('wireless', name, 'disabled') != '1' };
+						}
+						data[0] = data[0].map((radio) => network.instantiateWifiDevice(radio.getName(), states[radio.getName()]));
+						data[1] = data[1].map((net) => {
+							const target = resolver.aliasMap[net.getName()];
+							const live = network.instantiateWifiNetwork(net.getName(), net.getWifiDeviceName(),
+								states[net.getWifiDeviceName()], net.getID(), { ifname: target, iwinfo: this.iwinfoInfoMap[target] || {} });
+							for (const key of ['assoclist', 'isWPSEnabled', 'wps_status'])
+								live[key] = net[key];
+							return live;
+						});
+					}
 					return data;
 				});
 			}, this));
