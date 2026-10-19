@@ -14228,3 +14228,9 @@ msgstr "目标唤醒时间（TWT）"
 
 msgid "MU-MIMO"
 msgstr "多用户 MIMO（MU-MIMO）"
+
+msgid "Enable CSA"
+msgstr "启用 CSA"
+
+msgid "Announce channel switches to clients. Automatic channel selection remains available when disabled."
+msgstr "向客户端通告信道切换。关闭后仍可自动选择信道。"
