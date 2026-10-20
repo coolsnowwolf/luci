@@ -214,8 +214,9 @@ function addResolvedPort(knownPorts, seenPorts, role, device, mapping, board, sw
 			});
 		}
 		else {
-			const deviceInfo = L.isObject(board) && L.isObject(board['network-device'])
-				? board['network-device'][value] : null;
+			const devices = L.isObject(board)
+				? (board['network-device'] || board.network_device) : null;
+			const deviceInfo = L.isObject(devices) ? devices[value] : null;
 
 			addKnownPort(knownPorts, seenPorts, role, value,
 				L.isObject(deviceInfo) && isString(deviceInfo.label) ? { label: deviceInfo.label } : null);
