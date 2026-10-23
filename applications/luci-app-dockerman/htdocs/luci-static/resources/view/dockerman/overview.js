@@ -256,11 +256,31 @@ return dm2.dv.extend({
 		let isLocal = false;
 		if (!docker_ep || docker_ep.length === 0 || docker_ep.map(e => e.includes('.sock')).filter(Boolean).length == 1)
 			isLocal = true;
-
-		if (info_response?.code !== 200) {
-			return E('div', {}, [ info_response?.body?.message ]);
-		}
-
+if (info_response?.code !== 200) {
+    return E('div', { 'class': 'cbi-section' }, [
+        E('h3', {}, _('Docker Daemon Status')),
+        E('div', { 'class': 'alert-message warning', style: 'margin-bottom: 15px;' }, 
+            info_response?.body?.message || _('Failed to connect to Docker daemon.')
+        ),
+        E('p', {}, _('The Docker daemon appears to be stopped. You can attempt to start it below:')),
+        E('div', { style: 'display: flex; gap: 5px; flex-wrap: wrap; margin-top: 10px;' }, [
+            E('button', { 
+                'class': 'btn cbi-button-action positive', 
+                'click': () => {
+                    this.handleAction('dockerd', 'start').then((success) => {
+                        if (success) {
+                            setTimeout(() => location.reload(), 1500);
+                        }
+                    });
+                } 
+            }, [_('Start')]),
+            E('button', { 
+                'class': 'btn cbi-button-action neutral', 
+                'click': () => location.reload() 
+            }, [_('Refresh')])
+        ])
+    ]);
+}
 		this.parseHeaders(version_response.headers, version_headers);
 		this.parseBody(version_response.body, version_body);
 		info_body.push(...formatInfoBody(info_response.body));

@@ -809,7 +809,21 @@ msgstr "全局设置"
 #: applications/luci-app-dockerman/htdocs/luci-static/resources/view/dockerman/configuration.js:23
 msgid "Globals"
 msgstr "全局"
+#: applications/luci-app-dockerman/htdocs/luci-static/resources/view/dockerman/overview.js:229
+msgid "Docker Daemon Status"
+msgstr "Docker 守护进程状态"
 
+#: applications/luci-app-dockerman/htdocs/luci-static/resources/view/dockerman/overview.js:229
+msgid "Failed to connect to Docker daemon."
+msgstr "无法连接到 Docker 守护进程。"
+
+#: applications/luci-app-dockerman/htdocs/luci-static/resources/view/dockerman/overview.js:229
+msgid "The Docker daemon appears to be stopped. You can attempt to start it below:"
+msgstr "Docker 守护进程似乎已停止。您可以在下方尝试启动它："
+
+#: applications/luci-app-dockerman/htdocs/luci-static/resources/view/dockerman/overview.js:229
+msgid "Refresh"
+msgstr "刷新"
 #: applications/luci-app-dockerman/htdocs/luci-static/resources/view/dockerman/overview.js:262
 msgid "Go to relevant configuration page"
 msgstr "进入相关配置页面"
