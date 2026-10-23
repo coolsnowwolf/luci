@@ -234,7 +234,10 @@ const methods = {
 			const has_nft_flowoffload = access('/sys/module/nft_flow_offload/refcnt') == true;
 			const ubus = connect();
 			const sysboard = ubus ? ubus.call('system', 'board') : null;
-			const has_hw_offloading = has_supported_hw_offloading_target(sysboard?.release?.target) &&
+			const has_mt7621_vendor_hnat = sysboard?.release?.target == 'ramips/mt7621' &&
+				access('/sys/module/mtkhnat') == true;
+			const has_hw_offloading = !has_mt7621_vendor_hnat &&
+				has_supported_hw_offloading_target(sysboard?.release?.target) &&
 				((has_fw3 && has_ipt_flowoffload) || (has_fw4 && has_nft_flowoffload));
 
 			if (ubus)
@@ -377,7 +380,7 @@ const methods = {
 						is_port_attr = true;
 					}
 					else if (match(line, /cpu @/)) {
-						result.switch_title = match(line, /^switch[0-9]+: \w+\((.+)\)/)?.[1];
+						result.switch_title = match(line, /^switch[0-9]+: \w+\(([^)]+)\)/)?.[1];
 						result.num_vlans    = match(line, /vlans: ([0-9]+)/)?.[1] ?? 16;
 						result.min_vid      = 1;
 					}
@@ -416,14 +419,16 @@ const methods = {
 	},
 
 	getSwconfigPortState: {
-		args: { switch: 'switch0' },
+		args: { switch: 'switch0', linkonly: false },
 		call: function(request) {
-			const swc = popen(`swconfig dev ${shellquote(request.args.switch)} show 2>/dev/null`);
+			// Avoid scanning thousands of VLAN slots for a port status poll.
+			const command = request.args.linkonly ? 'showlinks' : 'showports';
+			const swc = popen(`swconfig dev ${shellquote(request.args.switch)} ${command} 2>/dev/null || swconfig dev ${shellquote(request.args.switch)} show 2>/dev/null`);
 
 			if (swc) {
 				let ports = [], port;
 
-				for (let line = swc.read('line'); length(line); line = swc.read('line')) {
+				for (let line in split(swc.read('all') || '', '\n')) {
 					if (match(line, /^VLAN [0-9]+:/) && length(ports))
 						break;
 
@@ -450,6 +455,21 @@ const methods = {
 					if (port) {
 						let m;
 
+						// Most MIB lines are irrelevant to the port overview.
+						if ((m = match(line, /^\s*(RxGoodByte|RxByte|TxByte|RxUniCast|RxUni|RxMulti|RxBroad|TxUniCast|TxUni|TxMulti|TxBroad)\s*:\s*([0-9]+)/)) != null) {
+							if (m[1] == 'RxGoodByte' || m[1] == 'RxByte')
+								port.rx_bytes = +m[2];
+							else if (m[1] == 'TxByte')
+								port.tx_bytes = +m[2];
+							else if (substr(m[1], 0, 2) == 'Rx')
+								port.rx_packets += +m[2];
+							else
+								port.tx_packets += +m[2];
+							continue;
+						}
+						if (!match(line, /(link|status|speed):| Mbps|duplex|auto-negotiate/))
+							continue;
+
 						if (match(line, /full[ -]duplex/))
 							port.duplex = true;
 
@@ -474,17 +494,6 @@ const methods = {
 						if (match(line, /link:.*txflow/))
 							port.txflow = true;
 
-						if ((m = match(line, /^\s*RxGoodByte\s*:\s*([0-9]+)/)) != null)
-							port.rx_bytes = +m[1];
-
-						if ((m = match(line, /^\s*TxByte\s*:\s*([0-9]+)/)) != null)
-							port.tx_bytes = +m[1];
-
-						if ((m = match(line, /^\s*Rx(UniCast|Multi|Broad)\s*:\s*([0-9]+)/)) != null)
-							port.rx_packets += +m[2];
-
-						if ((m = match(line, /^\s*Tx(UniCast|Multi|Broad)\s*:\s*([0-9]+)/)) != null)
-							port.tx_packets += +m[2];
 					}
 				}
 

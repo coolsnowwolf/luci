@@ -91,7 +91,7 @@ function update_port_status(topologies) {
 	const tasks = [];
 
 	for (let switch_name in topologies)
-		tasks.push(callSwconfigPortState(switch_name).then(L.bind(function(switch_name, ports) {
+		tasks.push(callSwconfigPortState(switch_name, true).then(L.bind(function(switch_name, ports) {
 			for (let p of ports) {
 				const node = document.querySelector('[data-switch="%s"][data-port="%d"]'.format(switch_name, p.port));
 				render_port_status(node, p);
@@ -111,7 +111,7 @@ const callSwconfigFeatures = rpc.declare({
 const callSwconfigPortState = rpc.declare({
 	object: 'luci',
 	method: 'getSwconfigPortState',
-	params: [ 'switch' ],
+	params: [ 'switch', 'linkonly' ],
 	expect: { result: [] }
 });
 
@@ -124,7 +124,7 @@ return view.extend({
 				tasks.push(callSwconfigFeatures(switch_name).then(L.bind(function(features) {
 					this.features = features;
 				}, topologies[switch_name])));
-				tasks.push(callSwconfigPortState(switch_name).then(L.bind(function(ports) {
+				tasks.push(callSwconfigPortState(switch_name, true).then(L.bind(function(ports) {
 					this.portstate = ports;
 				}, topologies[switch_name])));
 			}
