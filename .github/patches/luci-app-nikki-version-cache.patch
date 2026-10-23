@@ -1,0 +1,52 @@
+Subject: [PATCH] luci-app-nikki: prewarm and cache installed versions
+
+Signed-off-by: coolsnowwolf <coolsnowwolf@gmail.com>
+
+--- a/applications/luci-app-nikki/root/usr/share/rpcd/ucode/luci.nikki
++++ b/applications/luci-app-nikki/root/usr/share/rpcd/ucode/luci.nikki
+@@ -2,12 +2,20 @@
+ 
+ 'use strict';
+ 
+-import { access, popen, writefile } from 'fs';
++import { access, popen, writefile, stat } from 'fs';
+ import { get_users, get_groups, get_cgroups, load_profile } from '/etc/nikki/ucode/include.uc';
+ 
+-const methods = {
+-	version: {
+-		call: function() {
++// Prewarm once when rpcd loads this module, before the first LuCI visit.
++// Recheck file identities so package/core replacements invalidate the cache.
++function version_signature() {
++	return map(['/usr/lib/opkg/status', '/lib/apk/db/installed',
++		'/usr/bin/mihomo'], function(path) {
++		let s = stat(path);
++		return s ? [s.ino, s.size, s.mtime, s.ctime] : null;
++	});
++}
++
++function query_version() {
+ 			let process;
+ 			let app = '';
+ 			if (system('command -v opkg') == 0) {
+@@ -30,6 +38,20 @@
+ 				process.close();
+ 			}
+ 			return { app: app, core: core };
++}
++
++let cached_signature = sprintf('%J', version_signature());
++let cached_version = query_version();
++
++const methods = {
++	version: {
++		call: function() {
++			let signature = sprintf('%J', version_signature());
++			if (signature != cached_signature) {
++				cached_version = query_version();
++				cached_signature = signature;
++			}
++			return cached_version;
+ 		}
+ 	},
+ 	profile: {

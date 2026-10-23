@@ -75,6 +75,20 @@ jobs:
           sync_app "coolsnowwolf/homeproxy" "lean" \
             "." "applications/luci-app-homeproxy"
 
+      - name: Restore local Nikki version cache patch
+        shell: bash
+        run: |
+          set -euo pipefail
+          patch_file=.github/patches/luci-app-nikki-version-cache.patch
+          if git apply --check "$patch_file"; then
+            git apply "$patch_file"
+          elif git apply --reverse --check "$patch_file"; then
+            echo 'Nikki version cache patch already applied.'
+          else
+            echo '::error::Nikki cache patch needs rebasing; refusing to publish.'
+            exit 1
+          fi
+
       - name: Commit and push changes
         env:
           TARGET_BRANCH: ${{ github.ref_name }}
