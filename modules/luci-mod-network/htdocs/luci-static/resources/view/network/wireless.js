@@ -2972,14 +2972,18 @@ return view.extend({
 					o.wifiNetwork = radioNet;
 
 					if (ppeVpTarget) {
-						o = ss.taboption('advanced', form.Flag, 'ppe_vp', _('Enable wireless PPE acceleration'));
+						o = ss.taboption('advanced', form.Flag, 'ppe_vp', _('Enable wireless PPE acceleration'),
+							_('Direct Switch (DS): Wi-Fi exchanges packets with PPE directly, without passing them through the CPU.'));
 						o.ucisection = radioNet.getName();
-						o.enabled = 'active';
+						o.enabled = '3';
 						o.disabled = 'none';
 						o.rmempty = false;
+						/* Direct Switch is ppe_vp 3. Any other type, or none set (the
+						 * driver script then uses Active VP), shows as enabled, so saving
+						 * switches it to Direct Switch instead of writing 'none'. */
 						o.cfgvalue = function(section_id) {
 							const value = uci.get('wireless', this.ucisection ?? section_id, 'ppe_vp');
-							return (value == null || value === '') ? 'active' : value;
+							return (value === 'none' || value === '0') ? 'none' : '3';
 						};
 					}
 				}
