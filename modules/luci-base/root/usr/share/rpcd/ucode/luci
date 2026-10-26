@@ -19,6 +19,10 @@ function shellquote(s) {
 }
 
 function has_supported_hw_offloading_target(target) {
+	if (target == 'ipq40xx/generic')
+		return access('/sys/module/qca_ssdk') == true &&
+			access('/sys/module/essedma') == true;
+
 	return type(target) == 'string' &&
 		match(target, /^(ramips\/mt7621|mediatek\/mt76..|mediatek\/filogic|airoha\/an758[0-9])$/) != null;
 }
