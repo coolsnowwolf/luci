@@ -61,6 +61,12 @@ const callLuciWirelessDevices = rpc.declare({
 	expect: { '': {} }
 });
 
+const callWirelessStatus = rpc.declare({
+	object: 'network.wireless',
+	method: 'status',
+	expect: { '': {} }
+});
+
 const callLuciBoardJSON = rpc.declare({
 	object: 'luci-rpc',
 	method: 'getBoardJSON'
@@ -1446,6 +1452,27 @@ Network = baseclass.extend(/** @lends LuCI.network.prototype */ {
 
 			return rv;
 		}, this));
+	},
+
+	/** Return configured QCA VAP names reported by netifd, without driver probes. */
+	getWifiRuntimeIfnames() {
+		// netifd supplies VAP names without probing disabled radios or creating VAPs.
+		return L.resolveDefault(callWirelessStatus(), {}).then((radios) => {
+			const names = Object.create(null);
+			for (const iface of uci.sections('wireless', 'wifi-iface')) {
+				const radio = radios[iface.device];
+				if (!radio || !['qcawifi', 'qcawificfg80211'].includes(uci.get('wireless', iface.device, 'type')))
+					continue;
+				names[iface['.name']] = null;
+				if (!radio.up || radio.disabled || iface.disabled == '1' ||
+				    uci.get('wireless', iface.device, 'disabled') == '1')
+					continue;
+				const live = (radio.interfaces || []).find((net) => net.section == iface['.name']);
+				if (live?.ifname)
+					names[iface['.name']] = live.ifname;
+			}
+			return names;
+		});
 	},
 
 	/**

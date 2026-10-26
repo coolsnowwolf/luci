@@ -60,7 +60,12 @@ function pushUnique(list, value) {
 		list.push(value);
 }
 
+let runtimeIfnames = Object.create(null);
+
 function getQcaFallbackIfname(device, section) {
+	if (Object.prototype.hasOwnProperty.call(runtimeIfnames, section))
+		return runtimeIfnames[section];
+
 	if (/^ath\d+$/.test(String(section || '')))
 		return section;
 
@@ -162,7 +167,7 @@ function getRadioDisplayType(radio, iwinfoInfoMap) {
 	let name = radio.getI18n().replace(/^Generic | Wireless Controller .+$/g, '');
 
 	if (hwname && hwname != 'Generic Atheros')
-		name = hwname;
+		name = hwname + (info.hwmodes_text ? ' 802.11' + info.hwmodes_text : '');
 
 	if (name && !/^unknown$/i.test(name) && !/^802\.11unknown$/i.test(name))
 		return name;
@@ -241,9 +246,8 @@ function getDisplayEncryption(net) {
 }
 
 function getDisplayBSSID(net) {
-	const bssid = uci.get('wireless', net.getName(), 'macaddr') ||
-		uci.get('wireless', net.getWifiDeviceName(), 'macaddr') ||
-		net.getBSSID() || net.getActiveBSSID();
+	const bssid = net.getActiveBSSID() || net.getBSSID() ||
+		uci.get('wireless', net.getName(), 'macaddr');
 
 	if (bssid && bssid != '00:00:00:00:00:00')
 		return String(bssid).toUpperCase();
@@ -638,18 +642,21 @@ return baseclass.extend({
 
 	loadIwinfoResolver(radios, networks) {
 		// Vendor radios are queried through configured VIFs, not global probes.
-		const configOnly = useConfiguredWifi();
-		const configuredDevices = [];
+		return network.getWifiRuntimeIfnames().then((names) => {
+			runtimeIfnames = names;
+			const configOnly = useConfiguredWifi();
+			const configuredDevices = [];
 
-		for (const iface of uci.sections('wireless', 'wifi-iface')) {
-			if (iface.disabled == '1' || uci.get('wireless', iface.device, 'disabled') == '1')
-				continue;
+			for (const iface of uci.sections('wireless', 'wifi-iface')) {
+				if (iface.disabled == '1' || uci.get('wireless', iface.device, 'disabled') == '1')
+					continue;
 
-			pushUnique(configuredDevices, getConfiguredIfname(iface));
-		}
+				pushUnique(configuredDevices, getConfiguredIfname(iface));
+			}
 
-		return (configOnly ? Promise.resolve(configuredDevices) : L.resolveDefault(callIwinfoDevices(), [])).then((devices) => {
-			return buildIwinfoResolver(radios, networks, devices);
+			return (configOnly ? Promise.resolve(configuredDevices) : L.resolveDefault(callIwinfoDevices(), [])).then((devices) => {
+				return buildIwinfoResolver(radios, networks, devices);
+			});
 		}).catch(() => ({
 			deviceLookup: Object.create(null),
 			aliasMap: Object.create(null),
