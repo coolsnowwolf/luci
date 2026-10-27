@@ -30,6 +30,12 @@ const callIwinfoDevices = rpc.declare({
 	method: 'devices',
 	expect: { devices: [] }
 });
+const callIwinfoScanCompat = rpc.declare({
+	object: 'iwinfo',
+	method: 'scan',
+	params: [ 'device' ],
+	expect: { results: [] }
+});
 const callSystemBoard = rpc.declare({
 	object: 'system',
 	method: 'board',
@@ -1271,7 +1277,6 @@ function parseIwPhyMaxWidthMap(stdout) {
 
 		const widthHint = rawLine.match(/Supported Channel Width:\s*(.+)$/);
 		if (widthHint) {
-			let maxWidth = 20;
 			const widths = [];
 
 			widthHint[1].replace(/\b(20|40|80|160|320)\s*MHz\b/g, function(_, mhz) {
@@ -1282,9 +1287,13 @@ function parseIwPhyMaxWidthMap(stdout) {
 				widths.push(160);
 
 			if (widths.length)
-				maxWidth = Math.max.apply(Math, widths);
+				mapping[currentPhy] = Math.max(mapping[currentPhy] || 0, Math.max.apply(Math, widths));
+			continue;
+		}
 
-			mapping[currentPhy] = Math.max(mapping[currentPhy] || 0, maxWidth);
+		const heWidth = rawLine.match(/HE(?:\s+(?:RX|TX) MCS and NSS set\s+|)(160|80\+80)(?:\s*MHz|\/5GHz)/);
+		if (heWidth) {
+			mapping[currentPhy] = Math.max(mapping[currentPhy] || 0, 160);
 			continue;
 		}
 
@@ -4587,7 +4596,15 @@ return view.extend({
 		};
 
 		s.handleScanRefresh = function(radioDev, scanCache, table, stop) {
-			return radioDev.getScanList().then(L.bind(function(results) {
+			const radio = radioDev.getName();
+			const scan = isQcaWifiHwtype(uci.get('wireless', radio, 'type'))
+				? loadIwinfoResolver().then(function(resolver) {
+					const target = resolver.aliasMap[radio];
+					return target ? callIwinfoScanCompat(target) : [];
+				})
+				: radioDev.getScanList();
+
+			return scan.then(L.bind(function(results) {
 				const rows = [];
 
 				for (let r of results)
