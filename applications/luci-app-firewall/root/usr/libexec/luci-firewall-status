@@ -4,6 +4,9 @@ tcp_cca="$(cat /proc/sys/net/ipv4/tcp_congestion_control 2>/dev/null)"
 nat_mode="disabled"
 hnat_available=false
 [ -e /sys/kernel/debug/hnat/hook_toggle ] && hnat_available=true
+ecm_available=false
+[ -x /etc/init.d/qca-nss-ecm ] && [ -f /etc/config/ecm ] &&
+	[ -f /usr/share/ucitrack/qca-nss-ecm.json ] && ecm_available=true
 
 rules="$(iptables-save -t nat 2>/dev/null)"
 
@@ -21,4 +24,4 @@ else
 	fi
 fi
 
-printf '{"nat_mode":"%s","tcp_cca":"%s","hnat_available":%s}\n' "$nat_mode" "$tcp_cca" "$hnat_available"
+printf '{"nat_mode":"%s","tcp_cca":"%s","hnat_available":%s,"ecm_available":%s}\n' "$nat_mode" "$tcp_cca" "$hnat_available" "$ecm_available"

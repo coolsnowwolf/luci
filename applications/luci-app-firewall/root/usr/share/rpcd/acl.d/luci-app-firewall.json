@@ -11,7 +11,7 @@
 				"file": [ "read" ],
 				"luci": [ "getConntrackHelpers" ]
 			},
-			"uci": [ "firewall" ]
+			"uci": [ "firewall", "ecm" ]
 		},
 		"write": {
 			"file": {
@@ -23,7 +23,7 @@
 				"file": [ "write", "exec" ],
 				"uci": [ "commit" ]
 			},
-			"uci": [ "firewall" ]
+			"uci": [ "firewall", "ecm" ]
 		}
 	}
 }
