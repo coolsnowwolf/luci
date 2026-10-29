@@ -8,6 +8,7 @@
 				"/proc/sys/net/ipv6/conf/*/mtu": [ "read" ],
 				"/proc/sys/net/ipv6/conf/*/hop_limit": [ "read" ],
 				"/usr/sbin/iw": [ "exec" ],
+				"/usr/sbin/cfg80211tool ath* get_maxrate": [ "exec" ],
 				"/usr/libexec/luci-peeraddr": [ "exec" ],
 				"/usr/sbin/wlanconfig": [ "exec" ],
 				"/proc/sys/net/ipv[46]/conf/*": [ "read" ],
