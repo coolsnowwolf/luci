@@ -683,8 +683,6 @@ function getDisplayTxPower(radioNet) {
 
 		if (isPlausibleTxPowerValue(txpower, hwtype))
 			return txpower;
-		if (isPlausibleTxPowerValue(cfgvalue, hwtype))
-			return cfgvalue;
 		return null;
 	}
 
