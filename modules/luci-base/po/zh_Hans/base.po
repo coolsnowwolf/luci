@@ -3689,6 +3689,10 @@ msgstr "启用私有 PSK (PPSK)"
 msgid "Enable wireless PPE acceleration"
 msgstr "启用无线PPE加速"
 
+#: modules/luci-mod-network/htdocs/luci-static/resources/view/network/wireless.js:2976
+msgid "Direct Switch (DS): Wi-Fi exchanges packets with PPE directly, without passing them through the CPU."
+msgstr "Direct Switch（DS）模式：Wi-Fi 与 PPE 直接交换数据包，不经过 CPU。"
+
 #: protocols/luci-proto-vpnc/htdocs/luci-static/resources/protocol/vpnc.js:96
 msgid "Enable Single DES"
 msgstr "启用单个 DES"
