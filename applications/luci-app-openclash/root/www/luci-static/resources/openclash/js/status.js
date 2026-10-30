@@ -4178,7 +4178,9 @@ var ocLang = window.ocLang || '';
     function autoOpenGuide() {
         if (autoGuideChecked || coreMissing !== true || !ConfigFileManager.configListLoaded) return;
         autoGuideChecked = true;
-        if (localStorage.getItem('oc_guide_autostart') === '0') return;
+        var autostart = localStorage.getItem('oc_guide_autostart');
+        // Skip/Done records completion. Only an explicit opt-in may reopen it afterwards.
+        if (autostart === '0' || (autostart !== '1' && localStorage.getItem('oc_guide_done') === '1')) return;
         openGuide(ConfigFileManager.configList.length > 0);
     }
 
