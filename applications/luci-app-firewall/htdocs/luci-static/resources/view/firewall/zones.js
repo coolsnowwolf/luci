@@ -129,13 +129,14 @@ return view.extend({
 
 			o = s.option(form.RichListValue, "offloading_type", _("Flow offloading type"));
 			o.value('0', _("None"));
-			o.value('1', _("Software flow offloading"), _('Software based offloading for routing/NAT.'));
+			if (L.hasSystemFeature('offloading'))
+				o.value('1', _("Software flow offloading"), _('Software based offloading for routing/NAT.'));
 			if (L.hasSystemFeature('offloading_hw'))
 				o.value('2', _("Hardware flow offloading"), _('Hardware based offloading for routing with/without NAT.') + ' ' + _(' Requires hardware NAT support.'));
 			if (hasMediatekHNAT)
-				o.value('3', "Mediatek HNAT", "基于Mediatek原厂闭源驱动的HNAT卸载");
+				o.value('3', _('MediaTek HNAT'), _('Hardware NAT offloading using the MediaTek vendor driver.'));
 			if (hasQualcommECM)
-				o.value('4', 'Qualcomm NSS ECM 加速', 'ECM Auto 模式，自动选择加速引擎。');
+				o.value('4', _('Qualcomm NSS ECM acceleration'), _('Automatically select the acceleration engine in ECM Auto mode.'));
 			o.optional = false;
 			o.load = function (section_id) {
 				const flow_offloading = uci.get('firewall', section_id, 'flow_offloading');
@@ -145,7 +146,7 @@ return view.extend({
 					return '4';
 				if (hasMediatekHNAT && flow_offloading === '3')
 					return '3';
-				return (flow_offloading === '1')
+				return (flow_offloading === '1' && L.hasSystemFeature('offloading'))
 					? ((flow_offloading_hw === '1' && has_hw_offloading) ? '2' : '1')
 					: '0';
 			};

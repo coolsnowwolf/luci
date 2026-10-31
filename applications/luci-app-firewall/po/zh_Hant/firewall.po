@@ -1573,3 +1573,19 @@ msgstr "Shell 指令碼語法錯誤。"
 #: applications/luci-app-firewall/htdocs/luci-static/resources/view/firewall/custom.js
 msgid "Unable to restart the firewall."
 msgstr "無法重新啟動防火牆。"
+
+#: applications/luci-app-firewall/htdocs/luci-static/resources/view/firewall/zones.js
+msgid "MediaTek HNAT"
+msgstr "MediaTek HNAT"
+
+#: applications/luci-app-firewall/htdocs/luci-static/resources/view/firewall/zones.js
+msgid "Hardware NAT offloading using the MediaTek vendor driver."
+msgstr "使用 MediaTek 原廠驅動的硬體 NAT 卸載。"
+
+#: applications/luci-app-firewall/htdocs/luci-static/resources/view/firewall/zones.js
+msgid "Qualcomm NSS ECM acceleration"
+msgstr "Qualcomm NSS ECM 加速"
+
+#: applications/luci-app-firewall/htdocs/luci-static/resources/view/firewall/zones.js
+msgid "Automatically select the acceleration engine in ECM Auto mode."
+msgstr "在 ECM Auto 模式下自動選擇加速引擎。"
