@@ -31,9 +31,11 @@ return baseclass.extend({
 		var mem = L.isObject(systeminfo.memory) ? systeminfo.memory : {},
 		    swap = L.isObject(systeminfo.swap) ? systeminfo.swap : {};
 
-		var available = (mem.available != null) ? mem.available : mem.free;
+		// MemAvailable already accounts for reclaimable buffers and cache.
+		var available = (mem.available != null) ? mem.available :
+			(mem.free != null) ? mem.free + (mem.buffered || 0) : null;
 		if (available != null)
-			available = Math.min(mem.total ?? Infinity, Math.max(0, available + (mem.buffered || 0)));
+			available = Math.min(mem.total ?? Infinity, Math.max(0, available));
 
 		var fields = [
 			_('Total Available'), available, mem.total,
