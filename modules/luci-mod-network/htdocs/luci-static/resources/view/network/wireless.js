@@ -467,13 +467,13 @@ function isNetworkDisplayUp(radioNet) {
 
 function getRadioDisplayName(radioDev) {
 	const info = cachedIwinfoInfoMap?.[radioDev.getName()];
-	if (info?.hardware?.name)
+	if (info?.hardware?.name && !/^Generic(?:\s|$)/i.test(info.hardware.name))
 		return info.hardware.name + (info.hwmodes_text ? ' 802.11' + info.hwmodes_text : '');
 	const name = radioDev.getI18n().replace(/ Wireless Controller .+$/, '');
 	const hwtype = uci.get('wireless', radioDev.getName(), 'type');
 	const hwmode = uci.get('wireless', radioDev.getName(), 'hwmode') || '';
 
-	if (!/^Generic unknown$/.test(name) && !/^Generic 802\.11unknown$/.test(name))
+	if (!/^Generic(?:\s|$)/i.test(name))
 		return name;
 
 	if (!isQcaWifiHwtype(hwtype))
