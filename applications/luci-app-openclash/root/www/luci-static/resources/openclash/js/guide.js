@@ -2371,10 +2371,7 @@ var Guide = {
             this.setHtml(receipt, lines);
         }
         var auto = document.getElementById('guide-autostart');
-        if (auto) {
-            var autostart = localStorage.getItem('oc_guide_autostart');
-            auto.checked = (autostart === '1' || (autostart !== '0' && localStorage.getItem('oc_guide_done') !== '1'));
-        }
+        if (auto) auto.checked = (localStorage.getItem('oc_guide_autostart') !== '0');
     },
 
     render: function () {
