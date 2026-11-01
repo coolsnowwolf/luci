@@ -75,3 +75,10 @@ MAC. It includes idle tracked entries and counts records even without byte
 counters. It is a two-second snapshot, not a TCP ESTABLISHED-only count.
 Failed or stale snapshots return no counts, rendered as `-`; a valid empty
 snapshot returns zero. Counts are not restored from historical traffic state.
+
+The `routed_connections` table exposes original-source connections per MAC for
+HQoS admission monitoring. It combines IPv4 and IPv6, excludes destinations
+that terminate on the router after DNAT, multicast, TCP TIME_WAIT and CLOSE.
+Inbound connections are not charged to the destination client. The existing
+`connections` field keeps the homepage total count, including router sessions.
+Tests cover router-local IPv4/IPv6, redirect, hairpin and closed TCP states.

@@ -227,11 +227,13 @@ return baseclass.extend({
 			L.resolveDefault(uci.load('dhcp')),
 			L.resolveDefault(callClientWeb(), {}),
 			L.resolveDefault(fs.exec_direct('/usr/libexec/luci-arp'), ''),
-			L.resolveDefault(fs.read('/tmp/luci-client-history.json').then(JSON.parse), {})
+			L.resolveDefault(fs.read('/tmp/luci-client-history.json').then(JSON.parse), {}),
+			L.resolveDefault(rpc.list('hqos').then(methods => methods && methods.hqos && methods.hqos.set ? L.require('hqos') : null), null)
 		]);
 	},
 
-	render([dhcp_leases, host_hints, ufp_list, dhcp_config, web, arp, history]) {
+	render([dhcp_leases, host_hints, ufp_list, dhcp_config, web, arp, history, hqos]) {
+		this.hqos = hqos;
 		if (!this.ratePoll) {
 			this.ratePoll = L.bind(this.refreshRates, this);
 			poll.add(this.ratePoll, 2);
@@ -366,6 +368,8 @@ return baseclass.extend({
 	},
 
 	leaseActions(client) {
+		if (this.hqos)
+			return this.hqos.renderAction(client);
 		const actions = [];
 		for (const [family, leases] of [[4, client.leases], [6, client.leases6]]) {
 			for (const lease of leases) {
@@ -431,7 +435,7 @@ return baseclass.extend({
 				E('th', { 'class': 'th' }, _('Download')),
 				E('th', { 'class': 'th', 'data-total-traffic': '1' }, _('Total traffic') + ' (↑ / ↓)'),
 				E('th', { 'class': 'th' }, _('Connection count')),
-				isReadonlyView ? E([]) : E('th', { 'class': 'th cbi-section-actions center' }, _('Static Lease'))
+				isReadonlyView ? E([]) : E('th', { 'class': 'th cbi-section-actions center' }, this.hqos ? _('Client rate limit') : _('Static Lease'))
 			])
 		]);
 

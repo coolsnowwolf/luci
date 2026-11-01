@@ -73,7 +73,7 @@ static void feed(int family, const char *src, const char *dst, const char *reply
 	assert(process_flow(msg));
 }
 
-static void count_record(int family, const char *src, const char *dst, const char *reply_src)
+static void count_record_state(int family, const char *src, const char *dst, const char *reply_src, int state)
 {
 	char buffer[2048] = {0};
 	struct nlmsghdr *msg = (void *)buffer;
@@ -82,8 +82,19 @@ static void count_record(int family, const char *src, const char *dst, const cha
 	nf->nfgen_family = family;
 	tuple(msg, CTA_TUPLE_ORIG, src, dst);
 	tuple(msg, CTA_TUPLE_REPLY, reply_src, src);
+	if (state >= 0) {
+		struct nlattr *info = begin(msg, CTA_PROTOINFO), *tcp = begin(msg, CTA_PROTOINFO_TCP);
+		uint8_t value = state;
+		put(msg, CTA_PROTOINFO_TCP_STATE, &value, sizeof(value));
+		end(msg, tcp); end(msg, info);
+	}
 	/* Missing byte counters must not prevent connection counting. */
 	count_connection(msg);
+}
+
+static void count_record(int family, const char *src, const char *dst, const char *reply_src)
+{
+	count_record_state(family, src, dst, reply_src, -1);
 }
 
 static struct client *client(const char *ip)
@@ -115,6 +126,27 @@ int main(void)
 	assert(get_host(a->mac, false)->pending_connections == 3);
 	assert(get_host(b->mac, false)->pending_connections == 1);
 	assert(get_host(a->mac, false)->connections == 0);
+	assert(get_host(a->mac, false)->pending_routed_connections == 3);
+	assert(get_host(b->mac, false)->pending_routed_connections == 0);
+	struct sockaddr_in local4 = { .sin_family = AF_INET };
+	struct sockaddr_in6 local6 = { .sin6_family = AF_INET6 };
+	inet_pton(AF_INET, "192.168.0.1", &local4.sin_addr);
+	inet_pton(AF_INET6, "fd00::1", &local6.sin6_addr);
+	struct ifaddrs if6 = { .ifa_addr = (void *)&local6 };
+	struct ifaddrs if4 = { .ifa_addr = (void *)&local4, .ifa_next = &if6 };
+	router_addresses = &if4;
+	count_record(AF_INET, "192.168.0.100", "192.168.0.1", "192.168.0.1");
+	count_record(AF_INET6, "fd00::2", "fd00::1", "fd00::1");
+	count_record(AF_INET, "192.168.0.100", "8.8.8.8", "192.168.0.1"); /* Redirect to router. */
+	count_record(AF_INET6, "fd00::2", "ff02::fb", "ff02::fb");
+	count_record_state(AF_INET, "192.168.0.100", "8.8.8.8", "8.8.8.8", TCP_CONNTRACK_TIME_WAIT);
+	count_record_state(AF_INET, "192.168.0.100", "8.8.8.8", "8.8.8.8", TCP_CONNTRACK_CLOSE);
+	assert(get_host(a->mac, false)->pending_routed_connections == 3);
+	count_record(AF_INET, "192.168.0.100", "203.0.113.1", "192.168.0.101"); /* Hairpin forwards. */
+	count_record_state(AF_INET, "192.168.0.100", "8.8.8.8", "8.8.8.8", TCP_CONNTRACK_ESTABLISHED);
+	assert(get_host(a->mac, false)->pending_routed_connections == 5);
+	router_addresses = NULL;
+	get_host(a->mac, false)->pending_routed_connections = 0;
 	get_host(a->mac, false)->pending_connections = 0;
 	get_host(b->mac, false)->pending_connections = 0;
 	memcpy(v6->mac, v6mac, 6);
