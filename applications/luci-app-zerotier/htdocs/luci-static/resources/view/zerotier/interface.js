@@ -9,23 +9,23 @@
 'require view';
 
 return view.extend({
-	load: function() {
+	load() {
 		return fs.exec('/sbin/ifconfig').then(function(res) {
 			if (res.code !== 0 || !res.stdout || res.stdout.trim() === '') {
 				ui.addNotification(null, E('p', {}, _('Unable to get interface info: %s.').format(res.message)));
 				return '';
 			}
 
-			var interfaces = res.stdout.match(/zt[a-z0-9]+/g);
+			const interfaces = res.stdout.match(/zt[a-z0-9]+/g);
 			if (!interfaces || interfaces.length === 0)
 				return 'No interface online.';
 
-			var promises = interfaces.map(function(name) {
+			const promises = interfaces.map(function(name) {
 				return fs.exec('/sbin/ifconfig', [name]);
 			});
 
 			return Promise.all(promises).then(function(results) {
-				var data = results.map(function(res, index) {
+				const data = results.map(function(res, index) {
 					if (res.code !== 0 || !res.stdout || res.stdout.trim() === '') {
 						ui.addNotification(null, E('p', {}, _('Unable to get interface %s info: %s.').format(interfaces[index], res.message)));
 						return null;
@@ -37,8 +37,8 @@ return view.extend({
 				}).filter(Boolean);
 
 				return data.map(function(info) {
-					var lines = info.stdout.split('\n');
-					var parsedInfo = {
+					let lines = info.stdout.split('\n');
+					let parsedInfo = {
 						name: info.name
 					};
 
@@ -52,11 +52,11 @@ return view.extend({
 						} else if (line.includes('MTU:')) {
 							parsedInfo.mtu = line.split('MTU:')[1].trim().split(' ')[0];
 						} else if (line.includes('RX bytes:')) {
-							var rxMatch = line.match(/RX bytes:\d+ \(([\d.]+\s*[a-zA-Z]+)\)/);
+							let rxMatch = line.match(/RX bytes:\d+ \(([\d.]+\s*[a-zA-Z]+)\)/);
 							if (rxMatch && rxMatch[1]) {
 								parsedInfo.rxBytes = rxMatch[1];
 							}
-							var txMatch = line.match(/TX bytes:\d+ \(([\d.]+\s*[a-zA-Z]+)\)/);
+							let txMatch = line.match(/TX bytes:\d+ \(([\d.]+\s*[a-zA-Z]+)\)/);
 							if (txMatch && txMatch[1]) {
 								parsedInfo.txBytes = txMatch[1];
 							}
@@ -69,14 +69,14 @@ return view.extend({
 		});
 	},
 
-	render: function(data) {
-		var title = E('h2', {class: 'content'}, _('ZeroTier'));
-		var desc = E('div', {class: 'cbi-map-descr'}, _('ZeroTier is an open source, cross-platform and easy to use virtual LAN.'));
+	render(data) {
+		const title = E('h2', {class: 'content'}, _('ZeroTier'));
+		const desc = E('div', {class: 'cbi-map-descr'}, _('ZeroTier is an open source, cross-platform and easy to use virtual LAN.'));
 
 		if (!Array.isArray(data)) {
 			return E('div', {}, [title, desc, E('div', {}, _('No interface online.'))]);
 		}
-		var rows = data.flatMap(function(interfaceData) {
+		const rows = data.flatMap(function(interfaceData) {
 			return [
 				E('th', {class: 'th', colspan: '2'}, _('Network Interface Information')),
 				E('tr', {class: 'tr'}, [

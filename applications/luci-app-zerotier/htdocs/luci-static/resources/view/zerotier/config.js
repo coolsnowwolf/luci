@@ -40,7 +40,7 @@ function renderStatus(isRunning) {
 }
 
 return view.extend({
-	render: function() {
+	render() {
 		let m, s, o;
 
 		m = new form.Map('zerotier', _('ZeroTier'),
