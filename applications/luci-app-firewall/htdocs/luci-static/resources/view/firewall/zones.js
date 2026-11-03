@@ -161,6 +161,16 @@ return view.extend({
 				uci.set('firewall', section_id, 'flow_offloading_hw',
 					(value === '2' && L.hasSystemFeature('offloading_hw')) ? '1' : null);
 			};
+
+			if (fw4 && L.hasSystemFeature('offloading_hw')) {
+				o = s.option(form.ListValue, 'flow_offloading_hw_ipv6', _('Hardware offloading protocols'));
+				o.value('1', _('IPv4+v6 acceleration'));
+				o.value('0', _('IPv4 acceleration'));
+				o.default = '1';
+				o.rmempty = false;
+				o.retain = true;
+				o.depends('offloading_type', '2');
+			}
 		}
 
 
