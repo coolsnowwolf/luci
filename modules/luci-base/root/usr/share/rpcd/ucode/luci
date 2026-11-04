@@ -13,12 +13,33 @@ import { connect } from 'ubus';
 
 import timezones from 'luci.zoneinfo';
 
+// Cache board identity when rpcd loads this provider, not on every poll.
+const sr1010_build = trim(readfile('/tmp/sysinfo/board_name') || '') == 'zte,zx279133-sr1010' &&
+	match(readfile('/etc/openwrt_release') || '', /DISTRIB_TARGET=['"]zte\/zx279133['"]/) != null;
+
+function cpu_usage_result(cpuusage) {
+	let result = { cpuusage };
+	if (sr1010_build) {
+		// One fixed-size kernel summary; never enumerate flows or Conntrack.
+		const summary = readfile('/proc/net/nf_flowtable_summary') || '';
+		const hw = match(summary, /(^|[ \t])hw=([0-9]+)([ \t\r\n]|$)/);
+		const sw = match(summary, /(^|[ \t])sw=([0-9]+)([ \t\r\n]|$)/);
+		result.flows = { hw: hw ? +hw[2] : 0, sw: sw ? +sw[2] : 0 };
+	}
+	return result;
+}
+
 
 function shellquote(s) {
 	return `'${replace(s, "'", "'\\''")}'`;
 }
 
-function has_supported_hw_offloading_target(target) {
+function has_supported_hw_offloading_target(target, board) {
+	if (target == 'zte/zx279133' && board == 'zte,zx279133-sr1010')
+		return access('/sys/module/npu') == true &&
+			access('/sys/module/fnoffload') == true &&
+			length(glob('/sys/bus/platform/drivers/zx279133-eth/*/driver')) > 0;
+
 	if (target == 'ipq40xx/generic')
 		return access('/sys/module/qca_ssdk') == true &&
 			access('/sys/module/essedma') == true;
@@ -241,7 +262,7 @@ const methods = {
 			const has_mt7621_vendor_hnat = sysboard?.release?.target == 'ramips/mt7621' &&
 				access('/sys/module/mtkhnat') == true;
 			const has_hw_offloading = !has_mt7621_vendor_hnat &&
-				has_supported_hw_offloading_target(sysboard?.release?.target) &&
+				has_supported_hw_offloading_target(sysboard?.release?.target, sysboard?.board_name) &&
 				((has_fw3 && has_ipt_flowoffload) || (has_fw4 && has_nft_flowoffload));
 
 			if (ubus)
@@ -255,6 +276,8 @@ const methods = {
 				mii_tool:   access('/usr/sbin/mii-tool'),
 				offloading: (has_fw3 && has_ipt_flowoffload) || (has_fw4 && has_nft_flowoffload),
 				offloading_hw: has_hw_offloading,
+				zte_npu: sysboard?.release?.target == 'zte/zx279133' &&
+					sysboard?.board_name == 'zte,zx279133-sr1010',
 				fullcone:   access('/sys/module/xt_FULLCONENAT/refcnt') == true || access('/sys/module/nft_fullcone/refcnt') == true,
 				br2684ctl:  access('/usr/sbin/br2684ctl') == true,
 				swconfig:   access('/sbin/swconfig') == true,
@@ -774,18 +797,18 @@ const methods = {
 					fd.close();
 
 					if (length(cpuusage))
-						return { cpuusage };
+						return cpu_usage_result(cpuusage);
 				}
 			}
 
 			const fd = popen('top -n1 | awk \'/^CPU/ {printf("%d%", 100 - $8)}\'');
 			if (!fd)
-				return { cpuusage: error() };
+				return cpu_usage_result(error());
 
 			let cpuusage = trim(fd.read('all')) || '?';
 			fd.close();
 
-			return { cpuusage };
+			return cpu_usage_result(cpuusage);
 		}
 	},
 
