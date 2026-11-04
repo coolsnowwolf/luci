@@ -162,7 +162,7 @@ return view.extend({
 					(value === '2' && L.hasSystemFeature('offloading_hw')) ? '1' : null);
 			};
 
-			if (fw4 && L.hasSystemFeature('offloading_hw')) {
+			if (fw4 && L.hasSystemFeature('offloading_hw') && !L.hasSystemFeature('zte_npu')) {
 				o = s.option(form.ListValue, 'flow_offloading_hw_ipv6', _('Hardware offloading protocols'));
 				o.value('1', _('IPv4+v6 acceleration'));
 				o.value('0', _('IPv4 acceleration'));
