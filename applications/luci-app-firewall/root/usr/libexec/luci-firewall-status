@@ -8,6 +8,14 @@ ecm_available=false
 [ -x /etc/init.d/qca-nss-ecm ] && [ -f /etc/config/ecm ] &&
 	[ -f /usr/share/ucitrack/qca-nss-ecm.json ] && ecm_available=true
 
+ppe_bind_rate_available=false
+if [ -f /etc/openwrt_release ]; then
+	. /etc/openwrt_release
+	case "$DISTRIB_TARGET" in
+		airoha/*) [ ! -e /sys/kernel/debug/ppe/bind_rate ] || ppe_bind_rate_available=true ;;
+	esac
+fi
+
 rules="$(iptables-save -t nat 2>/dev/null)"
 
 if printf '%s\n' "$rules" | grep -q -- '--mode fullcone'; then
@@ -24,4 +32,4 @@ else
 	fi
 fi
 
-printf '{"nat_mode":"%s","tcp_cca":"%s","hnat_available":%s,"ecm_available":%s}\n' "$nat_mode" "$tcp_cca" "$hnat_available" "$ecm_available"
+printf '{"nat_mode":"%s","tcp_cca":"%s","hnat_available":%s,"ecm_available":%s,"ppe_bind_rate_available":%s}\n' "$nat_mode" "$tcp_cca" "$hnat_available" "$ecm_available" "$ppe_bind_rate_available"

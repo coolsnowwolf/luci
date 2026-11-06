@@ -1612,3 +1612,9 @@ msgstr "Qualcomm NSS ECM 加速"
 #: applications/luci-app-firewall/htdocs/luci-static/resources/view/firewall/zones.js
 msgid "Automatically select the acceleration engine in ECM Auto mode."
 msgstr "在 ECM Auto 模式下自动选择加速引擎。"
+
+msgid "PPE bind rate threshold"
+msgstr "PPE 绑定阈值"
+
+msgid "Packets per second required for hardware flow binding. Applies to both L2B and L3 on all active PPE engines. Default: 30 pps."
+msgstr "触发硬件流绑定所需的每秒包数，同时应用于所有已启用 PPE 引擎的 L2B 和 L3。默认：30 pps。"

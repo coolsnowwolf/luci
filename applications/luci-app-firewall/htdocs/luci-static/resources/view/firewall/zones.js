@@ -171,6 +171,17 @@ return view.extend({
 				o.retain = true;
 				o.depends('offloading_type', '2');
 			}
+
+			if (runtimeStatus?.ppe_bind_rate_available === true) {
+				o = s.option(form.Value, 'ppe_bind_rate', _('PPE bind rate threshold'),
+					_('Packets per second required for hardware flow binding. Applies to both L2B and L3 on all active PPE engines. Default: 30 pps.'));
+				o.datatype = 'and(uinteger,range(0,65535))';
+				o.default = '30';
+				o.placeholder = '30';
+				o.rmempty = false;
+				o.retain = true;
+				o.depends('offloading_type', '2');
+			}
 		}
 
 
