@@ -67,6 +67,11 @@ return baseclass.extend({
 
 		luciversion = luciversion.branch;
 
+		var cpuUsageText = cpuusage.cpuusage;
+		if (L.hasSystemFeature('zte_npu'))
+			cpuUsageText = (cpuUsageText || '?') + ', NPU: ' + (cpuusage.flows?.hw || 0) +
+				', Flow: ' + (cpuusage.flows?.sw || 0);
+
 		var datestr = null;
 
 		if (unixtime) {
@@ -102,7 +107,7 @@ return baseclass.extend({
 				systeminfo.load[1] / 65535.0,
 				systeminfo.load[2] / 65535.0
 			) : null,
-			_('CPU usage (%)'),    cpuusage.cpuusage
+			_('CPU usage (%)'),    cpuUsageText
 		];
 
 		var table = E('table', { 'class': 'table' });
