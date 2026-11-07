@@ -13,6 +13,10 @@ if [ -f /etc/openwrt_release ]; then
 	. /etc/openwrt_release
 	case "$DISTRIB_TARGET" in
 		airoha/*) [ ! -e /sys/kernel/debug/ppe/bind_rate ] || ppe_bind_rate_available=true ;;
+		mediatek/mt798x|mediatek/mt79xx)
+			[ "$hnat_available" != true ] || [ ! -e /sys/kernel/debug/hnat/hnat_setting ] ||
+				ppe_bind_rate_available=true
+			;;
 	esac
 fi
 
