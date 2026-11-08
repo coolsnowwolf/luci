@@ -4803,6 +4803,444 @@ body.node-admin-services-dockerman-overview[data-page="admin-services-dockerman"
     min-width: 200px;
 }
 
+/* Keep wide tables scrollable without widening the content panel. */
+#maincontent .design-table-scroll,
+#modal_overlay .design-table-scroll {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+#maincontent .tabs {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+#maincontent .tabs > li {
+    display: block;
+    max-width: 100%;
+}
+
+#maincontent .cbi-value > .cbi-value-field {
+    min-width: 0;
+}
+
+@media screen and (max-width: 768px) {
+    /* Keep client details readable while retaining the sortable column headings. */
+    #maincontent #status_leases,
+    #maincontent #status_leases > tbody {
+        display: block;
+        max-width: 100%;
+    }
+
+    #status_leases .tr {
+        position: relative;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: .15rem .5rem;
+        margin: .5rem 0;
+        padding: .5rem;
+        border: 1px solid var(--border_color);
+        border-radius: 8px;
+    }
+
+    #status_leases .td {
+        display: grid;
+        grid-column: 1 / -1;
+        grid-template-columns: 5.5rem minmax(0, 1fr);
+        gap: .5rem;
+        min-width: 0;
+        padding: .15rem 0;
+        text-align: left;
+        white-space: normal;
+        overflow-wrap: anywhere;
+    }
+
+    #status_leases .td::before {
+        display: block;
+        content: attr(data-title);
+        padding: 0;
+        font-weight: normal;
+        white-space: normal;
+        opacity: .7;
+    }
+
+    #status_leases .td:first-child {
+        position: absolute;
+        top: .7rem;
+        left: .5rem;
+        display: flex;
+        align-items: center;
+    }
+
+    #status_leases .td:nth-child(2) {
+        display: block;
+        padding-left: 1.5rem;
+        font-weight: 600;
+    }
+
+    #status_leases .td:first-child::before,
+    #status_leases .td:nth-child(2)::before {
+        display: none;
+    }
+
+    #status_leases .td > * {
+        min-width: 0;
+        max-width: 100%;
+    }
+
+    #status_leases .td:nth-child(4):not(:has(div)) {
+        display: none;
+    }
+
+    #status_leases .design-client-mac {
+        display: inline-block;
+        white-space: nowrap;
+    }
+
+    #status_leases .td:nth-child(6),
+    #status_leases .td:nth-child(7),
+    #status_leases .td:nth-child(9) {
+        grid-column: auto;
+        grid-template-columns: auto minmax(0, 1fr);
+        gap: .35rem;
+        align-items: center;
+    }
+
+    #status_leases .td:nth-child(8) {
+        grid-template-columns: max-content minmax(0, 1fr);
+    }
+
+    #status_leases .td:nth-child(8)::before,
+    #status_leases .luci-client-rate[data-direction="total"] {
+        white-space: nowrap;
+    }
+
+    #status_leases .td.cbi-section-actions {
+        display: flex;
+        grid-column: auto;
+        align-items: center;
+        justify-content: flex-end;
+    }
+
+    #status_leases .td.cbi-section-actions::before {
+        display: none;
+    }
+
+    #status_leases .cbi-button {
+        min-width: 0;
+        margin: 0;
+        padding: .3rem .5rem;
+        font-size: .8rem;
+    }
+
+    #status_leases .tr.table-titles {
+        display: flex;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        gap: .35rem;
+        margin: 0;
+        padding: .25rem 0 .5rem;
+        border: 0;
+        border-radius: 0;
+    }
+
+    #status_leases .th {
+        display: block;
+        flex: 0 0 auto;
+        padding: .5rem;
+        border-radius: 4px;
+        background: var(--inputbg_color);
+    }
+
+    #status_leases .tr.placeholder,
+    #status_leases .tr.placeholder > .td {
+        position: static;
+        display: block;
+        height: auto;
+    }
+
+    [data-page="admin-network-wireless"] #cbi-wireless .cbi-section-table,
+    [data-page="admin-network-wireless"] #cbi-wireless .cbi-section-tbody,
+    #maincontent #wifi_assoclist_table {
+        display: block;
+        max-width: 100%;
+    }
+
+    [data-page="admin-network-wireless"] #cbi-wireless .cbi-section-table-row {
+        position: relative;
+        display: block;
+        padding: .65rem;
+        margin-bottom: .6rem;
+        border: 1px solid var(--border_color);
+        border-radius: 8px;
+    }
+
+    [data-page="admin-network-wireless"] #cbi-wireless .cbi-section-table-row > .td {
+        display: block;
+        padding: 0;
+        white-space: normal;
+        overflow-wrap: anywhere;
+    }
+
+    [data-page="admin-network-wireless"] #cbi-wireless .cbi-section-table-row > .td[data-name="_badge"],
+    [data-page="admin-network-wireless"] #cbi-wireless .cbi-section-table-row > .td.cbi-section-actions {
+        width: auto !important;
+        min-width: 0 !important;
+        max-width: 100%;
+    }
+
+    [data-page="admin-network-wireless"] #cbi-wireless .td[data-name="_badge"] {
+        position: absolute;
+        top: .65rem;
+        right: .65rem;
+    }
+
+    [data-page="admin-network-wireless"] #cbi-wireless .design-wireless-radio > .td[data-name="_badge"] {
+        right: auto;
+        left: .65rem;
+    }
+
+    [data-page="admin-network-wireless"] #cbi-wireless .design-wireless-radio > .td[data-name="_stat"] {
+        min-height: 64px;
+        margin-left: 72px;
+    }
+
+    [data-page="admin-network-wireless"] #cbi-wireless .td[data-name="_stat"] big {
+        font-size: .95rem;
+    }
+
+    [data-page="admin-network-wireless"] #cbi-wireless .td[data-name="_stat"] .nowrap {
+        display: block;
+        white-space: normal;
+    }
+
+    [data-page="admin-network-wireless"] #cbi-wireless .cbi-section-table-row:not(.design-wireless-radio) .td[data-name="_stat"] > div > .nowrap:first-child {
+        padding-right: 85px;
+        font-weight: 600;
+    }
+
+    [data-page="admin-network-wireless"] #cbi-wireless .cbi-section-table-row:not(.design-wireless-radio) .td[data-name="_stat"] strong {
+        display: inline-block;
+        min-width: 4.5rem;
+    }
+
+    [data-page="admin-network-wireless"] #cbi-wireless .td[data-name="_stat"] br,
+    [data-page="admin-network-wireless"] #cbi-wireless .design-wireless-sep,
+    [data-page="admin-network-wireless"] #cbi-wireless .wireless-status-sep {
+        display: none;
+    }
+
+    [data-page="admin-network-wireless"] #cbi-wireless .td.cbi-section-actions > div {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: .35rem;
+        margin-top: .5rem;
+    }
+
+    [data-page="admin-network-wireless"] #cbi-wireless .cbi-button {
+        width: 100%;
+        min-width: 0;
+        margin: 0;
+        padding: .4rem;
+        font-size: .85rem;
+    }
+
+    #wifi_assoclist_table .tr {
+        display: block;
+        margin: .5rem 0;
+        padding: .5rem;
+        border: 1px solid var(--border_color);
+        border-radius: 8px;
+    }
+
+    #wifi_assoclist_table .td {
+        display: grid;
+        grid-template-columns: 5.5rem minmax(0, 1fr);
+        gap: .5rem;
+        padding: .2rem 0;
+        text-align: left;
+        white-space: normal;
+        overflow-wrap: anywhere;
+    }
+
+    #wifi_assoclist_table .td::before {
+        display: block;
+        content: attr(data-title);
+        padding: 0;
+        font-weight: normal;
+        white-space: normal;
+        opacity: .7;
+    }
+
+    #wifi_assoclist_table .td > * {
+        min-width: 0;
+        max-width: 100%;
+    }
+
+    #wifi_assoclist_table .design-client-mac {
+        display: inline-block;
+        white-space: nowrap;
+    }
+
+    #wifi_assoclist_table .tr.table-titles {
+        display: flex;
+        overflow-x: auto;
+        gap: .35rem;
+        margin: 0;
+        padding: .25rem 0 .5rem;
+        border: 0;
+        border-radius: 0;
+    }
+
+    #wifi_assoclist_table .th {
+        display: block;
+        flex: 0 0 auto;
+        padding: .5rem;
+        border-radius: 4px;
+        background: var(--inputbg_color);
+    }
+
+    #wifi_assoclist_table .tr.placeholder,
+    #wifi_assoclist_table .tr.placeholder > .td {
+        position: static;
+        display: block;
+        height: auto;
+        text-align: center;
+    }
+
+    #wifi_assoclist_table .tr.placeholder > .td::before {
+        display: none;
+    }
+
+    #maincontent .cbi-value,
+    #modal_overlay .cbi-value {
+        display: flex;
+    }
+
+    #maincontent .cbi-value > .cbi-value-title,
+    #maincontent .cbi-value > .cbi-value-field,
+    #modal_overlay .cbi-value > .cbi-value-title,
+    #modal_overlay .cbi-value > .cbi-value-field {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+    }
+
+    #maincontent input:not([type="checkbox"]):not([type="radio"]),
+    #maincontent select,
+    #maincontent textarea,
+    #maincontent .cbi-dropdown,
+    #modal_overlay input:not([type="checkbox"]):not([type="radio"]),
+    #modal_overlay select,
+    #modal_overlay textarea,
+    #modal_overlay .cbi-dropdown {
+        min-width: 0;
+        max-width: 100%;
+    }
+
+    #modal_overlay .cbi-section,
+    #modal_overlay .cbi-section-node,
+    #modal_overlay .network-status-table .ifacebox-body .ifacebadge {
+        min-width: 0;
+        max-width: 100%;
+    }
+
+    #modal_overlay .cbi-value-field .ifacebadge {
+        white-space: normal;
+        overflow-wrap: anywhere;
+    }
+
+    [data-page="admin-system-package-manager"] #maincontent .controls > * {
+        flex-basis: 100%;
+        padding: .25rem 0;
+        gap: .4rem;
+    }
+
+    [data-page="admin-system-package-manager"] #maincontent .control-group > input {
+        flex: 1 1 0;
+        width: 0;
+        margin: 0;
+    }
+
+    [data-page="admin-system-package-manager"] #maincontent .control-group > .btn {
+        flex: 0 0 auto;
+        margin: 0;
+        min-height: 2.8rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        white-space: normal;
+        line-height: 1.3;
+    }
+
+    [data-page="admin-system-package-manager"] #maincontent #action-label + .control-group {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    [data-page="admin-system-package-manager"] #maincontent #action-label + .control-group > :last-child {
+        grid-column: 1 / -1;
+    }
+
+    [data-page="admin-system-package-manager"] #maincontent .controls > *,
+    [data-page="admin-system-package-manager"] #maincontent .controls > * > * {
+        min-width: 0;
+        max-width: 100%;
+        white-space: normal;
+    }
+
+    [data-page="admin-system-package-manager"] #maincontent .control-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: .25rem;
+    }
+}
+
+#maincontent .cbi-section,
+#maincontent .cbi-section-node,
+#maincontent .cbi-value > .cbi-section {
+    min-width: 0;
+    max-width: 100%;
+}
+
+@media screen and (max-width: 768px) {
+    #maincontent .cbi-value > .cbi-section {
+        width: 100%;
+    }
+}
+
+#maincontent .cbi-map-descr,
+#maincontent .cbi-section-descr,
+#maincontent .cbi-value-description {
+    overflow-wrap: anywhere;
+}
+
+@media screen and (max-width: 992px) {
+    .showSide {
+        top: 0;
+        left: 0;
+        width: 60px;
+        height: 55px;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1;
+    }
+}
+
+#maincontent .cbi-section-create {
+    flex-wrap: wrap;
+    max-width: 100%;
+}
+
+#maincontent .cbi-section-create > * {
+    min-width: 0;
+    max-width: 100%;
+}
+
 @media (prefers-color-scheme: dark) {
 
     code, pre {

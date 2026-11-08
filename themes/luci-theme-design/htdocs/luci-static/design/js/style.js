@@ -66,10 +66,6 @@
     }
 
     function getOverviewPortColumns(width, cardCount) {
-        if (width <= 480) {
-            return 1;
-        }
-
         if (width <= 768) {
             return Math.min(cardCount, 2);
         }
@@ -80,6 +76,7 @@
     function syncOverviewPortStatus() {
         var view = document.getElementById('view');
         var portGroups = new Map();
+        var portIconSelector = 'img[src*="/luci-static/resources/icons/port_"], img[src*="/images/port_"]';
         var mediaPath = (L.env && L.env.media) ? L.env.media : '/luci-static/design';
         var iconMap = {
             'alias': 'ethernet',
@@ -148,7 +145,7 @@
                 grid.style &&
                 grid.style.display === 'grid' &&
                 grid.style.gridTemplateColumns.indexOf('minmax(70px, 1fr)') !== -1 &&
-                grid.querySelector('img[src*="/luci-static/resources/icons/port_"]');
+                grid.querySelector(portIconSelector);
 
             if (!isPortGrid) {
                 return;
@@ -161,7 +158,7 @@
             });
         });
 
-        Array.prototype.forEach.call(view.querySelectorAll('img[src*="/luci-static/resources/icons/port_"]'), function (img) {
+        Array.prototype.forEach.call(view.querySelectorAll(portIconSelector), function (img) {
             var card = img.closest('.ifacebox');
             var slot = card ? card.closest('.port-status-slot') : null;
             var parent = card ? (slot ? slot.parentElement : card.parentElement) : null;
@@ -375,17 +372,87 @@
         });
     }
 
+    function syncWirelessCards() {
+        document.querySelectorAll('#cbi-wireless .cbi-section-table-row').forEach(function (row) {
+            row.classList.toggle('design-wireless-radio', !!row.querySelector('.wireless-radio-badge'));
+
+            row.querySelectorAll('[data-name="_stat"] div').forEach(function (container) {
+                Array.from(container.childNodes).forEach(function (node) {
+                    if (node.nodeType === Node.TEXT_NODE && /^\s*\|\s*$/.test(node.textContent)) {
+                        var separator = document.createElement('span');
+                        separator.className = 'design-wireless-sep';
+                        container.replaceChild(separator, node);
+                        separator.appendChild(node);
+                    }
+                });
+            });
+        });
+    }
+
     function initWirelessIcons() {
         if (document.body.getAttribute('data-page') !== 'admin-network-wireless') {
             return;
         }
 
         syncWirelessIcons();
+        syncWirelessCards();
 
-        new MutationObserver(syncWirelessIcons).observe(document.body, {
+        new MutationObserver(function () {
+            syncWirelessIcons();
+            syncWirelessCards();
+        }).observe(document.body, {
             childList: true,
             subtree: true
         });
+    }
+
+    function initResponsiveTables() {
+        var pending = false;
+
+        function sync() {
+            pending = false;
+
+            document.querySelectorAll('#status_leases .tr > .td:nth-child(5), #wifi_assoclist_table .tr > .td:nth-child(2)').forEach(function (cell) {
+                var text = cell.firstChild;
+                var match = text && text.nodeType === Node.TEXT_NODE && text.textContent.match(/^([\da-f]{2}(?::[\da-f]{2}){5})(.*)$/i);
+
+                if (match && cell.childNodes.length === 1) {
+                    var address = document.createElement('span');
+                    var mac = document.createElement('span');
+                    mac.className = 'design-client-mac';
+                    mac.textContent = match[1];
+                    address.appendChild(mac);
+                    address.appendChild(document.createTextNode(match[2]));
+                    cell.replaceChild(address, text);
+                }
+            });
+
+            document.querySelectorAll('#maincontent table, #maincontent .table, #modal_overlay table, #modal_overlay .table').forEach(function (table) {
+                var parent = table.parentElement;
+                var style = window.getComputedStyle(parent);
+                var available = parent.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
+
+                if (available > 0 && table.getClientRects().length) {
+                    table.classList.toggle('design-table-scroll', table.scrollWidth > available + 1);
+                }
+            });
+        }
+
+        function schedule() {
+            if (!pending) {
+                pending = true;
+                window.requestAnimationFrame(sync);
+            }
+        }
+
+        new MutationObserver(schedule).observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+        window.addEventListener('resize', schedule);
+        document.addEventListener('click', schedule);
+        document.fonts.ready.then(schedule);
+        schedule();
     }
 
     function init() {
@@ -394,6 +461,7 @@
         initOverviewPortStatus();
         initNetworkInterfaceIcons();
         initWirelessIcons();
+        initResponsiveTables();
         setHeaderShadow();
         $(window).on('resize', setHeaderShadow);
     }
