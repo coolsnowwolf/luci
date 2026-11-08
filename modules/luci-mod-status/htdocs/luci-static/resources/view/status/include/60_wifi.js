@@ -169,6 +169,9 @@ function getRadioDisplayType(radio, iwinfoInfoMap) {
 	if (hwname && !/^Generic(?:\s|$)/i.test(hwname))
 		name = hwname + (info.hwmodes_text ? ' 802.11' + info.hwmodes_text : '');
 
+	if (isQcaWifiHwtype(hwtype))
+		name = name.replace(/^Atheros(?=\s|$)/, 'Qualcomm Atheros');
+
 	if (name && !/^(?:Generic(?:\s|$)|MAC80211(?:\s|$)|unknown$|802\.11unknown$)/i.test(name))
 		return name;
 
