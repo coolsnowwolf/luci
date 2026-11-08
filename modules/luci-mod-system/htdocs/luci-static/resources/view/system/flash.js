@@ -136,6 +136,30 @@ function findStorageSize(procmtd, procpart, procmounts) {
 }
 
 
+function loadEmmcPartitions() {
+	const devices = Object.create(null);
+
+	return L.resolveDefault(fs.list('/sys/class/block'), []).then(entries =>
+		Promise.all(entries.filter(entry => /^mmcblk\d+(?:p\d+|boot[01])$/.test(entry.name)).map(async entry => {
+			const name = entry.name;
+			const disk = name.match(/^(mmcblk\d+)/)[1];
+			devices[disk] ??= L.resolveDefault(fs.trimmed(`/sys/class/block/${disk}/device/type`), '');
+			if (await devices[disk] != 'MMC')
+				return null;
+
+			const [ uevent, sectors ] = await Promise.all([
+				L.resolveDefault(fs.read(`/sys/class/block/${name}/uevent`), ''),
+				L.resolveDefault(fs.trimmed(`/sys/class/block/${name}/size`), '0')
+			]);
+			const size = +sectors * 512;
+			if (!Number.isSafeInteger(size) || size <= 0)
+				return null;
+
+			return { device: name, name: uevent.match(/^PARTNAME=(.+)$/m)?.[1] || name, size };
+		}))
+	).then(partitions => partitions.filter(Boolean).sort((a, b) => L.naturalCompare(a.device, b.device)));
+}
+
 const mapdata = { actions: {}, config: {} };
 
 return view.extend({
@@ -145,7 +169,8 @@ return view.extend({
 			fs.trimmed('/proc/sys/kernel/hostname'),
 			fs.trimmed('/proc/mtd'),
 			fs.trimmed('/proc/partitions'),
-			fs.trimmed('/proc/mounts')
+			fs.trimmed('/proc/mounts'),
+			loadEmmcPartitions()
 		];
 
 		return Promise.all(tasks);
@@ -243,18 +268,19 @@ return view.extend({
 			.finally(function() { btn.firstChild.data = _('Upload archive...') });
 	},
 
-	handleBlock(hostname, ev) {
-		const mtdblock = dom.parent(ev.target, '.cbi-section').querySelector('[data-name="mtdselect"] select');
-		const mtdnumber = mtdblock.value;
-		const mtdname = mtdblock.selectedOptions[0].text.replace(/([^a-zA-Z0-9]+)/g, '-');
+	handleBlock(hostname, selector, ev) {
+		const block = dom.parent(ev.target, '.cbi-section').querySelector('[data-name="%s"] select'.format(selector));
+		const device = selector == 'mtdselect' ? 'mtdblock' + block.value : block.value;
+		const name = block.selectedOptions[0].text.replace(/([^a-zA-Z0-9]+)/g, '-');
+		const id = selector == 'mtdselect' ? 'mtd' + block.value : device;
 		const form = E('form', {
 			'method': 'post',
 			'action': L.env.cgi_base + '/cgi-download',
 			'enctype': 'application/x-www-form-urlencoded'
 		}, [
 			E('input', { 'type': 'hidden', 'name': 'sessionid', 'value': rpc.getSessionID() }),
-			E('input', { 'type': 'hidden', 'name': 'path',      'value': '/dev/mtdblock%d'.format(mtdnumber) }),
-			E('input', { 'type': 'hidden', 'name': 'filename',  'value': '%s.mtd%d.%s.bin'.format(hostname, mtdnumber, mtdname) })
+			E('input', { 'type': 'hidden', 'name': 'path',      'value': '/dev/' + device }),
+			E('input', { 'type': 'hidden', 'name': 'filename',  'value': '%s.%s.%s.bin'.format(hostname, id, name) })
 		]);
 
 		ev.currentTarget.parentNode.appendChild(form);
@@ -447,7 +473,7 @@ return view.extend({
 		});
 	},
 
-	render([p_fstat, hostname, procmtd, procpart, procmounts]) {
+	render([p_fstat, hostname, procmtd, procpart, procmounts, emmcPartitions]) {
 		const has_sysupgrade = (p_fstat.type == 'file');
 		const has_rootfs_data = (procmtd.match(/"rootfs_data"/) != null) || (procmounts.match("overlayfs:/overlay / ") != null);
 		const storage_size = findStorageSize(procmtd, procpart, procmounts);
@@ -504,9 +530,23 @@ return view.extend({
 			o = ss.option(form.Button, 'mtddownload', _('Download mtdblock'));
 			o.inputstyle = 'action important';
 			o.inputtitle = _('Save mtdblock');
-			o.onclick = L.bind(this.handleBlock, this, hostname);
+			o.onclick = L.bind(this.handleBlock, this, hostname, 'mtdselect');
 		}
 
+
+		if (emmcPartitions.length) {
+			o = s.option(form.SectionValue, 'actions', form.NamedSection, 'actions', 'actions', _('Export eMMC partition'), _('Download the raw contents of the selected eMMC partition.'));
+			ss = o.subsection;
+
+			o = ss.option(form.ListValue, 'emmcselect', _('Choose eMMC partition'));
+			for (const partition of emmcPartitions)
+				o.value(partition.device, '%s (%s, %1024.2mB)'.format(partition.name, partition.device, partition.size));
+
+			o = ss.option(form.Button, 'emmcdl', _('Download eMMC partition'));
+			o.inputstyle = 'action important';
+			o.inputtitle = _('Export partition');
+			o.onclick = L.bind(this.handleBlock, this, hostname, 'emmcselect');
+		}
 
 		o = s.option(form.SectionValue, 'actions', form.NamedSection, 'actions', 'actions', _('Flash new firmware image'),
 			has_sysupgrade

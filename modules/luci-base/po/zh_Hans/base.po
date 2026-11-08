@@ -14238,3 +14238,18 @@ msgstr "启用 CSA"
 
 msgid "Announce channel switches to clients. Automatic channel selection remains available when disabled."
 msgstr "向客户端通告信道切换。关闭后仍可自动选择信道。"
+
+msgid "Export eMMC partition"
+msgstr "导出 eMMC 分区"
+
+msgid "Download the raw contents of the selected eMMC partition."
+msgstr "下载所选 eMMC 分区的原始内容。"
+
+msgid "Choose eMMC partition"
+msgstr "选择 eMMC 分区"
+
+msgid "Download eMMC partition"
+msgstr "下载 eMMC 分区"
+
+msgid "Export partition"
+msgstr "导出分区"

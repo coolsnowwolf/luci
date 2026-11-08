@@ -13710,3 +13710,18 @@ msgstr ""
 
 msgid "Wireless scan failed: %s"
 msgstr ""
+
+msgid "Export eMMC partition"
+msgstr ""
+
+msgid "Download the raw contents of the selected eMMC partition."
+msgstr ""
+
+msgid "Choose eMMC partition"
+msgstr ""
+
+msgid "Download eMMC partition"
+msgstr ""
+
+msgid "Export partition"
+msgstr ""
