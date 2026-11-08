@@ -427,7 +427,16 @@
                 }
             });
 
-            document.querySelectorAll('#maincontent table, #maincontent .table, #modal_overlay table, #modal_overlay .table').forEach(function (table) {
+            var tables = document.querySelectorAll('#maincontent table, #maincontent .table, #modal_overlay table, #modal_overlay .table');
+
+            // Always measure the native layout. Measuring the scrollable block
+            // makes a previously overflowing table appear to fit, causing its
+            // layout (and action buttons) to alternate on every polling update.
+            tables.forEach(function (table) {
+                table.classList.remove('design-table-scroll');
+            });
+
+            tables.forEach(function (table) {
                 var parent = table.parentElement;
                 var style = window.getComputedStyle(parent);
                 var available = parent.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);

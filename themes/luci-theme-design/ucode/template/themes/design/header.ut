@@ -21,7 +21,7 @@
 	const show_proxy_icon = access('/etc/config/shadowsocksr') || access('/etc/config/google_fu_mode');
 	const show_openclash_icon = access('/etc/config/openclash');
 	const show_homeproxy_icon = access('/etc/config/homeproxy');
-	const theme_rev = `${version?.luciversion ?? 'dev'}-designfix-20261108-3`;
+	const theme_rev = `${version?.luciversion ?? 'dev'}-designfix-20261109-1`;
 
 	http.prepare_content('text/html; charset=UTF-8');
 -%}

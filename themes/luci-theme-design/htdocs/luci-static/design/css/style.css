@@ -4826,6 +4826,23 @@ body.node-admin-services-dockerman-overview[data-page="admin-services-dockerman"
     min-width: 0;
 }
 
+@media screen and (min-width: 769px) {
+    /* Fit all three actions inside the native table cell on desktop. */
+    [data-page="admin-network-wireless"] #cbi-wireless .td.cbi-section-actions > div {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: .5rem;
+        width: 270px;
+        max-width: 100%;
+    }
+
+    [data-page="admin-network-wireless"] #cbi-wireless .td.cbi-section-actions .cbi-button {
+        min-width: 0;
+        width: 100%;
+        margin: 0;
+    }
+}
+
 @media screen and (max-width: 768px) {
     /* Keep client details readable while retaining the sortable column headings. */
     #maincontent #status_leases,
