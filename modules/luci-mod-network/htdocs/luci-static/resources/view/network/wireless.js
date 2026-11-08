@@ -307,16 +307,6 @@ function loadIwinfoInfoMap(force) {
 		return Promise.all(queryTargets.map((name) =>
 			L.resolveDefault(callIwinfoInfoCompat(name), null).then((info) => [ name, info ])
 		)).then(async (entries) => {
-			await Promise.all(entries.map(async ([ name, info ]) => {
-				const iface = uci.sections('wireless', 'wifi-iface').find((iface) =>
-					isQcaWifiHwtype(uci.get('wireless', iface.device, 'type')) &&
-					resolver.aliasMap[iface['.name']] == name);
-				if (!iface || info?.mode != 'Master' || !/^ath\d+(?:\.\d+)?$/.test(name))
-					return;
-				const output = await L.resolveDefault(fs.exec_direct('/usr/sbin/cfg80211tool',
-					[ name, 'get_maxrate' ]), '');
-				info.theoretical_bitrate = parseQcaMaxPhyRate(output);
-			}));
 			const phyQueries = {};
 			for (const [ name, info ] of entries) {
 				if (info?.hardware?.id?.[0] != 0x14c3 || !/^phy\d+$/.test(info?.phy || ''))
@@ -948,13 +938,13 @@ function getFrequencyListBand(entry, hwmode) {
 	return null;
 }
 
-function normalizeIwinfoBitRate(rate) {
+function normalizeIwinfoBitRate(rate, inKbit = false) {
 	rate = +rate;
 
 	if (isNaN(rate) || rate <= 0)
 		return null;
 
-	return (rate > 100000) ? (rate / 1000) : rate;
+	return (inKbit || rate > 100000) ? (rate / 1000) : rate;
 }
 
 function getIwinfoInfoCandidates(radioNet) {
@@ -982,9 +972,10 @@ function getIwinfoInfoCandidates(radioNet) {
 }
 
 function getDisplayIwinfoBitRate(radioNet) {
+	const inKbit = isQcaWifiHwtype(uci.get('wireless', radioNet.getWifiDeviceName(), 'type'));
 	for (const candidate of getIwinfoInfoCandidates(radioNet)) {
 		const info = cachedIwinfoInfoMap ? cachedIwinfoInfoMap[candidate] : null;
-		const rate = normalizeIwinfoBitRate(info != null ? info.bitrate : null);
+		const rate = normalizeIwinfoBitRate(info != null ? info.bitrate : null, inKbit);
 
 		if (rate != null)
 			return rate;
@@ -1022,19 +1013,14 @@ function getDisplayTheoreticalBitRate(radioNet) {
 		return null;
 
 	for (const candidate of getIwinfoInfoCandidates(radioNet)) {
-		const rate = cachedIwinfoInfoMap?.[candidate]?.theoretical_bitrate;
+		const info = cachedIwinfoInfoMap?.[candidate];
+		/* QSDK SIOCGIWRATE reports the BSS PHY ceiling in kbit/s. */
+		const rate = isQcaWifiHwtype(hwtype)
+			? +info?.bitrate / 1000 : info?.theoretical_bitrate;
 		if (rate > 0)
 			return rate;
 	}
 	return null;
-}
-
-/* QSDK returns the running BSS PHY ceiling in kbit/s, including its
- * bandwidth-dependent NSS mapping. Never infer it from client rates. */
-function parseQcaMaxPhyRate(output) {
-	const match = String(output || '').match(/\bget_maxrate:\s*(\d+)\s*$/m);
-	const rate = match ? +match[1] : 0;
-	return rate > 0 ? Math.round(rate / 100) / 10 : null;
 }
 
 function getDisplayBitRate(radioNet) {
