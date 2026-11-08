@@ -82,7 +82,7 @@ function render_status(node, ifc, with_device) {
 	const cond00 = !changecount && !ifc.isDynamic() && !ifc.isAlias();
 	const cond01 = cond00 && macaddr;
 	const cond02 = cond00 && maindev;
-	const cond03 = cond00 && carrier;
+	const cond03 = !changecount && carrier;
 
 	function addEntries(label, array) {
 		return Array.isArray(array) ? array.flatMap((item) => [label, item]) : [label, null];
