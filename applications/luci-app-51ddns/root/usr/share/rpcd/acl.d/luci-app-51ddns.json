@@ -1,0 +1,18 @@
+{
+	"luci-app-51ddns": {
+		"description": "Grant access to the 51DDNS configuration",
+		"read": {
+			"ubus": {
+				"luci.51ddns": [ "status", "info" ],
+				"service": [ "list" ]
+			},
+			"uci": [ "51ddns" ]
+		},
+		"write": {
+			"ubus": {
+				"luci.51ddns": [ "wizard", "settings", "account_token" ]
+			},
+			"uci": [ "51ddns" ]
+		}
+	}
+}

@@ -1,0 +1,713 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: luci-app-51ddns\n"
+"PO-Revision-Date: 2026-09-26 00:00+0000\n"
+"Last-Translator: 51DDNS\n"
+"Language-Team: Chinese (Simplified)\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: zh_Hans\n"
+"MIME-Version: 1.0\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Device quota"
+msgstr "设备额度"
+
+msgid "Device limit reached. If this router already has a device record in the console, use its exact device ID to continue binding. Upgrade or purchase a plan only when adding another device."
+msgstr "设备额度已用完。若控制台已有这台路由器的设备记录，请填写该记录的准确设备 ID 继续绑定；确需新增设备时，再升级或购买套餐。"
+
+msgid "Go to device plans"
+msgstr "前往设备套餐"
+
+msgid "Enter your account token. For a device already created in the console, enter its exact device UUID below. Leave the ID blank for automatic registration only when this router has no saved device ID and your account has a free device slot."
+msgstr "请输入账号令牌。若已在控制台创建设备，请在下方填写该设备准确的 UUID。只有路由器尚无已保存的设备 ID 且账号有空闲设备席位时，留空才会自动注册。"
+
+msgid "Copy the token from the 51DDNS console. Updating it keeps the saved device ID. A token from another account will be rejected until the device identity is migrated."
+msgstr "从 51DDNS 控制台复制令牌。更新令牌会保留已保存的设备 ID；其他账号的令牌会被拒绝，须另行迁移设备身份。"
+
+msgid "Existing device ID (optional)"
+msgstr "已有设备 ID（可选）"
+
+msgid "Paste the exact UUID of the device created in the console. If verification failed before this router saved an identity, stop the agent to correct or clear this field. A saved router ID is never cleared here."
+msgstr "填写控制台设备的准确 UUID。若核验失败且路由器尚未保存身份，请先停用 Agent，再修改或清空此项；已保存的路由器 ID 不会在此清除。"
+
+msgid "Enter a valid device UUID from the console."
+msgstr "请输入控制台中有效的设备 UUID。"
+
+msgid "This router already has a configured device ID. Changing it requires a separate migration."
+msgstr "此路由器已配置设备 ID。更换身份须另行迁移。"
+
+msgid "This router already has a saved device ID. Changing it requires a separate migration."
+msgstr "此路由器已保存设备 ID。更换身份须另行迁移。"
+
+msgid "The saved device identity could not be verified. Refresh the page before setting a device ID."
+msgstr "无法核实已保存的设备身份。请刷新页面后再设置设备 ID。"
+
+msgid "Disable the agent and save first. Then enter the existing device ID and enable it again."
+msgstr "请先取消启用并保存，再填写已有设备 ID 并重新启用。"
+
+msgid "Tunnel client"
+msgstr "隧道客户端"
+
+msgid "Cannot write the tunnel client configuration. Retrying automatically; check storage and permissions."
+msgstr "无法写入隧道客户端配置，正在自动重试；请检查存储空间和权限。"
+
+msgid "Tunnel client could not start. Retrying automatically; check the frpc installation."
+msgstr "隧道客户端无法启动，正在自动重试；请检查 frpc 是否正确安装。"
+
+msgid "Tunnel client exited. Retrying automatically; the agent continues attempting device reporting."
+msgstr "隧道客户端已退出，正在自动重试；Agent 仍会尝试上报设备状态。"
+
+msgid "Router management"
+msgstr "路由器管理"
+
+msgid "Address assigned. Waiting for the public tunnel connection."
+msgstr "管理地址已分配，正在等待公网通道连通。"
+
+msgid "The management entry is reachable. Sign in with the owning account to open it."
+msgstr "管理入口已连通，使用设备所属账号验证后即可打开。"
+
+msgid "Remote router management is disabled. A console-disabled or deleted entry is not recreated."
+msgstr "远程管理已停用。在控制台停用或删除的入口不会自动重建。"
+
+msgid "Cannot identify the router Web service. Check the local management address."
+msgstr "未识别到路由器管理服务，请检查本地管理地址。"
+
+msgid "The local management proxy port is already in use."
+msgstr "本地管理代理端口已被占用。"
+
+msgid "Bind an active plan before creating the management address."
+msgstr "请先绑定有效套餐，再创建管理地址。"
+
+msgid "No domain quota remains. Existing domains were not changed."
+msgstr "域名额度已用完，现有域名未被修改。"
+
+msgid "The server has not enabled automatic router management yet."
+msgstr "服务端尚未启用自动路由器管理功能。"
+
+msgid "Status is unavailable or expired."
+msgstr "状态不可用或已过期。"
+
+msgid "Router management address"
+msgstr "路由器管理地址"
+
+msgid "Open router management"
+msgstr "打开路由器管理页面"
+
+msgid "Copy address"
+msgstr "复制地址"
+
+msgid "Automatic router management address"
+msgstr "自动分配路由器管理地址"
+
+msgid "Uses one domain from this device plan and requires the owning account to sign in."
+msgstr "占用本设备套餐的一个域名额度，访问时需要设备所属账号登录验证。"
+
+msgid "Local router Web address (optional)"
+msgstr "本地路由器管理地址（选填）"
+
+msgid "Leave blank to detect uhttpd. Only an IP on this router is accepted; HTTPS uses its configured public certificate."
+msgstr "留空则自动检测 uhttpd；仅允许本路由器的 IP 地址，HTTPS 使用其已配置的公开证书进行验证。"
+
+msgid "Setup guide"
+msgstr "设置向导"
+
+msgid "Router setup steps"
+msgstr "路由器设置步骤"
+
+msgid "Register / sign in"
+msgstr "注册 / 登录"
+
+msgid "Registration complete. Sign in to continue."
+msgstr "注册成功，点击登录继续。"
+
+msgid "This page uses HTTP. Only enter credentials on a trusted local network."
+msgstr "当前页面使用 HTTP，请仅在可信的局域网中输入账号信息。"
+
+msgid "Bind this device"
+msgstr "绑定此设备"
+
+msgid "Configure a domain"
+msgstr "配置域名"
+
+msgid "Test access"
+msgstr "测试访问"
+
+msgid "Test online"
+msgstr "测试上线"
+
+msgid "The account token was accepted by the device."
+msgstr "设备令牌已通过服务端验证。"
+
+msgid "Token saved. Waiting for a fresh device report to verify it."
+msgstr "令牌已保存，等待设备上报以完成验证。"
+
+msgid "Register or sign in to the console, then copy your account token here."
+msgstr "先在控制台注册或登录，再复制账号令牌并填入此页。"
+
+msgid "Device identity is bound and saved."
+msgstr "设备身份已绑定并保存。"
+
+msgid "For an existing device, enter its exact console UUID. Leave it blank only for a new router with an available device slot."
+msgstr "已有设备请填写控制台中的准确 UUID。只有全新路由器且账号有空闲设备额度时才留空。"
+
+msgid "Enable the management address below and save to request a domain. It is off by default."
+msgstr "在下方启用管理地址并保存以申请域名。此功能默认关闭。"
+
+msgid "The management domain is ready."
+msgstr "管理域名已就绪。"
+
+msgid "An active plan with domain quota is required. Review plans in the console; nothing is purchased automatically."
+msgstr "需要有效套餐和剩余域名额度。请在控制台查看套餐；系统不会自动购买。"
+
+msgid "Domain assigned; waiting for the secure tunnel to become ready."
+msgstr "域名已分配，正在等待安全隧道就绪。"
+
+msgid "Domain setup is pending. Check the device status and local Web address below."
+msgstr "域名配置尚未完成，请检查设备状态和下方本地 Web 地址。"
+
+msgid "Open the address and confirm that the router sign-in page loads."
+msgstr "打开地址并确认路由器登录页能够正常加载。"
+
+msgid "The access test becomes available after the domain and tunnel are ready."
+msgstr "域名和隧道就绪后即可测试访问。"
+
+msgid "Review plans"
+msgstr "查看套餐"
+
+msgid "Register"
+msgstr "注册"
+
+msgid "Sign in"
+msgstr "登录"
+
+msgid "Open router sign-in page"
+msgstr "打开路由器登录页"
+
+msgid "The relay limit cannot cover all access nodes. Increase the limit or disable router management."
+msgstr "当前节点连接上限不足以覆盖全部访问节点。请提高上限，或关闭路由器远程管理。"
+
+msgid "Some published access addresses are not reachable yet. The management entry is not ready."
+msgstr "部分已发布的访问地址尚未连通，管理入口暂未就绪。"
+
+msgid "Upgrade the agent to support the current router management protocol."
+msgstr "请升级客户端，以支持当前的路由器管理协议。"
+
+msgid "Bind device"
+msgstr "绑定设备"
+
+msgid "Choose plan"
+msgstr "选择套餐"
+
+msgid "Signed in as %s"
+msgstr "已登录 %s"
+
+msgid "Signed in"
+msgstr "已登录"
+
+msgid "Plans on this account"
+msgstr "我的套餐"
+
+msgid "Product catalog"
+msgstr "全部套餐"
+
+msgid "Loading product catalog…"
+msgstr "正在读取套餐目录…"
+
+msgid "Could not load the product catalog. Try again."
+msgstr "暂时无法读取套餐目录，请刷新重试。"
+
+msgid "There are no active products to display."
+msgstr "暂无在售套餐。"
+
+msgid "Choose a plan and billing period to see the next step."
+msgstr "点击选择套餐和周期，即可查看下一步操作。"
+
+msgid "Could not verify your authorizations. Refresh your plans to continue."
+msgstr "暂时无法核对当前账号的授权，请刷新套餐后继续。"
+
+msgid "This account has a matching authorization. Use it below to continue binding."
+msgstr "当前账号已有对应授权，可在下方继续绑定。"
+
+msgid "There is no usable authorization for this trial. Check its eligibility in the console."
+msgstr "当前没有可用于绑定的体验授权，请到控制台查看领取资格。"
+
+msgid "No authorization is available for this plan and period. Choose the same option in the console, then return and refresh."
+msgstr "当前账号没有此套餐和周期的可用授权。请在控制台选择相同规格，开通后返回刷新。"
+
+msgid "View trial eligibility in 51DDNS console"
+msgstr "在 51DDNS 控制台查看体验资格"
+
+msgid "Open 51DDNS console to purchase"
+msgstr "打开 51DDNS 控制台购买"
+
+msgid "Check for newly activated plans"
+msgstr "已开通，刷新套餐"
+
+msgid "Use another plan on this account"
+msgstr "使用账号的其他套餐"
+
+msgid "%s device slots per pack"
+msgstr "每包 %s 个设备席位"
+
+msgid "%s domains per device"
+msgstr "每台 %s 个域名"
+
+msgid "%s Mbps per device"
+msgstr "每台 %s Mbps"
+
+msgid "%s months"
+msgstr "%s 个月"
+
+msgid "%s days"
+msgstr "%s 天"
+
+msgid "Free"
+msgstr "免费"
+
+msgid "Domain limit"
+msgstr "域名额度"
+
+msgid "Bandwidth"
+msgstr "带宽"
+
+msgid "Available plans"
+msgstr "可用套餐"
+
+msgid "Select a plan"
+msgstr "请选择套餐"
+
+msgid "Selected plan"
+msgstr "已选套餐"
+
+msgid "Linked to this device"
+msgstr "已绑定此设备"
+
+msgid "Unused slot"
+msgstr "可用席位"
+
+msgid "Expires"
+msgstr "到期"
+
+msgid "Continue to bind"
+msgstr "下一步：绑定设备"
+
+msgid "Change plan"
+msgstr "重选套餐"
+
+msgid "Refresh plans"
+msgstr "刷新套餐"
+
+msgid "Use a different account"
+msgstr "换一个账号登录"
+
+msgid "No plan on this account can be used to bind this router. After adding a plan, refresh this list."
+msgstr "当前账号没有可用于绑定这台路由器的套餐。开通后请刷新此列表。"
+
+msgid "The selected plan is no longer available. Choose a plan again."
+msgstr "已选套餐已不可用，请重新选择。"
+
+msgid "Choose an unused plan slot before force binding this router."
+msgstr "强制绑定前，请重新选择有可用席位的套餐。"
+
+msgid "Write token"
+msgstr "写入令牌"
+
+msgid "Configure domain"
+msgstr "配置域名"
+
+msgid "Check the email and password and try again."
+msgstr "请检查邮箱和密码后重试。"
+
+msgid "This email is already registered. Continue to sign in."
+msgstr "该邮箱已注册，请继续登录。"
+
+msgid "The invitation code is invalid or expired."
+msgstr "邀请码无效或已过期。"
+
+msgid "Too many attempts. Wait before trying again."
+msgstr "操作次数过多，请稍后重试。"
+
+msgid "Your setup session expired. Sign in again to continue."
+msgstr "向导会话已过期，请重新登录。"
+
+msgid "No device slots are available on this account."
+msgstr "此账号没有可用的设备额度。"
+
+msgid "This account has reached its device limit."
+msgstr "此账号已达到设备数量上限。"
+
+msgid "This device is unavailable for the signed-in account."
+msgstr "当前登录账号无法使用此设备。"
+
+msgid "How to continue"
+msgstr "请选择下一步操作"
+
+msgid "Sign in with the 51DDNS email originally linked to this router, then bind this device again."
+msgstr "使用此路由器原先绑定的 51DDNS 邮箱登录，再重新绑定此设备。"
+
+msgid "Original account email"
+msgstr "原账号邮箱"
+
+msgid "Sign in with the original account"
+msgstr "登录原账号"
+
+msgid "Bind this router to the current account with a new device ID. This requires a free device slot. The old device and domains stay in the original account."
+msgstr "为此路由器分配新设备 ID，绑定到当前账号，需要可用设备额度。原设备和域名保留在原账号。"
+
+msgid "Force bind this router"
+msgstr "强制绑定该设备"
+
+msgid "Create a new device for this account? When you write the new token, this router will stop connecting as the old device. Existing domains stay with the old device."
+msgstr "确认在当前账号下创建新设备吗？写入新令牌后，此路由器将停止使用原设备连接。已有域名仍归原设备。"
+
+msgid "Writing the new token will switch this router to the new device. Access through the old device on this router will stop."
+msgstr "写入新令牌后，此路由器将切换到新设备，原设备在此路由器上的访问会中断。"
+
+msgid "The previous device settings could not be restored automatically. Check the router settings before continuing."
+msgstr "无法自动恢复原设备配置。请先检查路由器上的 51DDNS 配置，再继续操作。"
+
+msgid "The requested device differs from the identity saved on this router."
+msgstr "设备 ID 与路由器上保存的身份不一致。"
+
+msgid "This device is already associated with another installation."
+msgstr "此设备已关联到其他安装实例。"
+
+msgid "Apply or revert pending 51DDNS settings before continuing."
+msgstr "请先应用或撤销待提交的 51DDNS 配置。"
+
+msgid "Another 51DDNS setup operation is in progress. Try again shortly."
+msgstr "正在执行另一个 51DDNS 配置操作，请稍后重试。"
+
+msgid "The router could not reach 51DDNS securely. Try again shortly."
+msgstr "路由器暂时无法安全连接 51DDNS，请稍后重试。"
+
+msgid "The 51DDNS service is unavailable. Try again shortly."
+msgstr "51DDNS 服务暂不可用，请稍后重试。"
+
+msgid "This router uses a custom control server. Setup requires the configured 51DDNS service."
+msgstr "此路由器使用自定义控制服务，当前向导需要连接 51DDNS 服务。"
+
+msgid "Wait until this device reports online before continuing."
+msgstr "请等待此设备上报在线后继续。"
+
+msgid "The router could not save the settings."
+msgstr "路由器未能保存配置。"
+
+msgid "The 51DDNS Agent could not apply the settings."
+msgstr "51DDNS 客户端未能应用配置。"
+
+msgid "The domain is assigned. Waiting for the public tunnel."
+msgstr "域名已分配，正在等待公网隧道。"
+
+msgid "Router management is currently disabled on the server."
+msgstr "服务端当前尚未开启路由器远程管理。"
+
+msgid "An active plan is required to configure a management domain."
+msgstr "配置管理域名需要有效套餐。"
+
+msgid "No management domain quota is available on the current plan."
+msgstr "当前套餐没有可用的管理域名额度。"
+
+msgid "The router cannot connect to all required relay nodes."
+msgstr "路由器无法连接所有必需的中继节点。"
+
+msgid "At least one public address failed the HTTPS check."
+msgstr "至少一个公网地址未通过 HTTPS 检测。"
+
+msgid "The router web service could not be reached."
+msgstr "无法连接路由器的本地网页服务。"
+
+msgid "The local management proxy port is in use."
+msgstr "本地管理代理端口已被占用。"
+
+msgid "This management domain is disabled."
+msgstr "此管理域名已停用。"
+
+msgid "Update the 51DDNS Agent to continue."
+msgstr "请升级 51DDNS 客户端后继续。"
+
+msgid "The management domain could not be verified."
+msgstr "无法验证管理域名。"
+
+msgid "Setup could not continue. Please try again."
+msgstr "配置未能继续，请重试。"
+
+msgid "Already registered? Sign in"
+msgstr "已有账号？去登录"
+
+msgid "Create an account"
+msgstr "注册账号"
+
+msgid "Open this router page using HTTPS to enter your account details."
+msgstr "请使用 HTTPS 打开当前路由器页面后再输入账号信息。"
+
+msgid "Email address"
+msgstr "邮箱地址"
+
+msgid "Password"
+msgstr "密码"
+
+msgid "Invitation code (optional)"
+msgstr "邀请码（选填）"
+
+msgid "The public HTTPS test failed. Try again after the tunnel recovers."
+msgstr "公网 HTTPS 测试失败，请在隧道恢复后重试。"
+
+msgid "Could not read the router status. Retrying."
+msgstr "未能读取路由器状态，正在重试。"
+
+msgid "Timed out waiting for a new public HTTPS test. Try again."
+msgstr "等待新的公网 HTTPS 测试超时，请重试。"
+
+msgid "Could not read the router status. Try again."
+msgstr "未能读取路由器状态，请重试。"
+
+msgid "Bind this router to your account. Leave the device ID blank to register a new device."
+msgstr "将此路由器绑定到当前账号。新设备可将设备 ID 留空。"
+
+msgid "Enter a valid device ID."
+msgstr "请输入有效的设备 ID。"
+
+msgid "Token saved. Waiting for this router to report online."
+msgstr "令牌已保存，正在等待路由器上报在线。"
+
+msgid "Write the token securely to this router and start the 51DDNS Agent."
+msgstr "将令牌安全写入此路由器，并启动 51DDNS 客户端。"
+
+msgid "Refresh status"
+msgstr "刷新状态"
+
+msgid "Enable a protected router management address using one domain from this device plan."
+msgstr "开启受保护的路由器管理地址，占用此设备套餐的一个域名额度。"
+
+msgid "Waiting for the management domain."
+msgstr "正在等待管理域名。"
+
+msgid "Management address"
+msgstr "远程访问域名"
+
+msgid "Public HTTPS access test passed."
+msgstr "公网 HTTPS 访问测试通过。"
+
+msgid "Waiting for a new public HTTPS test from the router."
+msgstr "正在等待路由器执行新的公网 HTTPS 测试。"
+
+msgid "Test the management address through all published relay addresses."
+msgstr "通过全部已发布的中继地址测试管理域名。"
+
+msgid "Finish setup"
+msgstr "完成配置"
+
+msgid "Setup complete. Public HTTPS access was verified."
+msgstr "配置完成，公网 HTTPS 访问已验证。"
+
+msgid "Start again"
+msgstr "重新配置"
+
+msgid "Server connection"
+msgstr "服务器连接"
+
+msgid "Online"
+msgstr "在线"
+
+msgid "Offline"
+msgstr "离线"
+
+msgid "Device ID"
+msgstr "设备 ID"
+
+msgid "Not bound"
+msgstr "未绑定"
+
+msgid "Agent version"
+msgstr "客户端版本"
+
+msgid "Unavailable"
+msgstr "不可用"
+
+msgid "Runtime status"
+msgstr "运行状态"
+
+msgid "Running"
+msgstr "运行中"
+
+msgid "Not running"
+msgstr "未运行"
+
+msgid "Not configured"
+msgstr "未配置"
+
+msgid "Offline diagnosis"
+msgstr "离线诊断"
+
+msgid "Export diagnostics"
+msgstr "导出诊断包"
+
+msgid "The agent is stopped. Check the token and service switch below."
+msgstr "客户端未运行，请检查下方的令牌和服务开关。"
+
+msgid "The agent is running without a recent online report. Check the account binding and network connection."
+msgstr "客户端正在运行，但最近未上报在线。请检查账号绑定和网络连接。"
+
+msgid "The agent is online."
+msgstr "客户端在线。"
+
+msgid "Settings saved and applied."
+msgstr "配置已保存并应用。"
+
+msgid "Could not apply settings. Refresh the status and try again."
+msgstr "未能应用配置，请刷新状态后重试。"
+
+msgid "Basic settings"
+msgstr "基础配置"
+
+msgid "Advanced features"
+msgstr "高级功能"
+
+msgid "Enable 51DDNS"
+msgstr "启用 51DDNS"
+
+msgid "Account token"
+msgstr "用户令牌"
+
+msgid "The setup wizard writes the token directly to the router."
+msgstr "向导会将令牌直接写入路由器。"
+
+msgid "Open this LuCI page over HTTPS"
+msgstr "用 HTTPS 打开此 LuCI 页面"
+
+msgid "to view and copy the account token."
+msgstr "查看并复制用户令牌。"
+
+msgid "Reading the configured token…"
+msgstr "正在读取已配置的令牌…"
+
+msgid "The configured token could not be read."
+msgstr "暂时无法读取已配置的令牌。"
+
+msgid "Hidden"
+msgstr "已隐藏"
+
+msgid "Show account token"
+msgstr "显示用户令牌"
+
+msgid "Hide account token"
+msgstr "隐藏用户令牌"
+
+msgid "Leave the local address blank to detect it automatically."
+msgstr "本地地址留空时将自动检测。"
+
+msgid "Working…"
+msgstr "处理中…"
+
+msgid "Save and apply settings"
+msgstr "保存配置并应用"
+
+msgid "Welcome to 51DDNS"
+msgstr "欢迎使用 51DDNS"
+
+msgid "Current plan"
+msgstr "当前套餐"
+
+msgid "Plan"
+msgstr "套餐名称"
+
+msgid "Expired"
+msgstr "已到期"
+
+msgid "Last synced"
+msgstr "最近同步"
+
+msgid "Official plan specifications"
+msgstr "官网套餐规格"
+
+msgid "See the console for plan specifications."
+msgstr "请在官网控制台查看规格。"
+
+msgid "Plan information is temporarily unavailable."
+msgstr "暂时无法读取本设备的套餐信息。"
+
+msgid "Renewal support"
+msgstr "续费咨询"
+
+msgid "Upgrade in the console"
+msgstr "去官网升级"
+
+msgid "Set up your account, router and management domain here."
+msgstr "在此配置账号、路由器和管理域名。"
+
+msgid "Start setup"
+msgstr "开始配置"
+
+msgid "Setup steps"
+msgstr "配置步骤"
+
+msgid "Setup complete"
+msgstr "配置完成"
+
+msgid "Quick setup"
+msgstr "快速向导"
+
+msgid "Remote management"
+msgstr "远程管理"
+
+msgid "Enabled"
+msgstr "已开启"
+
+msgid "Disabled"
+msgstr "未开启"
+
+msgid "Device"
+msgstr "设备"
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/overview.js:68
+msgid "%d hour"
+msgid_plural "%d hours"
+msgstr[0] ""
+msgstr[1] ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/overview.js:159
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/overview.js:175
+#: applications/luci-app-51ddns/root/usr/share/luci/menu.d/luci-app-51ddns.json:3
+msgid "51DDNS Remote Access"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/overview.js:67
+msgid "About %d day"
+msgid_plural "About %d days"
+msgstr[0] ""
+msgstr[1] ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/overview.js:236
+msgid "Bind or purchase a plan"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/overview.js:217
+msgid "Enable"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/overview.js:229
+msgid "Expires at"
+msgstr ""
+
+#: applications/luci-app-51ddns/root/usr/share/rpcd/acl.d/luci-app-51ddns.json:3
+msgid "Grant access to the 51DDNS configuration"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/overview.js:227
+msgid "No active plan"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/overview.js:221
+msgid "Service status"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/overview.js:43
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/overview.js:58
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/overview.js:126
+msgid "Synchronizing"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/overview.js:232
+msgid "Time remaining"
+msgstr ""
