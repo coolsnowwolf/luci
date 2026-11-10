@@ -1,5 +1,6 @@
 
 config openclash 'config'
+	option china_ip_route '1'
 	option proxy_port '7892'
 	option tproxy_port '7895'
 	option mixed_port '7893'

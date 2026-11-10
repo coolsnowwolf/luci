@@ -75,6 +75,18 @@ jobs:
           sync_app "coolsnowwolf/homeproxy" "lean" \
             "." "applications/luci-app-homeproxy"
 
+          openclash_config='applications/luci-app-openclash/root/etc/config/openclash'
+          if [[ -f "$openclash_config" ]]; then
+            awk -v section="config openclash 'config'" -v option="\toption china_ip_route '1'" '
+              /^config[[:space:]]/ { in_config = ($0 == section) }
+              in_config && /^[[:space:]]*option[[:space:]]+china_ip_route[[:space:]]/ { next }
+              { print }
+              $0 == section { print option; found = 1 }
+              END { if (!found) exit 1 }
+            ' "$openclash_config" > "$work_dir/openclash.config"
+            cat "$work_dir/openclash.config" > "$openclash_config"
+          fi
+
       - name: Restore local Nikki version cache patch
         shell: bash
         run: |
