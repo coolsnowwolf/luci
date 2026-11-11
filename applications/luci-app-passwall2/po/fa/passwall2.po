@@ -604,6 +604,9 @@ msgstr "پنجره دریافت اتصال QUIC"
 msgid "QUIC concurrent bidirectional streams"
 msgstr "جریان‌های دوطرفه همزمان QUIC"
 
+msgid "Keep Alive"
+msgstr "زنده نگه داشتن اتصال"
+
 msgid "QUIC KeepAlive interval"
 msgstr "فاصله QUIC KeepAlive"
 
@@ -1369,6 +1372,9 @@ msgstr "زمانی استفاده می‌شود که لینک گره شامل ا
 msgid "%s Node Use Type"
 msgstr "نوع استفاده گره %s"
 
+msgid "Other"
+msgstr "سایر"
+
 msgid "UDP relay mode"
 msgstr "حالت بازپخش UDP"
 
@@ -1584,12 +1590,6 @@ msgstr "همزمانی XUDP Mux"
 
 msgid "Padding"
 msgstr "پدینگ (Padding)"
-
-msgid "Enable early data"
-msgstr "فعال‌سازی داده‌های اولیه (Early Data)"
-
-msgid "Early data length"
-msgstr "طول داده‌های اولیه"
 
 msgid "Early data header name"
 msgstr "نام هدر داده‌های اولیه"
