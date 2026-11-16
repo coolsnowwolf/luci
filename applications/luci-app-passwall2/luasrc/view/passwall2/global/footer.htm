@@ -8,25 +8,61 @@ local sid = "@global[0]"
 #cbi-<%=appname%>-socks .td.cbi-value-field > div {
 	white-space: nowrap;
 }
-@media (max-width: 1152px) {
+
+@media screen and (max-width: 1152px) {
 	#cbi-<%=appname%>-socks .td.cbi-value-field > div {
 		white-space: normal;
 	}
-}
 
-@media screen and (max-width: 1152px) {
+	/* Use the same narrow-screen table layout across themes. */
+	#cbi-<%=appname%>-socks .cbi-section-table,
+	#cbi-<%=appname%>-socks .cbi-section-table > tbody {
+		display: block;
+	}
+
 	#cbi-<%=appname%>-socks .cbi-section-table-titles {
 		display: none !important;
 	}
-}
 
-@media screen and (min-width: 1152px) {
-	#cbi-<%=appname%>-socks input[id*=".<%=appname%>."][id$=".port"],
-	#cbi-<%=appname%>-socks input[id*=".<%=appname%>."][id$=".http_port"] {
-		width: 100px !important;
-		min-width: unset !important;
-		max-width: unset !important;
-		text-align: center !important;
+	#cbi-<%=appname%>-socks .cbi-section-table-row {
+		display: flex;
+		flex-wrap: wrap;
+	}
+
+	#cbi-<%=appname%>-socks .cbi-section-table-row > .td {
+		display: block;
+		box-sizing: border-box;
+		margin: 0;
+		flex: 1 1 50%;
+		min-width: 0;
+		width: auto !important;
+		height: auto;
+	}
+
+	#cbi-<%=appname%>-socks .cbi-section-table-row > .td[data-title]::before {
+		content: attr(data-title);
+		display: block;
+	}
+
+	#cbi-<%=appname%>-socks .cbi-section-table-row > .td.cbi-section-actions {
+		flex: 1 1 100%;
+	}
+
+	#cbi-<%=appname%>-socks .cbi-value-field input:not([type="checkbox"], [type="radio"], [type="hidden"]),
+	#cbi-<%=appname%>-socks .cbi-value-field select {
+		box-sizing: border-box;
+		min-width: 0;
+		max-width: 100%;
+	}
+
+	/* Keep the enable column compact in mobile table cards. */
+	#cbi-<%=appname%>-socks .cbi-section-table-row > .td[data-name="enabled"] {
+		flex: 0 0 4.5em;
+	}
+
+	#cbi-<%=appname%>-socks .cbi-section-table-row > .td[data-name="node"] {
+		flex: 1 1 calc(100% - 4.5em);
+		min-width: 0;
 	}
 }
 </style>
@@ -62,7 +98,7 @@ local sid = "@global[0]"
 	const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 	async function go() {
-		const _status = document.getElementsByClassName('_status');
+		const _status = document.getElementsByClassName('_socks_status');
 		for (let i = 0; i < _status.length; i++) {
 			const id = _status[i].getAttribute("socks_id");
 			XHR.get('<%=api.url("socks_status")%>', {
@@ -70,24 +106,18 @@ local sid = "@global[0]"
 					id: id
 				},
 				function(x, result) {
-					const index = result.index;
-					let div = '';
-					const div1 = '<font style="font-weight:bold;" color="green">✓</font>&nbsp';
-					const div2 = '<font style="font-weight:bold;" color="red">X</font>&nbsp';
-
-					if (result.socks_status) {
-						div += div1;
-					} else {
-						div += div2;
+					const socks = _status[i].querySelector('._socks');
+					const http = _status[i].querySelector('._http');
+					if (socks) {
+						socks.textContent = result.socks_status ? "✓" : "X";
+						socks.style.fontWeight = "bold";
+						socks.style.color = result.socks_status ? "green" : "red";
 					}
-					if (result.use_http) {
-						if (result.http_status) {
-							div += div1;
-						} else {
-							div += div2;
-						}
+					if (http) {
+						http.textContent = result.http_status ? "✓" : "X";
+						http.style.fontWeight = "bold";
+						http.style.color = result.http_status ? "green" : "red";
 					}
-					_status[index].innerHTML = div;
 				}
 			);
 		}
