@@ -1,0 +1,943 @@
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8"
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/overview.js:68
+msgid "%d hour"
+msgid_plural "%d hours"
+msgstr[0] ""
+msgstr[1] ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:107
+msgid "%s Mbps per device"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:120
+msgid "%s days"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:104
+msgid "%s device slots per pack"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:105
+msgid "%s domains per device"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:120
+msgid "%s months"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/overview.js:159
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/overview.js:175
+#: applications/luci-app-51ddns/root/usr/share/luci/menu.d/luci-app-51ddns.json:3
+msgid "51DDNS Remote Access"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/overview.js:67
+msgid "About %d day"
+msgid_plural "About %d days"
+msgstr[0] ""
+msgstr[1] ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/overview.js:185
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:953
+msgid "Account token"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/overview.js:113
+msgid "Address assigned. Waiting for the public tunnel connection."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:1058
+msgid "Advanced features"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/overview.js:284
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:872
+msgid "Agent version"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:297
+msgid "Already registered? Sign in"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:59
+msgid "An active plan is required to configure a management domain."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:47
+msgid "Another 51DDNS setup operation is in progress. Try again shortly."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:46
+msgid "Apply or revert pending 51DDNS settings before continuing."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:62
+msgid "At least one public address failed the HTTPS check."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/overview.js:275
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:1067
+msgid "Automatic router management address"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:624
+msgid "Available plans"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:574
+msgid "Bandwidth"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:1056
+msgid "Basic settings"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/overview.js:118
+msgid "Bind an active plan before creating the management address."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:31
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:756
+msgid "Bind device"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/overview.js:236
+msgid "Bind or purchase a plan"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:724
+msgid ""
+"Bind this router to the current account with a new device ID. This requires "
+"a free device slot. The old device and domains stay in the original account."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:752
+msgid ""
+"Bind this router to your account. Leave the device ID blank to register a "
+"new device."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/overview.js:116
+msgid ""
+"Cannot identify the router Web service. Check the local management address."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/overview.js:97
+msgid ""
+"Cannot write the tunnel client configuration. Retrying automatically; check "
+"storage and permissions."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:767
+msgid "Change plan"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:649
+msgid "Check for newly activated plans"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:35
+msgid "Check the email and password and try again."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:632
+msgid "Choose a plan and billing period to see the next step."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:726
+msgid "Choose an unused plan slot before force binding this router."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:31
+msgid "Choose plan"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:31
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:804
+msgid "Configure domain"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:595
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:626
+msgid "Continue to bind"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/overview.js:135
+msgid "Copy address"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/overview.js:189
+msgid ""
+"Copy the token from the 51DDNS console. Updating it keeps the saved device "
+"ID. A token from another account will be rejected until the device identity "
+"is migrated."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:1035
+msgid "Could not apply settings. Refresh the status and try again."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:656
+msgid "Could not load the product catalog. Try again."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:399
+msgid "Could not read the router status. Retrying."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:426
+msgid "Could not read the router status. Try again."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:636
+msgid "Could not verify your authorizations. Refresh your plans to continue."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:736
+msgid ""
+"Create a new device for this account? When you write the new token, this "
+"router will stop connecting as the old device. Existing domains stay with "
+"the old device."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:297
+msgid "Create an account"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/overview.js:226
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:541
+msgid "Current plan"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:877
+msgid "Device"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:869
+msgid "Device ID"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/overview.js:245
+msgid ""
+"Device limit reached. If this router already has a device record in the "
+"console, use its exact device ID to continue binding. Upgrade or purchase a "
+"plan only when adding another device."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/overview.js:242
+msgid "Device quota"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/overview.js:208
+msgid ""
+"Disable the agent and save first. Then enter the existing device ID and "
+"enable it again."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:871
+msgid "Disabled"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:573
+msgid "Domain limit"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:319
+msgid "Email address"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/overview.js:217
+msgid "Enable"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:1063
+msgid "Enable 51DDNS"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:799
+msgid ""
+"Enable a protected router management address using one domain from this "
+"device plan."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:871
+msgid "Enabled"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:761
+msgid "Enter a valid device ID."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/overview.js:199
+msgid "Enter a valid device UUID from the console."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/overview.js:176
+msgid ""
+"Enter your account token. For a device already created in the console, enter "
+"its exact device UUID below. Leave the ID blank for automatic registration "
+"only when this router has no saved device ID and your account has a free "
+"device slot."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/overview.js:191
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:749
+msgid "Existing device ID (optional)"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/overview.js:62
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:526
+msgid "Expired"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:546
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:575
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:613
+msgid "Expires"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/overview.js:229
+msgid "Expires at"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:885
+msgid "Export diagnostics"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:821
+msgid "Finish setup"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:769
+msgid "Force bind this router"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:680
+msgid "Free"
+msgstr ""
+
+#: applications/luci-app-51ddns/root/usr/share/rpcd/acl.d/luci-app-51ddns.json:3
+msgid "Grant access to the 51DDNS configuration"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:954
+msgid "Hidden"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:972
+msgid "Hide account token"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:717
+msgid "How to continue"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:526
+msgid "Last synced"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/overview.js:281
+msgid ""
+"Leave blank to detect uhttpd. Only an IP on this router is accepted; HTTPS "
+"uses its configured public certificate."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:1069
+msgid "Leave the local address blank to detect it automatically."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:570
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:612
+msgid "Linked to this device"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:528
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:658
+msgid "Loading product catalog…"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/overview.js:279
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:1051
+msgid "Local router Web address (optional)"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:801
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:812
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:813
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:828
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:879
+msgid "Management address"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/overview.js:227
+msgid "No active plan"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:645
+msgid ""
+"No authorization is available for this plan and period. Choose the same "
+"option in the console, then return and refresh."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:40
+msgid "No device slots are available on this account."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/overview.js:119
+msgid "No domain quota remains. Existing domains were not changed."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:60
+msgid "No management domain quota is available on the current plan."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:584
+msgid ""
+"No plan on this account can be used to bind this router. After adding a "
+"plan, refresh this list."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/overview.js:230
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:869
+msgid "Not bound"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:881
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:954
+msgid "Not configured"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/overview.js:34
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:877
+msgid "Not running"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:547
+msgid "Official plan specifications"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:868
+msgid "Offline"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:884
+msgid "Offline diagnosis"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:868
+msgid "Online"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:648
+msgid "Open 51DDNS console to purchase"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/overview.js:131
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:839
+msgid "Open router management"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/overview.js:161
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:963
+msgid "Open this LuCI page over HTTPS"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:721
+msgid "Original account email"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:321
+msgid "Password"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/overview.js:193
+msgid ""
+"Paste the exact UUID of the device created in the console. If verification "
+"failed before this router saved an identity, stop the agent to correct or "
+"clear this field. A saved router ID is never cleared here."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:545
+msgid "Plan"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:548
+msgid "Plan information is temporarily unavailable."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:711
+msgid "Plans on this account"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:698
+msgid "Product catalog"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:815
+msgid "Public HTTPS access test passed."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/overview.js:178
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/overview.js:181
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:1119
+msgid "Quick setup"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:966
+msgid "Reading the configured token…"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:706
+msgid "Refresh plans"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:791
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:803
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:886
+msgid "Refresh status"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:340
+msgid "Register"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:31
+msgid "Register / sign in"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:307
+msgid "Registration complete. Sign in to continue."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:870
+msgid "Remote management"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/overview.js:115
+msgid ""
+"Remote router management is disabled. A console-disabled or deleted entry is "
+"not recreated."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:550
+msgid "Renewal support"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/overview.js:248
+msgid "Router management"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/overview.js:129
+msgid "Router management address"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:58
+msgid "Router management is currently disabled on the server."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/overview.js:34
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:877
+msgid "Running"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:875
+msgid "Runtime status"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:1074
+msgid "Save and apply settings"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:528
+msgid "See the console for plan specifications."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:609
+msgid "Select a plan"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:633
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:753
+msgid "Selected plan"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:868
+msgid "Server connection"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/overview.js:221
+msgid "Service status"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:1089
+msgid "Set up your account, router and management domain here."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:1030
+msgid "Settings saved and applied."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:1107
+msgid "Setup complete"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:827
+msgid "Setup complete. Public HTTPS access was verified."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:238
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:245
+msgid "Setup could not continue. Please try again."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/overview.js:180
+msgid "Setup guide"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:1098
+msgid "Setup steps"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:970
+msgid "Show account token"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:308
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:340
+msgid "Sign in"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:720
+msgid ""
+"Sign in with the 51DDNS email originally linked to this router, then bind "
+"this device again."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:768
+msgid "Sign in with the original account"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:704
+msgid "Signed in"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:704
+msgid "Signed in as %s"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/overview.js:122
+msgid ""
+"Some published access addresses are not reachable yet. The management entry "
+"is not ready."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:830
+msgid "Start again"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:1091
+msgid "Start setup"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/overview.js:126
+msgid "Status is unavailable or expired."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/overview.js:43
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/overview.js:58
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/overview.js:126
+msgid "Synchronizing"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:31
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:818
+msgid "Test online"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:817
+msgid "Test the management address through all published relay addresses."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:53
+msgid "The 51DDNS Agent could not apply the settings."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:49
+msgid "The 51DDNS service is unavailable. Try again shortly."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:891
+msgid "The agent is online."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:890
+msgid ""
+"The agent is running without a recent online report. Check the account "
+"binding and network connection."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:889
+msgid "The agent is stopped. Check the token and service switch below."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:969
+msgid "The configured token could not be read."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:57
+msgid "The domain is assigned. Waiting for the public tunnel."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:37
+msgid "The invitation code is invalid or expired."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/overview.js:117
+msgid "The local management proxy port is already in use."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:64
+msgid "The local management proxy port is in use."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:67
+msgid "The management domain could not be verified."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/overview.js:114
+msgid ""
+"The management entry is reachable. Sign in with the owning account to open "
+"it."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:54
+msgid ""
+"The previous device settings could not be restored automatically. Check the "
+"router settings before continuing."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:365
+msgid "The public HTTPS test failed. Try again after the tunnel recovers."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/overview.js:121
+msgid ""
+"The relay limit cannot cover all access nodes. Increase the limit or disable "
+"router management."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:44
+msgid "The requested device differs from the identity saved on this router."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:61
+msgid "The router cannot connect to all required relay nodes."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:48
+msgid "The router could not reach 51DDNS securely. Try again shortly."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:52
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:1025
+msgid "The router could not save the settings."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:63
+msgid "The router web service could not be reached."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/overview.js:206
+msgid ""
+"The saved device identity could not be verified. Refresh the page before "
+"setting a device ID."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:42
+msgid "The selected plan is no longer available. Choose a plan again."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/overview.js:120
+msgid "The server has not enabled automatic router management yet."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:1065
+msgid "The setup wizard writes the token directly to the router."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:660
+msgid "There are no active products to display."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:644
+msgid ""
+"There is no usable authorization for this trial. Check its eligibility in "
+"the console."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:640
+msgid ""
+"This account has a matching authorization. Use it below to continue binding."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:41
+msgid "This account has reached its device limit."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:45
+msgid "This device is already associated with another installation."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:43
+msgid "This device is unavailable for the signed-in account."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:36
+msgid "This email is already registered. Continue to sign in."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:65
+msgid "This management domain is disabled."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:301
+msgid "This page uses HTTP. Only enter credentials on a trusted local network."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/overview.js:202
+msgid ""
+"This router already has a configured device ID. Changing it requires a "
+"separate migration."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/overview.js:204
+msgid ""
+"This router already has a saved device ID. Changing it requires a separate "
+"migration."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:50
+msgid ""
+"This router uses a custom control server. Setup requires the configured "
+"51DDNS service."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/overview.js:232
+msgid "Time remaining"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:403
+msgid "Timed out waiting for a new public HTTPS test. Try again."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:776
+msgid "Token saved. Waiting for this router to report online."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:38
+msgid "Too many attempts. Wait before trying again."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/overview.js:288
+msgid "Tunnel client"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/overview.js:99
+msgid ""
+"Tunnel client could not start. Retrying automatically; check the frpc "
+"installation."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/overview.js:101
+msgid ""
+"Tunnel client exited. Retrying automatically; the agent continues attempting "
+"device reporting."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/overview.js:285
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:546
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:872
+msgid "Unavailable"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:570
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:612
+msgid "Unused slot"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:66
+msgid "Update the 51DDNS Agent to continue."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:551
+msgid "Upgrade in the console"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/overview.js:123
+msgid "Upgrade the agent to support the current router management protocol."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:707
+msgid "Use a different account"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:587
+msgid "Use another plan on this account"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/overview.js:278
+msgid ""
+"Uses one domain from this device plan and requires the owning account to "
+"sign in."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:648
+msgid "View trial eligibility in 51DDNS console"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:51
+msgid "Wait until this device reports online before continuing."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:816
+msgid "Waiting for a new public HTTPS test from the router."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:802
+msgid "Waiting for the management domain."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:1088
+msgid "Welcome to 51DDNS"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:1074
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:1091
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:1109
+msgid "Working…"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:777
+msgid "Write the token securely to this router and start the 51DDNS Agent."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:31
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:780
+msgid "Write token"
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:779
+msgid ""
+"Writing the new token will switch this router to the new device. Access "
+"through the old device on this router will stop."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:39
+msgid "Your setup session expired. Sign in again to continue."
+msgstr ""
+
+#: applications/luci-app-51ddns/htdocs/luci-static/resources/view/51ddns/wizard.js:963
+msgid "to view and copy the account token."
+msgstr ""
