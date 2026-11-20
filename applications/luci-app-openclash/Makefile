@@ -16,25 +16,25 @@ define Package/$(PKG_NAME)/config
 	default y if PACKAGE_$(PKG_NAME)
 
 	config PACKAGE_kmod-nft-tproxy
-	default y if PACKAGE_firewall4
+	default y if PACKAGE_$(PKG_NAME) && PACKAGE_firewall4
 
 	config PACKAGE_kmod-ipt-nat
-	default y if ! PACKAGE_firewall4
+	default y if PACKAGE_$(PKG_NAME) && ! PACKAGE_firewall4
 
 	config PACKAGE_iptables-mod-tproxy
-	default y if ! PACKAGE_firewall4
+	default y if PACKAGE_$(PKG_NAME) && ! PACKAGE_firewall4
 
 	config PACKAGE_iptables-mod-extra
-	default y if ! PACKAGE_firewall4
+	default y if PACKAGE_$(PKG_NAME) && ! PACKAGE_firewall4
 
 	config PACKAGE_dnsmasq_full_ipset
-	default y if ! PACKAGE_firewall4
+	default y if PACKAGE_$(PKG_NAME) && ! PACKAGE_firewall4
 
 	config PACKAGE_dnsmasq_full_nftset
-	default y if PACKAGE_firewall4
+	default y if PACKAGE_$(PKG_NAME) && PACKAGE_firewall4
 
 	config PACKAGE_ipset
-	default y if ! PACKAGE_firewall4
+	default y if PACKAGE_$(PKG_NAME) && ! PACKAGE_firewall4
 endef
 
 define Package/$(PKG_NAME)
