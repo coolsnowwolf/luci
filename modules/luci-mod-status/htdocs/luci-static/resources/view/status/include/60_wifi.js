@@ -317,7 +317,7 @@ function normalizeIwinfoBitRate(rate) {
 	if (isNaN(rate) || rate <= 0)
 		return null;
 
-	return (rate > 100000) ? (rate / 1000) : rate;
+	return rate / 1000;
 }
 
 function getIwinfoInfoCandidates(net) {
@@ -889,7 +889,7 @@ return baseclass.extend({
 			E('div', { class: 'ifacebox-body left' }, [
 				L.itemlist(E('span'), [
 					_('Type'), getRadioDisplayType(radio, this.iwinfoInfoMap),
-					_('Bitrate'), rate ? '%d %s'.format(rate, _('Mbit/s')) : null,
+					_('Bitrate'), rate ? '%s %s'.format(rate, _('Mbit/s')) : null,
 					_('Channel'), chan ? '%d (%.3f %s)'.format(chan, freq, _('GHz')) : null,
 					_('Country Code'), coco ? '%s'.format(coco) : null,
 					_('Noise'), noise ? '%.2f %s'.format(noise, _('dBm')) : null,

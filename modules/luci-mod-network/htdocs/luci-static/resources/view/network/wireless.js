@@ -938,13 +938,13 @@ function getFrequencyListBand(entry, hwmode) {
 	return null;
 }
 
-function normalizeIwinfoBitRate(rate, inKbit = false) {
+function normalizeIwinfoBitRate(rate) {
 	rate = +rate;
 
 	if (isNaN(rate) || rate <= 0)
 		return null;
 
-	return (inKbit || rate > 100000) ? (rate / 1000) : rate;
+	return rate / 1000;
 }
 
 function getIwinfoInfoCandidates(radioNet) {
@@ -972,10 +972,9 @@ function getIwinfoInfoCandidates(radioNet) {
 }
 
 function getDisplayIwinfoBitRate(radioNet) {
-	const inKbit = isQcaWifiHwtype(uci.get('wireless', radioNet.getWifiDeviceName(), 'type'));
 	for (const candidate of getIwinfoInfoCandidates(radioNet)) {
 		const info = cachedIwinfoInfoMap ? cachedIwinfoInfoMap[candidate] : null;
-		const rate = normalizeIwinfoBitRate(info != null ? info.bitrate : null, inKbit);
+		const rate = normalizeIwinfoBitRate(info != null ? info.bitrate : null);
 
 		if (rate != null)
 			return rate;
