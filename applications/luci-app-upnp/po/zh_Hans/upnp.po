@@ -139,11 +139,11 @@ msgstr "剩余有效期"
 msgid "External Port"
 msgstr "外部端口"
 
-msgid "Force forwarding"
-msgstr "强制转发"
+msgid "Allow private IPv4"
+msgstr "允许私网 IPv4 地址"
 
-msgid "Force forwarding ports even the network is behind NAT"
-msgstr "即使网络位于 NAT 之后，也强制转发端口"
+msgid "Enable port forwarding when the WAN IPv4 address is private or reserved"
+msgstr "当 WAN IPv4 地址为私网或保留地址时启用端口转发"
 
 #: applications/luci-app-upnp/root/usr/share/rpcd/acl.d/luci-app-upnp.json:3
 msgid "Grant access to UPnP IGD & PCP/NAT-PMP"
