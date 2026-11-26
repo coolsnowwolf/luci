@@ -1,0 +1,173 @@
+#!/bin/sh
+
+. /usr/share/libubox/jshn.sh
+. /usr/share/51ddns/wizard.sh
+
+valid_device_id() {
+	[ "${#1}" -eq 36 ] && printf '%s\n' "$1" | grep -Eq '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$'
+}
+
+valid_report_time() {
+	printf '%s\n' "$1" | grep -Eq '^[2-9][0-9]{3}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\.[0-9]{1,9})?Z$'
+}
+
+read_device_identity() {
+	status_identity_state='unavailable'
+	status_device_id=''
+	if [ -L /etc/51ddns/device.id ] || { [ -e /etc/51ddns/device.id ] && [ ! -f /etc/51ddns/device.id ]; }; then
+		return
+	fi
+	if [ ! -e /etc/51ddns/device.id ]; then
+		status_identity_state='empty'
+		return
+	fi
+	status_device_id="$(cat /etc/51ddns/device.id 2> /dev/null)" || return
+	if [ -z "$status_device_id" ]; then
+		status_identity_state='empty'
+	elif valid_device_id "$status_device_id"; then
+		status_identity_state='saved'
+	else
+		status_device_id=''
+	fi
+}
+
+print_status() {
+	status_has_plan=0
+	status_product_code=''
+	status_product_name=''
+	status_expires_at=''
+	status_error_code=''
+	status_updated_at=''
+	status_payload=''
+	status_router_host=''
+	status_router_state=''
+	status_router_checked_at=''
+	status_reported_device=''
+	status_online=''
+	status_token_configured=0
+	[ -z "$(uci -q get 51ddns.main.account_token 2> /dev/null)" ] || status_token_configured=1
+	status_enabled=0
+	status_router_enabled=0
+	[ "$(wizard_get enabled)" != 1 ] || status_enabled=1
+	[ "$(wizard_get router_web)" != 1 ] || status_router_enabled=1
+	status_router_target="$(wizard_get router_web_target)"
+	valid_router_web_target "$status_router_target" || status_router_target=''
+
+	if [ -s /var/lib/51ddns/status.json ]; then
+		status_payload="$(cat /var/lib/51ddns/status.json 2> /dev/null)"
+		if json_load "$status_payload" 2> /dev/null; then
+			json_get_var status_error_code error_code
+			json_get_var status_updated_at updated_at
+			json_get_var status_reported_device device_id
+			json_get_var status_online online
+			if json_select router_web > /dev/null 2>&1; then
+				json_get_var status_router_host hostname
+				json_get_var status_router_state state
+				json_get_var status_router_checked_at checked_at
+				json_select ..
+			fi
+			if json_select plan > /dev/null 2>&1; then
+				status_has_plan=1
+				json_get_var status_product_code product_code
+				json_get_var status_product_name product_name
+				json_get_var status_expires_at expires_at
+			fi
+		fi
+		json_cleanup
+	fi
+
+	json_init
+	read_device_identity
+	json_add_string identity_state "$status_identity_state"
+	json_add_object router_web
+	case "$status_router_state" in
+	ready | assigned | disabled | detecting | target_unavailable | port_in_use | plan_required | domain_quota_exceeded | server_not_ready | verification_unavailable | relay_capacity_insufficient | public_unavailable | agent_upgrade_required) json_add_string state "$status_router_state" ;;
+	*) json_add_string state 'unavailable' ;;
+	esac
+	if printf '%s' "$status_router_host" | grep -Eq '^router-[0-9a-f]{32}\.cdn\.cloud\.toddns\.com$'; then
+		json_add_string hostname "$status_router_host"
+	fi
+	if valid_report_time "$status_router_checked_at"; then
+		json_add_string checked_at "$status_router_checked_at"
+	fi
+	json_close_object
+	json_add_boolean token_configured "$status_token_configured"
+	json_add_object settings
+	json_add_boolean enabled "$status_enabled"
+	json_add_boolean router_web "$status_router_enabled"
+	json_add_string router_web_target "$status_router_target"
+	json_close_object
+	if valid_device_id "$status_reported_device"; then
+		json_add_string device_id "$status_reported_device"
+	fi
+	case "$status_online" in 1 | true) json_add_boolean online 1 ;; *) json_add_boolean online 0 ;; esac
+	json_add_string updated_at "$status_updated_at"
+	json_add_string router_time "$(date -u +%Y-%m-%dT%H:%M:%SZ 2> /dev/null)"
+	if [ "$status_identity_state" = 'saved' ]; then
+		json_add_string saved_device_id "$status_device_id"
+	fi
+	if [ "$status_has_plan" = 1 ]; then
+		json_add_object plan
+		json_add_string product_code "$status_product_code"
+		json_add_string product_name "$status_product_name"
+		json_add_string expires_at "$status_expires_at"
+		json_close_object
+	fi
+	case "$status_error_code" in
+	device_quota_exceeded | frpc_config_write_failed | frpc_start_failed | frpc_process_exited) ;;
+	*) status_error_code='' ;;
+	esac
+	if [ -n "$status_error_code" ] && [ -n "$status_updated_at" ]; then
+		json_add_string error_code "$status_error_code"
+	fi
+	json_dump
+	json_cleanup
+}
+
+print_account_token() {
+	local token=''
+	# Only the write ACL grants this method; status and diagnostics stay redacted.
+	if wizard_pending_clean; then
+		token="$(wizard_get account_token)" || token=''
+	fi
+	json_init
+	json_add_string token "$token"
+	json_dump
+	json_cleanup
+}
+
+case "$1" in
+list)
+	echo '{"status":{},"info":{},"account_token":{},"wizard":{"action":"","email":"","password":"","invite_code":"","handle":"","device_id":"","plan_id":""},"settings":{"enabled":"","router_web":"","router_web_target":""}}'
+	;;
+call)
+	case "$2" in
+	status)
+		print_status
+		;;
+	info)
+		version="$(/usr/bin/51ddns-agent --version 2> /dev/null | head -n 1)"
+		json_init
+		json_add_string version "$version"
+		json_dump
+		json_cleanup
+		;;
+	account_token)
+		print_account_token
+		;;
+	wizard)
+		wizard_call
+		;;
+	settings)
+		wizard_call settings
+		;;
+	*)
+		echo '{"error":"method not found"}'
+		exit 1
+		;;
+	esac
+	;;
+*)
+	exit 1
+	;;
+esac
