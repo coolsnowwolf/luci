@@ -5222,6 +5222,11 @@ body.node-admin-services-dockerman-overview[data-page="admin-services-dockerman"
     max-width: 100%;
 }
 
+/* Give every flash action group the same label and control columns. */
+[data-page="admin-system-flash"] #maincontent .cbi-value > .cbi-section {
+    width: 100%;
+}
+
 @media screen and (max-width: 768px) {
     #maincontent .cbi-value > .cbi-section {
         width: 100%;
